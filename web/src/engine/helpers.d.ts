@@ -1,0 +1,19 @@
+// Generated: the ported engine is untyped; ./index.ts adds the types.
+export declare const V0: any;
+export declare const b4: any;
+export declare const v4: any;
+export declare const p6: any;
+export declare const k4: any;
+export declare const x4: any;
+export declare const Gm: any;
+export declare const Iu: any;
+export declare const gl: any;
+export declare const w4: any;
+export declare const T4: any;
+export declare const J0: any;
+export declare const m6: any;
+export declare const Lu: any;
+export declare const $0: any;
+export declare const Qm: any;
+export declare const z6: any;
+export declare const cv: any;

@@ -1,0 +1,100 @@
+@font-face {
+  font-family: "Lora";
+  src: url("../fonts/Lora-Variable.ttf") format("truetype");
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: 183 67 47;
+  --brand-soft: 248 231 224;
+  --brand-ink: 128 41 26;
+  --paper: 250 247 240;
+  --card: 255 255 255;
+  --ink: 33 29 26;
+  --ink-soft: 92 84 77;
+  --ink-faint: 150 141 132;
+  --line: 233 226 214;
+  --herb: 63 122 74;
+  --herb-soft: 226 240 226;
+  --warn: 196 120 18;
+  --warn-soft: 252 239 214;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --brand: 226 120 94;
+    --brand-soft: 66 36 30;
+    --brand-ink: 244 170 150;
+    --paper: 24 21 19;
+    --card: 35 31 28;
+    --ink: 240 234 226;
+    --ink-soft: 196 187 177;
+    --ink-faint: 140 131 122;
+    --line: 62 56 50;
+    --herb: 128 196 136;
+    --herb-soft: 30 52 34;
+    --warn: 236 176 80;
+    --warn-soft: 60 44 18;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --brand: 226 120 94;
+  --brand-soft: 66 36 30;
+  --brand-ink: 244 170 150;
+  --paper: 24 21 19;
+  --card: 35 31 28;
+  --ink: 240 234 226;
+  --ink-soft: 196 187 177;
+  --ink-faint: 140 131 122;
+  --line: 62 56 50;
+  --herb: 128 196 136;
+  --herb-soft: 30 52 34;
+  --warn: 236 176 80;
+  --warn-soft: 60 44 18;
+  color-scheme: dark;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+html.large-text { font-size: 18px; }
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+  overscroll-behavior-y: none;
+}
+h1, h2, h3 { @apply font-serif; }
+button { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid rgb(var(--brand)); outline-offset: 2px; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none; }
+  .btn-primary { @apply btn bg-brand text-white shadow-sm hover:brightness-105; }
+  .btn-soft { @apply btn bg-brand-soft text-brand-ink hover:brightness-[.98]; }
+  .btn-ghost { @apply btn text-ink-soft hover:bg-line/50; }
+  .btn-outline { @apply btn border border-line bg-card text-ink hover:bg-line/30; }
+  .chip { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-card px-3 py-1.5 text-sm text-ink transition active:scale-[.97]; }
+  .chip-on { @apply border-brand bg-brand-soft text-brand-ink; }
+  .card { @apply rounded-xl2 border border-line/70 bg-card shadow-card; }
+  .input { @apply w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-base text-ink placeholder:text-ink-faint focus:border-brand focus:outline-none; }
+  .label { @apply text-xs font-semibold uppercase tracking-wide text-ink-faint; }
+  .scroll-x { @apply flex gap-2 overflow-x-auto pb-1; scrollbar-width: none; }
+  .scroll-x::-webkit-scrollbar { display: none; }
+}
+
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-top { padding-top: env(safe-area-inset-top); }
+
+@keyframes sheet-in { from { transform: translateY(24px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+.anim-sheet { animation: sheet-in .22s ease-out; }
+.anim-fade { animation: fade-in .18s ease-out; }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgb(var(--brand) / .45) } 100% { box-shadow: 0 0 0 14px rgb(var(--brand) / 0) } }
+.listening { animation: pulse-ring 1.2s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-sheet, .anim-fade, .listening { animation: none; }
+}

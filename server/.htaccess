@@ -16,7 +16,7 @@ AddType text/javascript .js
   <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
     Header set Cache-Control "no-cache"
   </FilesMatch>
-  <FilesMatch "^app-[0-9a-f]+\.(js|css)$">
+  <FilesMatch "^(app|chunk)-[A-Za-z0-9_-]+\.(js|css)$">
     Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 </IfModule>
