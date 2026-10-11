@@ -31,7 +31,8 @@ if (isset($_GET['setup'])) {
     exit(($r['ok'] ?? false) ? "Готово: вебхук $url\n" : 'Telegram ответил: ' . json_encode($r, JSON_UNESCAPED_UNICODE) . "\n");
 }
 
-if ($token === '' || !hash_equals($secret, (string)($_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? ''))) { http_response_code(403); exit; }
+// Only Telegram knows the secret: without a proper one the bot stays off (an empty secret would let anyone post updates).
+if ($token === '' || strlen($secret) < 16 || !hash_equals($secret, (string)($_SERVER['HTTP_X_TELEGRAM_BOT_API_SECRET_TOKEN'] ?? ''))) { http_response_code(403); exit; }
 $update = json_decode((string)file_get_contents('php://input', false, null, 0, 64000), true);
 http_response_code(200);
 if (!is_array($update)) exit;
