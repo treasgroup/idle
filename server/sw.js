@@ -1,5 +1,5 @@
 // Offline shell. Paths are relative to the service worker scope, so the site can live in a subfolder.
-const CACHE="cook-shell-82c786ab20",IMAGES="cook-images-v2";
+const CACHE="cook-shell-v2",IMAGES="cook-images-v2";
 const SCOPE=new URL(self.registration.scope);
 const local=path=>new URL(path,SCOPE).href;
 const isApi=url=>url.pathname.startsWith(new URL("api/",SCOPE).pathname);

@@ -1,0 +1,24 @@
+{
+  "about": "Примерные цены для оценки стоимости блюд и меню, ₽. perKg — за килограмм (жидкости — за литр), perPiece — за штуку, aisle — запасная цена за кг по отделу, если продукта нет в списке. Цены сильно зависят от города и магазина: поправьте их под свой регион. Сайт показывает оценку со знаком «≈».",
+  "updated": "2026-10",
+  "perKg": {
+    "potato": 55, "onion": 45, "red-onion": 90, "carrot": 55, "cabbage": 45, "napa-cabbage": 140, "beet": 55, "tomato": 260, "cucumber": 220,
+    "bell-pepper": 380, "zucchini": 140, "eggplant": 250, "broccoli": 380, "cauliflower": 260, "pumpkin": 80, "garlic": 450, "ginger": 450,
+    "dill": 900, "parsley": 900, "green-onion": 900, "cilantro": 1000, "spinach": 1200, "romaine-lettuce": 600, "mushroom": 380, "lemon": 260,
+    "apple": 150, "banana": 150, "avocado": 900, "radish": 300,
+    "chicken-fillet": 470, "chicken-thigh-fillet": 430, "turkey-fillet": 650, "chicken-liver": 300, "minced-beef": 750, "minced-pork-beef": 520,
+    "pork": 480, "beef": 850, "bacon": 900, "ham": 750, "boiled-sausage": 550, "frankfurters": 550, "smoked-pork": 900,
+    "pollock-fillet": 450, "cod-fillet": 900, "salmon-fillet": 2200, "pink-salmon-fillet": 650, "mackerel-fillet": 700, "shrimp": 1300,
+    "canned-tuna": 800, "canned-pink-salmon": 700, "crab-sticks": 500,
+    "milk": 95, "kefir": 105, "sour-cream": 330, "cottage-cheese": 550, "cream": 380, "heavy-cream": 700, "plain-yogurt": 350, "butter": 1150,
+    "hard-cheese": 900, "processed-cheese": 600, "feta-cheese": 1100, "mozzarella": 1200, "cream-cheese": 1100, "mayonnaise": 350,
+    "rice": 140, "buckwheat": 120, "pasta": 160, "wheat-noodle": 160, "oat-flakes": 110, "wheat-flour": 65, "semolina": 90, "millet": 90,
+    "pearl-barley": 70, "bulgur": 220, "couscous": 300, "red-lentil": 200, "canned-beans": 350, "canned-chickpea": 400, "canned-corn": 400,
+    "canned-peas": 350, "canned-tomato": 300, "tomato-paste": 450, "frozen-peas": 300, "ramen-noodles": 450, "rice-noodles": 500,
+    "mung-bean-glass-noodles": 700, "wheat-tortilla": 450, "lavash": 250, "white-bread": 140, "rye-bread": 140, "breadcrumbs": 250,
+    "tofu": 650, "sugar": 90, "honey": 900, "vegetable-oil": 170, "sunflower-oil": 170, "soy-sauce": 400, "salt": 25,
+    "frozen-dumplings": 450, "frozen-potato-dumplings": 300, "canned-beef-stew": 900, "walnut": 1200, "raisins": 450, "cocoa-powder": 900
+  },
+  "perPiece": { "egg": 12 },
+  "aisle": { "veg": 200, "meat": 600, "fish": 800, "dairy": 500, "bread": 200, "grocery": 200, "canned": 450, "spices": 1500, "frozen": 400, "other": 400 }
+}

@@ -87,6 +87,13 @@ export function Profile({ pwa }: { pwa: Pwa }) {
             </button>
           ))}
         </div>
+        {profile.goals.includes("budget") && (
+          <label className="mt-4 flex items-center justify-between gap-3">
+            <span><span className="block">Бюджет на продукты в неделю</span><span className="block text-xs text-ink-faint">Меню покажет, укладывается ли оно</span></span>
+            <input type="number" inputMode="numeric" min={0} step={100} className="input w-32" placeholder="₽" value={profile.weeklyBudget || ""}
+              onChange={(e) => setProfile((p) => ({ ...p, weeklyBudget: Math.max(0, Math.min(100000, Math.round(Number(e.target.value) || 0))) }))} />
+          </label>
+        )}
         <div className="label mb-2 mt-5">Опыт</div>
         <div className="flex flex-wrap gap-2">{LEVELS.map((l) => <Chip key={l.id} on={profile.level === l.id} onClick={() => setProfile((p) => ({ ...p, level: l.id }))}>{l.label}</Chip>)}</div>
         <div className="mt-5 flex items-center justify-between"><span>Сколько человек едят</span><Stepper value={profile.eaters} min={1} max={12} onChange={(n) => { setProfile((p) => ({ ...p, eaters: n })); update((st) => ({ ...st, conditions: { ...st.conditions, servings: n } })); }} label="Едоков" /></div>

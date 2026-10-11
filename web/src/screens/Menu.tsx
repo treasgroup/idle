@@ -7,6 +7,21 @@ import {
 import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
+import { menuCost, rub, usePrices } from "../app/prices";
+import { courseOf, nutritionOf, type Recipe } from "../engine";
+import type { Profile } from "../app/profile";
+
+/** The person's goals narrow the dishes a menu is made of. */
+function goalFilter(p: Profile, cheaper = false): ((r: Recipe) => boolean) | undefined {
+  const tests: ((r: Recipe) => boolean)[] = [];
+  if (cheaper) tests.push((r) => r.budget === "low");
+  else if (p.goals.includes("budget")) tests.push((r) => r.budget !== "high");
+  if (p.goals.includes("light")) tests.push((r) => { const k = nutritionOf(r).perServing.kcal; return k > 0 && k <= 600; });
+  if (p.goals.includes("protein")) tests.push((r) => courseOf(r) === "breakfast" || nutritionOf(r).perServing.protein >= 20);
+  if (p.level === "beginner") tests.push((r) => r.difficulty !== "hard");
+  if (p.kids || p.goals.includes("family")) tests.push((r) => r.kids !== false);
+  return tests.length ? (r) => tests.every((t) => t(r)) : undefined;
+}
 import { RecipeImage, RecipeMeta } from "../components/RecipeCard";
 import { Chip, Empty, Section, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
@@ -21,17 +36,20 @@ export function Menu() {
   const today = dateKey(new Date());
   const days = weekDays(s.menu);
   const filled = days.some((d) => d.items.length);
-  const plan = s.menuPlan;
+  const prices = usePrices();
+  const plan = { ...s.menuPlan, only: goalFilter(profile) } as typeof s.menuPlan;
   const save = (menu: MenuDay[]) => update((st) => ({ ...st, menu: menu.filter((d) => d.date >= today && d.items.length).slice(0, 31) }));
 
   const shared = useMemo(() => (filled ? sharedPerishables(days) : []), [days, filled]);
   const leftovers = useMemo(() => (filled ? weekLeftovers(s, days) : []), [s, days, filled]);
 
-  const make = () => {
+  const make = (cheaper = false) => {
     const empty = days.map((d) => ({ date: d.date, items: [] }));
-    save(generateMenu(empty, s.preferences, servings, Date.now(), plan));
-    toast("Меню готово. Любое блюдо можно заменить.");
+    save(generateMenu(empty, s.preferences, servings, Date.now(), cheaper ? ({ ...plan, only: goalFilter(profile, true) } as typeof plan) : plan));
+    toast(cheaper ? "Собрал меню из бюджетных блюд." : "Меню готово. Любое блюдо можно заменить.");
   };
+  const cost = filled ? menuCost(prices, days) : null;
+  const overBudget = cost !== null && profile.weeklyBudget > 0 && cost > profile.weeklyBudget;
   const fill = () => save(generateMenu(days, s.preferences, servings, Date.now(), plan));
 
   const toShopping = () => {
@@ -74,14 +92,20 @@ export function Menu() {
           <Empty icon={<CalendarDays size={32} />} title="Составлю меню за секунду">
             Блюда без повторов, в будни — быстрые, с общими продуктами, чтобы ничего не пропадало. Список покупок соберётся сам.
           </Empty>
-          <div className="mt-4 px-4"><button className="btn-primary w-full py-3 text-base" onClick={make}><Sparkles size={18} /> Составить меню</button></div>
+          <div className="mt-4 px-4"><button className="btn-primary w-full py-3 text-base" onClick={() => make()}><Sparkles size={18} /> Составить меню</button></div>
         </>
       ) : (
         <>
           <div className="mt-4 grid grid-cols-2 gap-2 px-4">
             <button className="btn-primary" onClick={toShopping}><ShoppingCart size={17} /> В покупки</button>
-            <button className="btn-outline" onClick={make}><RefreshCw size={16} /> Новое меню</button>
+            <button className="btn-outline" onClick={() => make()}><RefreshCw size={16} /> Новое меню</button>
           </div>
+          {cost !== null && (
+            <div className={cx("mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl2 px-4 py-2.5 text-sm", overBudget ? "bg-warn-soft" : "bg-card shadow-card")}>
+              <span>Продукты на неделю: <b>{rub(cost)}</b>{profile.weeklyBudget > 0 && <span className="text-ink-faint"> · бюджет {profile.weeklyBudget.toLocaleString("ru-RU")} ₽</span>}</span>
+              <button className="shrink-0 font-semibold text-brand" onClick={() => make(true)}>Дешевле</button>
+            </div>
+          )}
 
           {(shared.length > 0 || leftovers.length > 0) && (
             <Section title={<span className="flex items-center gap-2"><Recycle size={18} className="text-herb" /> Без остатков</span>}>

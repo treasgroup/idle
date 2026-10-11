@@ -3211,7 +3211,8 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
       s / 4294967296
     ),
     o = { ...rn(t), servings: n },
-    l = Qe(F, o, t, 1 / 0)
+    // plan.only: the person's goals (budget, light, protein) narrow the dishes the menu is made of.
+    l = Qe(i.only ? F.filter(i.only) : F, o, t, 1 / 0)
       .map((R) => R.recipe)
       .map((R) => ({ r: R, k: r() }))
       .sort((R, T) => R.k - T.k)

@@ -23,12 +23,17 @@ const NAV: { tab: Tab; label: string; icon: typeof Sparkles }[] = [
   { tab: "pantry", label: "Дома", icon: Refrigerator },
 ];
 
+// The address the page was opened with (the links below are removed from it once handled).
+const OPENED_WITH = new URLSearchParams(location.search);
+
 /** Links from the old site and from shared messages: ?recipe=, ?tab=, #poll=, #family=, #login=, #privacy. */
 function useIncomingLinks(onPoll: (t: string) => void) {
-  const { sync, toast, ready } = useStore();
+  const { sync, toast, ready, catalog } = useStore();
   const { openRecipe } = useActions();
+  const loaded = catalog.version > 0;
   useEffect(() => {
-    if (!ready) return;
+    // A shared recipe link needs the full catalog, not only the recipes built into the app.
+    if (!ready || !loaded) return;
     const q = new URLSearchParams(location.search);
     const h = location.hash;
     const clean = () => history.replaceState(null, "", location.pathname + routeHash({ tab: "home" }));
@@ -42,7 +47,7 @@ function useIncomingLinks(onPoll: (t: string) => void) {
     if (tab || recipe) history.replaceState(null, "", location.pathname + location.hash);
     if (tab === "shopping" || tab === "menu" || tab === "recipes") replace(routeHash({ tab: tab as Tab }));
     if (recipe) openRecipe(recipe);
-  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ready, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export function App() {
@@ -53,7 +58,7 @@ export function App() {
   const [onboarding, setOnboarding] = useState(false);
   useIncomingLinks(setPoll);
   useEffect(() => {
-    if (ready && !profile.setUp && s.onboarding === "new" && !new URLSearchParams(location.search).has("recipe")) setOnboarding(true);
+    if (ready && !profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=")) setOnboarding(true);
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { window.scrollTo(0, 0); }, [route.tab]);
 
