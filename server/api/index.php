@@ -1,0 +1,183 @@
+<?php
+// "Что приготовить?" API. All routes: api/index.php?r=<route>
+declare(strict_types=1);
+require __DIR__ . '/_private/lib.php';
+require __DIR__ . '/_private/providers.php';
+require __DIR__ . '/_private/admin.php';
+require __DIR__ . '/_private/accounts.php';
+require __DIR__ . '/_private/reviews.php';
+require __DIR__ . '/_private/push.php';
+require __DIR__ . '/_private/polls.php';
+
+const VERSION = '0.33.4';
+// The site's time zone first: event days, «today» in the statistics and reminders all count in it.
+try { config(); } catch (Throwable $e) {}
+$route = isset($_GET['r']) ? (string)$_GET['r'] : '';
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+try {
+    if ($route === 'status' && $method === 'GET') {
+        // Reminders without cron: after answering, a few due ones are sent (at most once a minute).
+        register_shutdown_function(function () { if (function_exists('fastcgi_finish_request')) fastcgi_finish_request(); push_opportunistic(); });
+        $dbOk = true;
+        try { db(); } catch (Throwable $e) { $dbOk = false; }
+        send_json(['aiReady' => $dbOk && intent_ready(), 'voiceReady' => $dbOk && speech_ready(), 'version' => VERSION]);
+    }
+    elseif ($route === 'health' && $method === 'GET') {
+        // Setup check for the site owner. Shows no secrets.
+        $storage = rtrim(config()['storage_dir'], '/\\');
+        $dbError = null;
+        try { db(); } catch (Throwable $e) { $dbError = $e->getMessage(); }
+        send_json([
+            'php' => PHP_VERSION, 'phpOk' => version_compare(PHP_VERSION, '7.4.0', '>='),
+            'sqlite' => class_exists('PDO') && in_array('sqlite', PDO::getAvailableDrivers(), true),
+            'curl' => function_exists('curl_init'), 'mbstring' => function_exists('mb_substr'),
+            'configFile' => is_file(__DIR__ . '/_private/config.php'),
+            'storageWritable' => is_dir($storage) ? is_writable($storage) : is_writable(dirname($storage)),
+            'database' => $dbError ?? 'ok',
+            'intentProvider' => config()['intent_provider'], 'intentReady' => intent_ready(),
+            'speechProvider' => config()['speech_provider'], 'speechReady' => speech_ready(),
+            'https' => is_https(),
+            // Every server file loaded in full: a file cut short or emptied during an upload shows up here.
+            'modules' => ['lib' => function_exists('catalog_files'), 'admin' => function_exists('setting') && function_exists('admin_status') && defined('RECIPE_ID'), 'accounts' => function_exists('legal_info'), 'reviews' => function_exists('reviews_list'), 'push' => function_exists('push_run'), 'polls' => function_exists('poll_vote'), 'providers' => function_exists('intent_ready')],
+            'files' => array_map(function ($f) { $p = __DIR__ . '/_private/' . $f; return is_file($p) ? filesize($p) : 0; }, ['lib.php' => 'lib.php', 'admin.php' => 'admin.php', 'accounts.php' => 'accounts.php', 'reviews.php' => 'reviews.php', 'push.php' => 'push.php', 'polls.php' => 'polls.php', 'providers.php' => 'providers.php']),
+        ]);
+    }
+    elseif ($route === 'session' && $method === 'POST') {
+        create_session();
+    }
+    elseif ($route === 'recommendations' && $method === 'POST') {
+        require_same_origin();
+        $body = read_json_body();
+        validate_recommendation_request($body);
+        if (!intent_ready()) throw new ApiError(503, 'ai_not_configured', 'ИИ пока не подключён.');
+        $result = paid_operation($body['operationId'], 'intent', hash('sha256', json_encode($body, JSON_UNESCAPED_UNICODE)), function () use ($body) {
+            $patch = extract_intent($body);
+            return ['patch' => $patch, 'reply' => $patch['reply']];
+        });
+        send_json($result);
+    }
+    elseif ($route === 'transcriptions' && $method === 'POST') {
+        require_same_origin();
+        if (!speech_ready()) throw new ApiError(503, 'ai_not_configured', 'Распознавание на сервере не подключено. Напишите запрос текстом.');
+        if ((int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 6 * 1024 * 1024) throw new ApiError(413, 'audio_size', 'Запись слишком большая.');
+        $file = $_FILES['audio'] ?? null;
+        $id = $_POST['operationId'] ?? '';
+        $duration = (float)($_POST['duration'] ?? 0);
+        if (!$file || ($file['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name']) || $file['size'] <= 0 || $file['size'] > 5 * 1024 * 1024 || !is_uuid($id) || $duration < 0.2 || $duration > 61)
+            throw new ApiError(400, 'audio', 'Нужна запись до 60 секунд и 5 МБ.');
+        $mime = (string)($file['type'] ?? '');
+        if (!preg_match('#^(audio/(webm|mp4|ogg|wav|mpeg|x-m4a)|video/webm)#', $mime)) throw new ApiError(415, 'audio_type', 'Этот формат записи не поддерживается.');
+        $ext = strpos($mime, 'mp4') !== false || strpos($mime, 'm4a') !== false ? 'm4a' : (strpos($mime, 'ogg') !== false ? 'ogg' : (strpos($mime, 'wav') !== false ? 'wav' : (strpos($mime, 'mpeg') !== false ? 'mp3' : 'webm')));
+        $tmp = $file['tmp_name'];
+        $result = paid_operation($id, 'speech', hash('sha256', $id . '|' . hash_file('sha256', $tmp)), function () use ($tmp, $mime, $ext) {
+            return transcribe($tmp, preg_replace('/;.*$/', '', $mime), 'voice.' . $ext);
+        });
+        send_json($result);
+    }
+    elseif ($route === 'feedback' && $method === 'POST') {
+        require_same_origin();
+        $v = read_json_body(2000);
+        $recipeIds = array_column(catalog_recipes(), 'id');
+        if (!in_array($v['value'] ?? '', ['cooked', 'liked', 'not_now', 'too_hard', 'dislike_ingredient', 'like', 'dislike'], true) || !in_array($v['recipeId'] ?? '', $recipeIds, true) || !is_uuid($v['operationId'] ?? ''))
+            throw new ApiError(400, 'validation', 'Неверная оценка.');
+        $sid = current_session();
+        db()->prepare('INSERT OR IGNORE INTO feedback (session_id, id, recipe_id, value, created_at) VALUES (?, ?, ?, ?, ?)')->execute([$sid, $v['operationId'], $v['recipeId'], $v['value'], now_ms()]);
+        send_json(['saved' => true]);
+    }
+    elseif ($route === 'catalog' && $method === 'GET') {
+        // Files are passed through as written (so {} stays an object); the app validates every entry.
+        $parts = [];
+        foreach (catalog_files() as $f) $parts[] = isset($f['error'])
+            ? json_encode(['name' => $f['name'], 'error' => $f['error']], JSON_UNESCAPED_UNICODE)
+            : '{"name":' . json_encode($f['name'], JSON_UNESCAPED_UNICODE) . ',"data":' . $f['raw'] . '}';
+        http_response_code(200);
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-cache');
+        // Recipes hidden by the owner and photo versions (so a replaced photo is not taken from the browser cache).
+        $hidden = []; $taught = []; try { $hidden = setting('hidden', []); $taught = setting('taught', []); } catch (Throwable $e) {}
+        $photos = photo_versions();
+        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . '}';
+    }
+    elseif ($route === 'event' && $method === 'POST') {
+        require_same_origin();
+        record_events(read_json_body(12000));
+    }
+    // ---------- Accounts without registration, households (семья) ----------
+    elseif ($route === 'account.init' && $method === 'POST') account_init();
+    elseif ($route === 'account.state' && $method === 'GET') account_state_route();
+    elseif ($route === 'account.save' && $method === 'POST') account_save(read_json_body(HOUSEHOLD_MAX + 20000));
+    elseif ($route === 'account.code' && $method === 'POST') account_code();
+    elseif ($route === 'account.login' && $method === 'POST') account_login(read_json_body(2000));
+    elseif ($route === 'account.delete' && $method === 'POST') account_delete();
+    elseif ($route === 'household.invite' && $method === 'POST') household_invite();
+    elseif ($route === 'household.join' && $method === 'POST') household_join(read_json_body(2000));
+    elseif ($route === 'household.leave' && $method === 'POST') household_leave();
+    elseif ($route === 'legal' && $method === 'GET') { $l = legal_info(); send_json($l); }
+    elseif ($route === 'admin.legal' && $method === 'POST') { require_admin(true); admin_legal(read_json_body(2000)); }
+    // ---------- Family poll «Что хотите на ужин?» ----------
+    elseif ($route === 'poll.create' && $method === 'POST') poll_create(read_json_body(4000));
+    elseif ($route === 'poll.get' && $method === 'POST') poll_get(read_json_body(1000));
+    elseif ($route === 'poll.vote' && $method === 'POST') poll_vote(read_json_body(1000));
+    // ---------- Reminders (web push) ----------
+    elseif ($route === 'push.key' && $method === 'GET') push_key_route();
+    elseif ($route === 'push.subscribe' && $method === 'POST') push_subscribe(read_json_body(8000));
+    elseif ($route === 'push.unsubscribe' && $method === 'POST') push_unsubscribe(read_json_body(2000));
+    elseif ($route === 'push.next' && $method === 'POST') push_next(read_json_body(2000));
+    elseif ($route === 'push.test' && $method === 'POST') push_test(read_json_body(2000));
+    elseif ($route === 'push.cron' && $method === 'GET') push_cron();
+    // ---------- Reviews: stars, text, photos, likes, replies ----------
+    elseif ($route === 'reviews.list' && $method === 'GET') reviews_list();
+    elseif ($route === 'reviews.ratings' && $method === 'GET') reviews_ratings();
+    elseif ($route === 'reviews.save' && $method === 'POST') reviews_save();
+    elseif ($route === 'reviews.delete' && $method === 'POST') reviews_delete(read_json_body(2000));
+    elseif ($route === 'reviews.like' && $method === 'POST') reviews_like(read_json_body(2000));
+    elseif ($route === 'reviews.reply' && $method === 'POST') reviews_reply(read_json_body(8000));
+    elseif ($route === 'reviews.reply.delete' && $method === 'POST') reviews_reply_delete(read_json_body(2000));
+    elseif ($route === 'reviews.report' && $method === 'POST') reviews_report(read_json_body(2000));
+    elseif ($route === 'admin.reviews' && $method === 'GET') { require_admin(); admin_reviews(); }
+    elseif ($route === 'admin.review' && $method === 'POST') { require_admin(true); admin_review_action(read_json_body(2000)); }
+    elseif ($route === 'admin.reviews.settings' && $method === 'POST') { require_admin(true); admin_reviews_settings(read_json_body(2000)); }
+    // ---------- Admin panel (admin/index.html) ----------
+    elseif ($route === 'admin.status' && $method === 'GET') admin_status();
+    elseif ($route === 'admin.login' && $method === 'POST') admin_login(read_json_body(2000));
+    elseif ($route === 'admin.logout' && $method === 'POST') admin_logout();
+    elseif ($route === 'admin.hash' && $method === 'POST') admin_hash(read_json_body(2000));
+    elseif ($route === 'admin.stats' && $method === 'GET') { require_admin(); admin_stats((int)($_GET['days'] ?? 30)); }
+    // Forget one query in the statistics ("абвгд", a test, a query already answered by a new recipe).
+    elseif ($route === 'admin.stats.forget' && $method === 'POST') { require_admin(true); $b = read_json_body(2000); $text = $b['text'] ?? null;
+        if (!is_string($text) || $text === '' || strlen($text) > 600) throw new ApiError(400, 'validation', 'Нет текста запроса.');
+        $st = db()->prepare("DELETE FROM events WHERE type = 'query' AND norm = ?" . (($b['only'] ?? '') === 'failed' ? ' AND value <= 0' : ''));
+        $st->execute([$text]); send_json(['deleted' => $st->rowCount()]); }
+    elseif ($route === 'admin.stats.clear' && $method === 'POST') { require_admin(true); db()->exec('DELETE FROM events'); db()->exec('DELETE FROM page_views'); send_json(['cleared' => true]); }
+    elseif ($route === 'admin.files' && $method === 'GET') { require_admin(); admin_files(); }
+    elseif ($route === 'admin.file.save' && $method === 'POST') { require_admin(true); admin_file_save(read_json_body(3500000)); }
+    elseif ($route === 'admin.file.delete' && $method === 'POST') { require_admin(true); admin_file_delete(read_json_body(2000)); }
+    elseif ($route === 'admin.backups' && $method === 'GET') { require_admin(); admin_backups((string)($_GET['name'] ?? '')); }
+    elseif ($route === 'admin.backup.restore' && $method === 'POST') { require_admin(true); admin_backup_restore(read_json_body(2000)); }
+    elseif ($route === 'admin.hidden' && $method === 'POST') { require_admin(true); admin_hidden(read_json_body(100000)); }
+    elseif ($route === 'admin.photo.upload' && $method === 'POST') { require_admin(true); admin_photo_upload(); }
+    elseif ($route === 'admin.photo.real' && $method === 'POST') { require_admin(true); admin_photo_real(read_json_body(2000)); }
+    elseif ($route === 'admin.photo.delete' && $method === 'POST') { require_admin(true); admin_photo_delete(read_json_body(2000)); }
+    elseif ($route === 'admin.taught' && $method === 'GET') { require_admin(); send_json(['taught' => setting('taught', [])]); }
+    elseif ($route === 'admin.teach' && $method === 'POST') { require_admin(true); admin_teach(read_json_body(4000)); }
+    else {
+        throw new ApiError(404, 'not_found', 'Неизвестный адрес API.');
+    }
+} catch (Throwable $e) {
+    fail($e);
+}
+
+function validate_recommendation_request(array $b): void {
+    $bad = new ApiError(400, 'validation', 'Проверьте запрос: до 2000 символов, от 1 до 12 порций.');
+    if (!is_uuid($b['operationId'] ?? null) || !is_string($b['message'] ?? null)) throw $bad;
+    $len = function_exists('mb_strlen') ? mb_strlen(trim($b['message'])) : strlen(trim($b['message']));
+    if ($len < 1 || $len > 2000) throw $bad;
+    $ids = function ($v) { if (!is_array($v) || count($v) > 80) return false; foreach ($v as $x) if (!is_string($x) || strlen($x) > 64) return false; return true; };
+    $c = $b['conditions'] ?? null; $p = $b['preferences'] ?? null; $h = $b['history'] ?? null;
+    if (!is_array($c) || !is_array($p) || !is_array($h) || count($h) > 10) throw $bad;
+    foreach (['desired', 'available', 'absent', 'excluded', 'appliances'] as $k) if (!$ids($c[$k] ?? null)) throw $bad;
+    if (!is_int($c['servings'] ?? null) || $c['servings'] < 1 || $c['servings'] > 12) throw $bad;
+    if (!$ids($p['excluded'] ?? null) || !$ids($p['appliances'] ?? null)) throw $bad;
+    foreach ($h as $m) if (!is_array($m) || !in_array($m['role'] ?? '', ['user', 'assistant'], true) || !is_string($m['text'] ?? null) || strlen($m['text']) > 8000) throw $bad;
+}

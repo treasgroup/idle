@@ -1,0 +1,7 @@
+# Owner's admin panel: not indexed, never cached.
+DirectoryIndex index.html
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+  Header set Cache-Control "no-store"
+  Header set Referrer-Policy "no-referrer"
+</IfModule>

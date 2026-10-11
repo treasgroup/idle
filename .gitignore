@@ -1,0 +1,12 @@
+# Secrets and user data never go to git
+server/api/_private/config.php
+server/api/_private/storage/*
+!server/api/_private/storage/.htaccess
+server/photos/
+server/data/backups/
+
+# Build tooling
+node_modules/
+web/dist/
+*.log
+.DS_Store

@@ -1,0 +1,46 @@
+# "Что приготовить?" — Apache settings. Works without mod_rewrite.
+DirectoryIndex index.html
+Options -Indexes
+AddDefaultCharset utf-8
+AddType application/manifest+json .webmanifest
+AddType text/javascript .js
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Microphone is needed for voice input on this site only.
+  Header always set Permissions-Policy "microphone=(self), camera=(), geolocation=()"
+  # Own security policy for this app. Replaces one inherited from a parent folder
+  Header unset Content-Security-Policy
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'; font-src 'self'; upgrade-insecure-requests"
+  <FilesMatch "^(index\.html|sw\.js|manifest\.webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "^app-[0-9a-f]+\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json application/manifest+json image/svg+xml
+</IfModule>
+
+# Recipe pages for search engines: /recipe/<id>, /recipes/, /recipes/<kind>, /sitemap.xml.
+# Without mod_rewrite the same pages work as recipe.php?id=<id>, recipes.php, sitemap.php.
+# COOK_PRETTY tells the pages that the short addresses work. Rules of the parent folder still apply.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteOptions Inherit
+  RewriteRule ^ - [E=COOK_PRETTY:1]
+  RewriteRule ^recipe/([a-z0-9-]+)/?$ recipe.php?id=$1 [L,QSA]
+  RewriteRule ^recipes/?$ recipes.php [L,QSA]
+  RewriteRule ^recipes/([a-z]+)/?$ recipes.php?c=$1 [L,QSA]
+  RewriteRule ^sitemap\.xml$ sitemap.php [L]
+</IfModule>
+
+# Uncomment to force HTTPS (voice input and installation as an app require HTTPS):
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} off
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>

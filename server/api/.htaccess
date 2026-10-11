@@ -1,0 +1,11 @@
+Options -Indexes
+DirectoryIndex index.php
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store"
+  Header set X-Content-Type-Options "nosniff"
+</IfModule>
+<FilesMatch "^\.user\.ini$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</FilesMatch>
