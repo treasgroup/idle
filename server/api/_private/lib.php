@@ -17,6 +17,9 @@ function config(): array {
         'storage_dir' => __DIR__ . '/storage',
         'admin_password_hash' => '', 'admin_password' => '',
         'timezone' => 'Asia/Yekaterinburg',
+        'partners' => [],
+        'telegram' => ['token' => '', 'secret' => ''],
+        'alice' => ['skill_id' => ''],
     ];
     $file = __DIR__ . '/config.php';
     $user = is_file($file) ? require $file : [];

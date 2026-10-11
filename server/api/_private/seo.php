@@ -169,7 +169,7 @@ function seo_head(array $o): string {
 }
 function seo_header(): string {
     $p = h(seo_path());
-    return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}favicon.svg\" alt=\"\" width=\"32\" height=\"32\"><span>" . h(SEO_SITE) . "</span></a><nav><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a class=\"pill\" href=\"$p\">Подобрать блюдо</a></nav></div></header>\n<main class=\"wrap\">\n";
+    return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}favicon.svg\" alt=\"\" width=\"32\" height=\"32\"><span>" . h(SEO_SITE) . "</span></a><nav><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_combo_path('')) . "\">По продуктам</a><a class=\"pill\" href=\"$p\">Подобрать блюдо</a></nav></div></header>\n<main class=\"wrap\">\n";
 }
 function seo_footer(): string {
     $p = h(seo_path());
@@ -365,6 +365,9 @@ function seo_sitemap(): void {
     $courses = [];
     foreach ($all as $r) $courses[$r['_course']] = max($courses[$r['_course']] ?? 0, (int)$r['_mtime']);
     foreach (SEO_COURSES as $c => $_) if (isset($courses[$c])) $url(seo_abs(seo_list_path($c)), $courses[$c]);
+    $url(seo_abs(seo_combo_path('')), $newest);
+    foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
+    foreach (seo_combo_pairs() as [$a, $b]) $url(seo_abs(seo_combo_path($a, $b)), $newest);
     foreach ($all as $r) {
         $p = seo_photo($r['id']);
         $url(seo_abs(seo_recipe_path($r['id'])), max((int)$r['_mtime'], $p['mtime'] ?? 0), $p ? '<image:image><image:loc>' . $x(seo_abs($p['path'])) . '</image:loc></image:image>' : '');
@@ -381,4 +384,105 @@ function seo_run(callable $page): void {
         if (!headers_sent()) { http_response_code(503); header('Content-Type: text/html; charset=utf-8'); header('Retry-After: 120'); }
         echo '<!doctype html><meta charset="utf-8"><title>' . h(SEO_SITE) . '</title><p>Страница временно недоступна. <a href="' . h(seo_path()) . '">Открыть «' . h(SEO_SITE) . '»</a></p>';
     }
+}
+
+// ---------- combo.php: "что приготовить из X и Y" ----------
+// Pages for what people actually search: one product or a pair of products, with every recipe that has them.
+// Only combinations with at least SEO_COMBO_MIN recipes get a page, so there are no thin pages.
+const SEO_COMBO_MIN = 3;
+const SEO_COMBO_SKIP = ['water', 'salt', 'black-pepper', 'sugar', 'vegetable-oil', 'sunflower-oil', 'bay-leaf', 'wheat-flour', 'butter'];
+
+function seo_combo_path(string $a, ?string $b = null): string {
+    if ($b !== null && strcmp($a, $b) > 0) [$a, $b] = [$b, $a];
+    if (seo_pretty()) return seo_path() . 'iz/' . $a . ($b ? '/' . $b : '');
+    return seo_path() . 'combo.php?a=' . $a . ($b ? '&b=' . $b : '');
+}
+/** Short product name for headings: "картофель", "говяжий фарш". */
+function seo_ing_name(string $id): string {
+    $ing = catalog_ingredients()[$id] ?? null;
+    if (!$ing) return $id;
+    foreach ((array)($ing['aliases'] ?? []) as $a) if (mb_strlen($a, 'UTF-8') <= 22 && !preg_match('/\d/', $a)) return mb_strtolower($a, 'UTF-8');
+    return mb_strtolower(preg_replace('/,.*$/u', '', (string)$ing['name']), 'UTF-8');
+}
+function seo_ucfirst(string $s): string { return mb_strtoupper(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8'); }
+/** [ingredient id => [recipe ids]] for products worth a page. */
+function seo_combo_index(): array {
+    static $idx = null;
+    if ($idx !== null) return $idx;
+    $idx = [];
+    foreach (seo_recipes() as $r) foreach ($r['ingredients'] as $i) {
+        $id = (string)($i['id'] ?? '');
+        if ($id === '' || !empty($i['optional']) || in_array($id, SEO_COMBO_SKIP, true)) continue;
+        $idx[$id][$r['id']] = true;
+    }
+    $idx = array_filter(array_map('array_keys', $idx), fn($l) => count($l) >= SEO_COMBO_MIN);
+    return $idx;
+}
+/** Pairs with enough recipes, most recipes first. */
+function seo_combo_pairs(int $limit = 1500): array {
+    $idx = seo_combo_index(); $ids = array_keys($idx); $pairs = [];
+    for ($i = 0; $i < count($ids); $i++) for ($j = $i + 1; $j < count($ids); $j++) {
+        $n = count(array_intersect($idx[$ids[$i]], $idx[$ids[$j]]));
+        if ($n >= SEO_COMBO_MIN) { [$a, $b] = strcmp($ids[$i], $ids[$j]) < 0 ? [$ids[$i], $ids[$j]] : [$ids[$j], $ids[$i]]; $pairs[] = [$a, $b, $n]; }
+    }
+    usort($pairs, fn($x, $y) => $y[2] <=> $x[2]);
+    return array_slice($pairs, 0, $limit);
+}
+function seo_combo_page(string $a, ?string $b): void {
+    $idx = seo_combo_index();
+    if ($a === '' && $b === null) { seo_combo_list(); return; }
+    if (!isset($idx[$a]) || ($b !== null && (!isset($idx[$b]) || $a === $b))) { seo_not_found(); return; }
+    if ($b !== null && strcmp($a, $b) > 0) { header('Location: ' . seo_combo_path($b, $a), true, 301); return; }
+    $all = seo_recipes();
+    $ids = $b ? array_values(array_intersect($idx[$a], $idx[$b])) : $idx[$a];
+    if (count($ids) < SEO_COMBO_MIN) { seo_not_found(); return; }
+    $list = array_map(fn($id) => $all[$id], $ids);
+    usort($list, fn($x, $y) => ((int)$x['totalMinutes'] <=> (int)$y['totalMinutes']) ?: strcmp($x['title'], $y['title']));
+    $n = count($list);
+    $names = $b ? seo_ing_name($a) . ' и ' . seo_ing_name($b) : seo_ing_name($a);
+    $quick = count(array_filter($list, fn($r) => (int)$r['totalMinutes'] <= 30));
+    $title = seo_ucfirst($names) . ': что приготовить — ' . $n . ' ' . seo_plural($n, 'рецепт', 'рецепта', 'рецептов');
+    $desc = 'Что приготовить, если дома есть ' . $names . ': ' . $n . ' ' . seo_plural($n, 'домашний рецепт', 'домашних рецепта', 'домашних рецептов')
+        . ($quick ? ', из них ' . $quick . ' — за 30 минут и быстрее' : '') . '. Время, ингредиенты, шаги и калорийность.';
+    $canonical = seo_abs(seo_combo_path($a, $b));
+    $ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => $title, 'numberOfItems' => $n,
+        'itemListElement' => array_values(array_map(fn($r, $k) => ['@type' => 'ListItem', 'position' => $k + 1, 'url' => seo_abs(seo_recipe_path($r['id'])), 'name' => (string)$r['title']], $list, array_keys($list)))];
+    header('Content-Type: text/html; charset=utf-8');
+    header('Cache-Control: public, max-age=600');
+    echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
+    echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_combo_path('')) . '">Что приготовить из продуктов</a>' . ($b ? ' › <a href="' . h(seo_combo_path($a)) . '">' . h(seo_ucfirst(seo_ing_name($a))) . '</a>' : '') . "</nav>\n";
+    echo '<h1>' . h(seo_ucfirst($names)) . ': что приготовить</h1><p class="lead">' . h($desc) . "</p>\n";
+    echo '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — подберём блюдо и посчитаем, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Подобрать по продуктам</a></div>\n";
+    echo '<ul class="grid">';
+    foreach ($list as $r) echo seo_card($r, true);
+    echo "</ul>\n";
+    // Neighbours: other products that go with this one.
+    $with = [];
+    foreach ($idx as $other => $rs) {
+        if ($other === $a || $other === $b) continue;
+        $k = count(array_intersect($ids, $rs));
+        if ($k >= SEO_COMBO_MIN) $with[$other] = $k;
+    }
+    arsort($with);
+    if ($with) {
+        echo '<h2>' . ($b ? 'А если есть ещё' : 'С чем ещё ' . h(seo_ing_name($a))) . '</h2><ul class="cats">';
+        foreach (array_slice($with, 0, 24, true) as $other => $k) echo '<li><a href="' . h($b ? seo_combo_path($other) : seo_combo_path($a, $other)) . '">' . h(seo_ing_name($other)) . ' · ' . $k . '</a></li>';
+        echo "</ul>\n";
+    }
+    echo seo_footer();
+}
+function seo_combo_list(): void {
+    $idx = seo_combo_index();
+    uasort($idx, fn($x, $y) => count($y) <=> count($x));
+    $title = 'Что приготовить из того, что есть дома — рецепты по продуктам';
+    $desc = 'Выберите продукт, который есть дома, — покажем все рецепты с ним и удачные сочетания: картофель и фарш, курица и рис, яйца и сыр.';
+    header('Content-Type: text/html; charset=utf-8');
+    header('Cache-Control: public, max-age=600');
+    echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => seo_abs(seo_combo_path(''))]);
+    echo '<h1>Что приготовить из того, что есть дома</h1><p class="lead">' . h($desc) . "</p>\n";
+    echo '<ul class="cats">';
+    foreach ($idx as $id => $rs) echo '<li><a href="' . h(seo_combo_path($id)) . '">' . h(seo_ing_name($id)) . ' · ' . count($rs) . '</a></li>';
+    echo "</ul>\n<h2>Популярные сочетания</h2><ul class=\"cats\">";
+    foreach (seo_combo_pairs(60) as [$x, $y, $n]) echo '<li><a href="' . h(seo_combo_path($x, $y)) . '">' . h(seo_ing_name($x) . ' и ' . seo_ing_name($y)) . ' · ' . $n . '</a></li>';
+    echo "</ul>\n" . seo_footer();
 }

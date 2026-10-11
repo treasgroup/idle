@@ -8,6 +8,7 @@ require __DIR__ . '/_private/accounts.php';
 require __DIR__ . '/_private/reviews.php';
 require __DIR__ . '/_private/push.php';
 require __DIR__ . '/_private/polls.php';
+require __DIR__ . '/_private/partners.php';
 
 const VERSION = '0.33.4';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
@@ -119,6 +120,9 @@ try {
     elseif ($route === 'poll.create' && $method === 'POST') poll_create(read_json_body(4000));
     elseif ($route === 'poll.get' && $method === 'POST') poll_get(read_json_body(1000));
     elseif ($route === 'poll.vote' && $method === 'POST') poll_vote(read_json_body(1000));
+    // ---------- Delivery partners for the shopping list ----------
+    elseif ($route === 'partners' && $method === 'GET') partners_route();
+    elseif ($route === 'go' && $method === 'GET') partner_go((string)($_GET['to'] ?? ''));
     // ---------- Reminders (web push) ----------
     elseif ($route === 'push.key' && $method === 'GET') push_key_route();
     elseif ($route === 'push.subscribe' && $method === 'POST') push_subscribe(read_json_body(8000));

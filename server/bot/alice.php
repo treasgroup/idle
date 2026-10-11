@@ -1,0 +1,110 @@
+<?php
+// Alice skill (Яндекс Диалоги): "Алиса, попроси Что приготовить подобрать ужин из курицы и картошки".
+// Finds recipes, reads the ingredients and then the steps one by one: "дальше", "назад", "повтори".
+// Free: Yandex Dialogs + the site's own matcher (no AI). Webhook: ваш-сайт/bot/alice.php
+declare(strict_types=1);
+require __DIR__ . '/../api/_private/lib.php';
+require __DIR__ . '/../api/_private/admin.php';
+require __DIR__ . '/../api/_private/accounts.php';
+require __DIR__ . '/../api/_private/reviews.php';
+require __DIR__ . '/../api/_private/seo.php';
+require __DIR__ . '/../api/_private/match.php';
+require __DIR__ . '/../api/_private/bots.php';
+
+@ini_set('display_errors', '0');
+$_SERVER['SCRIPT_NAME'] = dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/bot/alice.php')) . '/index.php';
+header('Content-Type: application/json; charset=utf-8');
+$req = json_decode((string)file_get_contents('php://input', false, null, 0, 64000), true);
+if (!is_array($req) || !isset($req['request'], $req['session'])) { http_response_code(400); echo '{}'; exit; }
+$skill = (string)(config()['alice']['skill_id'] ?? '');
+if ($skill !== '' && ($req['session']['skill_id'] ?? '') !== $skill) { http_response_code(403); echo '{}'; exit; }
+
+$state = is_array($req['state']['session'] ?? null) ? $req['state']['session'] : [];
+$cmd = match_norm((string)($req['request']['command'] ?? ''));
+$orig = (string)($req['request']['original_utterance'] ?? '');
+
+/** Sends the answer: text on screen, the same text for speech (Alice limit: 1024 characters each). */
+function say(string $text, array $state = [], array $buttons = [], bool $end = false, ?string $tts = null): void {
+    $cut = fn($s) => mb_strlen($s, 'UTF-8') > 1000 ? mb_substr($s, 0, 997, 'UTF-8') . '…' : $s;
+    echo json_encode(['version' => '1.0', 'session_state' => $state, 'response' => [
+        'text' => $cut($text), 'tts' => $cut(str_replace(['«', '»', '•'], '', $tts ?? $text)), 'end_session' => $end,
+        'buttons' => array_map(fn($b) => is_array($b) ? $b : ['title' => $b, 'hide' => true], array_slice($buttons, 0, 6)),
+    ]], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+function alice_count(string $type, string $text = '', ?string $recipe = null): void {
+    try { db()->prepare('INSERT INTO events (ts, day, visitor, type, recipe_id, text, norm, value, source, ref) VALUES (?,?,?,?,?,?,?,?,?,?)')
+        ->execute([now_ms(), date('Y-m-d'), 'alice', $type, $recipe, mb_substr($text, 0, 300), mb_substr(match_norm($text), 0, 300), 1, 'voice', 'alice']); } catch (Throwable $e) {}
+}
+function step_text(array $r, int $n): string {
+    $steps = array_values($r['steps']);
+    $s = $steps[$n] ?? null;
+    if (!$s) return '';
+    $t = 'Шаг ' . ($n + 1) . ' из ' . count($steps) . '. ' . trim((string)$s['text']);
+    if (!empty($s['timerSeconds'])) $t .= ' Это займёт около ' . max(1, (int)round($s['timerSeconds'] / 60)) . ' ' . seo_plural(max(1, (int)round($s['timerSeconds'] / 60)), 'минуты', 'минут', 'минут') . ' — можете попросить Алису поставить таймер.';
+    return $t;
+}
+function offer(array $list, array $q): void {
+    if (!$list) say(bot_intro($q, 0), [], ['Удиви меня', 'Курица и картошка', 'Что-нибудь быстрое']);
+    $titles = array_map(fn($r) => $r['title'], $list);
+    $spoken = [];
+    foreach ($titles as $k => $t) $spoken[] = ['первое', 'второе', 'третье'][$k] . ' — ' . $t;
+    say(bot_intro($q, count($list)) . "\n" . implode("\n", array_map(fn($k, $t) => ($k + 1) . '. ' . $t, array_keys($titles), $titles)) . "\nКакое выберете?",
+        ['list' => array_map(fn($r) => $r['id'], $list), 'q' => $q['text']],
+        array_merge(array_map(fn($t) => mb_substr($t, 0, 64, 'UTF-8'), $titles), ['Другие варианты']),
+        false, bot_intro($q, count($list)) . ' ' . implode('. ', $spoken) . '. Какое выберете?');
+}
+function choose(array $r): void {
+    alice_count('open', '', $r['id']);
+    $ing = bot_ingredients($r);
+    say('«' . $r['title'] . '» — ' . seo_minutes((int)$r['totalMinutes']) . ', ' . (int)$r['servings'] . ' ' . seo_plural((int)$r['servings'], 'порция', 'порции', 'порций') . ".\nПонадобится: " . implode('; ', $ing) . ".\nСкажите «начать», и я поведу по шагам.",
+        ['rid' => $r['id'], 'step' => -1], ['Начать', 'Повтори продукты', ['title' => 'Открыть рецепт', 'url' => seo_abs(seo_app_path($r['id'])), 'hide' => false]],
+        false, '«' . $r['title'] . '». ' . seo_minutes((int)$r['totalMinutes']) . '. Понадобится: ' . implode(', ', array_map(fn($l) => preg_replace('/ — .*$/u', '', $l), $ing)) . '. Скажите «начать», и я поведу по шагам. Или «повтори продукты» — назову с количеством.');
+}
+
+try {
+    if ($orig === 'ping') say('pong');
+    if (!empty($req['session']['new']) && $cmd === '') {
+        alice_count('visit', 'alice');
+        say('Привет! Скажите, что есть дома, — подберу рецепт и проведу по шагам. Например: «курица и картошка» или «суп за 30 минут».', [], ['Курица и картошка', 'Удиви меня', 'Суп за 30 минут']);
+    }
+    if (preg_match('/^(хватит|стоп|выход|закончить|спасибо все|все спасибо|пока)/u', $cmd)) say('Приятного аппетита! Возвращайтесь, когда снова встанет вопрос «что приготовить».', [], [], true);
+    if (preg_match('/(помощь|что ты умеешь|что умеешь)/u', $cmd))
+        say('Назовите продукты — например, «фарш и рис без лука» или «быстрый ужин с рыбой». Я предложу три блюда. Выберите одно, и я назову продукты, а потом поведу по шагам: говорите «дальше», «назад» или «повтори».', $state, ['Удиви меня']);
+
+    // Cooking a chosen recipe step by step.
+    $r = isset($state['rid']) ? bot_recipe_by_id((string)$state['rid']) : null;
+    if ($r) {
+        $n = (int)($state['step'] ?? -1); $count = count($r['steps']);
+        $go = function (int $to) use ($r, $count) {
+            if ($to >= $count) say('Готово! Приятного аппетита. Хотите подобрать что-нибудь ещё?', [], ['Удиви меня'], false);
+            $to = max(0, $to);
+            say(step_text($r, $to), ['rid' => $r['id'], 'step' => $to], $to + 1 < $count ? ['Дальше', 'Повтори', 'Назад'] : ['Готово', 'Повтори']);
+        };
+        if (preg_match('/^(начать|начнем|начинай|давай|поехали|готовить|да)\b/u', $cmd) && $n < 0) $go(0);
+        if (preg_match('/(дальше|следующ|далее|готово|сделал|сделала|продолж)/u', $cmd)) $go($n + 1);
+        if (preg_match('/(назад|предыдущ|вернись)/u', $cmd)) $go($n - 1);
+        if (preg_match('/(повтор|еще раз|не расслышал|что\?)/u', $cmd)) { if (preg_match('/продукт|ингредиент/u', $cmd) || $n < 0) choose($r); $go($n); }
+        if (preg_match('/(продукт|ингредиент|что нужно|сколько)/u', $cmd))
+            say('Для «' . $r['title'] . '»: ' . implode('; ', bot_ingredients($r)) . '.', $state, $n < 0 ? ['Начать'] : ['Дальше', 'Повтори']);
+    }
+
+    // Picking one of the offered recipes: "второе", "номер три", or words of the title.
+    $offered = array_values(array_filter(array_map('bot_recipe_by_id', (array)($state['list'] ?? []))));
+    if ($offered) {
+        $pick = null;
+        foreach ([['перв', 'один', '1'], ['втор', 'два', '2'], ['трет', 'три', '3'], ['четв', 'четыре', '4'], ['пят', 'пять', '5']] as $k => $forms)
+            foreach ($forms as $f) if (preg_match('/(^|\s)' . $f . '/u', $cmd)) { $pick = $offered[$k] ?? null; break 2; }
+        if (!$pick) foreach ($offered as $o) { $tw = explode(' ', match_norm($o['title'])); $hits = 0; foreach (explode(' ', $cmd) as $w) foreach ($tw as $x) if (mb_strlen($w, 'UTF-8') >= 4 && match_same($w, $x)) $hits++; if ($hits >= 1 && $hits >= count(array_filter(explode(' ', $cmd), fn($w) => mb_strlen($w, 'UTF-8') >= 4)) / 2) { $pick = $o; break; } }
+        if ($pick) choose($pick);
+        if (preg_match('/(другие|ещ[её]|не то|не хочу)/u', $cmd) && isset($state['q'])) { [$list, $q] = bot_search((string)$state['q'], 3, 3); offer($list, $q); }
+    }
+
+    if (bot_is_surprise($cmd) || $cmd === '') { $r = bot_random(); if ($r) choose($r); }
+    alice_count('query', $orig);
+    [$list, $q] = bot_search($cmd, 0, 3);
+    offer($list, $q);
+} catch (Throwable $e) {
+    error_log('[what-to-cook] alice: ' . $e->getMessage());
+    say('Что-то пошло не так. Попробуйте ещё раз чуть позже.');
+}

@@ -25,8 +25,8 @@ AddType text/javascript .js
   AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json application/manifest+json image/svg+xml
 </IfModule>
 
-# Recipe pages for search engines: /recipe/<id>, /recipes/, /recipes/<kind>, /sitemap.xml.
-# Without mod_rewrite the same pages work as recipe.php?id=<id>, recipes.php, sitemap.php.
+# Recipe pages for search engines: /recipe/<id>, /recipes/, /recipes/<kind>, /iz/<product>[/<product>], /sitemap.xml.
+# Without mod_rewrite the same pages work as recipe.php?id=<id>, recipes.php, combo.php?a=&b=, sitemap.php.
 # COOK_PRETTY tells the pages that the short addresses work. Rules of the parent folder still apply.
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -35,6 +35,9 @@ AddType text/javascript .js
   RewriteRule ^recipe/([a-z0-9-]+)/?$ recipe.php?id=$1 [L,QSA]
   RewriteRule ^recipes/?$ recipes.php [L,QSA]
   RewriteRule ^recipes/([a-z]+)/?$ recipes.php?c=$1 [L,QSA]
+  RewriteRule ^iz/?$ combo.php [L,QSA]
+  RewriteRule ^iz/([a-z0-9-]+)/?$ combo.php?a=$1 [L,QSA]
+  RewriteRule ^iz/([a-z0-9-]+)/([a-z0-9-]+)/?$ combo.php?a=$1&b=$2 [L,QSA]
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
 </IfModule>
 
