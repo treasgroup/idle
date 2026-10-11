@@ -119,7 +119,7 @@ export function Chat() {
         <div className="mx-auto max-w-chat px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
           <ConditionBar />
           <Composer variant="dock" busy={a.busy} focusKey={focusKey} onSend={(t, o) => send(t, o)}
-            placeholder={has ? undefined : "Например: курица, картошка, 30 минут"} />
+            placeholder={has ? undefined : "Например: курица и картошка"} />
         </div>
       </div>
       <PantryPicker open={picker} onClose={() => setPicker(false)} />

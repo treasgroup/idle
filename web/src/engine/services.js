@@ -1376,11 +1376,16 @@ async function E0(e) {
 }
 var mA = () => typeof navigator < "u" && typeof navigator.share == "function";
 var ra = React;
+// Older app versions know only these four appliances and reset all preferences (with the food exclusions) when the
+// synced list holds anything else. The newer appliances travel in their own field, which older versions ignore.
+var Q0 = ["pan", "pot", "oven", "blender"];
 function wm(e) {
+  let ap = e.preferences.appliances || [];
   return {
     favorites: e.favorites.map((t) => t.id),
     recent: e.recent.map((t) => t.id).slice(0, 20),
-    preferences: e.preferences,
+    preferences: { ...e.preferences, appliances: ap.filter((a) => Q0.includes(a)) },
+    appliancesExtra: ap.filter((a) => !Q0.includes(a)),
     largeText: e.largeText,
     onboarding: e.onboarding,
     voiceUsed: e.voiceUsed,
@@ -1427,6 +1432,7 @@ function gA(e, t, n) {
           favorites: wu(e.favorites, t.favorites, n.favorites),
           recent: rl(e.recent, t.recent, n.recent),
           preferences: rl(e.preferences, t.preferences, n.preferences),
+          appliancesExtra: rl(e.appliancesExtra, t.appliancesExtra, n.appliancesExtra),
           largeText: rl(e.largeText, t.largeText, n.largeText),
           onboarding: rl(e.onboarding, t.onboarding, n.onboarding),
           voiceUsed: t.voiceUsed || n.voiceUsed,
@@ -1496,11 +1502,25 @@ function _0(e, t) {
   let n = (f, p) => p.find((m) => m.id === f) ?? F.find((m) => m.id === f),
     a = t.favorites.map((f) => n(f, e.favorites)).filter((f) => !!f),
     i = t.recent.map((f) => n(f, e.recent)).filter((f) => !!f),
+    // Newer appliances: from their own field; a document written by an older version has none — keep ours.
+    ex = Array.isArray(t.appliancesExtra)
+      ? t.appliancesExtra
+      : (e.preferences.appliances || []).filter((x) => !Q0.includes(x)),
     s = vu({
       ...e,
       favorites: a,
       recent: i,
-      preferences: t.preferences,
+      preferences: t.preferences
+        ? {
+            ...t.preferences,
+            appliances: [
+              ...new Set([
+                ...(t.preferences.appliances || []).filter((x) => Q0.includes(x) || !Array.isArray(t.appliancesExtra)),
+                ...ex,
+              ]),
+            ],
+          }
+        : t.preferences,
       largeText: t.largeText,
       onboarding: t.onboarding,
       voiceUsed: t.voiceUsed,

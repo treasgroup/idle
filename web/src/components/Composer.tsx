@@ -5,7 +5,7 @@ import { useVoiceInput } from "../engine";
 import { useStore } from "../app/store";
 import { cx } from "./ui";
 
-const HERO_HINTS = ["Курица, картошка, 30 минут", "Мне грустно — хочу уютного", "Сколько варить яйца?", "Ужин без духовки на 4 человек", "Что приготовить из фарша?"];
+const HERO_HINTS = ["Курица и картошка", "Мне грустно — хочу уютного", "Сколько варить яйца?", "Ужин без духовки на 4 человек", "Что приготовить из фарша?"];
 
 export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusKey }: {
   variant: "hero" | "dock";

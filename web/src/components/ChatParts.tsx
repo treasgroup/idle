@@ -109,7 +109,7 @@ export function useSuggestions(send: (text: string) => void, onPantry: () => voi
       ? { icon: <Refrigerator size={20} />, text: "Из того, что дома · " + s.fridge.length, run: onPantry }
       : { icon: <Snowflake size={20} />, text: "Ужин за 20 минут", run: () => send("ужин за 20 минут") };
   return [
-    { icon: <Search size={20} />, text: "Есть курица и картошка, 30 минут", run: () => send("курица, картошка, 30 минут") },
+    { icon: <Search size={20} />, text: "Есть курица и картошка — что приготовить?", run: () => send("курица и картошка") },
     { icon: <Soup size={20} />, text: "Мне грустно — хочу уютного", run: () => send("мне грустно, хочется чего-то уютного") },
     { icon: <Egg size={20} />, text: "Сколько варить яйца?", run: () => send("сколько варить яйца?") },
     ctx,
