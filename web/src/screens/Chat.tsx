@@ -9,6 +9,7 @@ import { FOCUS_COMPOSER, takeFocusRequest } from "../app/chatNav";
 import { close, routeHash } from "../app/router";
 import { minutesIn, startTimer } from "../app/timers";
 import { Composer } from "../components/Composer";
+import { TimerStrip } from "../components/TimerStrip";
 import { ConditionBar, Message, MoodTiles, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
 import { ChefAvatar, cx, useScrolled } from "../components/ui";
 
@@ -84,6 +85,7 @@ export function Chat() {
           </span>
           {has && <button className="btn-ghost h-10 px-3" onClick={() => { a.newChat(); setFocusKey((k) => k + 1); }}><SquarePen size={18} />Новый</button>}
         </div>
+        <div className="mx-auto max-w-chat px-4"><TimerStrip className="pb-2" /></div>
       </header>
 
       <div className="mx-auto w-full max-w-chat flex-1 px-4" style={{ paddingBottom: "calc(var(--dock) + 24px)" }}>
@@ -98,7 +100,7 @@ export function Chat() {
                   <Message m={m} last={isLast && !a.busy} onOption={onOption} />
                   {mins && (
                     <div className="mt-2 sm:pl-10">
-                      <button className="btn-soft h-10" onClick={() => { startTimer({ dish: "Таймер", label: prev!.text.replace(/\?$/, "").slice(0, 40), seconds: mins * 60 }); toast("Таймер на " + mins + " мин запущен"); }}>
+                      <button className="btn-soft h-10" onClick={() => { startTimer({ dish: "Таймер", label: prev!.text.replace(/^(сколько|как долго|сколько минут)\s+/i, "").replace(/[?!.]+$/, "").slice(0, 30), seconds: mins * 60 }); toast("Таймер на " + mins + " мин запущен"); }}>
                         <Timer size={18} />Таймер на {mins} мин
                       </button>
                     </div>

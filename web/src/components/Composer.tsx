@@ -41,6 +41,18 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
 
   useEffect(() => { if (autoFocus || focusKey) area.current?.focus({ preventScroll: true }); }, [autoFocus, focusKey]);
 
+  // «/» anywhere on the page (outside fields) jumps into the box, as in chat apps.
+  useEffect(() => {
+    const on = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || el?.closest("input, textarea, select, [contenteditable], [role=dialog]")) return;
+      e.preventDefault();
+      area.current?.focus();
+    };
+    document.addEventListener("keydown", on);
+    return () => document.removeEventListener("keydown", on);
+  }, []);
+
   const send = () => {
     const t = text.trim();
     if (!t || busy) return;

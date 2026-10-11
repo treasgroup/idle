@@ -58,6 +58,13 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
   profileRef.current = profile;
   const openRef = useRef(onOpen);
   openRef.current = onOpen;
+  // Profile goals (lighter, more protein, quick) apply to every search until the person removes one in this conversation.
+  const relaxedGoals = useRef(new Set<string>());
+  const withGoals = useCallback((c: Conditions): Conditions => {
+    const g = goalConditions(profileRef.current, c);
+    const r = relaxedGoals.current;
+    return { ...g, maxKcal: r.has("kcal") ? c.maxKcal : g.maxKcal, minProtein: r.has("protein") ? c.minProtein : g.minProtein, maxMinutes: r.has("time") ? c.maxMinutes : g.maxMinutes };
+  }, []);
 
   const base = useCallback((): Conditions => ({
     ...freshConditions({ servings: profileRef.current.eaters, appliances: DEFAULT_CONDITIONS.appliances, vegetarian: stateRef.current.preferences.vegetarian }),
@@ -79,6 +86,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     const st = stateRef.current;
     archiveChat(st.conversation, st.conditions);
     focus.current = null;
+    relaxedGoals.current.clear();
     const c = base();
     stateRef.current = { ...st, conversation: [], conditions: c };
     update((x) => ({ ...x, conversation: [], conditions: c }));
@@ -88,6 +96,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     const saved = takeChat(id);
     if (!saved) return;
     stop();
+    relaxedGoals.current.clear();
     const st = stateRef.current;
     archiveChat(st.conversation, st.conditions);
     stateRef.current = { ...st, conversation: saved.messages, conditions: saved.conditions };
@@ -150,7 +159,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       const focusRecipe = f && f.after === shown ? recipeById(f.id) ?? null : st.cooking && !st.cooking.done ? st.cooking.recipe : null;
       const out = respond({
         message: cleaned, patch, reply, local: isLocal,
-        conditions: goalConditions(profileRef.current, st.conditions), preferences: st.preferences, conversation: st.conversation,
+        conditions: withGoals(st.conditions), preferences: st.preferences, conversation: st.conversation,
         guess: isLocal ? classifyIntent(cleaned) : null, focus: focusRecipe,
         focusServings: f && f.after === shown ? f.servings : st.cooking?.servings, voice: !!opts.voice,
       });
@@ -169,15 +178,16 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       clearTimeout(timer);
       if (id === turn.current) setBusy(false);
     }
-  }, [online, server.aiReady, ensureSession, push, toast, base, newChat]);
+  }, [online, server.aiReady, ensureSession, push, toast, base, newChat, withGoals]);
 
-  const found = useCallback((c: Conditions, limit = 5) => rankRecipes(recipes(), goalConditions(profileRef.current, c), stateRef.current.preferences, limit), []);
+  const found = useCallback((c: Conditions, limit = 5) => rankRecipes(recipes(), withGoals(c), stateRef.current.preferences, limit), [withGoals]);
 
   const choose = useCallback((o: ChatOption) => {
     if (o.open) return openRef.current(o.open);
     if (o.text) return void ask(o.text, { shown: o.label, source: "option" });
     if (!o.relax) return;
     stop();
+    if (["kcal", "protein", "time"].includes(o.relax)) relaxedGoals.current.add(o.relax);
     const c = relaxCondition(stateRef.current.conditions, o.relax);
     const list = found(c);
     const more = list.length ? [] : relaxOptions(c, stateRef.current.preferences);

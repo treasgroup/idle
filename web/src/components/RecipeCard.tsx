@@ -42,7 +42,7 @@ export function RecipeMeta({ recipe, size = "small", showDifficulty = true }: { 
   );
 }
 
-/** The best match in a reply: a big photo, why it fits, and the main actions. */
+/** The best match in a reply: a big photo, why it fits (`note`, else the dish summary), and the main actions. */
 export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: {
   recipe: Recipe; note?: string; onOpen: () => void; onMenu?: () => void; onSave?: () => void; saved?: boolean;
 }) {
@@ -57,7 +57,9 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
           <h3 className="line-clamp-2 font-serif text-[1.125rem] font-semibold leading-snug">{recipe.title}</h3>
         </button>
         <div className="mt-1.5"><RecipeMeta recipe={recipe} /></div>
-        {note && <p className="mt-2 flex items-start gap-1.5 text-small text-herb"><Check size={16} className="mt-0.5 shrink-0" aria-hidden />{note}</p>}
+        {note
+          ? <p className="mt-2 flex items-start gap-1.5 text-small text-herb"><Check size={16} className="mt-0.5 shrink-0" aria-hidden />{note}</p>
+          : recipe.summary && <p className="mt-2 line-clamp-2 text-small text-ink-soft">{recipe.summary}</p>}
         <div className="mt-4 flex gap-2">
           <button className="btn-primary flex-1" onClick={onOpen}>Открыть рецепт</button>
           {onMenu && <button className="icon-btn border border-line" onClick={onMenu} aria-label="Добавить в меню"><CalendarPlus size={20} /></button>}

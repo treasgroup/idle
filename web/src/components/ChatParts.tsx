@@ -25,7 +25,11 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
         <p className="max-w-[80%] whitespace-pre-line rounded-[20px] rounded-br-md bg-brand-soft px-4 py-2.5 text-body text-ink">{m.text}</p>
       </article>
     );
-  const results = (m.results ?? []).map((r) => ({ ...r, recipe: recipeById(r.id) })).filter((r) => r.recipe);
+  // `reason` falls back to the dish summary; only a real "why it fits" gets the green tick.
+  const results = (m.results ?? []).map((r) => {
+    const recipe = recipeById(r.id);
+    return { ...r, recipe, why: r.note || (r.reason && r.reason !== recipe?.summary ? r.reason : "") };
+  }).filter((r) => r.recipe);
   const open = (id: string) => { a.opened(id, s.conditions.servings); openRecipe(id); };
   const options = (m.options ?? []).map((o) => ({ ...o, label: chipLabel(o.label) })).filter((o): o is ChatOption => !!o.label);
   return (
@@ -34,12 +38,12 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
       <div className="min-w-0 flex-1 space-y-3">
         <p className={cx("whitespace-pre-line text-body", !results.length && m.text.length > 120 && "rounded-card border border-line bg-card p-4 shadow-e1")}>{tidyReply(m.text)}</p>
         {results[0]?.recipe && (
-          <RecipeFeatured recipe={results[0].recipe} note={results[0].note || results[0].reason} onOpen={() => open(results[0].id)}
+          <RecipeFeatured recipe={results[0].recipe} note={results[0].why || undefined} onOpen={() => open(results[0].id)}
             onMenu={() => setMenuFor(results[0].id)} onSave={() => toggleFavorite(results[0].recipe!)} saved={isFavorite(results[0].id)} />
         )}
         {results.length > 1 && (
           <div className="grid gap-2 lg:grid-cols-2">
-            {results.slice(1).map((r) => <RecipeRow key={r.id} recipe={r.recipe!} note={r.note || r.reason} favorite={isFavorite(r.id)} onOpen={() => open(r.id)} />)}
+            {results.slice(1).map((r) => <RecipeRow key={r.id} recipe={r.recipe!} note={r.why || r.recipe!.summary} favorite={isFavorite(r.id)} onOpen={() => open(r.id)} />)}
           </div>
         )}
         {last && options.length > 0 && (

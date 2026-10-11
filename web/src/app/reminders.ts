@@ -19,8 +19,11 @@ export function reminderPlan(s: EngineState, now = new Date()): { date: string; 
     const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
     const date = dateKey(day);
     const titles = (s.menu.find((m) => m.date === date)?.items ?? []).map((i) => recipeById(i.recipeId)?.title).filter((t): t is string => !!t);
-    const tomorrow = new Date(day.getTime() + 864e5).getTime();
-    const soon = expiringSoon(s.fridge, day.getTime()).filter((f) => (f.until ?? 0) <= tomorrow + 864e5).map((f) => shortName(f.id).toLowerCase());
+    // Only food that runs out on that day or the next — not what expired long before.
+    const next = dateKey(new Date(day.getTime() + 864e5));
+    const soon = expiringSoon(s.fridge, day.getTime())
+      .filter((f) => f.until != null && [date, next].includes(dateKey(new Date(f.until))))
+      .map((f) => shortName(f.id).toLowerCase());
     out.push({
       date,
       body: titles.length

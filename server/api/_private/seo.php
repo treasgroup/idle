@@ -163,26 +163,36 @@ function seo_head(array $o): string {
         . "<meta property=\"og:title\" content=\"" . h($o['ogTitle'] ?? $o['title']) . "\">\n<meta property=\"og:description\" content=\"$d\">\n<meta property=\"og:url\" content=\"$url\">\n<meta property=\"og:image\" content=\"" . h($img) . "\">\n";
     if (!empty($o['imageW'])) $out .= '<meta property="og:image:width" content="' . (int)$o['imageW'] . "\">\n<meta property=\"og:image:height\" content=\"" . (int)$o['imageH'] . "\">\n";
     if (!empty($o['imageAlt'])) $out .= '<meta property="og:image:alt" content="' . h($o['imageAlt']) . "\">\n";
-    $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#b7432f\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
+    $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
     foreach (($o['ld'] ?? []) as $ld) $out .= "<script type=\"application/ld+json\">\n" . seo_json($ld) . "\n</script>\n";
     return $out . '<style>' . seo_css() . "</style>\n</head>\n<body>\n" . seo_header();
 }
 function seo_header(): string {
     $p = h(seo_path());
-    return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}favicon.svg\" alt=\"\" width=\"32\" height=\"32\"><span>" . h(SEO_SITE) . "</span></a><nav><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_combo_path('')) . "\">По продуктам</a><a class=\"pill\" href=\"$p\">Подобрать блюдо</a></nav></div></header>\n<main class=\"wrap\">\n";
+    return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}favicon.svg\" alt=\"\" width=\"32\" height=\"32\"><span>" . h(SEO_SITE) . "</span></a><nav><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_combo_path('')) . "\">По продуктам</a><a class=\"pill\" href=\"$p\">Спросить Шефа</a></nav></div></header>\n<main class=\"wrap\">\n";
 }
 function seo_footer(): string {
     $p = h(seo_path());
     return "</main>\n<footer class=\"wrap foot\"><p><a href=\"$p\">«" . h(SEO_SITE) . "»</a> — подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, без регистрации.</p>"
         . "<p><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a> · <a href=\"{$p}#info\">Откуда сведения</a> · <a href=\"{$p}#privacy\">Конфиденциальность</a></p></footer>\n</body>\n</html>\n";
 }
+/** The site's own fonts (Golos Text for text, Lora for headings), served from /fonts next to the app. */
+function seo_fonts(): string {
+    $f = seo_path() . 'fonts/';
+    return "@font-face{font-family:'Golos Text';font-style:normal;font-weight:400 900;font-display:swap;src:url({$f}GolosText-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}"
+        . "@font-face{font-family:'Golos Text';font-style:normal;font-weight:400 900;font-display:swap;src:url({$f}GolosText-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}"
+        . "@font-face{font-family:Lora;font-style:normal;font-weight:400 700;font-display:swap;src:url({$f}Lora-Variable.ttf) format('truetype')}";
+}
 function seo_css(): string {
-    return ':root{--bg:#f7f2e9;--card:#fffdf8;--ink:#23241f;--muted:#5b5d53;--line:#e6ddcc;--accent:#b7432f;--accent-ink:#fff;--soft:#f1e6d6}'
-        . '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}'
+    return ':root{--bg:#faf7f0;--card:#fff;--ink:#211d1a;--muted:#5c544d;--line:#e8e1d5;--accent:#b7432f;--accent-ink:#fff;--soft:#f8e7e0;color-scheme:only light}'
+        . seo_fonts()
+        . '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}'
+        . 'h1,h2,.brand{font-family:Lora,Georgia,serif;letter-spacing:-.01em}'
         . 'a{color:var(--accent)}img{max-width:100%;display:block}.wrap{max-width:860px;margin:0 auto;padding:0 16px}'
         . '.top{background:var(--card);border-bottom:1px solid var(--line)}.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap}'
-        . '.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);text-decoration:none}.top nav{display:flex;gap:14px;align-items:center;font-size:15px}'
-        . '.pill{background:var(--accent);color:var(--accent-ink);padding:7px 14px;border-radius:999px;text-decoration:none;font-weight:600}'
+        . '.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);text-decoration:none}.top nav{display:flex;gap:14px;align-items:center;font-size:15px;white-space:nowrap}'
+        . '@media(max-width:560px){.top .wrap{padding-top:8px;padding-bottom:10px;gap:6px 12px}.top nav{width:100%;justify-content:space-between;gap:10px}}'
+        . '.pill{background:var(--accent);color:var(--accent-ink);padding:8px 16px;border-radius:999px;text-decoration:none;font-weight:600}'
         . '.crumbs{font-size:14px;color:var(--muted);margin:18px 0 6px}.crumbs a{color:var(--muted)}h1{font-size:clamp(28px,5vw,40px);line-height:1.15;margin:6px 0 10px}main>h1:first-child{margin-top:22px}'
         . '.lead{font-size:19px;color:var(--muted);margin:0 0 14px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}'
         . '.meta li{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:15px}'
@@ -338,7 +348,7 @@ function seo_list_page(?string $course): void {
     echo '<ul class="cats"><li><a href="' . h(seo_list_path()) . '"' . ($course ? '' : ' class="on"') . '>Все · ' . $count . '</a></li>';
     foreach (SEO_COURSES as $c => $names) if (!empty($by[$c])) echo '<li><a href="' . h(seo_list_path($c)) . '"' . ($course === $c ? ' class="on"' : '') . '>' . h($names[0]) . ' · ' . count($by[$c]) . '</a></li>';
     echo "</ul>\n";
-    echo '<div class="cta"><p>Не знаете, что выбрать? Скажите, что есть дома и сколько времени, — подберём рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Подобрать блюдо</a></div>\n";
+    echo '<div class="cta"><p>Не знаете, что выбрать? Спросите Шефа: назовите продукты, время или настроение — он подберёт рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
     foreach (SEO_COURSES as $c => $names) {
         if (empty($by[$c]) || ($course && $course !== $c)) continue;
         if (!$course) echo '<h2>' . h($names[0]) . '</h2>';
@@ -451,7 +461,7 @@ function seo_combo_page(string $a, ?string $b): void {
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_combo_path('')) . '">Что приготовить из продуктов</a>' . ($b ? ' › <a href="' . h(seo_combo_path($a)) . '">' . h(seo_ucfirst(seo_ing_name($a))) . '</a>' : '') . "</nav>\n";
     echo '<h1>' . h(seo_ucfirst($names)) . ': что приготовить</h1><p class="lead">' . h($desc) . "</p>\n";
-    echo '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — подберём блюдо и посчитаем, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Подобрать по продуктам</a></div>\n";
+    echo '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — Шеф подберёт блюдо и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
     echo '<ul class="grid">';
     foreach ($list as $r) echo seo_card($r, true);
     echo "</ul>\n";

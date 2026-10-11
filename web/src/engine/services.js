@@ -1587,12 +1587,16 @@ function bA(e, t, n, a) {
     u = (0, ra.useRef)(!0),
     f = () => r.current.syncBase ?? z0,
     p = (0, ra.useCallback)(
-      (x) => (
-        (o.current = o.current.then(x).catch(() => {
-          s((N) => ({ ...N, state: navigator.onLine ? "ready" : "offline" }));
-        })),
-        o.current
-      ),
+      (x) => {
+        // The queue keeps going after a failure, but the caller still sees it (to show the server's message).
+        let run = o.current.then(x);
+        return (
+          (o.current = run.catch(() => {
+            s((N) => ({ ...N, state: navigator.onLine ? "ready" : "offline" }));
+          })),
+          run
+        );
+      },
       [],
     ),
     m = (x) => {
@@ -1659,7 +1663,7 @@ function bA(e, t, n, a) {
         if (!x.ok)
           throw ((u.current = x.status !== 404), new Error(Cm(x.body)));
         await w(x.body);
-      }));
+      }).catch(() => {}));
   }, [t, n, p]);
   let v = JSON.stringify(wm(e)),
     b = JSON.stringify(Tm(e));
@@ -1668,7 +1672,7 @@ function bA(e, t, n, a) {
     let x = setTimeout(() => {
       p(async () => {
         await y("personal"), await y("household");
-      });
+      }).catch(() => {});
     }, 1200);
     return () => clearTimeout(x);
   }, [v, b, t, n, p]),
@@ -1691,7 +1695,7 @@ function bA(e, t, n, a) {
               }
               if (!B.ok) throw new Error(Cm(B.body));
               await w(B.body);
-            });
+            }).catch(() => {});
         },
         N = setInterval(x, 2e4);
       return (

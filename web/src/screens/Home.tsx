@@ -10,10 +10,12 @@ import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { CHAT_FRESH_MS, lastChatAt, useChats } from "../app/chats";
+import { CHAT_FRESH_MS, lastChatAt } from "../app/chats";
 import { GOALS, goalConditions, type Goal } from "../app/profile";
 import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
 import { Composer } from "../components/Composer";
+import { TimerStrip } from "../components/TimerStrip";
+import { useTimers } from "../app/timers";
 import { MoodTiles, SuggestionCards, useSuggestions } from "../components/ChatParts";
 import { RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { Chip, ScrollRow, Section, cx } from "../components/ui";
@@ -105,7 +107,6 @@ export function Home() {
           <Now rail />
           <Rescue rail />
           <CourseCard rail />
-          <RecentChats />
         </div>
       </aside>
     </div>
@@ -139,9 +140,11 @@ function Now({ rail }: { rail?: boolean }) {
   const menu = (s.menu.find((d) => d.date === today)?.items ?? []).map((i) => ({ i, r: recipeById(i.recipeId) })).filter((x): x is { i: typeof x.i; r: Recipe } => !!x.r);
   const toBuy = s.shopping.filter((i) => !i.checked).length;
   const cooking = s.cooking && !s.cooking.done ? s.cooking : null;
-  if (!cooking && !menu.length && !toBuy) return null;
+  const timers = useTimers().length;
+  if (!cooking && !menu.length && !toBuy && !timers) return null;
   const rows = (
     <div className={cx("grid gap-2", rail && "gap-1")}>
+      {timers > 0 && <TimerStrip flush={rail} />}
       {cooking && (
         <button onClick={() => openLayer(routeHash({ cook: true }))} className="flex min-h-[56px] items-center gap-3 rounded-input bg-ink px-3 text-left text-paper">
           <Flame size={20} className="shrink-0 text-brand-soft" aria-hidden />
@@ -256,21 +259,6 @@ function Saved() {
         {list.map((r) => { const fresh = recipeById(r.id) ?? r; return <RecipeTile key={r.id} recipe={fresh} onOpen={() => openRecipe(fresh)} className="w-[200px] shrink-0 snap-start" />; })}
       </ScrollRow>
     </Section>
-  );
-}
-
-function RecentChats() {
-  const chats = useChats();
-  const a = useAssistant();
-  if (!chats.length) return null;
-  return (
-    <RailBlock title="Прошлые разговоры" icon={<MessageCircle size={16} />}>
-      <ul className="grid gap-0.5">
-        {chats.slice(0, 4).map((c) => (
-          <li key={c.id}><button onClick={() => { a.restore(c.id); goChat(); }} className="flex h-9 w-full items-center rounded-lg px-2 text-left text-small text-ink-soft hover:bg-sunken hover:text-ink"><span className="truncate">{c.title}</span></button></li>
-        ))}
-      </ul>
-    </RailBlock>
   );
 }
 
