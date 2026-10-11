@@ -178,7 +178,6 @@ function seo_footer(): string {
 }
 function seo_css(): string {
     return ':root{--bg:#f7f2e9;--card:#fffdf8;--ink:#23241f;--muted:#5b5d53;--line:#e6ddcc;--accent:#b7432f;--accent-ink:#fff;--soft:#f1e6d6}'
-        . '@media(prefers-color-scheme:dark){:root{--bg:#1b1a17;--card:#25231f;--ink:#f1ece2;--muted:#b9b3a6;--line:#3a362f;--accent:#e0775f;--accent-ink:#1b1a17;--soft:#2f2b25}}'
         . '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}'
         . 'a{color:var(--accent)}img{max-width:100%;display:block}.wrap{max-width:860px;margin:0 auto;padding:0 16px}'
         . '.top{background:var(--card);border-bottom:1px solid var(--line)}.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap}'

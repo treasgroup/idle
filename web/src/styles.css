@@ -26,24 +26,7 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --brand: 226 120 94;
-    --brand-soft: 66 36 30;
-    --brand-ink: 244 170 150;
-    --paper: 24 21 19;
-    --card: 35 31 28;
-    --ink: 240 234 226;
-    --ink-soft: 196 187 177;
-    --ink-faint: 140 131 122;
-    --line: 62 56 50;
-    --herb: 128 196 136;
-    --herb-soft: 30 52 34;
-    --warn: 236 176 80;
-    --warn-soft: 60 44 18;
-    color-scheme: dark;
-  }
-}
+/* Dark theme: only when the person picks it in the profile (or picks "как в системе" on a dark device). */
 :root[data-theme="dark"] {
   --brand: 226 120 94;
   --brand-soft: 66 36 30;

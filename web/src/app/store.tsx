@@ -5,7 +5,7 @@ import {
   CATALOG_EVENT, DEFAULT_STATE, type EngineState, apiUrl, initNativeBridge, isNativeApp, loadCatalog, loadIntentModel, loadState,
   recipes, saveState, setTasteScorer, tasteScorer, track, deviceSource, useAccountSync, type SyncApi,
 } from "../engine";
-import { loadProfile, saveProfile, type Profile } from "./profile";
+import { applyTheme, loadProfile, saveProfile, type Profile } from "./profile";
 
 export interface CatalogStatus { version: number; source: string; problem?: string; count: number }
 export interface Server { aiReady: boolean; voiceReady: boolean }
@@ -102,6 +102,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // The taste profile nudges the ranking of every list.
   useEffect(() => { setTasteScorer(tasteScorer(s.taste)); }, [s.taste, catalog.version]);
   useEffect(() => { document.documentElement.classList.toggle("large-text", s.largeText); }, [s.largeText]);
+  useEffect(() => applyTheme(profile.theme), [profile.theme]);
 
   const sync = useAccountSync(s, ready, online, update);
 

@@ -10,7 +10,6 @@ import { useActions, haveIds } from "../app/actions";
 import { RecipeImage, RecipeMeta, RecipeTile } from "../components/RecipeCard";
 import { Chip, Layer, Section, Sheet, Stepper, cx } from "../components/ui";
 import { Reviews } from "./Reviews";
-import { recipeCost, rub, usePrices } from "../app/prices";
 
 export function RecipeLayer({ id, onClose }: { id: string; onClose: () => void }) {
   const { catalog } = useStore();
@@ -36,8 +35,6 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const nutrition = nutritionOf(base).perServing;
-  const prices = usePrices();
-  const cost = recipeCost(prices, recipe, servings);
   const fav = isFavorite(base.id);
   const staples = basics(s.preferences);
   const related = useMemo(() => similarRecipes(base, (r) => !s.preferences.excluded.some((e) => r.allergens.includes(e)), 6), [base, s.preferences.excluded]);
@@ -73,7 +70,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         <div className="px-4 pt-4">
           <h1 className="text-2xl font-semibold leading-tight">{base.title}</h1>
           <p className="mt-1.5 text-[15px] text-ink-soft">{base.summary}</p>
-          <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1"><RecipeMeta recipe={base} />{cost !== null && <span className="text-sm text-ink-soft" title="Примерно, по средним ценам">{rub(cost)} за {servings} порц.</span>}</div>
+          <div className="mt-2.5"><RecipeMeta recipe={base} /></div>
           {flags.length > 0 && <div className="mt-3 flex flex-wrap gap-1.5">{flags.map((f) => <span key={f.label} className="inline-flex items-center gap-1 rounded-full bg-herb-soft px-2.5 py-1 text-xs text-herb">{f.icon}{f.label}</span>)}</div>}
         </div>
 

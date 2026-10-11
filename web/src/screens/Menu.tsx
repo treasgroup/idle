@@ -7,7 +7,6 @@ import {
 import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
-import { menuCost, rub, usePrices } from "../app/prices";
 import { courseOf, nutritionOf, type Recipe } from "../engine";
 import type { Profile } from "../app/profile";
 
@@ -36,7 +35,6 @@ export function Menu() {
   const today = dateKey(new Date());
   const days = weekDays(s.menu);
   const filled = days.some((d) => d.items.length);
-  const prices = usePrices();
   const plan = { ...s.menuPlan, only: goalFilter(profile) } as typeof s.menuPlan;
   const save = (menu: MenuDay[]) => update((st) => ({ ...st, menu: menu.filter((d) => d.date >= today && d.items.length).slice(0, 31) }));
 
@@ -48,8 +46,7 @@ export function Menu() {
     save(generateMenu(empty, s.preferences, servings, Date.now(), cheaper ? ({ ...plan, only: goalFilter(profile, true) } as typeof plan) : plan));
     toast(cheaper ? "Собрал меню из бюджетных блюд." : "Меню готово. Любое блюдо можно заменить.");
   };
-  const cost = filled ? menuCost(prices, days) : null;
-  const overBudget = cost !== null && profile.weeklyBudget > 0 && cost > profile.weeklyBudget;
+
   const fill = () => save(generateMenu(days, s.preferences, servings, Date.now(), plan));
 
   const toShopping = () => {
@@ -100,11 +97,8 @@ export function Menu() {
             <button className="btn-primary" onClick={toShopping}><ShoppingCart size={17} /> В покупки</button>
             <button className="btn-outline" onClick={() => make()}><RefreshCw size={16} /> Новое меню</button>
           </div>
-          {cost !== null && (
-            <div className={cx("mx-4 mt-3 flex items-center justify-between gap-3 rounded-xl2 px-4 py-2.5 text-sm", overBudget ? "bg-warn-soft" : "bg-card shadow-card")}>
-              <span>Продукты на неделю: <b>{rub(cost)}</b>{profile.weeklyBudget > 0 && <span className="text-ink-faint"> · бюджет {profile.weeklyBudget.toLocaleString("ru-RU")} ₽</span>}</span>
-              <button className="shrink-0 font-semibold text-brand" onClick={() => make(true)}>Дешевле</button>
-            </div>
+          {profile.goals.includes("budget") && (
+            <button className="mx-4 mt-2 text-sm font-semibold text-brand" onClick={() => make(true)}>Собрать из самых бюджетных блюд</button>
           )}
 
           {(shared.length > 0 || leftovers.length > 0) && (

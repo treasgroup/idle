@@ -20,6 +20,8 @@ export interface Profile {
   /** Second dish cooked in parallel with the first (cooking mode). */
   parallel: { recipeId: string; servings: number; step: number; timerEnd: number | null } | null;
   setUp: boolean;
+  /** Light by default; dark only on request. "system" follows the device. */
+  theme: "light" | "dark" | "system";
 }
 
 export const DEFAULT_PROFILE: Profile = {
@@ -32,6 +34,7 @@ export const DEFAULT_PROFILE: Profile = {
   remindAsked: false,
   parallel: null,
   setUp: false,
+  theme: "light",
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
@@ -76,6 +79,7 @@ export function normalizeProfile(raw: unknown): Profile {
   if (par && typeof par === "object" && typeof par.recipeId === "string" && Number.isInteger(par.servings) && Number.isInteger(par.step))
     p.parallel = { recipeId: par.recipeId, servings: par.servings, step: par.step, timerEnd: typeof par.timerEnd === "number" ? par.timerEnd : null };
   p.setUp = r.setUp === true;
+  if (r.theme === "dark" || r.theme === "system") p.theme = r.theme;
   return p;
 }
 
@@ -85,4 +89,20 @@ export function loadProfile(): Profile {
 }
 export function saveProfile(p: Profile): void {
   try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* private mode: the profile lives for this visit only */ }
+}
+
+/** Puts the chosen theme on <html> (and keeps "как в системе" in step with the device). */
+export function applyTheme(theme: Profile["theme"]): () => void {
+  const root = document.documentElement;
+  const media = window.matchMedia?.("(prefers-color-scheme: dark)");
+  const set = () => {
+    const dark = theme === "dark" || (theme === "system" && !!media?.matches);
+    root.dataset.theme = dark ? "dark" : "light";
+    root.style.colorScheme = dark ? "dark" : "light";
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#181513" : "#b7432f");
+  };
+  set();
+  if (theme !== "system" || !media) return () => {};
+  media.addEventListener("change", set);
+  return () => media.removeEventListener("change", set);
 }
