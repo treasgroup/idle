@@ -2201,7 +2201,7 @@ var zp = {
     available: [],
     absent: [],
     excluded: [],
-    appliances: ["pan", "pot", "oven", "blender"],
+    appliances: ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"],
     strictPantry: !1,
     vegetarian: !1,
   },
@@ -2296,7 +2296,7 @@ var KE = [
     "sweet",
     "vegetarian",
   ],
-  XE = ["pan", "pot", "oven", "blender"],
+  XE = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"],
   QE = [
     "russian",
     "ukrainian",
@@ -2917,6 +2917,9 @@ var Oe = {
     pot: "Кастрюля",
     oven: "Духовка",
     blender: "Блендер",
+    multicooker: "Мультиварка",
+    airfryer: "Аэрогриль",
+    microwave: "Микроволновка",
     milk: "Молочное",
     egg: "Яйца",
     gluten: "Глютен",
@@ -3527,13 +3530,16 @@ function $o() {
   );
 }
 Oe["dish:oven"] = "В духовке";
+Oe["dish:multicooker"] = "В мультиварке";
+Oe["dish:airfryer"] = "В аэрогриле";
+Oe["dish:microwave"] = "В микроволновке";
 Oe["dish:freezer"] = "Можно заморозить";
 function Ds(e) {
   return $o(), Oe[e] || e.replace(/^dish:(r:)?/, "").replace(/-/g, " ");
 }
 function nt(e, t) {
   let n = t.slice(5);
-  if (n === "oven") return !!e.appliances?.includes("oven");
+  if (n === "oven" || n === "multicooker" || n === "airfryer" || n === "microwave") return !!e.appliances?.includes(n);
   if (n === "freezer") return !!e.freezerDays;
   let a = Oi.find((s) => s.key === n);
   return a
@@ -4028,7 +4034,8 @@ function CD(e, t) {
 }
 function Qe(e, t, n, a = 3, i = {}) {
   let s = [...new Set([...t.excluded, ...n.excluded])],
-    r = t.appliances.filter((p) => n.appliances.includes(p)),
+    // Asking "в аэрогриле" means the person has one, even if the profile does not say so.
+    r = t.appliances.filter((p) => n.appliances.includes(p) || t.desired.includes("dish:" + p)),
     o = (p) => t.available.some((m) => ia(p, m)),
     l = (p) => t.absent.some((m) => ia(p, m)),
     u = zs(n);
@@ -4286,7 +4293,7 @@ function rn(e) {
     vegetarian: e.vegetarian,
   };
 }
-var Gp = ["pan", "pot", "oven", "blender"],
+var Gp = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"],
   ND = { dairy: "milk", eggs: "egg" },
   MD = {
     egg: ["яиц", "яичко", "яички"],
@@ -4440,6 +4447,9 @@ function HS(e, t) {
 var OD = [
     ["oven", /^духовк/],
     ["blender", /^блендер/],
+    ["multicooker", /^мультиварк/],
+    ["airfryer", /^(аэрогрил|аэрофритюр)/],
+    ["microwave", /^(микроволн|свч)/],
     ["pan", /^сковород|^сковородк/],
     ["pot", /^кастрюл/],
   ],
@@ -4740,7 +4750,9 @@ function tl(e, t, n) {
     }
     let Y = ZD.find((le) => Kp(s, k, le));
     if (Y) {
-      B("excluded"),
+      // "без" is a preposition: it applies to what follows ("курица без духовки"), unlike "…не хочу",
+      // which applies to the products named before it.
+      Y[0] === "без" ? ((N = []), (_ = [])) : B("excluded"),
         (w = "excluded"),
         Y[0] !== "без" && (v = "excluded"),
         (k += Y.length - 1);
@@ -4773,12 +4785,12 @@ function tl(e, t, n) {
         ? ((b = b.filter((Ze) => Ze !== le)), (g = !0))
         : /только/.test(s.slice(Math.max(0, k - 3), k).join(" "))
           ? ((b = [le]), (g = !0))
-          : le === "oven" &&
+          : ["oven", "multicooker", "airfryer", "microwave"].includes(le) &&
               w !== "available" &&
-              /^(в|из)$/.test(s[k - 1] || "")
+              /^(в|из|для)$/.test(s[k - 1] || "")
             ? x.push({
                 mode: "desired",
-                ids: ["dish:oven"],
+                ids: ["dish:" + le],
                 group: !1,
                 dish: !0,
               })
@@ -7921,7 +7933,7 @@ function gu(e, t) {
     : t.startsWith("time:")
       ? { ...e, maxMinutes: Number(t.slice(5)) || null }
       : t === "appliances:all"
-        ? { ...e, appliances: ["pan", "pot", "oven", "blender"] }
+        ? { ...e, appliances: ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"] }
         : t === "strict"
           ? { ...e, strictPantry: !1 }
           : t === "mood"
@@ -8734,7 +8746,7 @@ function Er(e) {
         });
     }
     w.appliances.length < 4 &&
-      Qe(k, { ...w, appliances: ["pan", "pot", "oven", "blender"] }, a, 1)
+      Qe(k, { ...w, appliances: ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"] }, a, 1)
         .length &&
       b.push({ label: "Если можно в духовке", relax: "appliances:all" });
   }
@@ -8791,6 +8803,9 @@ function w_(e, t, n) {
       f.startsWith("dish:") &&
       !vC.has(f) &&
       f !== "dish:oven" &&
+      f !== "dish:multicooker" &&
+      f !== "dish:airfryer" &&
+      f !== "dish:microwave" &&
       f !== "dish:freezer" &&
       !f.startsWith("dish:r:"),
   );
@@ -9110,7 +9125,7 @@ var Bn = D.array(D.string().min(1).max(64)).max(80),
     available: Bn,
     absent: Bn,
     excluded: Bn,
-    appliances: D.array(D.enum(["pan", "pot", "oven", "blender"])).max(4),
+    appliances: D.array(D.enum(["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"])).max(7),
     strictPantry: D.boolean(),
     vegetarian: D.boolean(),
     maxKcal: D.number().int().min(100).max(2e3).nullable().optional(),
@@ -9119,7 +9134,7 @@ var Bn = D.array(D.string().min(1).max(64)).max(80),
   }).strict(),
   h0 = D.object({
     excluded: Bn,
-    appliances: D.array(D.enum(["pan", "pot", "oven", "blender"])).max(4),
+    appliances: D.array(D.enum(["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"])).max(7),
     vegetarian: D.boolean(),
     servings: D.number().int().min(1).max(12).optional(),
     basics: Bn.optional(),
@@ -9163,7 +9178,7 @@ var Bn = D.array(D.string().min(1).max(64)).max(80),
       "sweet",
     ]).nullable(),
     moodChanged: D.boolean(),
-    appliances: D.array(D.enum(["pan", "pot", "oven", "blender"])).max(4),
+    appliances: D.array(D.enum(["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"])).max(7),
     appliancesChanged: D.boolean(),
     strictPantry: D.boolean().nullable(),
     vegetarian: D.boolean().nullable(),

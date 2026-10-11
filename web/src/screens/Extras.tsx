@@ -122,9 +122,14 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const [level, setLevel] = useState<Level>("confident");
   const [goals, setGoals] = useState<Goal[]>(["tasty"]);
   const [kids, setKids] = useState(false);
+  const [extra, setExtra] = useState<string[]>([]);
   const finish = (skip: boolean) => {
     setProfile((p) => ({ ...p, ...(skip ? {} : { eaters, level, goals, kids }), setUp: true }));
-    update((st) => ({ ...st, onboarding: skip ? "skipped" : "done", conditions: { ...st.conditions, servings: skip ? st.conditions.servings : eaters } }));
+    update((st) => ({
+      ...st, onboarding: skip ? "skipped" : "done",
+      conditions: { ...st.conditions, servings: skip ? st.conditions.servings : eaters },
+      preferences: skip ? st.preferences : { ...st.preferences, appliances: [...new Set([...st.preferences.appliances, ...extra])] },
+    }));
     onDone();
   };
   return (
@@ -150,6 +155,13 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <div className="label mb-2 mt-6">Что важно (можно несколько)</div>
         <div className="flex flex-wrap gap-2">
           {GOALS.map((g) => <Chip key={g.id} on={goals.includes(g.id)} onClick={() => setGoals((x) => { const on = x.includes(g.id); const next = on ? x.filter((y) => y !== g.id) : [...x.filter((y) => y !== "tasty"), g.id]; return next.length ? next : ["tasty"]; })}>{g.emoji} {g.label}</Chip>)}
+        </div>
+
+        <div className="label mb-2 mt-6">Есть на кухне</div>
+        <div className="flex flex-wrap gap-2">
+          {[["multicooker", "Мультиварка"], ["airfryer", "Аэрогриль"], ["microwave", "Микроволновка"]].map(([id, label]) => (
+            <Chip key={id} on={extra.includes(id)} onClick={() => setExtra((x) => (x.includes(id) ? x.filter((y) => y !== id) : [...x, id]))}>{label}</Chip>
+          ))}
         </div>
 
         <button className="btn-primary mt-8 w-full py-3.5 text-base" onClick={() => finish(false)}>Начать</button>

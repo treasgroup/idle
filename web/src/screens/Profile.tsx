@@ -10,7 +10,7 @@ import { openLayer, replace, routeHash } from "../app/router";
 import { Chip, Section, Sheet, Stepper, Toggle, cx } from "../components/ui";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
-const APPLIANCES = ["pan", "pot", "oven", "blender"];
+const APPLIANCES = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"];
 
 function Row({ icon, title, hint, onClick }: { icon: JSX.Element; title: string; hint?: string; onClick: () => void }) {
   return (
@@ -102,7 +102,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         <ExcludeProduct />
         <div className="label mb-2 mt-5 flex items-center gap-1.5"><Utensils size={13} /> Какая техника есть</div>
         <div className="flex flex-wrap gap-2">
-          {APPLIANCES.map((a) => <Chip key={a} on={prefs.appliances.includes(a)} onClick={() => update((st) => { const has = st.preferences.appliances.includes(a); const next = has ? st.preferences.appliances.filter((x) => x !== a) : [...st.preferences.appliances, a]; return next.length ? { ...st, preferences: { ...st.preferences, appliances: next }, conditions: { ...st.conditions, appliances: next } } : st; })}>{LABELS[a] ?? a}</Chip>)}
+          {APPLIANCES.map((a) => <Chip key={a} on={prefs.appliances.includes(a)} onClick={() => update((st) => { const has = st.preferences.appliances.includes(a); const next = has ? st.preferences.appliances.filter((x) => x !== a) : [...st.preferences.appliances, a]; return next.length ? { ...st, preferences: { ...st.preferences, appliances: next } } : st; })}>{LABELS[a] ?? a}</Chip>)}
         </div>
         <p className="mt-2 text-xs text-ink-faint">Рецепты, для которых нужна техника, которой у вас нет, я не предложу.</p>
       </Sheet>

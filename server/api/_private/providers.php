@@ -5,7 +5,7 @@
 // transcribe_<name>(), add it to provider_ready() and the dispatchers below, and set it in config.php.
 
 const MOODS = ['cozy', 'light', 'hearty', 'quick', 'comfort', 'fresh', 'spicy', 'sweet'];
-const APPLIANCES = ['pan', 'pot', 'oven', 'blender'];
+const APPLIANCES = ['pan', 'pot', 'oven', 'blender', 'multicooker', 'airfryer', 'microwave'];
 const EXCLUSION_GROUPS = ['milk', 'egg', 'gluten', 'nuts', 'fish', 'soy', 'meat', 'poultry', 'seafood', 'mushrooms', 'legumes'];
 const PATCH_LISTS = ['desiredAdd', 'desiredRemove', 'availableAdd', 'availableRemove', 'absentAdd', 'absentRemove', 'excludedAdd', 'excludedRemove'];
 
