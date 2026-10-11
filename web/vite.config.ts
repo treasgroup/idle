@@ -4,12 +4,15 @@ import { readdirSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const assets = fileURLToPath(new URL("../server/assets/", import.meta.url));
+// PREVIEW_OUT: build into another folder (local previews); the hosting folder is left alone then.
+const previewOut = process.env.PREVIEW_OUT;
 
 /** Removes the previous build's bundles, so old files do not pile up on the hosting (assets/legacy stays). */
 const cleanOldBundles = (): Plugin => ({
   name: "clean-old-bundles",
   apply: "build",
   buildStart() {
+    if (previewOut) return;
     for (const f of readdirSync(assets)) if (/^(app|chunk)-[\w-]+\.(js|css)$/.test(f)) rmSync(assets + f);
   },
 });
@@ -20,7 +23,7 @@ export default defineConfig({
   base: "./",
   plugins: [react(), cleanOldBundles()],
   build: {
-    outDir: "../server",
+    outDir: previewOut ?? "../server",
     emptyOutDir: false,
     assetsDir: "assets",
     sourcemap: false,

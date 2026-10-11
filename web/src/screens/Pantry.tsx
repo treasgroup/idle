@@ -5,7 +5,6 @@ import {
   searchIngredients, setExpiry, shortName, type FridgeItem,
 } from "../engine";
 import { useStore } from "../app/store";
-import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { replace, routeHash } from "../app/router";
 import { Chip, Empty, Section, Sheet, cx } from "../components/ui";
@@ -31,8 +30,7 @@ export function parseReceipt(text: string, ids: string[]): string[] {
 
 export function Pantry() {
   const { s, update } = useStore();
-  const { openRecipe } = useActions();
-  const a = useAssistant(openRecipe);
+  const a = useAssistant();
   const [adding, setAdding] = useState(false);
   const [receipt, setReceipt] = useState(false);
   const [edit, setEdit] = useState<FridgeItem | null>(null);

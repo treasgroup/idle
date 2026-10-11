@@ -138,7 +138,7 @@ export function Menu() {
                         <span className="min-w-0">
                           <span className="block text-[11px] font-semibold uppercase tracking-wide text-ink-faint">{MEAL_LABELS[it.meal ?? "dinner"] ?? "Ужин"}{it.leftover ? " · разогреть" : " · " + it.servings + " порц."}</span>
                           <span className="line-clamp-2 font-medium leading-snug">{r.title}</span>
-                          {!it.leftover && <RecipeMeta recipe={r} compact />}
+                          {!it.leftover && <RecipeMeta recipe={r} size="caption" />}
                         </span>
                       </button>
                       {!it.leftover && <button className="btn-ghost px-2" onClick={() => save(replaceMenuItem(days, d.date, n, s.preferences, servings, Date.now(), plan))} aria-label="Заменить"><RefreshCw size={16} /></button>}

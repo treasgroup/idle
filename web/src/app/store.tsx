@@ -2,10 +2,11 @@
 // the person's profile, the catalog and the server's capabilities.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  CATALOG_EVENT, DEFAULT_STATE, type EngineState, apiUrl, initNativeBridge, isNativeApp, loadCatalog, loadIntentModel, loadState,
+  CATALOG_EVENT, DEFAULT_STATE, type EngineState, apiUrl, clearState, initNativeBridge, isNativeApp, loadCatalog, loadIntentModel, loadState,
   recipes, saveState, setTasteScorer, tasteScorer, track, deviceSource, useAccountSync, type SyncApi,
 } from "../engine";
 import { applyTheme, loadProfile, saveProfile, type Profile } from "./profile";
+import type { ToastMsg } from "../components/ui";
 
 export interface CatalogStatus { version: number; source: string; problem?: string; count: number }
 export interface Server { aiReady: boolean; voiceReady: boolean }
@@ -20,10 +21,14 @@ interface Store {
   server: Server;
   online: boolean;
   sync: SyncApi;
-  toast: (msg: string) => void;
-  message: string;
+  /** A short message at the bottom; `action` adds a button such as «Отменить». */
+  toast: (msg: string, action?: ToastMsg["action"]) => void;
+  message: ToastMsg | null;
+  clearToast: () => void;
   /** Starts the server session the AI and speech routes need (once). */
   ensureSession: () => Promise<void>;
+  /** Deletes everything: the server account, the saved state, local settings; then reloads the page. */
+  wipe: () => Promise<void>;
 }
 
 const Ctx = createContext<Store | null>(null);
@@ -40,7 +45,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [catalog, setCatalog] = useState<CatalogStatus>({ version: 0, source: "bundled", count: recipes().length });
   const [server, setServer] = useState<Server>({ aiReady: false, voiceReady: false });
   const [online, setOnline] = useState(() => navigator.onLine);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<ToastMsg | null>(null);
   const saveChain = useRef(Promise.resolve());
   const saveBroken = useRef(false);
   const sessionReady = useRef(false);
@@ -52,11 +57,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveProfile(next);
     return next;
   }), []);
-  const toast = useCallback((msg: string) => {
-    setMessage(msg);
+  const toast = useCallback((msg: string, action?: ToastMsg["action"]) => {
+    setMessage(msg ? { text: msg, action } : null);
     window.clearTimeout(toastTimer.current);
-    if (msg) toastTimer.current = window.setTimeout(() => setMessage(""), 4200);
+    if (msg) toastTimer.current = window.setTimeout(() => setMessage(null), action ? 8000 : 5000);
   }, []);
+  const clearToast = useCallback(() => { window.clearTimeout(toastTimer.current); setMessage(null); }, []);
   const ensureSession = useCallback(async () => {
     if (sessionReady.current) return;
     const r = await fetch(apiUrl("session"), { method: "POST" });
@@ -70,7 +76,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     initNativeBridge();
     if (isNativeApp()) document.documentElement.classList.add("is-app");
     loadState()
-      .then((loaded) => { setS(loaded); setReady(true); })
+      .then((loaded) => {
+        setS(loaded);
+        setReady(true);
+        // First visit of the new design: keep the household size the person set on the old site.
+        let fresh = false;
+        try { fresh = !localStorage.getItem("cook-profile-v1"); } catch { /* ignore */ }
+        const old = Number((loaded.preferences as { servings?: number }).servings ?? loaded.conditions.servings);
+        if (fresh && Number.isInteger(old) && old >= 1 && old <= 12 && old !== 2) setProfile((p) => ({ ...p, eaters: old }));
+      })
       .catch(() => { saveBroken.current = true; setReady(true); toast("Браузер не разрешил сохранения. Эта сессия работает без них."); });
     loadCatalog(4000, true).then((res) => {
       setCatalog({ version: Date.now(), source: res.source, problem: res.problem, count: recipes().length });
@@ -105,8 +119,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => applyTheme(profile.theme), [profile.theme]);
 
   const sync = useAccountSync(s, ready, online, update);
+  const wipe = useCallback(async () => {
+    // Stop saving first, so the state is not written back after it is cleared.
+    saveBroken.current = true;
+    await saveChain.current.catch(() => {});
+    try { await sync.remove(); } catch { /* offline: the device data is still removed */ }
+    await clearState().catch(() => {});
+    try { localStorage.clear(); sessionStorage.clear(); } catch { /* ignore */ }
+    location.href = location.pathname;
+  }, [sync]);
 
-  const value = useMemo<Store>(() => ({ s, update, ready, profile, setProfile, catalog, server, online, sync, toast, message, ensureSession }),
-    [s, update, ready, profile, setProfile, catalog, server, online, sync, toast, message, ensureSession]);
+  const value = useMemo<Store>(() => ({ s, update, ready, profile, setProfile, catalog, server, online, sync, toast, message, clearToast, ensureSession, wipe }),
+    [s, update, ready, profile, setProfile, catalog, server, online, sync, toast, message, clearToast, ensureSession, wipe]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

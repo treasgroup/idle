@@ -1,3 +1,18 @@
+/* Fonts are self-hosted in server/fonts (paths are relative to assets/). */
+@font-face {
+  font-family: "Golos Text";
+  src: url("../fonts/GolosText-cyrillic.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: "Golos Text";
+  src: url("../fonts/GolosText-latin.woff2") format("woff2");
+  font-weight: 400 700;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 @font-face {
   font-family: "Lora";
   src: url("../fonts/Lora-Variable.ttf") format("truetype");
@@ -9,75 +24,113 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light is the default; the browser's dark mode does not change the site. */
 :root {
-  --brand: 183 67 47;
-  --brand-soft: 248 231 224;
-  --brand-ink: 128 41 26;
   --paper: 250 247 240;
   --card: 255 255 255;
+  --sunken: 242 236 226;
+  --line: 232 225 213;
+  --line-strong: 149 138 124;
   --ink: 33 29 26;
   --ink-soft: 92 84 77;
-  --ink-faint: 150 141 132;
-  --line: 233 226 214;
-  --herb: 63 122 74;
+  --ink-faint: 111 102 94;
+  --brand: 183 67 47;
+  --brand-fill: 183 67 47;
+  --brand-soft: 248 231 224;
+  --brand-ink: 128 41 26;
+  --herb: 54 112 63;
   --herb-soft: 226 240 226;
-  --warn: 196 120 18;
+  --warn: 143 82 8;
   --warn-soft: 252 239 214;
-  color-scheme: light;
+  --scrim: 33 29 26;
+  --scrim-a: 0.4;
+  --nav-h: 0px;
+  --dock: 0px;
+  color-scheme: only light;
 }
 
-/* Dark theme: only when the person picks it in the profile (or picks "как в системе" on a dark device). */
+/* Dark theme: only when the person picks it in the profile (or picks "Авто" on a dark device). */
 :root[data-theme="dark"] {
-  --brand: 226 120 94;
-  --brand-soft: 66 36 30;
-  --brand-ink: 244 170 150;
   --paper: 24 21 19;
   --card: 35 31 28;
+  --sunken: 45 40 36;
+  --line: 62 56 50;
+  --line-strong: 122 112 102;
   --ink: 240 234 226;
   --ink-soft: 196 187 177;
-  --ink-faint: 140 131 122;
-  --line: 62 56 50;
+  --ink-faint: 163 154 144;
+  --brand: 226 120 94;
+  --brand-fill: 180 85 62;
+  --brand-soft: 66 36 30;
+  --brand-ink: 244 170 150;
   --herb: 128 196 136;
   --herb-soft: 30 52 34;
   --warn: 236 176 80;
   --warn-soft: 60 44 18;
+  --scrim: 0 0 0;
+  --scrim-a: 0.6;
   color-scheme: dark;
 }
 
-html { -webkit-text-size-adjust: 100%; }
-html.large-text { font-size: 18px; }
-body {
-  @apply bg-paper text-ink font-sans antialiased;
-  overscroll-behavior-y: none;
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  html.large-text { font-size: 112.5%; }
+  body { @apply bg-paper font-sans text-body text-ink antialiased; overscroll-behavior-y: none; }
+  h1, h2, h3 { @apply font-serif; }
+  button { -webkit-tap-highlight-color: transparent; }
+  :focus-visible { outline: 2px solid rgb(var(--brand)); outline-offset: 2px; border-radius: 6px; }
+  textarea:focus-visible, input:focus-visible { outline: none; }
+  ::selection { background: rgb(var(--brand-soft)); }
 }
-h1, h2, h3 { @apply font-serif; }
-button { -webkit-tap-highlight-color: transparent; }
-:focus-visible { outline: 2px solid rgb(var(--brand)); outline-offset: 2px; }
 
 @layer components {
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition active:scale-[.98] disabled:opacity-50 disabled:pointer-events-none; }
-  .btn-primary { @apply btn bg-brand text-white shadow-sm hover:brightness-105; }
+  .btn { @apply inline-flex h-11 min-w-[44px] items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-small font-semibold transition-[transform,background-color,color,border-color] duration-150 active:scale-[.98] disabled:pointer-events-none disabled:opacity-50; }
+  .btn-bar { @apply h-13 text-body; }
+  .btn-primary { @apply btn bg-brand-fill text-white hover:brightness-[1.06]; }
   .btn-soft { @apply btn bg-brand-soft text-brand-ink hover:brightness-[.98]; }
-  .btn-ghost { @apply btn text-ink-soft hover:bg-line/50; }
-  .btn-outline { @apply btn border border-line bg-card text-ink hover:bg-line/30; }
-  .chip { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-card px-3 py-1.5 text-sm text-ink transition active:scale-[.97]; }
-  .chip-on { @apply border-brand bg-brand-soft text-brand-ink; }
-  .card { @apply rounded-xl2 border border-line/70 bg-card shadow-card; }
-  .input { @apply w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-base text-ink placeholder:text-ink-faint focus:border-brand focus:outline-none; }
-  .label { @apply text-xs font-semibold uppercase tracking-wide text-ink-faint; }
-  .scroll-x { @apply flex gap-2 overflow-x-auto pb-1; scrollbar-width: none; }
-  .scroll-x::-webkit-scrollbar { display: none; }
+  .btn-outline { @apply btn border border-line bg-card text-ink hover:border-line-strong; }
+  .btn-ghost { @apply btn text-ink-soft hover:bg-sunken; }
+  .btn-danger { @apply btn border border-brand bg-card text-brand hover:bg-brand-soft; }
+  .icon-btn { @apply inline-grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink-soft transition-colors duration-150 hover:bg-sunken active:scale-[.96]; }
+
+  .chip { @apply inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-card px-3.5 text-body-sm text-ink transition-colors duration-150 hover:border-line-strong active:scale-[.98]; }
+  .chip-on { @apply border-brand bg-brand-soft text-brand-ink hover:border-brand; }
+
+  .card { @apply rounded-card border border-line bg-card shadow-e1; }
+  .input { @apply h-12 w-full rounded-input border border-line bg-card px-3.5 text-body text-ink placeholder:text-ink-faint focus:border-brand focus:ring-2 focus:ring-brand/20; }
+  textarea.input { @apply h-auto py-3; }
+  .label { @apply font-sans text-micro font-semibold uppercase tracking-[.04em] text-ink-soft; }
+  .link { @apply font-semibold text-brand hover:underline; }
+  .skeleton { @apply animate-pulse rounded-input bg-sunken; }
 }
 
-.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-.safe-top { padding-top: env(safe-area-inset-top); }
+/* Safe areas (phones with a notch / home indicator). */
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 
+/* Horizontal scroller for card carousels: edge fades so it is obvious there is more. */
+.scroller { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: 1rem; scrollbar-width: none; }
+.scroller::-webkit-scrollbar { display: none; }
+.scroller > * { scroll-snap-align: start; }
+.fade-x { mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 24px), transparent 100%); }
+
+@keyframes rise { from { transform: translateY(4px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes sheet-in { from { transform: translateY(24px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
-.anim-sheet { animation: sheet-in .22s ease-out; }
-.anim-fade { animation: fade-in .18s ease-out; }
+@keyframes dot { 0%, 80%, 100% { opacity: .25 } 40% { opacity: 1 } }
 @keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgb(var(--brand) / .45) } 100% { box-shadow: 0 0 0 14px rgb(var(--brand) / 0) } }
+@keyframes flash { from { background: rgb(var(--brand-soft)) } to { background: transparent } }
+.anim-rise { animation: rise .18s ease-out both; }
+.anim-sheet { animation: sheet-in .24s cubic-bezier(.2,.8,.2,1) both; }
+.anim-fade { animation: fade-in .18s ease-out both; }
+.anim-flash { animation: flash 1.2s ease-out; }
+.typing i { display: inline-block; width: 6px; height: 6px; margin: 0 2px; border-radius: 9999px; background: rgb(var(--ink-faint)); animation: dot 1.2s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; }
+.typing i:nth-child(3) { animation-delay: .3s; }
 .listening { animation: pulse-ring 1.2s ease-out infinite; }
+.scrim { background: rgb(var(--scrim) / var(--scrim-a)); }
+
 @media (prefers-reduced-motion: reduce) {
-  .anim-sheet, .anim-fade, .listening { animation: none; }
+  .anim-rise, .anim-sheet, .anim-fade, .anim-flash, .listening, .typing i, .animate-pulse { animation: none !important; }
+  * { scroll-behavior: auto !important; transition-duration: 0ms !important; }
 }

@@ -9,7 +9,7 @@ import { RecipeRow } from "../components/RecipeCard";
 import { Chip, Layer, Sheet, Stepper, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
 
-export function Learn() {
+export function Learn(_: { onClose?: () => void } = {}) {
   const { profile, setProfile } = useStore();
   const { openRecipe } = useActions();
   const [open, setOpen] = useState<string | null>(() => LESSONS.find((l) => !profile.lessonsDone.includes(l.id))?.id ?? null);

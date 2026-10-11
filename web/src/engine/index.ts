@@ -196,7 +196,7 @@ export const reviewsWord = (n: number): string => svc.dl(n);
 
 // ---------- React hooks from the old app ----------
 export interface VoiceInput {
-  state: "idle" | "listening" | "processing" | string;
+  state: "idle" | "recording" | "transcribing";
   seconds: number;
   interim: string;
   available: boolean;

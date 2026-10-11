@@ -11,8 +11,6 @@ export interface Profile {
   level: Level;
   goals: Goal[];
   kids: boolean;
-  /** Weekly grocery budget in roubles for the "уложиться в бюджет" menu; 0 = not set. */
-  weeklyBudget: number;
   /** Lessons of the beginner course already done. */
   lessonsDone: string[];
   /** Cooking reminder after the first cooked dish was offered (asked once). */
@@ -29,7 +27,6 @@ export const DEFAULT_PROFILE: Profile = {
   level: "confident",
   goals: ["tasty"],
   kids: false,
-  weeklyBudget: 0,
   lessonsDone: [],
   remindAsked: false,
   parallel: null,
@@ -40,7 +37,7 @@ export const DEFAULT_PROFILE: Profile = {
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
   { id: "tasty", label: "Просто вкусно", hint: "Без подсчётов", emoji: "😋" },
   { id: "quick", label: "Быстро", hint: "Будни до 30 минут", emoji: "⚡" },
-  { id: "budget", label: "Экономно", hint: "Бюджетные блюда и меню без остатков", emoji: "💰" },
+  { id: "budget", label: "Экономно", hint: "Простые продукты, меню без остатков", emoji: "🧺" },
   { id: "light", label: "Полегче", hint: "До 500 ккал на порцию", emoji: "🥗" },
   { id: "protein", label: "Больше белка", hint: "От 25 г белка на порцию — для спорта", emoji: "💪" },
   { id: "family", label: "Накормить семью", hint: "Сытно, просто, можно детям", emoji: "👨‍👩‍👧" },
@@ -72,7 +69,6 @@ export function normalizeProfile(raw: unknown): Profile {
     p.goals = g.length ? [...new Set(g)] : ["tasty"];
   }
   p.kids = r.kids === true;
-  if (typeof r.weeklyBudget === "number" && r.weeklyBudget >= 0 && r.weeklyBudget <= 100000) p.weeklyBudget = Math.round(r.weeklyBudget);
   if (Array.isArray(r.lessonsDone)) p.lessonsDone = r.lessonsDone.filter((x): x is string => typeof x === "string").slice(0, 100);
   p.remindAsked = r.remindAsked === true;
   const par = r.parallel as Profile["parallel"];
@@ -91,15 +87,17 @@ export function saveProfile(p: Profile): void {
   try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* private mode: the profile lives for this visit only */ }
 }
 
-/** Puts the chosen theme on <html> (and keeps "как в системе" in step with the device). */
+/** Puts the chosen theme on <html> (and keeps "Авто" in step with the device). Light unless dark was chosen. */
 export function applyTheme(theme: Profile["theme"]): () => void {
   const root = document.documentElement;
   const media = window.matchMedia?.("(prefers-color-scheme: dark)");
   const set = () => {
     const dark = theme === "dark" || (theme === "system" && !!media?.matches);
     root.dataset.theme = dark ? "dark" : "light";
-    root.style.colorScheme = dark ? "dark" : "light";
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#181513" : "#b7432f");
+    // "only light" also keeps Chrome's Auto Dark and Yandex Browser's dark sites mode away.
+    root.style.colorScheme = dark ? "dark" : "only light";
+    document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", dark ? "dark" : "only light");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#181513" : "#FAF7F0");
   };
   set();
   if (theme !== "system" || !media) return () => {};

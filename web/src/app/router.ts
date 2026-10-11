@@ -1,12 +1,13 @@
 // Hash routes, so the site works from any subfolder and the phone's "back" closes what was opened last.
-//   #/            home ("Сегодня")       #/recipes   #/menu   #/shopping   #/pantry   #/profile
+//   #/            home: Шеф (the assistant)     #/chat  the conversation with Шеф
+//   #/recipes   #/menu   #/shopping   #/pantry   #/profile
 //   …/r/<id>      a recipe opened over the current tab
 //   #/cook        cooking mode
 //   #/doc/<key>   a legal document;  #/learn  the beginner course
 import { useEffect, useState } from "react";
 
-export type Tab = "home" | "recipes" | "menu" | "shopping" | "pantry" | "profile" | "learn";
-export const TABS: Tab[] = ["home", "recipes", "menu", "shopping", "pantry", "profile", "learn"];
+export type Tab = "home" | "chat" | "recipes" | "menu" | "shopping" | "pantry" | "profile" | "learn";
+export const TABS: Tab[] = ["home", "chat", "recipes", "menu", "shopping", "pantry", "profile", "learn"];
 
 export interface Route {
   tab: Tab;
@@ -64,4 +65,14 @@ export function close(fallback: string): void {
 export function openLayer(hash: string): void {
   history.pushState({ cookOpened: true }, "", location.pathname + location.search + hash);
   window.dispatchEvent(new HashChangeEvent("hashchange"));
+}
+
+/** Opens «Рецепты» on a given view (the home screen's «Все» under «Сохранённое»). */
+const VIEW_KEY = "cook-recipes-view";
+export function openRecipesView(view: "saved"): void {
+  try { sessionStorage.setItem(VIEW_KEY, view); } catch { /* ignore */ }
+  replace(routeHash({ tab: "recipes" }));
+}
+export function takeRecipesView(): string | null {
+  try { const v = sessionStorage.getItem(VIEW_KEY); sessionStorage.removeItem(VIEW_KEY); return v; } catch { return null; }
 }
