@@ -91,7 +91,7 @@ export function Recipes() {
   const { openRecipe, isFavorite } = useActions();
   const a = useAssistant();
   const tiles = useMedia("(min-width: 640px)");
-  const desktop = useMedia("(min-width: 1024px)");
+  const desktop = useMedia("(min-width: 1280px)");
   const [view, setView] = useState<View>("all");
   const [q, setQ] = useState("");
   const query = useDeferredValue(q.trim());
@@ -190,9 +190,9 @@ export function Recipes() {
         <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length }} />
       </div>
 
-      <div className="mt-6 lg:mt-8 lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
+      <div className="mt-6 lg:mt-8 xl:grid xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-8">
         {desktop && (
-          <aside aria-label="Фильтры" className="self-start lg:sticky lg:top-8">
+          <aside aria-label="Фильтры" className="self-start xl:sticky xl:top-8">
             <div className="flex min-h-[44px] items-center justify-between gap-2">
               <h2 className="text-h2">Фильтры</h2>
               {filtered && <button className="-mr-2 h-11 rounded-full px-3 text-small font-semibold text-brand hover:bg-brand-soft" onClick={reset}>Сбросить</button>}
@@ -215,7 +215,7 @@ export function Recipes() {
           )}
 
           {active.length > 0 && (
-            <div className="mt-3 flex flex-wrap items-center gap-2 lg:mt-0 lg:mb-4">
+            <div className="mt-3 flex flex-wrap items-center gap-2 xl:mb-4 xl:mt-0">
               {active.map((x) => (
                 <button key={x.id} type="button" className="chip chip-on pr-2.5" onClick={x.off} aria-label={"Убрать фильтр: " + x.label}>
                   {x.label}<X size={16} aria-hidden />
@@ -249,7 +249,7 @@ export function Recipes() {
             )
           ) : (
             <>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:mt-0 lg:grid-cols-3 lg:gap-5 min-[1360px]:grid-cols-4">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5 xl:mt-0 min-[1440px]:grid-cols-4">
                 {handoff && (
                   <button type="button" onClick={() => ask(q.trim())}
                     className="flex min-h-[72px] items-center gap-3 rounded-card bg-brand-soft p-3 pr-4 text-left transition-transform duration-150 active:scale-[.99] sm:col-span-full">

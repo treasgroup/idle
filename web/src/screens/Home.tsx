@@ -62,7 +62,7 @@ export function Home() {
   const recent = !!firstUser && Date.now() - lastChatAt() < CHAT_FRESH_MS;
 
   return (
-    <div className="lg:grid lg:grid-cols-[minmax(0,720px)_320px] lg:justify-between lg:gap-10">
+    <div className="xl:grid xl:grid-cols-[minmax(0,720px)_320px] xl:justify-between xl:gap-10">
       <div className="min-w-0">
         <section className="pt-4 sm:pt-8 lg:pt-6" aria-labelledby="home-title">
           <p className="text-body-sm font-semibold text-brand">{greeting()}!</p>
@@ -88,19 +88,19 @@ export function Home() {
           {chips.map((c) => <Chip key={c.label} onClick={c.run}>{c.label}</Chip>)}
         </div>
 
-        <div className="lg:hidden">
+        <div className="xl:hidden">
           <Now />
           <Rescue />
         </div>
         <Sections />
         <Ideas />
-        <div className="lg:hidden">
+        <div className="xl:hidden">
           <CourseCard />
         </div>
         <Saved />
       </div>
 
-      <aside className="hidden lg:block">
+      <aside className="hidden xl:block">
         <div className="sticky top-8 space-y-2 pt-6">
           <RailBlock title="Под настроение" icon={<Smile size={16} />}>
             <MoodTiles send={(t, shown) => { void a.ask(t, { fresh: true, shown, source: "option" }); goChat(); }} compact />
