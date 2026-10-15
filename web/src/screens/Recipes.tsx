@@ -193,7 +193,7 @@ export function Recipes() {
             </div>
             <div className="mt-3">
               <Group title="Блюда">{dishChips}</Group>
-              <FilterFields f={f} set={setF} devices={devices} />
+              <div className="mt-6"><FilterFields f={f} set={setF} devices={devices} /></div>
             </div>
           </aside>
         )}

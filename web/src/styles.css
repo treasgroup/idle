@@ -75,6 +75,8 @@
 @layer base {
   html { -webkit-text-size-adjust: 100%; }
   html.large-text { font-size: 112.5%; }
+  /* A grid without explicit columns is one column that never grows wider than the screen (long words, truncated text). */
+  .grid { grid-template-columns: minmax(0, 1fr); }
   body { @apply bg-paper font-sans text-body text-ink antialiased; overscroll-behavior-y: none; }
   h1, h2, h3 { @apply font-serif; }
   button { -webkit-tap-highlight-color: transparent; }

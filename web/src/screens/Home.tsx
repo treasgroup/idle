@@ -141,11 +141,12 @@ function Now({ rail }: { rail?: boolean }) {
   const toBuy = s.shopping.filter((i) => !i.checked).length;
   const cooking = s.cooking && !s.cooking.done ? s.cooking : null;
   const timers = useTimers().length;
-  if (!cooking && !menu.length && !toBuy && !timers) return null;
+  // On phones and tablets the dish on the stove is in the bar above the nav.
+  if (!(cooking && rail) && !menu.length && !toBuy && !timers) return null;
   const rows = (
     <div className={cx("grid grid-cols-[minmax(0,1fr)] gap-2", rail && "gap-1")}>
       {timers > 0 && <TimerStrip flush={rail} />}
-      {cooking && (
+      {cooking && rail && (
         <button onClick={() => openLayer(routeHash({ cook: true }))} className="flex min-h-[56px] items-center gap-3 rounded-input bg-ink px-3 text-left text-paper">
           <Flame size={20} className="shrink-0 text-brand-soft" aria-hidden />
           <span className="min-w-0 flex-1"><span className="block truncate text-body-sm font-semibold">{cooking.recipe.title}</span><span className="block text-caption opacity-80">Готовите · шаг {cooking.step + 1} из {cooking.recipe.steps.length}</span></span>

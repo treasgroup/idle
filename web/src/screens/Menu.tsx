@@ -127,7 +127,7 @@ export function Menu() {
             <button className="btn-outline" onClick={() => setConfirm(true)}><RefreshCw size={18} />Заново</button>
           </div>
 
-          <div className="mt-6 grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-6 grid gap-3 lg:grid-cols-2">
             {days.map((d) => (
               <section key={d.date} className="card p-3" aria-label={dayLabel(d.date)}>
                 <div className="flex items-center justify-between gap-2 pl-1">

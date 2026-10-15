@@ -35,7 +35,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [wiping, setWiping] = useState(false);
   const prefs = s.preferences;
   const bookCount = new Set(s.book.map((b) => b.recipeId)).size;
-  const stats = ([["Приготовлено", bookCount], ["Сохранено", s.favorites.length], ["Дома", s.fridge.length]] as const).filter(([, v]) => v > 0);
+  const nonzero = ([["Приготовлено", bookCount], ["Сохранено", s.favorites.length], ["Дома", s.fridge.length]] as const).filter(([, v]) => v > 0);
+  const stats = nonzero.length >= 2 ? nonzero : [];
   const excludedHint = [prefs.vegetarian ? "без мяса и рыбы" : "", ...prefs.excluded.slice(0, 3).map((x) => (LABELS[x] ?? shortName(x)).toLowerCase())].filter(Boolean).join(", ");
   const close = () => setSheet(null);
 
