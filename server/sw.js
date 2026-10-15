@@ -1,9 +1,9 @@
 // Offline shell. Paths are relative to the service worker scope, so the site can live in a subfolder.
-const CACHE="cook-shell-v3",IMAGES="cook-images-v2";
+const CACHE="cook-shell-v4",IMAGES="cook-images-v2";
 const SCOPE=new URL(self.registration.scope);
 const local=path=>new URL(path,SCOPE).href;
 const isApi=url=>url.pathname.startsWith(new URL("api/",SCOPE).pathname);
-self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(["./","manifest.webmanifest","favicon.svg","icons/icon-192.png","icons/icon-512.png"].map(local))).then(()=>self.skipWaiting()));});
+self.addEventListener("install",event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(["./","boot.js","manifest.webmanifest","favicon.svg","icons/icon-192.png","icons/icon-512.png"].map(local))).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith("cook-")&&k!==CACHE&&k!==IMAGES&&k!==IMAGES.replace("images","catalog")).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
 self.addEventListener("message",event=>{if(event.data?.type!=="CACHE_ASSETS"||!Array.isArray(event.data.urls))return;const urls=event.data.urls.filter(value=>{try{const u=new URL(value,self.location.origin);return u.origin===self.location.origin&&/\.(js|css|woff2?)(\?|$)/.test(u.pathname)&&!isApi(u);}catch{return false;}}).slice(0,80);event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(urls)).then(()=>event.ports[0]?.postMessage({ready:true})).catch(()=>event.ports[0]?.postMessage({ready:false})));});
 self.addEventListener("fetch",event=>{

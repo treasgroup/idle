@@ -39,7 +39,6 @@ export function Menu() {
   const { openRecipe } = useActions();
   const [settings, setSettings] = useState(false);
   const [share, setShare] = useState(false);
-  const [confirm, setConfirm] = useState(false);
   const [dayMenu, setDayMenu] = useState<string | null>(null);
   const [itemMenu, setItemMenu] = useState<{ date: string; index: number } | null>(null);
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
@@ -62,8 +61,8 @@ export function Menu() {
   const make = () => {
     const had = filled;
     save(generateMenu(days.map((d) => ({ date: d.date, items: [] })), s.preferences, servings, Date.now(), enginePlan));
-    if (had) withUndo("Меню собрано заново");
-    else toast("Меню готово. Любое блюдо можно заменить.");
+    if (had) withUndo("План собран заново");
+    else toast("План готов. Любое блюдо можно заменить.");
   };
   const fill = () => save(generateMenu(days, s.preferences, servings, Date.now(), enginePlan));
 
@@ -107,7 +106,7 @@ export function Menu() {
     <div className="pt-4 sm:pt-6">
       <div className="flex items-start justify-between gap-3">
         <h1 className="text-h1">План на неделю</h1>
-        {filled && <button className="icon-btn -mr-2" onClick={() => setShare(true)} aria-label="Поделиться меню"><Share2 size={20} /></button>}
+        {filled && <button className="icon-btn -mr-2" onClick={() => setShare(true)} aria-label="Поделиться планом"><Share2 size={20} /></button>}
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {planChips.map((c) => <span key={c} className="inline-flex h-9 items-center rounded-full bg-sunken px-3 text-small text-ink-soft">{c}</span>)}
@@ -116,8 +115,8 @@ export function Menu() {
 
       {!filled ? (
         <div className="mt-6">
-          <Empty icon={<CalendarDays size={48} />} title="Составлю меню за секунду"
-            actions={<button className="btn-primary h-13" onClick={make}><Sparkles size={18} />Составить меню</button>}>
+          <Empty icon={<CalendarDays size={48} />} title="Составлю план за секунду"
+            actions={<button className="btn-primary h-13" onClick={make}><Sparkles size={18} />Составить план</button>}>
             Блюда без повторов, в будни — быстрые, с общими продуктами, чтобы ничего не пропадало. Список покупок соберётся сам.
           </Empty>
         </div>
@@ -125,7 +124,7 @@ export function Menu() {
         <>
           <div className="mt-4 flex gap-2">
             <button className="btn-primary flex-1 sm:flex-none" onClick={toShopping}><ShoppingCart size={18} />В покупки</button>
-            <button className="btn-outline" onClick={() => setConfirm(true)}><RefreshCw size={18} />Заново</button>
+            <button className="btn-outline" onClick={make}><RefreshCw size={18} />Заново</button>
           </div>
 
           <div className="mt-6 grid gap-3 xl:grid-cols-2">
@@ -184,7 +183,7 @@ export function Menu() {
                           {l.ideas.map((r) => (
                             <li key={r.id} className="flex items-center gap-2">
                               <button className="link min-w-0 flex-1 truncate text-left" onClick={() => openRecipe(r)}>{r.title}</button>
-                              <button className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full px-2 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => addToNearestFree(r)}><CalendarPlus size={16} aria-hidden />В меню</button>
+                              <button className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full px-2 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => addToNearestFree(r)}><CalendarPlus size={16} aria-hidden />В план</button>
                             </li>
                           ))}
                         </ul>
@@ -199,13 +198,9 @@ export function Menu() {
       )}
 
       <Sheet open={settings} title="Как планировать" onClose={() => setSettings(false)}
-        footer={filled ? <button className="btn-primary w-full" onClick={() => { setSettings(false); make(); }}>Применить к меню</button> : undefined}>
+        footer={filled ? <button className="btn-primary w-full" onClick={() => { setSettings(false); make(); }}>Применить к плану</button> : undefined}>
         <PlanSettings plan={plan} servings={servings}
           onChange={(p, n) => { update((st) => ({ ...st, menuPlan: p })); setProfile((x) => ({ ...x, eaters: n })); }} />
-      </Sheet>
-      <Sheet open={confirm} title="Заменить всё меню?" onClose={() => setConfirm(false)}
-        footer={<div className="flex gap-2"><button className="btn-outline flex-1" onClick={() => setConfirm(false)}>Отмена</button><button className="btn-primary flex-1" onClick={() => { setConfirm(false); make(); }}>Заменить</button></div>}>
-        <p className="text-body-sm text-ink-soft">Соберу новые блюда на всю неделю. Если передумаете — нажмите «Отменить» внизу экрана.</p>
       </Sheet>
       <Sheet open={!!dayMenu} title={dayMenu ? dayLabel(dayMenu) : ""} onClose={() => setDayMenu(null)}>
         {dayMenu && (
@@ -220,11 +215,11 @@ export function Menu() {
         {itemMenu && (
           <div className="grid gap-2">
             <button className="btn-outline justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), enginePlan)); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
-            <button className="btn-outline justify-start text-brand" onClick={() => { save(removeMenuItem(days, itemMenu.date, itemMenu.index, servings)); withUndo("Блюдо убрано"); setItemMenu(null); }}><Trash2 size={18} />Убрать из меню</button>
+            <button className="btn-outline justify-start text-brand" onClick={() => { save(removeMenuItem(days, itemMenu.date, itemMenu.index, servings)); withUndo("Блюдо убрано"); setItemMenu(null); }}><Trash2 size={18} />Убрать из плана</button>
           </div>
         )}
       </Sheet>
-      <Sheet open={share} title="Поделиться меню" onClose={() => setShare(false)}>
+      <Sheet open={share} title="Поделиться планом" onClose={() => setShare(false)}>
         <ShareOptions title="План на неделю" text={menuText(days)} onDone={() => setShare(false)} onPrint={() => printText("План на неделю", menuText(days))} />
       </Sheet>
       <Sheet open={!!poll} title="Опрос «Что на ужин?»" onClose={() => setPoll(null)}>

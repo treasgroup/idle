@@ -1,10 +1,10 @@
 // The recipe page. Phones: a photo under a clear header that turns solid (title + «Продукты · Шаги · Отзывы»)
-// once the title has scrolled away, and a bar with «В меню» and «Начать готовить». Wide screens: photo left,
+// once the title has scrolled away, and a bar with «В план» and «Начать готовить». Wide screens: photo left,
 // facts and actions right, the products column sticks while the steps scroll.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
-  Timer, BellRing, Lightbulb, Users, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send, Printer } from "lucide-react";
+  Timer, BellRing, Lightbulb, Users, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send, Printer } from "lucide-react";
 import {
   LABELS, canShare, clampServings, copyText, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, shareLink, similarRecipes, suggestSides, needsSide, withSide, yieldText, SHARE_TARGETS,
@@ -14,6 +14,8 @@ import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
 import { printPage } from "../app/print";
+import { useHint } from "../app/hints";
+import { PAN_CHOICES, area, panOf, panText, type Pan } from "../app/pan";
 import { stepTips } from "../app/stepTips";
 import { ChefSecret } from "../components/ChefSecret";
 import { goChat } from "../app/chatNav";
@@ -22,6 +24,7 @@ import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause,
 import { RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { AskSheet, accusative, askStarters, type AskRequest } from "../components/AskSheet";
+import { ServeBySheet } from "../components/ServeBy";
 import { TimerStrip } from "../components/TimerStrip";
 import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { Reviews, Stars, useReviews } from "./Reviews";
@@ -164,6 +167,10 @@ interface Group { key: string; title: string | null; rows: RecipeIngredient[]; a
 
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const { s, profile, setProfile, update, toast, online } = useStore();
+  const [haveHint, haveSeen] = useHint("recipe-have");
+  const [serveOpen, setServeOpen] = useState(false);
+  const [panOpen, setPanOpen] = useState(false);
+  const pan = useMemo(() => panOf(base), [base]);
   const textSize = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
   const bigger = () => {
     const next = textSize === "m" ? "l" : textSize === "l" ? "xl" : "m";
@@ -248,8 +255,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const cook = () => (cookingThis ? openLayer(routeHash({ cook: true })) : startCooking(recipe, servings));
 
   // The three things people ask first, as big tiles; the rest as small pills under them.
-  const facts: { icon: ReactNode; label: string; value: string; onClick?: () => void }[] = [
-    { icon: <Clock size={20} />, label: "Время", value: formatMinutes(recipe.totalMinutes) },
+  const facts: { icon: ReactNode; label: string; value: string; more?: string; onClick?: () => void }[] = [
+    { icon: <Clock size={20} />, label: "Время", value: formatMinutes(recipe.totalMinutes), more: "к сроку", onClick: () => setServeOpen(true) },
     { icon: <Gauge size={20} />, label: "Сложность", value: DIFF[base.difficulty] ?? base.difficulty },
     { icon: <Users size={20} />, label: "Порции", value: "на " + servings + " " + plural(servings, "человека", "человека", "человек"), onClick: () => go("recipe-products") },
   ];
@@ -278,7 +285,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
     <Layer title={base.title} onClose={onClose} width="max-w-none" transparentUntil={header.until} label={base.title} actions={
       <>
         <button className="icon-btn text-body-sm font-medium" onClick={bigger} aria-label={"Размер текста: " + SIZE_NAMES[textSize]} title="Размер текста">
-          <span className="flex items-baseline" aria-hidden>А<span className="text-small">{textSize === "xl" ? "−" : "+"}</span></span>
+          <span className="flex items-baseline" aria-hidden><span className="text-title">А</span><span className="text-small">а</span></span>
         </button>
         <button className="icon-btn" onClick={() => setShareOpen(true)} aria-label="Поделиться"><Share2 size={20} /></button>
         <button className="icon-btn" onClick={() => toggleFavorite(base)} aria-label={fav ? "Убрать из сохранённого" : "Сохранить"} aria-pressed={fav}>
@@ -306,13 +313,19 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                 </div>
               )}
               {base.summary && <p className="mt-3 text-body text-ink-soft">{base.summary}</p>}
+              {s.notes[base.id] && (
+                <button className="mt-3 flex w-full gap-2.5 rounded-input bg-sunken px-3.5 py-2.5 text-left text-body-sm text-ink" onClick={() => go("recipe-note")}>
+                  <PenLine size={18} className="mt-0.5 shrink-0 text-ink-soft" aria-hidden /><span><span className="text-ink-soft">Ваша заметка: </span>{s.notes[base.id]}</span>
+                </button>
+              )}
               <dl className="mt-4 grid grid-cols-3 gap-2">
                 {facts.map((f) => {
                   const inner = (
                     <>
-                      <span className="text-brand" aria-hidden>{f.icon}</span>
+                      <span className="text-ink-soft" aria-hidden>{f.icon}</span>
                       <dt className="text-caption text-ink-soft">{f.label}</dt>
                       <dd className="text-body-sm font-medium leading-snug">{f.value}</dd>
+                      {f.more && <span className="text-caption text-ink-faint underline decoration-dotted underline-offset-2">{f.more}</span>}
                     </>
                   );
                   const cls = "flex h-full min-h-[88px] flex-col items-center justify-center gap-0.5 rounded-input border border-line bg-card px-1.5 py-2.5 text-center";
@@ -331,7 +344,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
               {nutrition.kcal > 0 && <Nutrition recipe={base} n={nutrition} side={!!side} />}
               <div className="mt-6 hidden gap-3 lg:flex">
                 <button className="btn-primary btn-bar flex-1" onClick={cook}><ChefHat size={20} />{cookingThis ? "Продолжить готовить" : "Начать готовить"}</button>
-                <button className="btn-outline btn-bar" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В меню</button>
+                <button className="btn-outline btn-bar" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В план</button>
               </div>
             </div>
           </div>
@@ -347,20 +360,27 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <h2 className="text-h2">Продукты</h2>
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
-                <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}Отметьте, что уже есть дома.</p>
+                {(!!base.yields || haveHint) && <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}{haveHint && "Отметьте, что уже есть дома."}</p>}
                 <HaveBar owned={owned} total={needed.length} missing={missing} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (
                     <div key={g.key} ref={g.added ? sideRows : undefined}>
                       {g.title && <h3 className="label mb-1.5 px-1">{g.title}</h3>}
                       <ul className="card px-1">
-                        {g.rows.map((i, k) => <Row key={g.key + i.id + i.unit} i={i} own={hasIt(i.id)} flash={g.added} first={k === 0} onToggle={() => toggleHave(i.id)} />)}
+                        {g.rows.map((i, k) => <Row key={g.key + i.id + i.unit} i={i} own={hasIt(i.id)} flash={g.added} first={k === 0} onToggle={() => { toggleHave(i.id); haveSeen(); }} />)}
                       </ul>
                     </div>
                   ))}
                 </div>
+                {pan && (
+                  <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60" onClick={() => setPanOpen(true)}>
+                    <CookingPot size={18} className="shrink-0" aria-hidden />
+                    <span className="flex-1">Форма {panText(pan)} — на {base.servings} {plural(base.servings, "порцию", "порции", "порций")}. У вас другая?</span>
+                    <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+                  </button>
+                )}
                 {missing > 0 && (
-                  <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-brand hover:bg-sunken/60"
+                  <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60"
                     onClick={() => ask(swapQuestion)}>
                     <Lightbulb size={18} className="shrink-0" aria-hidden />
                     <span className="flex-1">Чего-то нет дома? Подскажу, чем заменить</span>
@@ -407,7 +427,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
               {base.tips.length > 0 && (
                 <Section title="Советы">
                   <ul className="card space-y-3 p-4">
-                    {base.tips.map((t) => <li key={t} className="flex gap-3 text-body-sm"><Lightbulb size={20} className="mt-px shrink-0 text-brand" aria-hidden />{t}</li>)}
+                    {base.tips.map((t) => <li key={t} className="flex gap-3 text-body-sm"><Lightbulb size={20} className="mt-px shrink-0 text-ink-soft" aria-hidden />{t}</li>)}
                   </ul>
                 </Section>
               )}
@@ -437,7 +457,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
       {/* The bar at the bottom (phones and tablets) */}
       <div ref={bar} className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 shadow-e2 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-3xl gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 min-[360px]:gap-3 sm:px-6">
-          <button className="btn-outline btn-bar px-4" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В меню</button>
+          <button className="btn-outline btn-bar px-4" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В план</button>
           <button className="btn-primary btn-bar flex-1 px-4" onClick={cook}>
             <ChefHat size={20} className="max-[359px]:hidden" />
             {cookingThis ? <><span className="max-[359px]:hidden">Продолжить готовить</span><span className="min-[360px]:hidden">Продолжить</span></> : "Начать готовить"}
@@ -445,6 +465,14 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         </div>
       </div>
 
+      {pan && <PanSheet open={panOpen} onClose={() => setPanOpen(false)} pan={pan} onPick={(p) => {
+        const k = area(p) / area(pan);
+        const n = clampServings(base, Math.max(1, Math.round(base.servings * k)));
+        setServings(n);
+        setPanOpen(false);
+        toast("Под форму " + panText(p) + " — продукты на " + n + " " + plural(n, "порцию", "порции", "порций"));
+      }} />}
+      <ServeBySheet open={serveOpen} onClose={() => setServeOpen(false)} title={base.title} recipeId={base.id} minutes={recipe.totalMinutes} onCook={cook} />
       {menuOpen && <AddToMenuSheet recipeId={base.id} servings={servings} onClose={() => setMenuOpen(false)} />}
       <Sheet open={shareOpen} title="Поделиться рецептом" onClose={() => setShareOpen(false)}>
         <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)}
@@ -654,11 +682,18 @@ function Note({ id }: { id: string }) {
     return () => window.clearTimeout(t);
   }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { if (latest.current.text.trim() !== latest.current.saved) save(latest.current.text); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Closed until wanted: a quiet line instead of an empty box on every recipe.
+  const [open, setOpen] = useState(!!saved);
+  if (!open) return (
+    <button id="recipe-note" className="mt-8 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60" onClick={() => setOpen(true)}>
+      <PenLine size={18} aria-hidden />Заметка для себя
+    </button>
+  );
   return (
-    <Section title="Моя заметка">
+    <Section title="Моя заметка" id="recipe-note" className={UNDER_HEADER}>
       <textarea className="input min-h-[96px]" aria-label="Моя заметка к рецепту" placeholder="Например: соли меньше, добавить чеснок" value={text} maxLength={500}
-        onChange={(e) => setText(e.target.value)} onBlur={() => save(text)} />
-      <p className="mt-1.5 text-caption text-ink-faint">Видна только вам. Сохраняется сама.</p>
+        autoFocus={!saved} onChange={(e) => setText(e.target.value)} onBlur={() => save(text)} />
+      <p className="mt-1.5 text-caption text-ink-faint">Видна только вам. Сохраняется сама. Покажу её вверху рецепта в следующий раз.</p>
     </Section>
   );
 }
@@ -687,5 +722,23 @@ export function ShareOptions({ text, title, url, onDone, onPrint }: { text: stri
         {onPrint !== undefined && <button className="btn-ghost" onClick={() => { onPrint(); onDone(); }}><Printer size={18} />Распечатать</button>}
       </div>
     </div>
+  );
+}
+
+/** «У вас другая форма?»: products are recounted by the form's area. */
+function PanSheet({ open, onClose, pan, onPick }: { open: boolean; onClose: () => void; pan: Pan; onPick: (p: Pan) => void }) {
+  const group = (kind: Pan["kind"]) => PAN_CHOICES.filter((p) => p.kind === kind);
+  const same = (p: Pan) => panText(p) === panText(pan);
+  return (
+    <Sheet open={open} title="Какая у вас форма?" onClose={onClose}>
+      <p className="text-body-sm text-ink-soft">В рецепте — {pan.kind === "round" ? "круглая " : ""}форма {panText(pan)}. Выберите свою — пересчитаю продукты.</p>
+      {(["round", "rect"] as const).map((kind) => (
+        <div key={kind} className="mt-4">
+          <p className="label mb-2">{kind === "round" ? "Круглая, диаметр" : "Прямоугольная"}</p>
+          <div className="flex flex-wrap gap-2">{group(kind).map((p) => <Chip key={panText(p)} on={same(p)} onClick={() => onPick(p)}>{panText(p)}</Chip>)}</div>
+        </div>
+      ))}
+      <p className="mt-4 text-caption text-ink-faint">Время проверяйте шпажкой: в большой форме слой тоньше и печётся быстрее, в маленькой — дольше.</p>
+    </Sheet>
   );
 }

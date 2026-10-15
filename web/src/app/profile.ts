@@ -19,12 +19,16 @@ export interface Profile {
   parallel: { recipeId: string; servings: number; step: number; timerEnd: number | null } | null;
   setUp: boolean;
   /** Light by default; dark only on request. "system" follows the device. */
-  theme: "light" | "dark" | "system";
+  theme: "light" | "dark" | "contrast" | "system";
   /** Simple mode: bigger text and only the main things (Главная, Шеф, Избранное). */
   simple: boolean;
   /** Text size: normal, large, very large. */
   textSize: "m" | "l" | "xl";
+  /** Who else eats and what they do not: their products are left out of every suggestion. */
+  members: Member[];
 }
+
+export interface Member { name: string; excluded: string[] }
 
 export const DEFAULT_PROFILE: Profile = {
   eaters: 2,
@@ -38,12 +42,13 @@ export const DEFAULT_PROFILE: Profile = {
   theme: "light",
   simple: false,
   textSize: "m",
+  members: [],
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
   { id: "tasty", label: "Просто вкусно", hint: "Без подсчётов", emoji: "😋" },
   { id: "quick", label: "Быстро", hint: "Будни до 30 минут", emoji: "⚡" },
-  { id: "budget", label: "Экономно", hint: "Простые продукты, меню без остатков", emoji: "🧺" },
+  { id: "budget", label: "Экономно", hint: "Простые продукты, план без остатков", emoji: "🧺" },
   { id: "light", label: "Полегче", hint: "До 500 ккал на порцию", emoji: "🥗" },
   { id: "protein", label: "Больше белка", hint: "От 25 г белка на порцию — для спорта", emoji: "💪" },
   { id: "family", label: "Накормить семью", hint: "Сытно, просто, можно детям", emoji: "👨‍👩‍👧" },
@@ -81,9 +86,12 @@ export function normalizeProfile(raw: unknown): Profile {
   if (par && typeof par === "object" && typeof par.recipeId === "string" && Number.isInteger(par.servings) && Number.isInteger(par.step))
     p.parallel = { recipeId: par.recipeId, servings: par.servings, step: par.step, timerEnd: typeof par.timerEnd === "number" ? par.timerEnd : null };
   p.setUp = r.setUp === true;
-  if (r.theme === "dark" || r.theme === "system") p.theme = r.theme;
+  if (r.theme === "dark" || r.theme === "contrast" || r.theme === "system") p.theme = r.theme;
   p.simple = r.simple === true;
   if (r.textSize === "l" || r.textSize === "xl") p.textSize = r.textSize;
+  if (Array.isArray(r.members)) p.members = r.members
+    .filter((m): m is Member => !!m && typeof m === "object" && typeof (m as Member).name === "string" && Array.isArray((m as Member).excluded))
+    .slice(0, 10).map((m) => ({ name: m.name.slice(0, 30), excluded: m.excluded.filter((x): x is string => typeof x === "string").slice(0, 40) }));
   return p;
 }
 
@@ -101,14 +109,21 @@ export function applyTheme(theme: Profile["theme"]): () => void {
   const media = window.matchMedia?.("(prefers-color-scheme: dark)");
   const set = () => {
     const dark = theme === "dark" || (theme === "system" && !!media?.matches);
-    root.dataset.theme = dark ? "dark" : "light";
+    root.dataset.theme = dark ? "dark" : theme === "contrast" ? "contrast" : "light";
     // "only light" also keeps Chrome's Auto Dark and Yandex Browser's dark sites mode away.
     root.style.colorScheme = dark ? "dark" : "only light";
     document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", dark ? "dark" : "only light");
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#181513" : "#FAF7F0");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#181513" : theme === "contrast" ? "#FFFFFF" : "#FAF7F0");
   };
   set();
   if (theme !== "system" || !media) return () => {};
   media.addEventListener("change", set);
   return () => media.removeEventListener("change", set);
+}
+
+/** The family's «не едим» joined into the shared list: what a member added comes off when nobody needs it any more. */
+export function withMembers(excluded: string[], before: Member[], after: Member[]): string[] {
+  const had = new Set(before.flatMap((m) => m.excluded));
+  const now = new Set(after.flatMap((m) => m.excluded));
+  return [...new Set([...excluded.filter((x) => !had.has(x) || now.has(x)), ...now])];
 }

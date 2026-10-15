@@ -1,6 +1,6 @@
 // «Мои продукты»: what is in the fridge and cupboards, what has to be used soon, and Шеф's ideas from it.
 import { useMemo, useState } from "react";
-import { Plus, ScanText, Search, X, Refrigerator, Clock, ChevronRight, Trash2, UtensilsCrossed } from "lucide-react";
+import { Plus, ScanText, Search, X, Refrigerator, Clock, ChevronRight, Trash2, UtensilsCrossed, Bell, ScanBarcode } from "lucide-react";
 import {
   AISLES, LEFTOVERS, aisleOf, addToFridge, daysLeft, expiringSoon, expiryLabel, ingredient, ingredientOptions, pantryGroups, plural,
   searchIngredients, setExpiry, shortName, type FridgeItem,
@@ -9,6 +9,9 @@ import { useStore } from "../app/store";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { ChefAvatar, Chip, Empty, Section, Sheet, cx } from "../components/ui";
+import { useReminders } from "../app/reminders";
+import { useHint } from "../app/hints";
+import { BarcodeScan, canScan } from "../components/BarcodeScan";
 import { ProductTiles } from "../components/ProductTiles";
 
 const EXPIRY = [["Сегодня", 0], ["Завтра", 1], ["3 дня", 3], ["Неделя", 7], ["Месяц", 30], ["Без срока", null]] as const;
@@ -46,6 +49,8 @@ export function Pantry() {
   const [receipt, setReceipt] = useState(false);
   const [edit, setEdit] = useState<FridgeItem | null>(null);
   const soon = useMemo(() => expiringSoon(s.fridge), [s.fridge]);
+  const reminders = useReminders();
+  const [remindHint, remindSeen] = useHint("pantry-remind");
   const byAisle = useMemo(() => AISLES.map((x) => ({ ...x, items: s.fridge.filter((f) => aisleOf({ ingredientId: f.id, name: ingredient(f.id)?.name ?? f.id }) === x.key) }))
     .filter((g) => g.items.length).map((g) => ({ ...g, items: [...g.items].sort((p, q) => (p.until ?? Infinity) - (q.until ?? Infinity)) })), [s.fridge]);
 
@@ -96,8 +101,23 @@ export function Pantry() {
               <span className="block text-title text-brand-ink">Что приготовить из этого?</span>
               <span className="block text-small text-ink-soft">Шеф подберёт блюда из ваших продуктов</span>
             </span>
-            <ChevronRight size={20} className="shrink-0 text-brand" aria-hidden />
+            <ChevronRight size={20} className="shrink-0 text-ink-faint" aria-hidden />
           </button>
+          {remindHint && reminders.supported && !reminders.on && s.fridge.some((f) => f.until != null) && (
+            <div className="mt-3 flex items-start gap-3 rounded-card border border-line bg-card p-4">
+              <Bell size={20} className="mt-0.5 shrink-0 text-ink-soft" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="text-body-sm font-medium">Напомнить, пока не испортилось?</p>
+                <p className="mt-0.5 text-small text-ink-soft">Вечером в 17:30 подскажу, что пора использовать и что из этого приготовить.</p>
+                <button className="btn-soft mt-3 h-10" onClick={async () => {
+                  remindSeen();
+                  try { await reminders.enable("17:30", s.reminders.weekly); toast("Готово: напомню в 17:30"); }
+                  catch (e) { toast(e instanceof Error ? e.message : "Не получилось включить напоминания"); }
+                }}>Напоминать</button>
+              </div>
+              <button className="icon-btn -mr-2 -mt-2" onClick={remindSeen} aria-label="Не надо"><X size={18} /></button>
+            </div>
+          )}
 
           {soon.length > 0 && (
             <Section title="Пора использовать" icon={<Clock size={20} className="text-warn" aria-hidden />}>
@@ -167,8 +187,10 @@ export function Pantry() {
 }
 
 function AddProducts({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { s, update } = useStore();
+  const { s, update, toast } = useStore();
   const [q, setQ] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const scan = canScan();
   const ids = useMemo(() => ingredientOptions().map((o) => o.id).filter((id) => id !== "water"), []);
   const groups = useMemo(() => pantryGroups(), []);
   const has = (id: string) => s.fridge.some((f) => f.id === id);
@@ -179,8 +201,14 @@ function AddProducts({ open, onClose }: { open: boolean; onClose: () => void }) 
       footer={<button className="btn-primary w-full" onClick={onClose}>Готово · дома {s.fridge.length}</button>}>
       <div className="relative">
         <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-soft" aria-hidden />
-        <input className="input pl-10" placeholder="Найти продукт" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input className={cx("input pl-10", scan && "pr-14")} placeholder="Найти продукт" value={q} onChange={(e) => setQ(e.target.value)} />
+        {scan && <button className="icon-btn absolute right-0.5 top-1/2 -translate-y-1/2" onClick={() => setScanning(true)} aria-label="Сканировать штрихкод"><ScanBarcode size={22} /></button>}
       </div>
+      {scanning && <BarcodeScan onClose={() => setScanning(false)} onFound={({ id, name }) => {
+        setScanning(false);
+        if (id) { if (!has(id)) toggle(id); toast("Добавлено: " + shortName(id)); }
+        else { if (name) setQ(name.split(/\s+/).slice(0, 2).join(" ")); toast(name ? "Не узнал «" + name + "» — выберите продукт из списка" : "Этого штрихкода нет в базе — найдите продукт поиском"); }
+      }} />}
       {q.trim() ? (
         <div className="mt-3 flex flex-wrap gap-2">{found.length ? found.map((id) => <Chip key={id} on={has(id)} onClick={() => toggle(id)}>{shortName(id)}</Chip>) : <p className="text-small text-ink-soft">Такого продукта нет в рецептах.</p>}</div>
       ) : <>

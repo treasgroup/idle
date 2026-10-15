@@ -9,7 +9,7 @@ AddType text/javascript .js
   Header always set X-Content-Type-Options "nosniff"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   # Microphone is needed for voice input on this site only.
-  Header always set Permissions-Policy "microphone=(self), camera=(), geolocation=()"
+  Header always set Permissions-Policy "microphone=(self), camera=(self), geolocation=()"
   # Own security policy for this app. Replaces one inherited from a parent folder
   Header unset Content-Security-Policy
   Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; form-action 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; media-src 'self' blob:; worker-src 'self'; manifest-src 'self'; font-src 'self'; upgrade-insecure-requests"

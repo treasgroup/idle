@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
-  MessageCircle, MessageCircleQuestion, Mic, Pause, Play, Plus, Refrigerator, Search, Star, Volume2, X,
+  MessageCircle, MessageCircleQuestion, Mic, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
@@ -25,6 +25,7 @@ import { TimerRing, TimerStrip } from "../components/TimerStrip";
 import { StepTimer } from "../components/StepTimer";
 import { AskSheet } from "../components/AskSheet";
 import { homeAmount, mergeSame } from "../app/amounts";
+import { useHint } from "../app/hints";
 import { stepTips } from "../app/stepTips";
 import { ChefSecret } from "../components/ChefSecret";
 
@@ -201,6 +202,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", on);
   }, [dish, total, go]);
 
+  const [tapHint, tapSeen] = useHint("cook-tap");
   // A horizontal swipe over the step changes it.
   const touch = useRef<{ x: number; y: number; t: number } | null>(null);
   const onTouchStart = (e: TouchEvent) => { const p = e.touches[0]; touch.current = { x: p.clientX, y: p.clientY, t: Date.now() }; };
@@ -217,6 +219,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
 
   const tapStep = (e: MouseEvent<HTMLElement>) => {
     if (!dish || window.getSelection()?.toString()) return;
+    tapSeen();
     const box = e.currentTarget.getBoundingClientRect();
     if (e.clientX - box.left < box.width * 0.3) { if (dish.step > 0) go(-1); }
     else if (dish.step < total - 1) go(1);
@@ -292,7 +295,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <div key={dish.key + dish.step} className="anim-rise">
             {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
             <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{cur.text}</p>
-            {dish.step === 0 && total > 1 && <p className="mt-2 text-caption text-ink-faint">Коснитесь текста справа — следующий шаг, слева — назад</p>}
+            {tapHint && total > 1 && <p className="mt-2 text-caption text-ink-faint">Коснитесь текста справа — следующий шаг, слева — назад</p>}
             {uses.length > 0 && (
               <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
                 {uses.map((i) => (
@@ -577,7 +580,7 @@ function PickSecond({ main, onClose, onPick }: { main: Recipe; onClose: () => vo
     }));
     const out = [
       { title: "Гарнир к этому блюду", list: take(suggestSides(main), 4), note: undefined },
-      { title: "Из меню", list: take(menu, 4), note: when },
+      { title: "Из плана", list: take(menu, 4), note: when },
       { title: "Сохранённое", list: take(s.favorites.map((f) => recipeById(f.id) ?? f), 6), note: undefined },
     ];
     if (!out.some((g) => g.list.length)) out.push({ title: "Гарниры и салаты", list: take(recipes().filter((r) => r.course === "side" || r.course === "salad"), 8), note: undefined });
@@ -656,7 +659,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const r = c.recipe;
   const [stars, setStars] = useState(0);
   const [hover, setHover] = useState(0);
-  const [sheet, setSheet] = useState<"menu" | "left" | null>(null);
+  const [sheet, setSheet] = useState<"menu" | "left" | "note" | null>(null);
   const askRemind = !profile.remindAsked && !s.reminders.daily && reminders.supported;
   const fav = isFavorite(r.id);
 
@@ -703,22 +706,24 @@ function Done({ onClose }: { onClose: () => void }) {
           )}
         </section>
 
+        {/* Three things worth doing now; the rest is one quiet line. */}
         <ul className="card mt-8 divide-y divide-line overflow-hidden">
-          <li className="flex items-center">
-            <DoneRow icon={<BookOpenCheck size={20} />} title="Сохранено в «Я готовил(а)»" hint="Все блюда, которые вы готовили" onClick={book} />
-            <button className="icon-btn mr-2" onClick={() => toggleFavorite(r)} aria-pressed={fav} aria-label={fav ? "Убрать из сохранённого" : "Сохранить рецепт"}>
-              <Heart size={20} className={cx(fav && "fill-brand text-brand")} />
-            </button>
-          </li>
+          <li><DoneRow icon={<Refrigerator size={20} />} title="Что-то осталось?" hint="Запишу в «Мои продукты»" onClick={() => setSheet("left")} chevron /></li>
+          <li><DoneRow icon={<PenLine size={20} />} title={s.notes[r.id] ? "Ваша заметка" : "Заметка на следующий раз"} hint={s.notes[r.id] || "Например: соли меньше"} onClick={() => setSheet("note")} chevron /></li>
           <li><DoneRow icon={<MessageCircle size={20} />} title="Что приготовить завтра?" hint="Спросить Шефа" onClick={tomorrow} chevron /></li>
-          <li><DoneRow icon={<CalendarPlus size={20} />} title="В меню" hint="Повторить в другой день" onClick={() => setSheet("menu")} chevron /></li>
-          <li><DoneRow icon={<Refrigerator size={20} />} title="Что осталось → в «Мои продукты»" hint="Отметить продукты, которые остались" onClick={() => setSheet("left")} chevron /></li>
         </ul>
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-1 text-small text-ink-soft">
+          <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken" onClick={book}><BookOpenCheck size={16} aria-hidden />В «Я готовил(а)»</button>
+          <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken" onClick={() => toggleFavorite(r)} aria-pressed={fav}>
+            <Heart size={16} className={cx(fav && "fill-brand text-brand")} aria-hidden />{fav ? "Сохранено" : "Сохранить"}
+          </button>
+          <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken" onClick={() => setSheet("menu")}><CalendarPlus size={16} aria-hidden />В план</button>
+        </div>
 
         {askRemind && (
           <div className="card mt-4 p-4">
-            <p className="flex items-center gap-2 text-body-sm font-semibold"><Bell size={18} className="text-brand" aria-hidden />Подсказывать, что приготовить?</p>
-            <p className="mt-1 text-body-sm text-ink-soft">Каждый день в 17:30 — идея на ужин или блюдо из вашего меню. Отключить можно в профиле.</p>
+            <p className="flex items-center gap-2 text-body-sm font-semibold"><Bell size={18} className="text-ink-soft" aria-hidden />Подсказывать, что приготовить?</p>
+            <p className="mt-1 text-body-sm text-ink-soft">Каждый день в 17:30 — идея на ужин или блюдо из вашего плана. Отключить можно в профиле.</p>
             <div className="mt-3 flex gap-2">
               <button className="btn-primary flex-1" onClick={async () => {
                 setProfile((p) => ({ ...p, remindAsked: true }));
@@ -732,6 +737,7 @@ function Done({ onClose }: { onClose: () => void }) {
       </div>
       {sheet === "menu" && <AddToMenuSheet recipeId={r.id} servings={c.servings} onClose={() => setSheet(null)} />}
       {sheet === "left" && <LeftoverSheet recipe={r} servings={c.servings} onClose={() => setSheet(null)} />}
+      {sheet === "note" && <NoteSheet id={r.id} onClose={() => setSheet(null)} />}
     </Layer>
   );
 }
@@ -739,7 +745,7 @@ function Done({ onClose }: { onClose: () => void }) {
 function DoneRow({ icon, title, hint, onClick, chevron }: { icon: ReactNode; title: string; hint: string; onClick: () => void; chevron?: boolean }) {
   return (
     <button onClick={onClick} className="flex min-h-[64px] w-full min-w-0 flex-1 items-center gap-3 px-4 py-2.5 text-left transition-colors duration-150 hover:bg-sunken/60">
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-brand" aria-hidden>{icon}</span>
+      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{icon}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-body-sm font-semibold">{title}</span>
         <span className="block truncate text-caption text-ink-soft">{hint}</span>
@@ -752,6 +758,7 @@ function DoneRow({ icon, title, hint, onClick, chevron }: { icon: ReactNode; tit
 /** After cooking: products that are left over go to «Мои продукты» (the ones sold in bigger packs are pre-selected). */
 function LeftoverSheet({ recipe, servings, onClose }: { recipe: Recipe; servings: number; onClose: () => void }) {
   const { s, update, toast } = useStore();
+  const a = useAssistant();
   const items = useMemo(() => {
     const skip = basics(s.preferences);
     return recipe.ingredients.filter((i) => !skip.has(i.id) && i.id !== "water").map((i) => {
@@ -766,7 +773,10 @@ function LeftoverSheet({ recipe, servings, onClose }: { recipe: Recipe; servings
   const save = () => {
     const ids = [...on];
     update((st) => ({ ...st, fridge: addToFridge(st.fridge, ids) }));
-    toast("В «Мои продукты»: " + ids.length + " " + plural(ids.length, "продукт", "продукта", "продуктов"), { label: "Открыть", run: () => replace(routeHash({ tab: "pantry" })) });
+    toast("В «Мои продукты»: " + ids.length + " " + plural(ids.length, "продукт", "продукта", "продуктов"), {
+      label: "Что приготовить?",
+      run: () => { a.show("Из того, что осталось", { ...a.base(), available: ids, strictPantry: false }, "Из остатков можно приготовить:"); goChat(); },
+    });
     onClose();
   };
   return (
@@ -786,6 +796,24 @@ function LeftoverSheet({ recipe, servings, onClose }: { recipe: Recipe; servings
           </li>
         ))}
       </ul>
+    </Sheet>
+  );
+}
+
+/** A note for next time, written right after cooking — when it is fresh in mind. */
+function NoteSheet({ id, onClose }: { id: string; onClose: () => void }) {
+  const { s, update, toast } = useStore();
+  const [text, setText] = useState(s.notes[id] ?? "");
+  const save = () => {
+    const t = text.trim();
+    update((st) => { const notes = { ...st.notes }; if (t) notes[id] = t; else delete notes[id]; return { ...st, notes }; });
+    if (t) toast("Заметка сохранена — покажу её вверху рецепта");
+    onClose();
+  };
+  return (
+    <Sheet open title="Заметка на следующий раз" onClose={onClose} footer={<button className="btn-primary h-13 w-full" onClick={save}>Сохранить</button>}>
+      <textarea className="input min-h-[120px] py-3" autoFocus placeholder="Например: соли меньше, добавить чеснок, жарить дольше" value={text} maxLength={500} onChange={(e) => setText(e.target.value)} />
+      <p className="mt-1.5 text-caption text-ink-faint">Видна только вам. Можно надиктовать — кнопка микрофона на клавиатуре.</p>
     </Sheet>
   );
 }

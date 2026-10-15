@@ -276,7 +276,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
               <div className="grid gap-2">
                 {examples.map((e) => (
                   <button key={e.text} onClick={() => finish(e.ask)} className="flex min-h-[60px] items-center gap-3 rounded-input border border-line bg-card px-3 text-left hover:border-line-strong">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink" aria-hidden>{e.icon}</span>
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{e.icon}</span>
                     <span className="flex-1 text-body-sm">{e.text}</span>
                     <ArrowUpRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
                   </button>

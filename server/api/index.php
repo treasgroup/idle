@@ -9,6 +9,7 @@ require __DIR__ . '/_private/reviews.php';
 require __DIR__ . '/_private/push.php';
 require __DIR__ . '/_private/polls.php';
 require __DIR__ . '/_private/partners.php';
+require __DIR__ . '/_private/barcode.php';
 
 const VERSION = '0.33.4';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
@@ -121,6 +122,7 @@ try {
     elseif ($route === 'poll.get' && $method === 'POST') poll_get(read_json_body(1000));
     elseif ($route === 'poll.vote' && $method === 'POST') poll_vote(read_json_body(1000));
     // ---------- Delivery partners for the shopping list ----------
+    elseif ($route === 'barcode' && $method === 'POST') { require_same_origin(); barcode_lookup((string)(read_json_body(500)['code'] ?? '')); }
     elseif ($route === 'partners' && $method === 'GET') partners_route();
     elseif ($route === 'go' && $method === 'GET') partner_go((string)($_GET['to'] ?? ''));
     // ---------- Reminders (web push) ----------

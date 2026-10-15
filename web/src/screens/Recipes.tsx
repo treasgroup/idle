@@ -166,6 +166,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
 
   // An empty «Избранное» is just the explanation: no search or filters over nothing.
   const bare = mode === "favorites" && base.length === 0 && !q;
+  // Until something is chosen, the big section tiles are the way in; the same dishes as chips would repeat them.
+  const sections = mode === "search" && !query && !dish && !active.length;
   const countLine = query
     ? "Нашлось: " + list.length + " " + recipesWord(list.length)
     : view === "saved" ? "Сохранено: " + list.length + " " + recipesWord(list.length)
@@ -217,7 +219,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
               <button type="button" className={cx("chip", active.length > 0 && "chip-on")} onClick={() => setSheet(true)} aria-haspopup="dialog">
                 <SlidersHorizontal size={18} aria-hidden />Фильтры{active.length > 0 && " · " + active.length}
               </button>
-              {dishChips}
+              {!sections && dishChips}
             </div>
             </div>
           )}
@@ -233,7 +235,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
             </div>
           )}
 
-          {mode === "search" && !query && !dish && !active.length && (
+          {sections && (
             <section className="mt-5" aria-label="Разделы">
               <h2 className="label mb-2">Разделы</h2>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(112px,1fr))]">

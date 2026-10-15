@@ -129,7 +129,7 @@ function push_next(array $b): void {
     $st = db()->prepare('SELECT * FROM push_subs WHERE id = ?'); $st->execute([push_id($b['endpoint'])]); $s = $st->fetch(PDO::FETCH_ASSOC);
     $title = 'Что приготовить?';
     if (!$s) send_json(['title' => $title, 'body' => 'Загляните — идея дня уже ждёт.', 'url' => './']);
-    if ($s['last_kind'] === 'weekly') send_json(['title' => 'Меню на неделю', 'body' => 'Составим меню на следующую неделю? Это займёт минуту, а список покупок соберётся сам.', 'url' => './?tab=menu']);
+    if ($s['last_kind'] === 'weekly') send_json(['title' => 'План на неделю', 'body' => 'Составим план на следующую неделю? Это займёт минуту, а список покупок соберётся сам.', 'url' => './?tab=menu']);
     if ($s['last_kind'] === 'test') send_json(['title' => $title, 'body' => 'Готово! Так будут выглядеть напоминания.', 'url' => './']);
     $today = gmdate('Y-m-d', time() + (int)$s['tz'] * 60);
     $body = 'Не знаете, что приготовить? Идея дня уже ждёт.';

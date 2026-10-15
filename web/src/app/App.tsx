@@ -23,6 +23,7 @@ import { Pantry } from "../screens/Pantry";
 import { Profile } from "../screens/Profile";
 import { RecipeLayer } from "../screens/RecipeLayer";
 import { CookingLayer } from "../screens/Cooking";
+import { ScreenSkeleton } from "../components/Skeleton";
 import { DocLayer, Learn, Onboarding, PollSheet } from "../screens/Extras";
 import { Boundary, ChefAvatar, Toast, cx, mmss, useScrolled } from "../components/ui";
 
@@ -56,13 +57,13 @@ function useIncomingLinks(onPoll: (t: string) => void) {
     const clean = () => history.replaceState(null, "", location.pathname + routeHash({ tab: "home" }));
     const poll = h.match(/^#poll=([0-9a-f]{32})$/), family = h.match(/^#family=([0-9a-f]{32})$/), login = h.match(/^#login=(\d{16})$/), doc = h.match(/^#(privacy|rules|terms|info)$/);
     if (poll) { clean(); onPoll(poll[1]); }
-    else if (family) { clean(); sync.join(family[1]).then(() => toast("Вы в семье: меню и покупки теперь общие")).catch((e: Error) => toast(e.message)); }
+    else if (family) { clean(); sync.join(family[1]).then(() => toast("Вы в семье: план и покупки теперь общие")).catch((e: Error) => toast(e.message)); }
     else if (login) { clean(); sync.login(login[1]).then(() => toast("Готово — данные объединены")).catch((e: Error) => toast(e.message)); }
     else if (doc) { replace(routeHash({ doc: doc[1] })); }
     const tab = q.get("tab");
     const recipe = q.get("recipe");
     if (tab || recipe) history.replaceState(null, "", location.pathname + location.hash);
-    if (tab === "shopping" || tab === "menu" || tab === "recipes") replace(routeHash({ tab: tab as Tab }));
+    if (tab === "shopping" || tab === "menu" || tab === "recipes" || tab === "pantry" || tab === "favorites" || tab === "chat") replace(routeHash({ tab: tab as Tab }));
     if (recipe) openRecipe(recipe);
   }, [ready, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 }
@@ -145,7 +146,7 @@ function Shell() {
           <Boundary resetKey="chat">{screen}</Boundary>
         ) : (
           <div className="mx-auto w-full max-w-3xl px-4 pt-2 sm:px-6 sm:pt-4 lg:max-w-[1200px] lg:px-8 lg:pt-8">
-            <Boundary resetKey={route.tab}>{screen}</Boundary>
+            <Boundary resetKey={route.tab}>{ready ? screen : <ScreenSkeleton home={route.tab === "home"} />}</Boundary>
           </div>
         )}
       </main>
@@ -234,7 +235,7 @@ function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
           </button>
         )}
         <span className="flex-1" />
-        {!online && <span className="flex h-7 shrink-0 items-center gap-1 rounded-full bg-sunken px-2.5 text-caption text-ink-soft" title="Нет интернета: рецепты, меню и покупки работают"><WifiOff size={14} aria-hidden />офлайн</span>}
+        {!online && <span className="flex h-7 shrink-0 items-center gap-1 rounded-full bg-sunken px-2.5 text-caption text-ink-soft" title="Нет интернета: рецепты, план и покупки работают"><WifiOff size={14} aria-hidden />офлайн</span>}
         {route.tab !== "profile" && <ProfileButton className="-mr-1.5 sm:hidden" />}
       </div>
     </header>

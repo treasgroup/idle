@@ -27,7 +27,7 @@ export function reminderPlan(s: EngineState, now = new Date()): { date: string; 
     out.push({
       date,
       body: titles.length
-        ? "Сегодня по меню: «" + titles[0] + "»" + (titles.length > 1 ? " и ещё " + (titles.length - 1) : "") + ". Рецепт и продукты — в одно касание."
+        ? "Сегодня по плану: «" + titles[0] + "»" + (titles.length > 1 ? " и ещё " + (titles.length - 1) : "") + ". Рецепт и продукты — в одно касание."
         : soon.length
           ? "Пора использовать: " + soon.slice(0, 2).join(" и ") + ". Загляните — подскажу, что приготовить."
           : GENERIC[day.getDate() % 3],

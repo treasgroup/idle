@@ -9,8 +9,10 @@ import { cx } from "./ui";
 export function RecipeImage({ recipe, className, rounded = "rounded-img", eager }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean }) {
   const src = photoUrl(recipe.id);
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   if (src && !failed)
-    return <img src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" onError={() => setFailed(true)} className={cx("bg-sunken object-cover", rounded, className)} />;
+    return <img src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" onError={() => setFailed(true)} onLoad={() => setLoaded(true)}
+      className={cx("object-cover", loaded ? "img-in bg-sunken" : "skeleton", rounded, className)} />;
   const [a, b] = dishTint(recipe);
   const v = dishVariant(recipe);
   return (
@@ -59,7 +61,7 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
           : recipe.summary && <p className="mt-2 line-clamp-2 text-small text-ink-soft">{recipe.summary}</p>}
         <div className="mt-4 flex gap-2">
           <button className="btn-primary flex-1" onClick={onOpen}>Открыть рецепт</button>
-          {onMenu && <button className="icon-btn border border-line" onClick={onMenu} aria-label="Добавить в меню"><CalendarPlus size={20} /></button>}
+          {onMenu && <button className="icon-btn border border-line" onClick={onMenu} aria-label="Добавить в план"><CalendarPlus size={20} /></button>}
           {onSave && <button className="icon-btn border border-line" onClick={onSave} aria-label={saved ? "Убрать из сохранённого" : "Сохранить"} aria-pressed={saved}><Heart size={20} className={cx(saved && "fill-brand text-brand")} /></button>}
         </div>
       </div>

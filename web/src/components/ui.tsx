@@ -265,7 +265,7 @@ export class Boundary extends Component<{ children: ReactNode; resetKey?: string
     return (
       <div className="mx-4 mt-8 rounded-card border border-line p-6 text-center">
         <h2 className="text-h2">Что-то пошло не так</h2>
-        <p className="mt-1 text-body-sm text-ink-soft">Обновите страницу — ваши рецепты, меню и покупки сохранены.</p>
+        <p className="mt-1 text-body-sm text-ink-soft">Обновите страницу — ваши рецепты, план и покупки сохранены.</p>
         <button className="btn-primary mt-4" onClick={() => location.reload()}>Обновить</button>
       </div>
     );

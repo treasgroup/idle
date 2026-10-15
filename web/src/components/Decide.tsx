@@ -1,4 +1,4 @@
-// «Решите за меня»: one dish at a time, big; «Другое» shows the next one. Choosing from one is easier than from twenty.
+// «Выбрать за меня»: one dish at a time, big; «Другое» shows the next one. Choosing from one is easier than from twenty.
 import { useMemo, useState } from "react";
 import { Shuffle, ChefHat, Clock } from "lucide-react";
 import { formatMinutes, freshConditions, rankRecipes, recipes, type Recipe } from "../engine";
@@ -25,7 +25,7 @@ export function DecideSheet({ open, onClose, meal }: { open: boolean; onClose: (
   const r = list.length ? list[i % list.length] : null;
   const close = () => { setI(0); onClose(); };
   return (
-    <Sheet open={open} title="Решите за меня" onClose={close} tall
+    <Sheet open={open} title="Выбрал для вас" onClose={close} tall
       footer={r ? (
         <div className="flex gap-2">
           <button className="btn-outline h-13 flex-1 text-body" onClick={() => setI((x) => x + 1)}><Shuffle size={20} />Другое</button>

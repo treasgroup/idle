@@ -1,4 +1,4 @@
-// Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Решите за меня», collections that
+// Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useMemo, useState } from "react";
 import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, ChefHat } from "lucide-react";
@@ -73,7 +73,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
     <div className="pb-4">
       <div className="flex items-start justify-between gap-3 pt-3 sm:pt-6">
         <div>
-          <p className="text-body-sm font-medium text-brand">{greeting()}!</p>
+          <p className="text-body-sm text-ink-soft">{greeting()}!</p>
           <h1 className="mt-1 text-h1 sm:text-display">Что приготовим {MEAL_WORD[meal]}?</h1>
         </div>
         <ProfileButton className="-mr-1.5 lg:hidden" />
@@ -84,18 +84,18 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         <div className="grid content-start gap-3">
           <RepeatCard />
           <button onClick={() => setDecide(true)} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-brand" aria-hidden><Shuffle size={20} /></span>
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Shuffle size={20} /></span>
             <span className="min-w-0 flex-1">
-              <span className="block text-body font-medium">Решите за меня</span>
-              <span className="block text-small text-ink-soft">Покажу одно блюдо — не понравится, покажу другое</span>
+              <span className="block text-body font-medium">Выбрать за меня</span>
+              <span className="block text-small text-ink-soft">Одно блюдо: не понравится — покажу другое</span>
             </span>
             <ChevronRight size={20} className="shrink-0 text-ink-soft" aria-hidden />
           </button>
           <button onClick={() => replace(routeHash({ tab: "chat" }))} className="flex min-h-[64px] items-center gap-3 rounded-card bg-brand-soft px-4 py-3 text-left transition-transform active:scale-[.99]">
             <ChefAvatar size={40} />
             <span className="min-w-0 flex-1">
-              <span className="block text-body font-medium">Не знаете, что приготовить?</span>
-              <span className="block text-small text-ink-soft">Спросите Шефа — подберёт за минуту</span>
+              <span className="block text-body font-medium">Написать Шефу</span>
+              <span className="block text-small text-ink-soft">Расскажите, что есть дома или чего хочется</span>
             </span>
             <ChevronRight size={20} className="shrink-0 text-brand" aria-hidden />
           </button>
@@ -231,11 +231,11 @@ function Now({ rail }: { rail?: boolean }) {
         </button>
       )}
       {menu.map(({ i, r }) => rail
-        ? <RecipeMini key={r.id + i.servings} recipe={r} note={i.leftover ? "Только разогреть" : "По меню · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />
-        : <RecipeRow key={r.id + i.servings} recipe={r} note={i.leftover ? "Приготовлено вчера — только разогреть" : "По меню на сегодня · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />)}
+        ? <RecipeMini key={r.id + i.servings} recipe={r} note={i.leftover ? "Только разогреть" : "По плану · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />
+        : <RecipeRow key={r.id + i.servings} recipe={r} note={i.leftover ? "Приготовлено вчера — только разогреть" : "По плану на сегодня · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />)}
       {toBuy > 0 && (
         <button onClick={() => replace(routeHash({ tab: "shopping" }))} className="flex min-h-[52px] items-center gap-3 rounded-input border border-line bg-card px-3 text-left hover:border-line-strong/60">
-          <ShoppingCart size={20} className="shrink-0 text-brand" aria-hidden />
+          <ShoppingCart size={20} className="shrink-0 text-ink-soft" aria-hidden />
           <span className="flex-1 text-body-sm">В покупках: <b>{toBuy}</b></span>
           <ChevronRight size={18} className="text-ink-faint" aria-hidden />
         </button>

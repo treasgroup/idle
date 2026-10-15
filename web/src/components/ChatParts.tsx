@@ -122,7 +122,7 @@ export function SuggestionCards({ items, className }: { items: Suggestion[]; cla
       {items.map((it) => (
         <button key={it.text} onClick={it.run}
           className="flex min-h-[96px] flex-col items-start gap-2 rounded-input border border-line bg-card p-3 text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.98] sm:min-h-[64px] sm:flex-row sm:items-center sm:gap-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink" aria-hidden>{it.icon}</span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{it.icon}</span>
           <span className="line-clamp-3 min-w-0 flex-1 text-body-sm leading-snug sm:line-clamp-2">{it.text}</span>
           <ArrowUpRight size={16} className="hidden shrink-0 text-ink-faint sm:block" aria-hidden />
         </button>

@@ -66,6 +66,34 @@
   color-scheme: dark;
 }
 
+/* High contrast, for weak eyesight: black on white, dark borders, deeper colours (all pass WCAG AAA for text). */
+:root[data-theme="contrast"] {
+  --paper: 255 255 255;
+  --card: 255 255 255;
+  --sunken: 238 238 238;
+  --line: 120 120 120;
+  --line-strong: 40 40 40;
+  --ink: 0 0 0;
+  --ink-soft: 34 34 34;
+  --ink-faint: 51 51 51;
+  --brand: 150 30 10;
+  --brand-fill: 150 30 10;
+  --brand-soft: 255 228 220;
+  --brand-ink: 110 20 5;
+  --herb: 20 82 30;
+  --herb-soft: 220 240 220;
+  --warn: 110 60 0;
+  --warn-soft: 255 236 200;
+  --scrim: 0 0 0;
+  --scrim-a: 0.55;
+}
+:root[data-theme="contrast"] body { font-weight: 450; }
+
+/* Loading placeholders: a soft light passes over grey shapes (still, if motion is reduced). */
+@keyframes skel { from { background-position: 150% 0; } to { background-position: -50% 0; } }
+.img-in { animation: img-in .25s ease-out; }
+@keyframes img-in { from { opacity: 0; } to { opacity: 1; } }
+
 @layer base {
   html { -webkit-text-size-adjust: 100%; }
   html.large-text { font-size: 112.5%; }
@@ -99,7 +127,8 @@
   textarea.input { @apply h-auto py-3; }
   .label { @apply text-small font-medium text-ink-soft; }
   .link { @apply font-medium text-brand underline-offset-2 hover:underline; }
-  .skeleton { @apply animate-pulse rounded-input bg-sunken; }
+  .skeleton { @apply rounded-input; background-color: rgb(var(--line) / .75); background-image: linear-gradient(90deg, transparent 0, rgb(var(--card) / .45) 50%, transparent 100%); background-size: 200% 100%; background-repeat: no-repeat; animation: skel 1.4s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .skeleton { animation: none; background-image: none; } }
 }
 
 /* Safe areas (phones with a notch / home indicator). */

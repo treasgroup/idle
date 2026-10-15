@@ -15,16 +15,26 @@
   <meta property="og:image" content="./icons/icon-512.png">
   <meta name="twitter:card" content="summary">
   <link rel="preload" href="./fonts/GolosText-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="./boot.js"></script>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Что приготовить?">
-  <script type="module" crossorigin src="./assets/app-D77839IJ.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/app-DPKjk0E5.css">
+  <script type="module" crossorigin src="./assets/app-BEefuu8L.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/app-BLzgfL5m.css">
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Shown until the app starts: the shape of the home screen in grey, so the page never looks empty. -->
+    <div class="mx-auto max-w-3xl px-4 pt-5" aria-label="Загрузка" role="status">
+      <span class="skeleton block h-4 w-28 rounded-full"></span>
+      <span class="skeleton mt-3 block h-8 w-2/3"></span>
+      <span class="skeleton mt-6 block aspect-[4/3] w-full rounded-card"></span>
+      <span class="skeleton mt-4 block h-16 rounded-card"></span>
+      <span class="skeleton mt-3 block h-16 rounded-card"></span>
+    </div>
+  </div>
   <noscript><p>Для подбора рецептов включите JavaScript. Без него можно открыть <a href="./recipes.php">каталог всех рецептов</a>.</p></noscript>
 </body>
 </html>

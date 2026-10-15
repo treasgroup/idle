@@ -112,9 +112,9 @@ export function Shopping() {
           <Empty icon={<ShoppingBag size={48} />} title="Список покупок пуст"
             actions={<>
               <button className="btn-primary" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукт</button>
-              <button className="btn-outline" onClick={() => replace(routeHash({ tab: "menu" }))}><CalendarDays size={18} />Составить меню</button>
+              <button className="btn-outline" onClick={() => replace(routeHash({ tab: "menu" }))}><CalendarDays size={18} />Составить план</button>
             </>}>
-            Нажмите «Докупить» в рецепте или «В покупки» в меню — продукты сложатся по отделам магазина, с подсказкой, сколько упаковок брать.
+            Нажмите «Докупить» в рецепте или «В покупки» в плане на неделю — продукты сложатся по отделам магазина, с подсказкой, сколько упаковок брать.
           </Empty>
         </div>
       ) : (
@@ -157,7 +157,7 @@ export function Shopping() {
               ) : (
                 <span className="flex-1 text-small text-ink-soft">Отмечайте купленное — потом перенесу его в «Мои продукты»</span>
               )}
-              <button className="btn-ghost shrink-0 px-3 sm:px-5" onClick={() => setClear(true)} aria-label="Очистить список"><Trash2 size={18} /><span className="hidden sm:inline">Очистить</span></button>
+              <button className="btn-ghost shrink-0 px-3 sm:px-5" onClick={() => (bought.length ? setClear(true) : withUndo("Список очищен", () => []))} aria-label="Очистить список"><Trash2 size={18} /><span className="hidden sm:inline">Очистить</span></button>
             </div>
           </div>
         </>

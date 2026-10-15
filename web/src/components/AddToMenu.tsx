@@ -18,11 +18,11 @@ export function AddToMenuSheet({ recipeId, servings, onClose }: { recipeId: stri
       else menu.push({ date, items: [item] });
       return { ...st, menu: menu.filter((d) => d.date >= dateKey(new Date())).sort((x, y) => x.date.localeCompare(y.date)).slice(0, 31) };
     });
-    toast("Добавлено в меню: " + dayLabel(date).toLowerCase());
+    toast("Добавлено в план: " + dayLabel(date).toLowerCase());
     onClose();
   };
   return (
-    <Sheet open title="Добавить в меню" onClose={onClose}>
+    <Sheet open title="Добавить в план" onClose={onClose}>
       <div className="grid gap-2">
         {days.map((d) => (
           <button key={d.date} className="flex min-h-[52px] items-center justify-between rounded-input border border-line bg-card px-4 text-left hover:border-line-strong/60" onClick={() => add(d.date)}>

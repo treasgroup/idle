@@ -9,7 +9,7 @@ import { FOCUS_COMPOSER, takeFocusRequest } from "../app/chatNav";
 import { minutesIn, startTimer } from "../app/timers";
 import { Composer } from "../components/Composer";
 import { TimerStrip } from "../components/TimerStrip";
-import { ConditionBar, Message, MoodTiles, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
+import { ConditionBar, Message, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
 import { ChefAvatar, Chip, Sheet, cx, useScrolled } from "../components/ui";
 import { useChats } from "../app/chats";
 
@@ -130,7 +130,7 @@ export function Chat() {
             <li key={c.id}>
               <button className="flex min-h-[56px] w-full items-center gap-3 rounded-input border border-line bg-card px-4 text-left hover:border-line-strong"
                 onClick={() => { a.restore(c.id); setHistory(false); }}>
-                <MessageCircle size={20} className="shrink-0 text-brand" aria-hidden />
+                <MessageCircle size={20} className="shrink-0 text-ink-soft" aria-hidden />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-body-sm font-medium">{c.title}</span>
                   <span className="block text-caption text-ink-soft">{new Date(c.at).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</span>
@@ -146,6 +146,7 @@ export function Chat() {
 
 /** An empty conversation looks like a messenger chat: Шеф says hello and offers ready answers to tap. */
 function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSuggestions>; send: (t: string, o?: { shown?: string; source?: string }) => void }) {
+  const fridge = useStore().s.fridge.length > 0;
   const quick = [
     ["Что-нибудь быстрое", "что-нибудь быстрое на ужин"], ["Из того, что есть", "что приготовить из того, что есть дома"],
     ["Хочу суп", "хочу суп"], ["Удиви меня", "удиви меня"],
@@ -160,9 +161,7 @@ function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSu
         {quick.map(([label, text]) => <Chip key={label} className="border-brand text-brand" onClick={() => send(text, { shown: label, source: "option" })}>{label}</Chip>)}
       </div>
       <h2 className="label pt-4">Или выберите пример</h2>
-      <SuggestionCards items={suggestions} />
-      <h2 className="label pt-4">Под настроение</h2>
-      <MoodTiles send={(t, shown) => send(t, { shown, source: "option" })} />
+      <SuggestionCards items={fridge ? [suggestions[3], suggestions[0]] : [suggestions[0], suggestions[2]]} />
     </div>
   );
 }

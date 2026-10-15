@@ -50,7 +50,8 @@ export function useActions() {
       favorites: on ? st.favorites.filter((f) => f.id !== r.id) : [r, ...st.favorites],
       taste: on ? st.taste : updateTaste(st.taste, r.id, "liked"),
     }));
-    toast(on ? "Убрано из сохранённого" : "Сохранено");
+    if (on) toast("Убрано из сохранённого", { label: "Отменить", run: () => update((st) => (st.favorites.some((f) => f.id === r.id) ? st : { ...st, favorites: [r, ...st.favorites] })) });
+    else toast("Сохранено");
   }, [s.favorites, update, toast]);
 
   /** Adds what is missing for the dish to the shopping list (scaled to servings). */

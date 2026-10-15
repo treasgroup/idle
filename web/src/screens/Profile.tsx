@@ -12,6 +12,7 @@ import { GOALS, LEVELS } from "../app/profile";
 import { openLayer, openRecipesView, routeHash } from "../app/router";
 import { Chip, Section, Segmented, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
+import { FamilyMembers } from "../components/FamilyMembers";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
 const APPLIANCES = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"];
@@ -19,7 +20,7 @@ const APPLIANCES = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", 
 function Row({ icon, title, hint, onClick }: { icon: JSX.Element; title: string; hint?: string; onClick: () => void }) {
   return (
     <button className="flex min-h-[60px] w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-sunken/60" onClick={onClick}>
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink" aria-hidden>{icon}</span>
+      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{icon}</span>
       <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">{title}</span>{hint && <span className="block truncate text-caption text-ink-soft">{hint}</span>}</span>
       <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
     </button>
@@ -68,7 +69,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
 
       <div className="card mt-3 overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink" aria-hidden><Type size={18} /></span>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Type size={18} /></span>
           <span className="flex-1 text-body-sm font-semibold">Размер текста</span>
           <div role="radiogroup" aria-label="Размер текста" className="flex rounded-full bg-sunken p-1">
             {(["m", "l", "xl"] as const).map((k, i) => (
@@ -98,7 +99,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
 
           <Section title="Семья и устройства">
             <div className="card divide-y divide-line overflow-hidden">
-              <Row icon={<Users size={18} />} title="Семья" hint={sync.status.members > 1 ? "В семье: " + sync.status.members + " — общее меню и покупки" : "Общее меню и список покупок"} onClick={() => setSheet("family")} />
+              <Row icon={<Users size={18} />} title="Семья" hint={sync.status.members > 1 ? "В семье: " + sync.status.members + " — общий план и покупки" : "Общий план и список покупок"} onClick={() => setSheet("family")} />
               <Row icon={<KeyRound size={18} />} title="Другое устройство" hint="Перенести рецепты на телефон или компьютер" onClick={() => setSheet("login")} />
             </div>
           </Section>
@@ -110,7 +111,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
               <div className="border-b border-line px-4 py-3">
                 <p className="mb-2 text-body-sm font-semibold">Тема</p>
                 <Segmented label="Тема" value={profile.theme} onChange={(v) => setProfile((p) => ({ ...p, theme: v }))}
-                  options={[{ id: "light", label: "Светлая" }, { id: "dark", label: "Тёмная" }, { id: "system", label: "Авто" }]} />
+                  options={[{ id: "light", label: "Светлая" }, { id: "dark", label: "Тёмная" }, { id: "contrast", label: "Контраст" }, { id: "system", label: "Авто" }]} />
+                {profile.theme === "contrast" && <p className="mt-2 text-caption text-ink-soft">Чёрный текст на белом и чёткие рамки — легче читать при слабом зрении.</p>}
               </div>
               <div className="divide-y divide-line px-4">
                 <Toggle on={s.readAloud} onChange={(v) => update((st) => ({ ...st, readAloud: v }))} label="Читать шаги вслух" hint="В режиме готовки" />
@@ -178,6 +180,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
           })}
         </div>
         <ExcludeProduct />
+        <FamilyMembers />
       </Sheet>
 
       <Sheet open={sheet === "kitchen"} title="Техника" onClose={close}>
@@ -207,7 +210,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
             await wipe();
           }}>{wiping ? "Удаляю…" : "Удалить всё"}</button>
         </div>}>
-        <p className="text-body-sm text-ink-soft">Удалятся сохранённые рецепты, «Я готовил(а)», заметки, продукты «Мои продукты», меню, список покупок, ваши отзывы, напоминания и анонимный аккаунт на сервере. Отменить нельзя.</p>
+        <p className="text-body-sm text-ink-soft">Удалятся сохранённые рецепты, «Я готовил(а)», заметки, продукты «Мои продукты», план на неделю, список покупок, ваши отзывы, напоминания и анонимный аккаунт на сервере. Отменить нельзя.</p>
       </Sheet>
     </div>
   );
@@ -241,11 +244,11 @@ function Family() {
   const [link, setLink] = useState("");
   return (
     <div>
-      <p className="text-body-sm text-ink-soft">Меню на неделю, список покупок и продукты «Мои продукты» станут общими: изменения увидят все в семье. Без телефонов и почты — по ссылке-приглашению.</p>
+      <p className="text-body-sm text-ink-soft">План на неделю, список покупок и «Мои продукты» станут общими: изменения увидят все в семье. Без телефонов и почты — по ссылке-приглашению.</p>
       <p className="mt-2 text-body-sm">Сейчас в семье: <b>{sync.status.members}</b></p>
       {link ? (
         <div className="mt-4">
-          <ShareOptions title="Приглашение в семью" text={"Присоединяйся к нашему меню и списку покупок: " + link} url={link} onDone={() => toast("Приглашение готово — ссылка действует 7 дней")} />
+          <ShareOptions title="Приглашение в семью" text={"Присоединяйся к нашему плану на неделю и списку покупок: " + link} url={link} onDone={() => toast("Приглашение готово — ссылка действует 7 дней")} />
         </div>
       ) : (
         <button className="btn-primary mt-4 w-full" onClick={async () => { try { setLink(siteBase() + "#family=" + (await sync.invite())); } catch (e) { toast(e instanceof Error ? e.message : "Нет связи с сервером"); } }}><Link2 size={18} />Пригласить в семью</button>
@@ -264,13 +267,13 @@ function Login() {
   if (!mode)
     return (
       <div className="grid gap-2">
-        <p className="mb-2 text-body-sm text-ink-soft">Рецепты, меню и покупки можно перенести на другой телефон или компьютер — без регистрации, по коду.</p>
+        <p className="mb-2 text-body-sm text-ink-soft">Рецепты, план и покупки можно перенести на другой телефон или компьютер — без регистрации, по коду.</p>
         <button className="flex min-h-[64px] items-center gap-3 rounded-input border border-line bg-card px-4 text-left" onClick={() => setMode("enter")}>
-          <Smartphone size={20} className="shrink-0 text-brand" aria-hidden />
+          <Smartphone size={20} className="shrink-0 text-ink-soft" aria-hidden />
           <span><span className="block text-body-sm font-semibold">Это новое устройство</span><span className="block text-caption text-ink-soft">Ввести код с другого</span></span>
         </button>
         <button className="flex min-h-[64px] items-center gap-3 rounded-input border border-line bg-card px-4 text-left" onClick={show}>
-          <QrCode size={20} className="shrink-0 text-brand" aria-hidden />
+          <QrCode size={20} className="shrink-0 text-ink-soft" aria-hidden />
           <span><span className="block text-body-sm font-semibold">Перенести на другое устройство</span><span className="block text-caption text-ink-soft">Показать код и QR</span></span>
         </button>
       </div>
@@ -310,14 +313,14 @@ function Reminders() {
   };
   return (
     <div>
-      <p className="text-body-sm text-ink-soft">Раз в день — блюдо из вашего меню, продукты, которые пора использовать, или идея на ужин. По воскресеньям — составить меню на неделю.</p>
+      <p className="text-body-sm text-ink-soft">Раз в день — блюдо из вашего плана, продукты, которые пора использовать, или идея на ужин. По воскресеньям — составить план на неделю.</p>
       <label className="mt-4 flex items-center justify-between gap-3">
         <span className="text-body-sm">Каждый день в</span>
         <select className="input w-32" value={time} onChange={(e) => setTime(e.target.value)}>
           {(HOURS.includes(time) ? HOURS : [time, ...HOURS]).map((h) => <option key={h} value={h}>{h}</option>)}
         </select>
       </label>
-      <Toggle on={weekly} onChange={setWeekly} label="По воскресеньям — меню на неделю" />
+      <Toggle on={weekly} onChange={setWeekly} label="По воскресеньям — план на неделю" />
       <div className="mt-4 grid grid-cols-2 gap-2">
         <button className="btn-primary" onClick={() => apply(time, weekly)}>Включить</button>
         <button className="btn-outline" onClick={() => apply(null, false)}>Выключить</button>
