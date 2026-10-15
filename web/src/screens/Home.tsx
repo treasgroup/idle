@@ -143,7 +143,7 @@ function Now({ rail }: { rail?: boolean }) {
   const timers = useTimers().length;
   if (!cooking && !menu.length && !toBuy && !timers) return null;
   const rows = (
-    <div className={cx("grid gap-2", rail && "gap-1")}>
+    <div className={cx("grid grid-cols-[minmax(0,1fr)] gap-2", rail && "gap-1")}>
       {timers > 0 && <TimerStrip flush={rail} />}
       {cooking && (
         <button onClick={() => openLayer(routeHash({ cook: true }))} className="flex min-h-[56px] items-center gap-3 rounded-input bg-ink px-3 text-left text-paper">

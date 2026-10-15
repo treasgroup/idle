@@ -1,224 +1,619 @@
-import { useEffect, useMemo, useState } from "react";
-import { Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Users, Leaf, Baby, Info } from "lucide-react";
+// The recipe page. Phones: a photo under a clear header that turns solid (title + «Продукты · Шаги · Отзывы»)
+// once the title has scrolled away, and a bar with «В меню» and «Начать готовить». Wide screens: photo left,
+// facts and actions right, the products column sticks while the steps scroll.
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
-  basics, clampServings, dateKey, displayName, dayLabel, formatAmount, ingredient, ingredientMatches, isLenten, nutritionOf, recipeById, recipePageUrl,
-  scaleIngredient, shareLink, similarRecipes, suggestSides, needsSide, withSide, yieldText, copyText, canShare, SHARE_TARGETS, weekDays,
-  clampServings as clamp, LABELS, type Recipe,
+  Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
+  Timer, BellRing, Lightbulb, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send,
+} from "lucide-react";
+import {
+  LABELS, canShare, clampServings, copyText, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
+  recipeById, recipePageUrl, reviewsWord, scaleIngredient, shareLink, similarRecipes, suggestSides, needsSide, withSide, yieldText, SHARE_TARGETS,
+  type Recipe, type RecipeIngredient,
 } from "../engine";
 import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
-import { RecipeImage, RecipeMeta, RecipeTile } from "../components/RecipeCard";
-import { Chip, Layer, Section, Sheet, Stepper, cx } from "../components/ui";
-import { Reviews } from "./Reviews";
+import { homeQuantity, mergeSame } from "../app/amounts";
+import { goChat } from "../app/chatNav";
+import { openLayer, replace, routeHash } from "../app/router";
+import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
+import { RecipeImage, RecipeTile } from "../components/RecipeCard";
+import { AddToMenuSheet } from "../components/AddToMenu";
+import { AskSheet, askStarters, type AskRequest } from "../components/AskSheet";
+import { TimerStrip } from "../components/TimerStrip";
+import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../components/ui";
+import { Reviews, Stars, useReviews } from "./Reviews";
+
+const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
+const ANCHORS = [
+  { id: "recipe-products", label: "Продукты" },
+  { id: "recipe-steps", label: "Шаги" },
+  { id: "recipe-reviews", label: "Отзывы" },
+];
+// Below the solid header (56px) and the anchor row (44px).
+const UNDER_HEADER = "scroll-mt-[calc(env(safe-area-inset-top)+7rem)]";
+const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const wide = () => matchMedia("(min-width: 1024px)").matches;
 
 export function RecipeLayer({ id, onClose }: { id: string; onClose: () => void }) {
   const { catalog } = useStore();
   const base = recipeById(id);
-  if (!base && catalog.version === 0) return <Layer title="Рецепт" onClose={onClose}><div className="p-6 text-center text-ink-faint">Загружаю рецепт…</div></Layer>;
-  if (!base) return (
+  // A shared link can arrive before the full catalog: wait for it instead of saying the recipe is gone.
+  const waiting = !base && catalog.source !== "server";
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    if (!waiting) return;
+    const t = window.setTimeout(() => setSlow(true), 8000);
+    return () => window.clearTimeout(t);
+  }, [waiting]);
+  if (base) return <RecipeView key={id} base={base} onClose={onClose} />;
+  return (
     <Layer title="Рецепт" onClose={onClose}>
-      <div className="p-6 text-center text-ink-soft">Этого рецепта больше нет в каталоге.</div>
+      {waiting ? <Loading slow={slow} /> : <Missing />}
     </Layer>
   );
-  return <RecipeView key={id} base={base} onClose={onClose} />;
 }
 
+function Loading({ slow }: { slow: boolean }) {
+  return (
+    <div className="mx-auto max-w-3xl pb-10 sm:px-6 sm:pt-2" role="status" aria-live="polite">
+      <div className="skeleton aspect-[4/3] w-full rounded-none sm:aspect-[3/2] sm:rounded-card" />
+      <div className="px-4 pt-5 sm:px-0">
+        <p className="text-body-sm text-ink-soft">{slow ? "Каталог загружается дольше обычного. Проверьте интернет — рецепт откроется сам." : "Загружаю рецепт…"}</p>
+        {slow && <button className="btn-outline mt-3" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={18} />Все рецепты</button>}
+        <div className="skeleton mt-3 h-8 w-3/4" />
+        <div className="skeleton mt-3 h-4 w-full" />
+        <div className="skeleton mt-2 h-4 w-5/6" />
+        <div className="mt-5 flex gap-2"><div className="skeleton h-8 w-24 rounded-full" /><div className="skeleton h-8 w-24 rounded-full" /><div className="skeleton h-8 w-20 rounded-full" /></div>
+        <div className="skeleton mt-8 h-48 rounded-card" />
+      </div>
+    </div>
+  );
+}
+
+function Missing() {
+  return (
+    <div className="mx-auto max-w-md px-6 pb-10 pt-12 text-center">
+      <SearchX size={48} className="mx-auto text-ink-faint" aria-hidden />
+      <h1 className="mt-4 text-h1">Рецепт не найден</h1>
+      <p className="mt-2 text-body-sm text-ink-soft">Похоже, его убрали из каталога. Найдите похожее блюдо в рецептах или спросите Шефа.</p>
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        <button className="btn-primary" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={18} />Все рецепты</button>
+        <button className="btn-outline" onClick={() => goChat(true)}><MessageCircle size={18} />Спросить Шефа</button>
+      </div>
+    </div>
+  );
+}
+
+/** Where the header turns solid (the title has scrolled under it) and which section is on screen. */
+function useHeader(root: RefObject<HTMLElement>, title: RefObject<HTMLElement>) {
+  const [until, setUntil] = useState(10000);
+  const [solid, setSolid] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
+  const limit = useRef(until);
+  const box = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    let el = root.current?.parentElement ?? null;
+    while (el && !/(auto|scroll)/.test(getComputedStyle(el).overflowY)) el = el.parentElement;
+    if (!el || !root.current) return;
+    const scroller = el;
+    box.current = scroller;
+    const head = () => (scroller.previousElementSibling as HTMLElement | null)?.offsetHeight ?? 56;
+    const measure = () => {
+      const h = title.current;
+      if (!h) return;
+      const bottom = h.getBoundingClientRect().bottom - scroller.getBoundingClientRect().top + scroller.scrollTop;
+      limit.current = Math.max(0, Math.round(bottom - head()));
+      setUntil(limit.current);
+      onScroll();
+    };
+    const onScroll = () => {
+      setSolid(scroller.scrollTop > limit.current);
+      const top = scroller.getBoundingClientRect().top + head() + 44 + 24;
+      let on: string | null = null;
+      for (const a of ANCHORS) {
+        const t = document.getElementById(a.id);
+        if (t && t.getBoundingClientRect().top <= top) on = a.id;
+      }
+      setActive(on);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(root.current);
+    scroller.addEventListener("scroll", onScroll, { passive: true });
+    return () => { ro.disconnect(); scroller.removeEventListener("scroll", onScroll); };
+  }, [root, title]);
+  return { until, solid, active, box };
+}
+
+/** The products column sticks on wide screens only while it fits under the header. */
+function useFits(el: RefObject<HTMLElement>, box: RefObject<HTMLElement | null>): boolean {
+  const [fits, setFits] = useState(true);
+  useEffect(() => {
+    const a = el.current, b = box.current;
+    if (!a || !b) return;
+    const check = () => setFits(a.offsetHeight <= b.clientHeight - 100);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(a);
+    ro.observe(b);
+    return () => ro.disconnect();
+  }, [el, box]);
+  return fits;
+}
+
+/** «Котлеты домашние», «Куриные бёдра» — the dish part of a title, for the group of its products. */
+const dishPart = (title: string) => title.split(/,|\s(?:с|со|в|во|на|по|из|под|без)\s/)[0];
+/** Steps of a side come as «Гарнир («пюре»): сварите…». */
+const splitSide = (text: string) => {
+  const m = text.match(/^Гарнир \(«(.+?)»\):\s*/);
+  return m ? { side: m[1], text: text.slice(m[0].length, m[0].length + 1).toUpperCase() + text.slice(m[0].length + 1) } : { side: null, text };
+};
+/** A few words of a step for its timer: «Шаг 5 · жарьте котлеты». */
+function stepLabel(text: string): string {
+  const words = splitSide(text).text.split(/[.,;:(—–]/)[0].trim().split(/\s+/).slice(0, 3);
+  while (words.length > 1 && /^(и|а|на|в|во|с|со|до|по|для|из|к|о|от|за|под|при|\d+([.,]\d+)?)$/i.test(words[words.length - 1])) words.pop();
+  const s = words.join(" ");
+  return s.charAt(0).toLowerCase() + s.slice(1);
+}
+
+interface Group { key: string; title: string | null; rows: RecipeIngredient[]; added?: boolean }
+
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
-  const { s, update, profile, toast } = useStore();
+  const { s, profile, toast, online } = useStore();
   const { isFavorite, toggleFavorite, addRecipeToShopping, startCooking, openRecipe } = useActions();
+  const reviews = useReviews(base.id);
   const [servings, setServings] = useState(() => clampServings(base, s.conditions.servings || profile.eaters));
   const [sideId, setSideId] = useState<string | null>(null);
-  const sides = useMemo(() => (needsSide(base) ? suggestSides(base, s.preferences.excluded) : []), [base, s.preferences.excluded]);
-  const side = sides.find((x) => x.id === sideId) ?? null;
-  const recipe = side ? withSide(base, side) : base;
   const [have, setHave] = useState<string[]>(() => haveIds(s));
   const [menuOpen, setMenuOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [askOpen, setAskOpen] = useState(false);
+  const [askReq, setAskReq] = useState<AskRequest | null>(null);
+  const root = useRef<HTMLDivElement>(null);
+  const h1 = useRef<HTMLHeadingElement>(null);
+  const body = useRef<HTMLDivElement>(null);
+  const sideRows = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLDivElement>(null);
+  const aside = useRef<HTMLElement>(null);
+  const header = useHeader(root, h1);
+  const fits = useFits(aside, header.box);
+
+  const sides = useMemo(() => (needsSide(base) ? suggestSides(base, s.preferences.excluded) : []), [base, s.preferences.excluded]);
+  const side = sides.find((x) => x.id === sideId) ?? null;
+  // One recipe with the side merged in, for cooking and the shopping list.
+  const recipe = useMemo(() => (side ? withSide(base, side) : base), [base, side]);
+  // The same for questions, with its own version so nutrition is not mixed up with the dish alone.
+  const askRecipe = useMemo(() => (side ? { ...recipe, version: base.version + "+" + side.id } : base), [recipe, base, side]);
   const nutrition = nutritionOf(base).perServing;
   const fav = isFavorite(base.id);
-  const staples = basics(s.preferences);
-  const related = useMemo(() => similarRecipes(base, (r) => !s.preferences.excluded.some((e) => r.allergens.includes(e)), 6), [base, s.preferences.excluded]);
-  const note = s.notes[base.id] ?? "";
+  const related = useMemo(() => similarRecipes(base, (r) => !s.preferences.excluded.some((e) => r.allergens.includes(e)), 8), [base, s.preferences.excluded]);
+  const starters = useMemo(() => askStarters(askRecipe, servings, s.preferences), [askRecipe, servings, s.preferences]);
+  const cookedTimes = s.book.filter((b) => b.recipeId === base.id).length;
+  const cookingThis = !!s.cooking && !s.cooking.done && s.cooking.recipe.id === base.id;
 
-  const scaled = recipe.ingredients.map((i) => scaleIngredient(i, recipe, servings));
-  const hasIt = (iid: string) => staples.has(iid) || have.some((h) => ingredientMatches(iid, h));
-  const missing = scaled.filter((i) => !i.optional && i.id !== "water" && !hasIt(i.id));
-  const toggleHave = (iid: string) => setHave((h) => (h.includes(iid) ? h.filter((x) => x !== iid) : [...h, iid]));
+  // Products in groups: the dish, then the side (both scaled to the chosen servings, repeats merged).
+  const scale = (list: RecipeIngredient[]) => mergeSame(list).map((i) => scaleIngredient(i, base, servings));
+  const groups: Group[] = [{ key: "main", title: side ? dishPart(base.title) : null, rows: scale(base.ingredients) }];
+  if (side) {
+    const k = base.servings / side.servings;
+    groups.push({ key: side.id, title: "Гарнир: " + side.title.toLowerCase(), rows: scale(side.ingredients.map((i) => ({ ...i, amount: Math.round(i.amount * k * 100) / 100 }))), added: true });
+  }
+  const hasIt = (id: string) => have.some((h) => ingredientMatches(id, h));
+  const needed = [...new Set(recipe.ingredients.filter((i) => !i.optional && i.id !== "water").map((i) => i.id))];
+  const owned = needed.filter(hasIt).length;
+  const missing = needed.length - owned;
+  const toggleHave = (id: string) => setHave((h) => (hasIt(id) ? h.filter((x) => !ingredientMatches(id, x)) : [...h, id]));
 
   useEffect(() => { document.title = base.title + " — Что приготовить?"; return () => { document.title = "Что приготовить?"; }; }, [base.title]);
 
-  const flags = [
-    base.tags.includes("vegetarian") && { icon: <Leaf size={14} />, label: "Без мяса" },
-    isLenten(base) && { icon: <Leaf size={14} />, label: "Постное" },
-    base.kids && { icon: <Baby size={14} />, label: "Можно детям" },
-    base.storageDays ? { icon: <Refrigerator size={14} />, label: "Хранится " + base.storageDays + " дн." } : null,
-    base.freezerDays ? { icon: <Snowflake size={14} />, label: "Можно заморозить" } : null,
-    base.budget === "low" && { icon: <span>💰</span>, label: "Бюджетно" },
-  ].filter(Boolean) as { icon: JSX.Element; label: string }[];
+  // --dock: the bottom bar's height, so toasts float above it.
+  useLayoutEffect(() => {
+    const el = bar.current;
+    if (!el) return;
+    const rootStyle = document.documentElement.style;
+    const set = () => rootStyle.setProperty("--dock", el.offsetHeight + "px");
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => { ro.disconnect(); rootStyle.setProperty("--dock", "0px"); };
+  }, []);
+
+  const go = (id: string) => {
+    const el = id === "recipe-products" && wide() ? body.current : document.getElementById(id);
+    el?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+  };
+  const goStep = (step: number | null) => {
+    if (step == null) return go("recipe-steps");
+    document.getElementById("recipe-step-" + step)?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" });
+  };
+  const pickSide = (id: string | null) => {
+    setSideId(id);
+    if (id) window.setTimeout(() => sideRows.current?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "nearest" }), 60);
+  };
+  const ask = (text?: string) => { setAskReq(text ? { text, key: Date.now() } : null); setAskOpen(true); };
+  const cook = () => (cookingThis ? openLayer(routeHash({ cook: true })) : startCooking(recipe, servings));
+
+  const flags: { icon: ReactNode; label: string }[] = [
+    { icon: <Clock size={16} />, label: formatMinutes(recipe.totalMinutes) },
+    ...(nutrition.kcal > 0 ? [{ icon: <Flame size={16} />, label: nutrition.kcal + " ккал" }] : []),
+    { icon: <Gauge size={16} />, label: DIFF[base.difficulty] ?? base.difficulty },
+    ...(base.budget === "low" ? [{ icon: <ShoppingBasket size={16} />, label: "Из простых продуктов" }] : []),
+    ...(base.tags.includes("vegetarian") ? [{ icon: <Leaf size={16} />, label: "Без мяса" }] : []),
+    ...(isLenten(base) ? [{ icon: <Sprout size={16} />, label: "Постное" }] : []),
+    ...(base.kids ? [{ icon: <Baby size={16} />, label: "Можно детям" }] : []),
+    ...(base.storageDays ? [{ icon: <Refrigerator size={16} />, label: "Хранится " + base.storageDays + " " + plural(base.storageDays, "день", "дня", "дней") }] : []),
+    ...(base.freezerDays ? [{ icon: <Snowflake size={16} />, label: "Можно заморозить" }] : []),
+  ];
+  // Гарнир: before the products on phones, above the steps next to the products column on wide screens.
+  const sidePicker = sides.length > 0 && (
+    <Section title="Гарнир">
+      <p className="-mt-2 mb-3 text-small text-ink-soft">{side ? "Добавил продукты и шаги гарнира — приготовите всё вместе." : "Подскажу, что подать к блюду, и добавлю продукты и шаги."}</p>
+      <div className="scroller fade-x -mx-4 !gap-2 px-4 sm:mx-0 sm:flex-wrap sm:px-0 sm:[mask-image:none]">
+        <Chip on={!sideId} onClick={() => pickSide(null)}>Без гарнира</Chip>
+        {sides.map((x) => <Chip key={x.id} on={sideId === x.id} onClick={() => pickSide(x.id)}>{x.title}</Chip>)}
+      </div>
+    </Section>
+  );
+  const sum = reviews.data?.summary;
+  const anchors = ANCHORS.filter((a) => a.id !== "recipe-reviews" || online || !!reviews.data);
 
   return (
-    <Layer title={base.title} onClose={onClose} actions={
+    <Layer title={base.title} onClose={onClose} width="max-w-none" transparentUntil={header.until} label={base.title} actions={
       <>
-        <button className="btn-ghost px-2" onClick={() => setShareOpen(true)} aria-label="Поделиться"><Share2 size={20} /></button>
-        <button className="btn-ghost px-2" onClick={() => toggleFavorite(base)} aria-label={fav ? "Убрать из сохранённого" : "Сохранить"}>
+        <button className="icon-btn" onClick={() => setShareOpen(true)} aria-label="Поделиться"><Share2 size={20} /></button>
+        <button className="icon-btn" onClick={() => toggleFavorite(base)} aria-label={fav ? "Убрать из сохранённого" : "Сохранить"} aria-pressed={fav}>
           <Heart size={20} className={cx(fav && "fill-brand text-brand")} />
         </button>
       </>
     }>
-      <div className="pb-28">
-        <RecipeImage recipe={base} className="h-56 w-full sm:h-72" rounded="rounded-none" />
-        <div className="px-4 pt-4">
-          <h1 className="text-2xl font-semibold leading-tight">{base.title}</h1>
-          <p className="mt-1.5 text-[15px] text-ink-soft">{base.summary}</p>
-          <div className="mt-2.5"><RecipeMeta recipe={base} /></div>
-          {flags.length > 0 && <div className="mt-3 flex flex-wrap gap-1.5">{flags.map((f) => <span key={f.label} className="inline-flex items-center gap-1 rounded-full bg-herb-soft px-2.5 py-1 text-xs text-herb">{f.icon}{f.label}</span>)}</div>}
-        </div>
+      <div ref={root} className="pb-[calc(var(--dock)+2.5rem)] lg:pb-16">
+        <AnchorBar show={header.solid} anchors={anchors} active={header.active} go={go} recipeId={base.id} goStep={goStep} />
 
-        {/* Nutrition */}
-        {nutrition.kcal > 0 && (
-          <div className="mx-4 mt-4 grid grid-cols-4 gap-2 text-center">
-            {[["ккал", nutrition.kcal], ["белки", nutrition.protein], ["жиры", nutrition.fat], ["углев.", nutrition.carbs]].map(([l, v]) => (
-              <div key={l} className="rounded-xl bg-card px-1 py-2 shadow-card"><div className="text-lg font-semibold tabular-nums">{v}</div><div className="text-[11px] text-ink-faint">{l}{l !== "ккал" ? ", г" : ""}</div></div>
-            ))}
-            <div className="col-span-4 text-left text-[11px] text-ink-faint">На порцию, расчёт по составу. {base.allergens.length ? "Аллергены: " + base.allergens.map((a) => (LABELS[a === "milk" ? "dairy" : a === "egg" ? "eggs" : a] || a).toLowerCase()).join(", ") + "." : "Основных аллергенов нет."}</div>
-          </div>
-        )}
-
-        {/* Ingredients */}
-        <Section title="Продукты" action={<Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Порции" />}>
-          <div className="px-4">
-            <div className="mb-2 flex items-center gap-1.5 text-xs text-ink-faint"><Users size={13} /> {servings} порц.{base.yields ? " · " + yieldText(base, servings) : ""} · отметьте, что есть дома</div>
-            <ul className="card divide-y divide-line/60">
-              {scaled.map((i) => {
-                const own = hasIt(i.id);
-                const swaps = (i.swap || []).map((x) => ingredient(x)?.name).filter(Boolean);
-                return (
-                  <li key={i.id + i.unit}>
-                    <button className="flex w-full items-start gap-3 px-3 py-2.5 text-left" onClick={() => toggleHave(i.id)} aria-pressed={own}>
-                      <span className={cx("mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full border", own ? "border-herb bg-herb text-white" : "border-line")}>{own && <Check size={13} />}</span>
-                      <span className="min-w-0 flex-1">
-                        <span className={cx("text-[15px]", own && "text-ink-soft")}>{displayName(i.id, i.name)}{i.optional && <span className="text-ink-faint"> (по желанию)</span>}</span>
-                        {i.name.toLowerCase() !== displayName(i.id, i.name).toLowerCase() && <span className="block text-xs text-ink-faint">{i.name}</span>}
-                        {swaps.length > 0 && <span className="block text-xs text-ink-faint">можно заменить: {swaps.join(", ").toLowerCase()}</span>}
-                      </span>
-                      <span className="shrink-0 text-sm tabular-nums text-ink-soft">{formatAmount(i.amount, i.unit)}</span>
+        <div className="mx-auto max-w-3xl sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+4rem)] lg:max-w-[1120px] lg:px-8 lg:pt-[calc(env(safe-area-inset-top)+4.5rem)]">
+          {/* Top: photo, title, facts, nutrition (and the actions on wide screens) */}
+          <div className="lg:grid lg:grid-cols-[minmax(0,560px)_minmax(340px,1fr)] lg:items-start lg:gap-8 xl:gap-10">
+            <RecipeImage recipe={base} eager className="aspect-[4/3] w-full sm:aspect-[3/2]" rounded="rounded-none sm:rounded-card" />
+            <div className="px-4 pt-5 sm:px-0 sm:pt-6 lg:pt-1">
+              <h1 ref={h1} className="text-h1 xl:text-display">{base.title}</h1>
+              {(!!sum?.count || cookedTimes > 0) && (
+                <div className="mt-2 flex flex-wrap items-center gap-x-3 text-small text-ink-soft">
+                  {!!sum?.count && (
+                    <button className="-mx-1 -my-1.5 inline-flex h-11 items-center gap-1.5 rounded-full px-1 hover:text-ink" onClick={() => go("recipe-reviews")}>
+                      <Stars value={sum.avg} size={14} /><span className="font-semibold text-ink">{sum.avg.toFixed(1).replace(".", ",")}</span><span>· {reviewsWord(sum.count)}</span>
                     </button>
+                  )}
+                  {cookedTimes > 0 && <span className="inline-flex h-8 items-center gap-1.5"><Check size={16} className="text-herb" aria-hidden />Готовили {cookedTimes} {plural(cookedTimes, "раз", "раза", "раз")}</span>}
+                </div>
+              )}
+              {base.summary && <p className="mt-3 text-body text-ink-soft">{base.summary}</p>}
+              <ul className="mt-4 flex flex-wrap gap-2" aria-label="Коротко о блюде">
+                {flags.map((f) => (
+                  <li key={f.label} className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full bg-sunken px-3 text-small text-ink">
+                    <span className="text-ink-soft" aria-hidden>{f.icon}</span>{f.label}
                   </li>
-                );
-              })}
-            </ul>
-            {missing.length > 0 && (
-              <button className="btn-soft mt-3 w-full" onClick={() => addRecipeToShopping(recipe, servings, have)}>
-                <ShoppingCart size={17} className="shrink-0" /> Докупить недостающее · {missing.length}
-              </button>
-            )}
-          </div>
-        </Section>
-
-        {sides.length > 0 && (
-          <Section title="Гарнир">
-            <div className="scroll-x px-4">
-              <Chip on={!sideId} onClick={() => setSideId(null)}>Без гарнира</Chip>
-              {sides.map((x) => <Chip key={x.id} on={sideId === x.id} onClick={() => setSideId(x.id)}>{x.title}</Chip>)}
+                ))}
+              </ul>
+              {nutrition.kcal > 0 && <Nutrition recipe={base} n={nutrition} side={!!side} />}
+              <div className="mt-6 hidden gap-3 lg:flex">
+                <button className="btn-primary btn-bar flex-1" onClick={cook}><ChefHat size={20} />{cookingThis ? "Продолжить готовить" : "Начать готовить"}</button>
+                <button className="btn-outline btn-bar" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В меню</button>
+              </div>
             </div>
-            {side && <p className="px-4 pt-2 text-xs text-ink-faint">Гарнир добавлен в продукты и шаги — приготовите всё вместе.</p>}
-          </Section>
-        )}
-
-        {/* Steps */}
-        <Section title={"Как готовить · " + recipe.steps.length + " шагов"}>
-          <ol className="space-y-3 px-4">
-            {recipe.steps.map((st, n) => (
-              <li key={n} className="flex gap-3">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-soft text-sm font-semibold text-brand-ink">{n + 1}</span>
-                <p className="pt-0.5 text-[15px] leading-relaxed">{st.text}{st.timerSeconds ? <span className="ml-1.5 whitespace-nowrap rounded-full bg-warn-soft px-2 py-0.5 text-xs text-warn">⏱ {Math.round(st.timerSeconds / 60)} мин</span> : null}</p>
-              </li>
-            ))}
-          </ol>
-        </Section>
-
-        {base.tips.length > 0 && (
-          <Section title="Советы">
-            <ul className="mx-4 space-y-2 rounded-xl2 bg-herb-soft/60 p-4 text-[15px]">{base.tips.map((t) => <li key={t} className="flex gap-2"><Info size={16} className="mt-0.5 shrink-0 text-herb" />{t}</li>)}</ul>
-          </Section>
-        )}
-
-        <Section title="Моя заметка">
-          <div className="px-4">
-            <textarea className="input min-h-[72px]" placeholder="Например: соли меньше, добавить чеснок" defaultValue={note} maxLength={500}
-              onBlur={(e) => { const v = e.target.value.trim(); if (v !== note) update((st) => { const notes = { ...st.notes }; if (v) notes[base.id] = v; else delete notes[base.id]; return { ...st, notes }; }); }} />
           </div>
-        </Section>
 
-        <Reviews recipe={base} />
+          {/* Body: products (sticky on wide screens) and everything else */}
+          <div ref={body} className={cx("px-4 sm:px-0 lg:mt-4 lg:grid lg:grid-cols-[minmax(280px,360px)_minmax(360px,1fr)] lg:items-start lg:gap-8 xl:gap-10", UNDER_HEADER)}>
+            <aside ref={aside} className={cx("lg:pb-4", fits && "lg:sticky lg:top-[calc(env(safe-area-inset-top)+5.25rem)]")}>
+              {sidePicker && <div className="lg:hidden">{sidePicker}</div>}
 
-        {(related.variants.length > 0 || related.similar.length > 0) && (
-          <Section title={related.variants.length ? "Другие варианты и похожие" : "Похожие блюда"}>
-            <div className="scroll-x px-4">{[...related.variants, ...related.similar].slice(0, 8).map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} />)}</div>
-          </Section>
-        )}
+              <Section id="recipe-products" className={UNDER_HEADER}>
+                {/* Own header: the stepper drops under the title when there is no room (320px, large text). */}
+                <div className="mb-3 flex min-h-[44px] flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <h2 className="text-h2">Продукты</h2>
+                  <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Порции" suffix={plural(servings, "порция", "порции", "порций")} />
+                </div>
+                <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}Отметьте, что уже есть дома.</p>
+                <HaveBar owned={owned} total={needed.length} missing={missing} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
+                <div className="mt-3 space-y-4">
+                  {groups.map((g) => (
+                    <div key={g.key} ref={g.added ? sideRows : undefined}>
+                      {g.title && <h3 className="label mb-1.5 px-1">{g.title}</h3>}
+                      <ul className="card px-1">
+                        {g.rows.map((i, k) => <Row key={g.key + i.id + i.unit} i={i} own={hasIt(i.id)} flash={g.added} first={k === 0} onToggle={() => toggleHave(i.id)} />)}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            </aside>
 
-        {base.sources && base.sources.length > 0 && (
-          <div className="px-4 pt-6 text-xs text-ink-faint">Источники: {base.sources.map((src, k) => <span key={k}>{k > 0 && "; "}{src.url ? <a className="underline" href={src.url} target="_blank" rel="noopener noreferrer nofollow">{src.title}</a> : src.title}</span>)}</div>
-        )}
+            <div className="min-w-0">
+              {sidePicker && <div className="hidden lg:block">{sidePicker}</div>}
+              <AskCard starters={starters} ask={ask} />
+
+              <Section id="recipe-steps" className={UNDER_HEADER} title="Шаги"
+                action={<span className="text-small text-ink-soft">{recipe.steps.length} {plural(recipe.steps.length, "шаг", "шага", "шагов")} · {formatMinutes(recipe.totalMinutes)}</span>}>
+                <TimerStrip only={base.id} onJump={(t) => goStep(t.step)} className="mb-4" />
+                <ol className="space-y-6">
+                  {recipe.steps.map((st, n) => {
+                    const part = splitSide(st.text);
+                    return (
+                      <li key={n} id={"recipe-step-" + n} className={cx("flex gap-3", UNDER_HEADER)}>
+                        <span aria-hidden className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-soft text-small font-semibold tabular-nums text-brand-ink">{n + 1}</span>
+                        <div className="min-w-0 flex-1 pt-0.5">
+                          {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
+                          <p className="text-body">{part.text}</p>
+                          {!!st.timerSeconds && <TimerChip recipe={base} step={n} text={st.text} seconds={st.timerSeconds} />}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </Section>
+
+              {base.tips.length > 0 && (
+                <Section title="Советы">
+                  <ul className="card space-y-3 p-4">
+                    {base.tips.map((t) => <li key={t} className="flex gap-3 text-body-sm"><Lightbulb size={20} className="mt-px shrink-0 text-brand" aria-hidden />{t}</li>)}
+                  </ul>
+                </Section>
+              )}
+
+              <Note id={base.id} />
+
+              <Reviews recipe={base} state={reviews} id="recipe-reviews" className={UNDER_HEADER} />
+            </div>
+          </div>
+
+          {(related.variants.length > 0 || related.similar.length > 0) && (
+            <Section title={related.variants.length ? "Другие варианты и похожие" : "Похожие блюда"} className="px-4 sm:px-0 lg:mt-12">
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
+                {[...related.variants, ...related.similar].slice(0, 8).map((r, k) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className={cx(k >= 6 && "hidden lg:flex")} />)}
+              </div>
+            </Section>
+          )}
+
+          {base.sources && base.sources.length > 0 && (
+            <p className="mt-8 px-4 text-caption text-ink-faint sm:px-0">
+              Источники: {base.sources.map((src, k) => <span key={k}>{k > 0 && "; "}{src.url ? <a className="underline hover:text-ink" href={src.url} target="_blank" rel="noopener noreferrer nofollow">{src.title}</a> : src.title}</span>)}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="safe-bottom fixed inset-x-0 bottom-0 z-10 mx-auto flex max-w-2xl gap-2 border-t border-line/60 bg-paper/95 px-4 py-3 backdrop-blur">
-        <button className="btn-outline" onClick={() => setMenuOpen(true)} aria-label="В меню"><CalendarPlus size={18} /></button>
-        <button className="btn-primary flex-1 py-3 text-base" onClick={() => startCooking(recipe, servings)}><ChefHat size={19} /> Готовить</button>
+      {/* The bar at the bottom (phones and tablets) */}
+      <div ref={bar} className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 shadow-e2 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-3xl gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 min-[360px]:gap-3 sm:px-6">
+          <button className="btn-outline btn-bar px-4" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В меню</button>
+          <button className="btn-primary btn-bar flex-1 px-4" onClick={cook}>
+            <ChefHat size={20} className="max-[359px]:hidden" />
+            {cookingThis ? <><span className="max-[359px]:hidden">Продолжить готовить</span><span className="min-[360px]:hidden">Продолжить</span></> : "Начать готовить"}
+          </button>
+        </div>
       </div>
 
-      <AddToMenu open={menuOpen} onClose={() => setMenuOpen(false)} recipe={base} servings={servings} />
+      {menuOpen && <AddToMenuSheet recipeId={base.id} servings={servings} onClose={() => setMenuOpen(false)} />}
       <Sheet open={shareOpen} title="Поделиться рецептом" onClose={() => setShareOpen(false)}>
-        <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)} onDone={() => { setShareOpen(false); toast("Ссылка готова"); }} />
+        <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)}
+          onDone={(copied) => { setShareOpen(false); toast(copied ? "Ссылка скопирована" : "Ссылка готова"); }} />
       </Sheet>
+      <AskSheet open={askOpen} onClose={() => setAskOpen(false)} recipe={askRecipe} servings={servings} prefs={s.preferences} request={askReq}
+        onServings={(n) => { setServings(clampServings(base, n)); window.setTimeout(() => go("recipe-products"), 80); }} />
     </Layer>
   );
 }
 
-function AddToMenu({ open, onClose, recipe, servings }: { open: boolean; onClose: () => void; recipe: Recipe; servings: number }) {
-  const { s, update, toast } = useStore();
-  const days = weekDays(s.menu);
-  const add = (date: string) => {
-    update((st) => {
-      const menu = [...st.menu];
-      const at = menu.findIndex((d) => d.date === date);
-      const item = { recipeId: recipe.id, servings: clamp(recipe, servings) };
-      if (at >= 0) menu[at] = { ...menu[at], items: [...menu[at].items, item].slice(0, 6) };
-      else menu.push({ date, items: [item] });
-      return { ...st, menu: menu.filter((d) => d.date >= dateKey(new Date())).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 31) };
-    });
-    toast("Добавлено в меню: " + dayLabel(date).toLowerCase());
-    onClose();
-  };
+/** The row under the solid header: jump to a section; the nearest running timer on the right. */
+function AnchorBar({ show, anchors, active, go, recipeId, goStep }: {
+  show: boolean; anchors: typeof ANCHORS; active: string | null; go: (id: string) => void; recipeId: string; goStep: (step: number | null) => void;
+}) {
+  const timers = useTimers().filter((t) => t.recipeId === recipeId);
+  const t = timers.find((x) => x.rang) ?? timers.find((x) => x.end) ?? timers[0];
+  const now = useTick(!!t && !!t.end && !t.rang);
   return (
-    <Sheet open={open} title="Добавить в меню" onClose={onClose}>
-      <div className="grid gap-2">
-        {days.map((d) => (
-          <button key={d.date} className="card flex items-center justify-between px-4 py-3 text-left" onClick={() => add(d.date)}>
-            <span className="font-medium">{dayLabel(d.date)}</span>
-            <span className="text-xs text-ink-faint">{d.items.length ? d.items.length + " блюд" : "пусто"}</span>
-          </button>
-        ))}
-      </div>
-    </Sheet>
+    <div className="sticky top-[calc(env(safe-area-inset-top)+3.5rem)] z-30 h-0">
+      <nav aria-label="Разделы рецепта" aria-hidden={!show}
+        className={cx("absolute inset-x-0 top-0 border-b border-line bg-paper transition-opacity duration-150", show ? "opacity-100" : "pointer-events-none opacity-0")}>
+        <div className="mx-auto flex h-11 max-w-3xl items-center px-2 sm:px-4 lg:max-w-[1120px] lg:px-6">
+          {anchors.map((a) => (
+            <button key={a.id} tabIndex={show ? 0 : -1} onClick={() => go(a.id)} aria-current={active === a.id ? "true" : undefined}
+              className={cx("relative h-11 whitespace-nowrap px-2.5 text-small font-semibold transition-colors min-[360px]:px-3", active === a.id ? "text-brand" : "text-ink-soft hover:text-ink")}>
+              {a.label}
+              {active === a.id && <span aria-hidden className="absolute inset-x-2.5 bottom-0 h-0.5 rounded-full bg-brand min-[360px]:inset-x-3" />}
+            </button>
+          ))}
+          <span className="flex-1" />
+          {t && (
+            <button tabIndex={show ? 0 : -1} onClick={() => goStep(t.step)} aria-label={timerTitle(t) + (t.rang ? ": время вышло" : ": осталось " + mmss(secondsLeft(t, now)))}
+              className="grid h-11 shrink-0 place-items-center pl-1">
+              <span className={cx("inline-flex h-8 items-center gap-1.5 rounded-full px-2.5 text-small font-semibold tabular-nums", t.rang ? "bg-brand-fill text-white" : "bg-brand-soft text-brand-ink")}>
+                {t.rang ? <BellRing size={16} aria-hidden /> : <Timer size={16} aria-hidden />}{t.rang ? "Готово" : mmss(secondsLeft(t, now))}
+                {timers.length > 1 && <span className="text-micro opacity-80">+{timers.length - 1}</span>}
+              </span>
+            </button>
+          )}
+        </div>
+      </nav>
+    </div>
   );
 }
 
-export function ShareOptions({ text, title, url, onDone }: { text: string; title: string; url?: string; onDone: () => void }) {
+function Nutrition({ recipe, n, side }: { recipe: Recipe; n: { kcal: number; protein: number; fat: number; carbs: number }; side: boolean }) {
+  const allergen = (a: string) => (LABELS[a === "milk" ? "dairy" : a === "egg" ? "eggs" : a] || a).toLowerCase();
+  const cells: [ReactNode, number, string][] = [
+    ["ккал", n.kcal, ""], ["белки", n.protein, " г"], ["жиры", n.fat, " г"],
+    [<><span className="min-[360px]:hidden">углев.</span><span className="max-[359px]:hidden">углеводы</span></>, n.carbs, " г"],
+  ];
+  return (
+    <div className="mt-5">
+      <dl className="grid grid-cols-4 gap-2">
+        {cells.map(([label, v, unit], k) => (
+          <div key={k} className="flex flex-col-reverse items-center rounded-input border border-line bg-card px-1 py-2.5 text-center">
+            <dt className="whitespace-nowrap text-caption text-ink-soft">{label}</dt>
+            <dd className="whitespace-nowrap text-title tabular-nums">{v}{unit && <span className="text-small font-normal text-ink-soft">{unit}</span>}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="mt-2 text-caption text-ink-faint">
+        На порцию{side ? ", без гарнира" : ""}, по составу.{" "}
+        {recipe.allergens.length ? "Аллергены: " + recipe.allergens.map(allergen).join(", ") + "." : "Основных аллергенов нет."}
+      </p>
+    </div>
+  );
+}
+
+/** «Есть дома 5 из 7» with a progress line, and «Докупить 2 продукта». */
+function HaveBar({ owned, total, missing, onBuy }: { owned: number; total: number; missing: number; onBuy: () => void }) {
+  return (
+    <div className="rounded-input bg-herb-soft p-3 pl-4 sm:flex sm:items-center sm:gap-4 lg:block">
+      <div className="flex min-h-[32px] min-w-0 flex-1 items-center gap-3">
+        <span className="flex shrink-0 items-center gap-2 whitespace-nowrap text-body-sm font-semibold text-herb">
+          <Check size={18} aria-hidden />{missing ? "Есть дома " + owned + " из " + total : "Всё есть дома"}
+        </span>
+        <span className="h-1.5 min-w-[48px] flex-1 overflow-hidden rounded-full bg-herb/15" aria-hidden>
+          <span className="block h-full rounded-full bg-herb transition-[width] duration-150" style={{ width: (total ? (owned / total) * 100 : 100) + "%" }} />
+        </span>
+      </div>
+      {missing > 0 && (
+        <button className="btn mt-3 h-11 w-full shrink-0 border border-line bg-card px-4 text-ink shadow-e1 hover:border-line-strong sm:mt-0 sm:w-auto lg:mt-3 lg:w-full" onClick={onBuy}>
+          <ShoppingCart size={18} className="text-brand" />Докупить {missing} {plural(missing, "продукт", "продукта", "продуктов")}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/** One product: tap marks «есть дома». */
+function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boolean; flash?: boolean; first: boolean; onToggle: () => void }) {
+  const q = homeQuantity(i);
+  const swaps = (i.swap || []).map((x) => ingredient(x)?.name).filter(Boolean) as string[];
+  return (
+    <li className={cx(!first && "border-t border-line")}>
+      <button className={cx("flex min-h-[52px] w-full items-center gap-1 rounded-input py-1 pr-3 text-left lg:min-h-[44px] lg:py-0.5", flash && "anim-flash")} onClick={onToggle} aria-pressed={own}>
+        <span className="grid h-11 w-11 shrink-0 place-items-center" aria-hidden>
+          <span className={cx("grid h-6 w-6 place-items-center rounded-full border-2 transition-colors duration-150", own ? "border-herb bg-herb text-paper" : "border-line-strong")}>
+            {own && <Check size={14} strokeWidth={3} />}
+          </span>
+        </span>
+        <span className="min-w-0 flex-1 py-1.5">
+          <span className="text-body-sm">{displayName(i.id, i.name)}</span>
+          {i.optional && <span className="text-caption text-ink-faint"> · по желанию</span>}
+          {swaps.length > 0 && <span className="block text-caption text-ink-faint">можно заменить: {swaps.join(", ").toLowerCase()}</span>}
+          {own && <span className="sr-only"> — есть дома</span>}
+        </span>
+        <span className={cx("shrink-0 whitespace-nowrap pl-2 text-body-sm tabular-nums", q.toTaste ? "text-ink-faint" : "text-ink-soft")}>{q.text}</span>
+      </button>
+    </li>
+  );
+}
+
+/** «Спросить Шефа» about this recipe: the card opens the sheet; a chip asks right away. */
+function AskCard({ starters, ask }: { starters: string[]; ask: (text?: string) => void }) {
+  return (
+    <section className="card mt-8 p-4" aria-label="Спросить Шефа">
+      <button className="-m-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-input p-2 text-left hover:bg-sunken/60" onClick={() => ask()}>
+        <ChefAvatar size={40} />
+        <span className="min-w-0 flex-1">
+          <span className="block text-title">Спросить Шефа</span>
+          <span className="block text-small text-ink-soft">Замены, порции, хранение — отвечу про этот рецепт</span>
+        </span>
+        <ChevronRight size={20} className="shrink-0 text-ink-faint" aria-hidden />
+      </button>
+      {starters.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {starters.slice(0, 3).map((q) => <Chip key={q} onClick={() => ask(q)} className="h-auto min-h-[40px] max-w-full whitespace-normal py-2 text-left">{q}</Chip>)}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** The timer of a step: start it, then it counts down here and in the timer row. */
+function TimerChip({ recipe, step, text, seconds }: { recipe: Recipe; step: number; text: string; seconds: number }) {
+  const t = useTimers().find((x) => x.recipeId === recipe.id && x.step === step);
+  const now = useTick(!!t && !!t.end && !t.rang);
+  const [menu, setMenu] = useState<CookTimer | null>(null);
+  const length = seconds < 60 ? seconds + " сек" : seconds % 60 ? Math.floor(seconds / 60) + " мин " + (seconds % 60) + " сек" : formatMinutes(seconds / 60);
+  if (!t)
+    return (
+      <button className="chip mt-3 h-10 text-small font-semibold text-brand-ink" aria-label={"Запустить таймер на " + length}
+        onClick={() => startTimer({ dish: recipe.title, recipeId: recipe.id, step, label: stepLabel(text), seconds })}>
+        <Timer size={18} className="text-brand" aria-hidden />Таймер · {length}
+      </button>
+    );
+  const left = secondsLeft(t, now);
+  const paused = t.pausedLeft != null;
+  return (
+    <>
+      <button className={cx("chip mt-3 h-10 font-semibold tabular-nums", t.rang ? "border-brand-fill bg-brand-fill text-white hover:border-brand-fill" : "chip-on")}
+        onClick={() => (t.rang ? stopTimer(t.id) : setMenu(t))}
+        aria-label={t.rang ? "Время вышло. Убрать таймер" : "Таймер: осталось " + mmss(left) + (paused ? ", на паузе" : "") + ". Действия"}>
+        {t.rang ? <BellRing size={18} aria-hidden /> : paused ? <Pause size={18} aria-hidden /> : <Timer size={18} aria-hidden />}
+        {t.rang ? <>Готово<X size={16} aria-hidden /></> : mmss(left)}
+      </button>
+      <Sheet open={!!menu} title={"Шаг " + (step + 1) + " · таймер"} onClose={() => setMenu(null)}>
+        <div className="grid gap-2">
+          <button className="btn-outline justify-start" onClick={() => { addMinute(t.id); setMenu(null); }}><Plus size={18} />Добавить минуту</button>
+          <button className="btn-outline justify-start" onClick={() => { togglePause(t.id); setMenu(null); }}>{paused ? <><Play size={18} />Продолжить</> : <><Pause size={18} />Пауза</>}</button>
+          <button className="btn-outline justify-start" onClick={() => { stopTimer(t.id); setMenu(null); }}><X size={18} />Остановить</button>
+        </div>
+      </Sheet>
+    </>
+  );
+}
+
+/** «Моя заметка»: kept on the device, saved as you type. */
+function Note({ id }: { id: string }) {
+  const { s, update } = useStore();
+  const saved = s.notes[id] ?? "";
+  const [text, setText] = useState(saved);
+  const latest = useRef({ text, saved });
+  latest.current = { text, saved };
+  const save = (v: string) => {
+    const t = v.trim();
+    update((st) => {
+      if ((st.notes[id] ?? "") === t) return st;
+      const notes = { ...st.notes };
+      if (t) notes[id] = t; else delete notes[id];
+      return { ...st, notes };
+    });
+  };
+  useEffect(() => {
+    if (text.trim() === saved) return;
+    const t = window.setTimeout(() => save(text), 600);
+    return () => window.clearTimeout(t);
+  }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => { if (latest.current.text.trim() !== latest.current.saved) save(latest.current.text); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <Section title="Моя заметка">
+      <textarea className="input min-h-[96px]" aria-label="Моя заметка к рецепту" placeholder="Например: соли меньше, добавить чеснок" value={text} maxLength={500}
+        onChange={(e) => setText(e.target.value)} onBlur={() => save(text)} />
+      <p className="mt-1.5 text-caption text-ink-faint">Видна только вам. Сохраняется сама.</p>
+    </Section>
+  );
+}
+
+/** Ways to send a link or a text: the phone's share sheet, messengers, copy. Also used by Меню and Покупки. */
+export function ShareOptions({ text, title, url, onDone }: { text: string; title: string; url?: string; onDone: (copied?: boolean) => void }) {
   return (
     <div className="grid gap-2">
-      {canShare() && <button className="btn-primary" onClick={() => navigator.share({ title, text, ...(url ? { url } : {}) }).then(onDone).catch(() => {})}>Отправить…</button>}
-      {SHARE_TARGETS.map((t) => (
-        <button key={t.id} className="btn-outline" onClick={async () => {
-          const l = shareLink(t.id, text);
-          if (l.copyFirst) await copyText(text);
-          window.open(l.url, "_blank", "noopener");
-          onDone();
-        }}>{t.label}</button>
-      ))}
-      <button className="btn-ghost" onClick={async () => { await copyText(text); onDone(); }}>Скопировать текст</button>
+      {canShare() && (
+        <button className="btn-primary btn-bar" onClick={() => navigator.share({ title, text, ...(url ? { url } : {}) }).then(() => onDone()).catch(() => {})}>
+          <Send size={18} />Отправить…
+        </button>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        {SHARE_TARGETS.map((t) => (
+          <button key={t.id} className="btn-outline" onClick={async () => {
+            const l = shareLink(t.id, text);
+            if (l.copyFirst) await copyText(text);
+            window.open(l.url, "_blank", "noopener");
+            onDone();
+          }}>{t.label}</button>
+        ))}
+      </div>
+      <button className="btn-ghost" onClick={async () => { await copyText(url ?? text); onDone(true); }}><Link2 size={18} />{url ? "Скопировать ссылку" : "Скопировать текст"}</button>
     </div>
   );
 }

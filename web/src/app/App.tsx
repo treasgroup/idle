@@ -5,7 +5,7 @@ import {
   BookOpen, CalendarDays, ChefHat, Flame, GraduationCap, MessageCircle, Refrigerator, ShoppingCart, SquarePen, UserRound, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
-import { expiringSoon, usePwa } from "../engine";
+import { expiringSoon, recipeById, usePwa } from "../engine";
 import { useStore } from "./store";
 import { useActions } from "./actions";
 import { AssistantProvider, useAssistant } from "./assistant";
@@ -115,7 +115,7 @@ function Shell() {
   const closeTop = useCallback(() => close(routeHash({ tab: "home" })), []);
   const layer = !!(route.recipe || route.cook || route.doc || route.tab === "learn");
   const chat = route.tab === "chat";
-  const cookingNow = !!(s.cooking && !s.cooking.done) && !route.cook;
+  const cookingNow = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
   const go = (tab: Tab) => { clearToast(); replace(routeHash({ tab })); };
 
   const screen = {
@@ -270,7 +270,8 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const openChat = useOpenChat();
   const chats = useChats();
   const badges = useBadges();
-  const cooking = !!(s.cooking && !s.cooking.done) && !route.cook;
+  const { profile } = useStore();
+  const cooking = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
   const current = s.conversation.find((m) => m.role === "user")?.text;
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-4 pt-5 lg:flex" aria-label="Меню сайта">
@@ -334,11 +335,15 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
 
 /** The dish on the stove: one tap back into cooking mode, with the nearest timer. */
 function MiniPlayer({ card }: { card?: boolean }) {
-  const { s } = useStore();
+  const { s, profile } = useStore();
   const timers = useTimers();
-  const c = s.cooking!;
-  const t = timers.find((x) => x.recipeId === c.recipe.id && !x.rang) ?? timers.find((x) => !x.rang);
+  // The main dish, or the second one when the main is already done.
+  const main = s.cooking && !s.cooking.done ? s.cooking : null;
+  const second = profile.parallel ? recipeById(profile.parallel.recipeId) : null;
+  const c = main ?? (second && profile.parallel ? { recipe: second, step: profile.parallel.step } : null);
+  const t = c ? timers.find((x) => x.recipeId === c.recipe.id && !x.rang) ?? timers.find((x) => !x.rang) : undefined;
   useTick(!!t);
+  if (!c) return null;
   const left = t ? secondsLeft(t) : null;
   const open = () => openLayer(routeHash({ cook: true }));
   const where = "шаг " + (c.step + 1) + " из " + c.recipe.steps.length;

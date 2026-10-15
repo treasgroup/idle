@@ -6,6 +6,7 @@ import {
 } from "../engine";
 import { useStore } from "./store";
 import { openLayer, close, routeHash, parseRoute } from "./router";
+import { stopTimersFor } from "./timers";
 
 /** Ingredient ids the person has: the conditions they named plus the home pantry and staples. */
 export function haveIds(s: EngineState): string[] {
@@ -18,17 +19,18 @@ export function haveIds(s: EngineState): string[] {
 }
 
 export function useActions() {
-  const { s, update, toast } = useStore();
+  const { s, update, toast, setProfile, catalog } = useStore();
 
   const openRecipe = useCallback((r: Recipe | string) => {
     const id = typeof r === "string" ? r : r.id;
     const recipe = recipeById(id);
-    if (!recipe) return toast("Этот рецепт больше не в каталоге.");
+    // Until the full catalog has arrived, the recipe page waits for it (a shared link to a newer recipe).
+    if (!recipe && catalog.source === "server") return toast("Этот рецепт больше не в каталоге.");
     track({ type: "open", recipeId: id });
-    update((st) => ({ ...st, engaged: true, recent: [recipe, ...st.recent.filter((x) => x.id !== id)].slice(0, 20) }));
+    if (recipe) update((st) => ({ ...st, engaged: true, recent: [recipe, ...st.recent.filter((x) => x.id !== id)].slice(0, 20) }));
     const route = parseRoute(location.hash);
     openLayer(routeHash({ tab: route.tab, recipe: id }));
-  }, [update, toast]);
+  }, [update, toast, catalog.source]);
 
   const closeRecipe = useCallback(() => {
     const route = parseRoute(location.hash);
@@ -46,7 +48,7 @@ export function useActions() {
       favorites: on ? st.favorites.filter((f) => f.id !== r.id) : [r, ...st.favorites],
       taste: on ? st.taste : updateTaste(st.taste, r.id, "liked"),
     }));
-    toast(on ? "Убрано из сохранённого" : "Сохранено ❤️");
+    toast(on ? "Убрано из сохранённого" : "Сохранено");
   }, [s.favorites, update, toast]);
 
   /** Adds what is missing for the dish to the shopping list (scaled to servings). */
@@ -67,12 +69,15 @@ export function useActions() {
       engaged: true,
       cooking: { recipe: r, servings: n, step: 0, timerEnd: null, timerStep: null, startedAt: Date.now(), done: false },
     }));
+    // A second dish belongs to the previous cooking session.
+    setProfile((p) => (p.parallel ? { ...p, parallel: null } : p));
     openLayer(routeHash({ cook: true }));
-  }, [update]);
+  }, [update, setProfile]);
 
   /** The dish is done: into "Моя книга", taste profile, used-up perishables off the home list. */
   const finishCooking = useCallback((r: Recipe, fromMenu = false, markDone = true) => {
     track({ type: "cook_done", recipeId: r.id });
+    stopTimersFor(r.id);
     let removed = 0;
     update((st) => {
       const used = useUpFromFridge(st, r);
@@ -85,7 +90,7 @@ export function useActions() {
       };
     });
     if (removed) toast("Отметил в «Дома»: продукты для блюда израсходованы");
-  }, [update, toast]);
+  }, [update, toast, catalog.source]);
 
   const markHave = useCallback((ids: string[]) => {
     update((st) => ({ ...st, fridge: addToFridge(st.fridge, ids) }));

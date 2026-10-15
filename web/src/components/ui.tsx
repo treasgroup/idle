@@ -6,8 +6,11 @@ export function cx(...parts: (string | false | null | undefined)[]): string {
 }
 
 // ---------- Overlay stack: Esc closes only the top layer, focus returns to the opener ----------
-const stack: { id: string; close: () => void }[] = [];
+const stack: { id: string; close: () => void; sheet?: boolean }[] = [];
 let locked = 0;
+/** Fires when a sheet opens or closes (toasts move to the top so they do not cover a sheet's buttons). */
+const SHEETS_EVENT = "cook-sheets";
+export const sheetOpen = (): boolean => stack.some((x) => x.sheet);
 if (typeof document !== "undefined") {
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape" || !stack.length) return;
@@ -15,18 +18,20 @@ if (typeof document !== "undefined") {
     stack[stack.length - 1].close();
   });
 }
-function useOverlay(active: boolean, close: () => void) {
+function useOverlay(active: boolean, close: () => void, sheet = false) {
   const id = useId();
   const closeRef = useRef(close);
   closeRef.current = close;
   useEffect(() => {
     if (!active) return;
     const opener = document.activeElement as HTMLElement | null;
-    stack.push({ id, close: () => closeRef.current() });
+    stack.push({ id, close: () => closeRef.current(), sheet });
     if (locked++ === 0) document.body.style.overflow = "hidden";
+    if (sheet) window.dispatchEvent(new Event(SHEETS_EVENT));
     return () => {
       const i = stack.findIndex((x) => x.id === id);
       if (i >= 0) stack.splice(i, 1);
+      if (sheet) window.dispatchEvent(new Event(SHEETS_EVENT));
       if (--locked === 0) document.body.style.overflow = "";
       opener?.focus?.({ preventScroll: true });
     };
@@ -85,7 +90,7 @@ export function Layer({ title, onClose, children, actions, width = "max-w-3xl", 
 
 /** A bottom sheet on phones, a centred dialog on desktop. `footer` sticks to the bottom with the main action. */
 export function Sheet({ open, title, onClose, children, footer, tall }: { open: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; tall?: boolean }) {
-  useOverlay(open, onClose);
+  useOverlay(open, onClose, true);
   if (!open) return null;
   return (
     <div className="scrim anim-fade fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" onClick={onClose}>
@@ -193,9 +198,16 @@ export function ScrollRow({ children, label }: { children: ReactNode; label: str
 
 export interface ToastMsg { text: string; action?: { label: string; run: () => void } }
 export function Toast({ message, onClose, raised }: { message: ToastMsg | null; onClose: () => void; raised?: boolean }) {
+  const [top, setTop] = useState(sheetOpen);
+  useEffect(() => {
+    const on = () => setTop(sheetOpen());
+    window.addEventListener(SHEETS_EVENT, on);
+    return () => window.removeEventListener(SHEETS_EVENT, on);
+  }, []);
   if (!message) return null;
   return (
-    <div role="status" aria-live="polite" className={cx("pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-4 lg:left-64", raised ? "bottom-[calc(var(--nav-h)+var(--dock,0px)+4.5rem)]" : "bottom-[calc(var(--nav-h)+var(--dock,0px)+0.75rem)]")}>
+    <div role="status" aria-live="polite" className={cx("pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-4",
+      top ? "top-[calc(env(safe-area-inset-top)+0.75rem)]" : cx("lg:left-64", raised ? "bottom-[calc(var(--nav-h)+var(--dock,0px)+4.5rem)]" : "bottom-[calc(var(--nav-h)+var(--dock,0px)+0.75rem)]"))}>
       <div className="anim-sheet pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl bg-ink py-2.5 pl-4 pr-2 text-small text-paper shadow-e2">
         <span className="py-1">{message.text}</span>
         {message.action && <button className="h-9 shrink-0 rounded-full px-3 font-semibold text-brand-soft hover:bg-white/10" onClick={() => { message.action!.run(); onClose(); }}>{message.action.label}</button>}
