@@ -213,10 +213,12 @@ function Iu(e, t = Date.now()) {
     : n < 0
       ? "срок вышел"
       : n === 0
-        ? "до сегодня"
+        ? "истекает сегодня"
         : n === 1
-          ? "до завтра"
-          : "до " +
+          ? "истекает завтра"
+          : n <= 4
+            ? "ещё " + n + " дня"
+            : "до " +
             new Date(e.until)
               .toLocaleDateString("ru-RU", { day: "numeric", month: "short" })
               .replace(".", "");
