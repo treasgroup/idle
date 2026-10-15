@@ -12,6 +12,7 @@ import { chipLabel, tidyReply, MOOD_LABEL } from "../app/chatText";
 import { RecipeFeatured, RecipeRow } from "./RecipeCard";
 import { ChefAvatar, Chip, Sheet, cx } from "./ui";
 import { AddToMenuSheet } from "./AddToMenu";
+import { ProductTiles, useFrequent } from "./ProductTiles";
 
 /** One message. Results: the best one big, the rest as rows; follow-up chips only under the last message. */
 export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; onOption: (o: ChatOption) => void }) {
@@ -160,6 +161,8 @@ export function PantryPicker({ open, onClose }: { open: boolean; onClose: () => 
   const ids = useMemo(() => ingredientOptions().map((o) => o.id).filter((id) => id !== "water"), []);
   const popular = useMemo(() => pantryGroups().flatMap((g) => g.items.slice(0, 4).map((i) => i.id)).slice(0, 16), []);
   const found = q.trim() ? searchIngredients(q, ids, 8) : [];
+  const freq = useFrequent();
+  const frequent = useMemo(() => new Set(freq.map(([id]) => id)), [freq]);
   const toggle = (id: string) => setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
   const go = () => {
     if (remember) update((st) => ({ ...st, fridge: addToFridge(st.fridge, picked.filter((id) => !st.fridge.some((f) => f.id === id))) }));
@@ -174,8 +177,10 @@ export function PantryPicker({ open, onClose }: { open: boolean; onClose: () => 
         <button className="btn-primary" disabled={!picked.length} onClick={go}><Sparkles size={18} />Подобрать · {picked.length}</button>
       </div>}>
       <input className="input" placeholder="Найти продукт: фарш, кабачок…" value={q} onChange={(e) => setQ(e.target.value)} />
-      <div className="mt-4 flex flex-wrap gap-2">
-        {(q.trim() ? found : [...new Set([...picked, ...popular])]).map((id) => <Chip key={id} on={picked.includes(id)} onClick={() => toggle(id)}>{shortName(id)}</Chip>)}
+      {!q.trim() && <ProductTiles className="mt-4" on={(id) => picked.includes(id)} onToggle={toggle} />}
+      {!q.trim() && <p className="label mt-5">Ещё продукты</p>}
+      <div className="mt-3 flex flex-wrap gap-2">
+        {(q.trim() ? found : [...new Set([...picked, ...popular])].filter((id) => !frequent.has(id))).map((id) => <Chip key={id} on={picked.includes(id)} onClick={() => toggle(id)}>{shortName(id)}</Chip>)}
         {q.trim() && !found.length && <p className="text-small text-ink-soft">Такого продукта нет в рецептах.</p>}
       </div>
     </Sheet>

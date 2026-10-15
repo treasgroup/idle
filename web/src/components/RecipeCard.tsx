@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Clock, Flame, Heart, CalendarPlus, Check } from "lucide-react";
 import { formatMinutes, nutritionOf, photoUrl, type Recipe } from "../engine";
 import { dishEmoji, dishTint, dishVariant } from "./dishArt";
+import { useStore } from "../app/store";
 import { cx } from "./ui";
 
 /** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
@@ -90,9 +91,12 @@ export function RecipeRow({ recipe, note, onOpen, favorite, rating }: { recipe: 
 
 /** A tile for grids and carousels: 4:3 photo, two-line title, facts. */
 export function RecipeTile({ recipe, note, onOpen, className }: { recipe: Recipe; note?: string; onOpen: () => void; className?: string }) {
+  const { s } = useStore();
+  const cooked = s.book.some((b) => b.recipeId === recipe.id);
   return (
-    <button onClick={onOpen} className={cx("card flex flex-col overflow-hidden text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.99]", className)}>
+    <button onClick={onOpen} className={cx("card relative flex flex-col overflow-hidden text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.99]", className)}>
       <RecipeImage recipe={recipe} className="aspect-[4/3] w-full" rounded="rounded-none" />
+      {cooked && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-card/95 px-2 py-0.5 text-caption text-ink shadow-e1"><Check size={12} className="text-herb" aria-hidden />Вы готовили</span>}
       <span className="flex flex-1 flex-col p-3">
         <span className="line-clamp-2 min-h-[3rem] text-title leading-snug">{recipe.title}</span>
         <span className="mt-1"><RecipeMeta recipe={recipe} size="caption" showDifficulty={false} /></span>

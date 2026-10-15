@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, ChefHat } from "lucide-react";
 import {
-  courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, rankRecipes, recipeById, recipes, shortName,
+  courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -32,7 +32,7 @@ export const mealNow = (): "breakfast" | "lunch" | "dinner" => {
 };
 const MEAL_WORD = { breakfast: "на завтрак", lunch: "на обед", dinner: "на ужин" };
 const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
-const people = (n: number) => n + " " + (n % 10 === 1 && n % 100 !== 11 ? "человека" : "человек");
+const people = (n: number) => n + " " + plural(n, "человека", "человека", "человек");
 
 /** Dishes that suit the person (goals, level, kids) and the meal; stable for the day. */
 function useSuitable() {

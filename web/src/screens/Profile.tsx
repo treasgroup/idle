@@ -47,7 +47,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink"><UserRound size={30} /></span>
         <div>
           <h1 className="text-h1">Профиль</h1>
-          <p className="text-body-sm text-ink-soft">Готовлю на {profile.eaters} {plural(profile.eaters, "человека", "человек", "человек")} · без регистрации</p>
+          <p className="text-body-sm text-ink-soft">Готовлю на {profile.eaters} {plural(profile.eaters, "человека", "человека", "человек")} · без регистрации</p>
         </div>
       </div>
 
@@ -93,7 +93,6 @@ export function Profile({ pwa }: { pwa: Pwa }) {
                 onClick={() => setSheet("goals")} />
               <Row icon={<Ban size={18} />} title="Ограничения" hint={excludedHint || "Ничего не исключено"} onClick={() => setSheet("limits")} />
               <Row icon={<Utensils size={18} />} title="Техника" hint={prefs.appliances.map((a) => (LABELS[a] ?? a).toLowerCase()).join(", ")} onClick={() => setSheet("kitchen")} />
-              <Row icon={<GraduationCap size={18} />} title="Школа готовки" hint={profile.lessonsDone.length ? "Пройдено уроков: " + profile.lessonsDone.length : "14 коротких уроков для начинающих"} onClick={() => openLayer(routeHash({ tab: "learn" }))} />
             </div>
           </Section>
 

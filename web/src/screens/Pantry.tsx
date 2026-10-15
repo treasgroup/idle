@@ -9,6 +9,7 @@ import { useStore } from "../app/store";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { ChefAvatar, Chip, Empty, Section, Sheet, cx } from "../components/ui";
+import { ProductTiles } from "../components/ProductTiles";
 
 const EXPIRY = [["Сегодня", 0], ["Завтра", 1], ["3 дня", 3], ["Неделя", 7], ["Месяц", 30], ["Без срока", null]] as const;
 
@@ -182,12 +183,14 @@ function AddProducts({ open, onClose }: { open: boolean; onClose: () => void }) 
       </div>
       {q.trim() ? (
         <div className="mt-3 flex flex-wrap gap-2">{found.length ? found.map((id) => <Chip key={id} on={has(id)} onClick={() => toggle(id)}>{shortName(id)}</Chip>) : <p className="text-small text-ink-soft">Такого продукта нет в рецептах.</p>}</div>
-      ) : groups.map((g) => (
+      ) : <>
+        <ProductTiles className="mt-4" on={has} onToggle={toggle} />
+        {groups.map((g) => (
         <div key={g.key} className="mt-4">
           <p className="label mb-2">{g.label}</p>
           <div className="flex flex-wrap gap-2">{g.items.slice(0, 14).map((i) => <Chip key={i.id} on={has(i.id)} onClick={() => toggle(i.id)}>{i.label}</Chip>)}</div>
         </div>
-      ))}
+      ))}</>}
     </Sheet>
   );
 }

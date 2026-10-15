@@ -133,10 +133,15 @@ const APPLIANCE_CHOICES = [["oven", "Духовка"], ["multicooker", "Муль
 const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Молочное"], ["gluten", "Глютен"], ["nuts", "Орехи"], ["mushrooms", "Грибы"], ["spicy", "Острое"]] as const;
 
 /** First visit: three short steps to tailor everything, then «Знакомьтесь — Шеф». Can be skipped. */
+const LAST = 4;
+
 export function Onboarding({ onDone }: { onDone: () => void }) {
-  const { s, setProfile, update } = useStore();
+  const { s, profile, setProfile, update } = useStore();
   const a = useAssistant();
   const [step, setStep] = useState(0);
+  const size = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
+  const setSize = (k: "m" | "l" | "xl") => { setProfile((p) => ({ ...p, textSize: k })); update((st) => ({ ...st, largeText: k !== "m" })); };
+  const setSimple = (v: boolean) => setProfile((p) => ({ ...p, simple: v }));
   const [eaters, setEaters] = useState(2);
   const [kids, setKids] = useState(false);
   const [level, setLevel] = useState<Level>("confident");
@@ -153,13 +158,47 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     }));
   };
   const finish = (ask?: string) => {
-    if (step < 3) save(false);
+    if (step < LAST) save(false);
     onDone();
     if (ask) { void a.ask(ask, { fresh: true, source: "onboarding" }); goChat(); }
   };
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
+  const modes = [
+    { simple: true, title: "Простой", hint: "Крупно и только главное", tabs: ["Главная", "Шеф", "Избранное"] },
+    { simple: false, title: "Полный", hint: "Все возможности: поиск, покупки, план на неделю", tabs: ["Главная", "Поиск", "Шеф", "Избранное", "Покупки"] },
+  ];
   const steps = [
+    <div key="mode">
+      <h1 className="text-h1">Как вам удобнее?</h1>
+      <p className="mt-2 text-body-sm text-ink-soft">Можно поменять в любой момент в профиле.</p>
+      <div className="mt-6 grid gap-3" role="radiogroup" aria-label="Режим">
+        {modes.map((m) => {
+          const on = profile.simple === m.simple;
+          return (
+            <button key={m.title} role="radio" aria-checked={on} onClick={() => setSimple(m.simple)}
+              className={cx("rounded-card border p-4 text-left", on ? "border-brand bg-brand-soft" : "border-line bg-card")}>
+              <span className="flex items-center gap-3">
+                <span className={cx("grid h-6 w-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand" : "border-line-strong")}>{on && <span className="h-3 w-3 rounded-full bg-brand-fill" />}</span>
+                <span><span className="block text-title">{m.title}</span><span className="block text-small text-ink-soft">{m.hint}</span></span>
+              </span>
+              <span className="mt-3 flex gap-1 rounded-input bg-paper/80 p-1.5" aria-hidden>
+                {m.tabs.map((t) => <span key={t} className={cx("min-w-0 flex-auto truncate rounded-md px-1 py-1.5 text-center text-micro", t === "Шеф" ? "bg-brand-fill text-white" : "bg-sunken text-ink-soft", m.simple && "py-2.5 text-small")}>{t}</span>)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="label mb-2 mt-6">Размер текста</p>
+      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Размер текста">
+        {(["m", "l", "xl"] as const).map((k, i) => (
+          <button key={k} role="radio" aria-checked={size === k} onClick={() => setSize(k)}
+            className={cx("flex h-16 items-center justify-center rounded-input border", size === k ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-card")}>
+            <span style={{ fontSize: [16, 21, 26][i] + "px" }}>А</span>
+          </button>
+        ))}
+      </div>
+    </div>,
     <div key="who">
       <h1 className="text-h1">Для кого готовите?</h1>
       <p className="mt-2 text-body-sm text-ink-soft">Рецепты и списки покупок посчитаю на нужное число порций.</p>
@@ -168,7 +207,6 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <Stepper value={eaters} min={1} max={12} onChange={setEaters} label="Едоков" />
       </div>
       <div className="mt-2 rounded-card border border-line bg-card px-4"><Toggle on={kids} onChange={setKids} label="Есть дети" hint="Чаще покажу то, что нравится детям" /></div>
-      <div className="mt-2 rounded-card border border-line bg-card px-4"><Toggle on={s.largeText} onChange={(v) => update((st) => ({ ...st, largeText: v }))} label="Крупный текст" hint="Удобнее читать с телефона" /></div>
     </div>,
     <div key="level">
       <h1 className="text-h1">Как часто готовите?</h1>
@@ -211,17 +249,17 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   return (
     <div className="anim-fade fixed inset-0 z-50 overflow-y-auto bg-paper" role="dialog" aria-modal="true" aria-label="Знакомство">
       <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)]">
-        {step < 3 ? (
+        {step < LAST ? (
           <>
             <div className="flex items-center gap-3">
               <ChefAvatar size={32} />
-              <div className="grid flex-1 grid-cols-3 gap-1.5" aria-label={"Шаг " + (step + 1) + " из 3"}>
-                {[0, 1, 2].map((i) => <span key={i} className={cx("h-1.5 rounded-full", i <= step ? "bg-brand-fill" : "bg-sunken")} />)}
+              <div className="grid flex-1 grid-cols-4 gap-1.5" aria-label={"Шаг " + (step + 1) + " из " + LAST}>
+                {[0, 1, 2, 3].map((i) => <span key={i} className={cx("h-1.5 rounded-full", i <= step ? "bg-brand-fill" : "bg-sunken")} />)}
               </div>
             </div>
             <div className="anim-rise mt-8 flex-1" key={step}>{steps[step]}</div>
             <div className="sticky bottom-0 -mx-5 mt-8 bg-paper px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
-              <button className="btn-primary h-13 w-full" onClick={() => { if (step === 2) save(false); setStep(step + 1); }}>Дальше</button>
+              <button className="btn-primary h-13 w-full" onClick={() => { if (step === LAST - 1) save(false); setStep(step + 1); }}>Дальше</button>
               <div className="mt-1 flex">
                 {step > 0 && <button className="btn-ghost flex-1" onClick={() => setStep(step - 1)}>Назад</button>}
                 <button className="btn-ghost flex-1" onClick={() => { save(true); onDone(); }}>Пропустить</button>

@@ -4,7 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
-  Timer, BellRing, Lightbulb, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send, Printer } from "lucide-react";
+  Timer, BellRing, Lightbulb, Users, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send, Printer } from "lucide-react";
 import {
   LABELS, canShare, clampServings, copyText, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, shareLink, similarRecipes, suggestSides, needsSide, withSide, yieldText, SHARE_TARGETS,
@@ -21,12 +21,13 @@ import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
-import { AskSheet, askStarters, type AskRequest } from "../components/AskSheet";
+import { AskSheet, accusative, askStarters, type AskRequest } from "../components/AskSheet";
 import { TimerStrip } from "../components/TimerStrip";
 import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { Reviews, Stars, useReviews } from "./Reviews";
 
 const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
+const SIZE_NAMES = { m: "обычный", l: "крупный", xl: "очень крупный" } as const;
 const ANCHORS = [
   { id: "recipe-products", label: "Продукты" },
   { id: "recipe-steps", label: "Шаги" },
@@ -162,7 +163,14 @@ function stepLabel(text: string): string {
 interface Group { key: string; title: string | null; rows: RecipeIngredient[]; added?: boolean }
 
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
-  const { s, profile, toast, online } = useStore();
+  const { s, profile, setProfile, update, toast, online } = useStore();
+  const textSize = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
+  const bigger = () => {
+    const next = textSize === "m" ? "l" : textSize === "l" ? "xl" : "m";
+    setProfile((p) => ({ ...p, textSize: next }));
+    update((st) => ({ ...st, largeText: next !== "m" }));
+    toast("Текст: " + SIZE_NAMES[next]);
+  };
   const { isFavorite, toggleFavorite, addRecipeToShopping, startCooking, openRecipe } = useActions();
   const reviews = useReviews(base.id);
   const [servings, setServings] = useState(() => clampServings(base, s.conditions.servings || profile.eaters));
@@ -206,6 +214,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const needed = [...new Set(recipe.ingredients.filter((i) => !i.optional && i.id !== "water").map((i) => i.id))];
   const owned = needed.filter(hasIt).length;
   const missing = needed.length - owned;
+  const firstMissing = recipe.ingredients.find((i) => i.id === needed.find((id) => !hasIt(id)));
+  const swapQuestion = firstMissing ? "Чем заменить " + accusative(displayName(firstMissing.id, firstMissing.name)) + "?" : undefined;
   const toggleHave = (id: string) => setHave((h) => (hasIt(id) ? h.filter((x) => !ingredientMatches(id, x)) : [...h, id]));
 
   useEffect(() => { document.title = base.title + " — Что приготовить?"; return () => { document.title = "Что приготовить?"; }; }, [base.title]);
@@ -237,10 +247,13 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const ask = (text?: string) => { setAskReq(text ? { text, key: Date.now() } : null); setAskOpen(true); };
   const cook = () => (cookingThis ? openLayer(routeHash({ cook: true })) : startCooking(recipe, servings));
 
+  // The three things people ask first, as big tiles; the rest as small pills under them.
+  const facts: { icon: ReactNode; label: string; value: string; onClick?: () => void }[] = [
+    { icon: <Clock size={20} />, label: "Время", value: formatMinutes(recipe.totalMinutes) },
+    { icon: <Gauge size={20} />, label: "Сложность", value: DIFF[base.difficulty] ?? base.difficulty },
+    { icon: <Users size={20} />, label: "Порции", value: "на " + servings + " " + plural(servings, "человека", "человека", "человек"), onClick: () => go("recipe-products") },
+  ];
   const flags: { icon: ReactNode; label: string }[] = [
-    { icon: <Clock size={16} />, label: formatMinutes(recipe.totalMinutes) },
-    ...(nutrition.kcal > 0 ? [{ icon: <Flame size={16} />, label: nutrition.kcal + " ккал" }] : []),
-    { icon: <Gauge size={16} />, label: DIFF[base.difficulty] ?? base.difficulty },
     ...(base.budget === "low" ? [{ icon: <ShoppingBasket size={16} />, label: "Из простых продуктов" }] : []),
     ...(base.tags.includes("vegetarian") ? [{ icon: <Leaf size={16} />, label: "Без мяса" }] : []),
     ...(isLenten(base) ? [{ icon: <Sprout size={16} />, label: "Постное" }] : []),
@@ -264,6 +277,9 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   return (
     <Layer title={base.title} onClose={onClose} width="max-w-none" transparentUntil={header.until} label={base.title} actions={
       <>
+        <button className="icon-btn text-body-sm font-medium" onClick={bigger} aria-label={"Размер текста: " + SIZE_NAMES[textSize]} title="Размер текста">
+          <span className="flex items-baseline" aria-hidden>А<span className="text-small">{textSize === "xl" ? "−" : "+"}</span></span>
+        </button>
         <button className="icon-btn" onClick={() => setShareOpen(true)} aria-label="Поделиться"><Share2 size={20} /></button>
         <button className="icon-btn" onClick={() => toggleFavorite(base)} aria-label={fav ? "Убрать из сохранённого" : "Сохранить"} aria-pressed={fav}>
           <Heart size={20} className={cx(fav && "fill-brand text-brand")} />
@@ -290,13 +306,28 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                 </div>
               )}
               {base.summary && <p className="mt-3 text-body text-ink-soft">{base.summary}</p>}
-              <ul className="mt-4 flex flex-wrap gap-2" aria-label="Коротко о блюде">
+              <dl className="mt-4 grid grid-cols-3 gap-2">
+                {facts.map((f) => {
+                  const inner = (
+                    <>
+                      <span className="text-brand" aria-hidden>{f.icon}</span>
+                      <dt className="text-caption text-ink-soft">{f.label}</dt>
+                      <dd className="text-body-sm font-medium leading-snug">{f.value}</dd>
+                    </>
+                  );
+                  const cls = "flex h-full min-h-[88px] flex-col items-center justify-center gap-0.5 rounded-input border border-line bg-card px-1.5 py-2.5 text-center";
+                  return f.onClick
+                    ? <div key={f.label}><button className={cx(cls, "w-full hover:border-line-strong")} onClick={f.onClick}>{inner}</button></div>
+                    : <div key={f.label} className={cls}>{inner}</div>;
+                })}
+              </dl>
+              {flags.length > 0 && <ul className="mt-3 flex flex-wrap gap-2" aria-label="Коротко о блюде">
                 {flags.map((f) => (
                   <li key={f.label} className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full bg-sunken px-3 text-small text-ink">
                     <span className="text-ink-soft" aria-hidden>{f.icon}</span>{f.label}
                   </li>
                 ))}
-              </ul>
+              </ul>}
               {nutrition.kcal > 0 && <Nutrition recipe={base} n={nutrition} side={!!side} />}
               <div className="mt-6 hidden gap-3 lg:flex">
                 <button className="btn-primary btn-bar flex-1" onClick={cook}><ChefHat size={20} />{cookingThis ? "Продолжить готовить" : "Начать готовить"}</button>
@@ -314,7 +345,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                 {/* Own header: the stepper drops under the title when there is no room (320px, large text). */}
                 <div className="mb-3 flex min-h-[44px] flex-wrap items-center justify-between gap-x-3 gap-y-2">
                   <h2 className="text-h2">Продукты</h2>
-                  <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Порции" suffix={plural(servings, "порция", "порции", "порций")} />
+                  <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
                 <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}Отметьте, что уже есть дома.</p>
                 <HaveBar owned={owned} total={needed.length} missing={missing} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
@@ -328,6 +359,14 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                     </div>
                   ))}
                 </div>
+                {missing > 0 && (
+                  <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-brand hover:bg-sunken/60"
+                    onClick={() => ask(swapQuestion)}>
+                    <Lightbulb size={18} className="shrink-0" aria-hidden />
+                    <span className="flex-1">Чего-то нет дома? Подскажу, чем заменить</span>
+                    <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+                  </button>
+                )}
               </Section>
             </aside>
 
@@ -465,7 +504,14 @@ function Nutrition({ recipe, n, side }: { recipe: Recipe; n: { kcal: number; pro
     [<><span className="min-[360px]:hidden">углев.</span><span className="max-[359px]:hidden">углеводы</span></>, n.carbs, " г"],
   ];
   return (
-    <div className="mt-5">
+    <details className="group mt-4 rounded-input border border-line bg-card">
+      <summary className="flex min-h-[48px] cursor-pointer list-none items-center gap-2 px-4 text-body-sm [&::-webkit-details-marker]:hidden">
+        <Flame size={18} className="text-ink-soft" aria-hidden />
+        <span className="flex-1">Калории и состав</span>
+        <span className="text-ink-soft">{n.kcal} ккал</span>
+        <ChevronRight size={18} className="text-ink-faint transition-transform group-open:rotate-90" aria-hidden />
+      </summary>
+      <div className="px-3 pb-3">
       <dl className="grid grid-cols-4 gap-2">
         {cells.map(([label, v, unit], k) => (
           <div key={k} className="flex flex-col-reverse items-center rounded-input border border-line bg-card px-1 py-2.5 text-center">
@@ -478,7 +524,8 @@ function Nutrition({ recipe, n, side }: { recipe: Recipe; n: { kcal: number; pro
         На порцию{side ? ", без гарнира" : ""}, по составу.{" "}
         {recipe.allergens.length ? "Аллергены: " + recipe.allergens.map(allergen).join(", ") + "." : "Основных аллергенов нет."}
       </p>
-    </div>
+      </div>
+    </details>
   );
 }
 
@@ -518,7 +565,7 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
         <span className="min-w-0 flex-1 py-1.5">
           <span className="text-body-sm">{displayName(i.id, i.name)}</span>
           {i.optional && <span className="text-caption text-ink-faint"> · по желанию</span>}
-          {swaps.length > 0 && <span className="block text-caption text-ink-faint">можно заменить: {swaps.join(", ").toLowerCase()}</span>}
+          {swaps.length > 0 && <span className="block text-caption text-ink-faint">{own ? "можно заменить" : "нет дома — замените"}: {swaps.join(", ").toLowerCase()}</span>}
           {own && <span className="sr-only"> — есть дома</span>}
         </span>
         <span className="shrink-0 pl-2 text-right">

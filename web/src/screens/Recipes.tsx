@@ -164,6 +164,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     return x && x.count ? "★ " + x.avg.toFixed(1).replace(".", ",") : undefined;
   };
 
+  // An empty «Избранное» is just the explanation: no search or filters over nothing.
+  const bare = mode === "favorites" && base.length === 0 && !q;
   const countLine = query
     ? "Нашлось: " + list.length + " " + recipesWord(list.length)
     : view === "saved" ? "Сохранено: " + list.length + " " + recipesWord(list.length)
@@ -182,19 +184,19 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
       <h1 className="pt-2 text-h1 sm:pt-0">{mode === "favorites" ? "Избранное" : "Поиск"}</h1>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-4">
-        <form role="search" onSubmit={(e) => { e.preventDefault(); input.current?.blur(); }} className="relative">
+        {!bare && <form role="search" onSubmit={(e) => { e.preventDefault(); input.current?.blur(); }} className="relative">
           <Search size={20} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-faint" aria-hidden />
           <input ref={input} value={q} onChange={(e) => setQ(e.target.value)} placeholder="Найти рецепт" aria-label="Найти рецепт"
             enterKeyHint="search" autoComplete="off" spellCheck={false}
             onKeyDown={(e) => { if (e.key === "Escape" && q) { e.stopPropagation(); setQ(""); } }}
             className="h-12 w-full rounded-input bg-sunken pl-11 pr-12 text-body text-ink outline-none transition-colors duration-150 placeholder:text-ink-faint hover:bg-line/60 focus:bg-card focus:ring-2 focus:ring-brand/30" />
           {q && <button type="button" className="icon-btn absolute right-0.5 top-1/2 -translate-y-1/2" onClick={() => { setQ(""); input.current?.focus(); }} aria-label="Очистить поиск"><X size={20} /></button>}
-        </form>
+        </form>}
         {mode === "favorites" && <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length }} />}
       </div>
 
       <div className="mt-6 lg:mt-8 xl:grid xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-8">
-        {desktop && (
+        {desktop && !bare && (
           <aside aria-label="Фильтры" className="self-start xl:sticky xl:top-8">
             <div className="flex min-h-[44px] items-center justify-between gap-2">
               <h2 className="text-h2">Фильтры</h2>
@@ -208,7 +210,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
         )}
 
         <div className="min-w-0">
-          {!desktop && (
+          {!desktop && !bare && (
             // On phones the row stays under the header while the list scrolls.
             <div className="sticky top-[calc(env(safe-area-inset-top)+3.5rem)] z-20 -mx-4 bg-paper/95 py-2 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:py-0 sm:backdrop-blur-none">
             <div className="scroller fade-x !gap-2 px-4 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none]" aria-label="Блюда и фильтры">
@@ -248,7 +250,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
               </div>
             </section>
           )}
-          <p className={cx("text-small text-ink-soft", desktop ? "flex min-h-[44px] items-center" : "mt-4")} aria-live="polite">{countLine}</p>
+          {!bare && <p className={cx("text-small text-ink-soft", desktop ? "flex min-h-[44px] items-center" : "mt-4")} aria-live="polite">{countLine}</p>}
 
           {list.length === 0 ? (
             view === "saved" && !query && !filtered ? (

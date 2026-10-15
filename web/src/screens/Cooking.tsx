@@ -1,6 +1,6 @@
 // Cooking mode (#/cook): one step at a time in large type, the step's own timer, voice control, a second dish
 // cooked alongside, and a finish screen. Timers are the app's kitchen timers (app/timers.ts); the shell rings them.
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TouchEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
   MessageCircle, MessageCircleQuestion, Mic, Pause, Play, Plus, Refrigerator, Search, Star, Volume2, X,
@@ -215,6 +215,12 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     if (dx > 0 && dish.step > 0) go(-1);
   };
 
+  const tapStep = (e: MouseEvent<HTMLElement>) => {
+    if (!dish || window.getSelection()?.toString()) return;
+    const box = e.currentTarget.getBoundingClientRect();
+    if (e.clientX - box.left < box.width * 0.3) { if (dish.step > 0) go(-1); }
+    else if (dish.step < total - 1) go(1);
+  };
   const toggleVoice = () => {
     const on = !handsFree;
     setHandsFree(on);
@@ -284,7 +290,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <h1 className="sr-only">{r.title}</h1>
           <p className="sr-only" aria-live="polite">Шаг {dish.step + 1} из {total}. {cur.text}</p>
           <div key={dish.key + dish.step} className="anim-rise">
-            <p className="mt-5 text-step md:text-step-lg lg:mt-8">{cur.text}</p>
+            {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
+            <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{cur.text}</p>
+            {dish.step === 0 && total > 1 && <p className="mt-2 text-caption text-ink-faint">Коснитесь текста справа — следующий шаг, слева — назад</p>}
             {uses.length > 0 && (
               <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
                 {uses.map((i) => (
