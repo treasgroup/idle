@@ -1291,7 +1291,7 @@ var uA = [
   { id: "vk", label: "ВКонтакте" },
   { id: "max", label: "MAX" },
   { id: "telegram", label: "Telegram" },
-  { id: "whatsapp", label: "WhatsApp" },
+  { id: "ok", label: "Одноклассники" },
 ];
 function dA(e) {
   return Ua() + "recipe.php?id=" + encodeURIComponent(e);
@@ -1352,8 +1352,15 @@ function pA(e, t) {
           n,
         copyFirst: !1,
       };
-    case "whatsapp":
-      return { url: "https://wa.me/?text=" + n, copyFirst: !1 };
+    case "ok":
+      return {
+        url:
+          "https://connect.ok.ru/offer?url=" +
+          encodeURIComponent((t.match(/https?:\/\/\S+/) || [Ua()])[0]) +
+          "&title=" +
+          n,
+        copyFirst: !1,
+      };
   }
 }
 async function E0(e) {
