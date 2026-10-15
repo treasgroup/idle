@@ -15,7 +15,7 @@ import { replace, routeHash } from "../app/router";
 import type { Profile } from "../app/profile";
 import { RecipeImage, RecipeMeta } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
-import { ShareOptions } from "./RecipeLayer";
+import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
 
 /** The person's goals narrow the dishes a menu is made of (passed to the engine only, never stored). */

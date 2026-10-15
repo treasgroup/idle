@@ -1,7 +1,7 @@
 // The app shell: the bottom bar on phones, a rail on tablets, a sidebar on desktop.
 // Five destinations: Главная · Поиск · Шеф · Избранное · Покупки (Шеф is the coloured one, level with the rest).
 // Simple mode keeps three: Главная · Шеф · Избранное. Everything else lives in Профиль.
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
   type LucideIcon,
@@ -13,16 +13,30 @@ import { AssistantProvider } from "./assistant";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
-import { Chat } from "../screens/Chat";
 import { Recipes } from "../screens/Recipes";
-import { Menu } from "../screens/Menu";
-import { Shopping } from "../screens/Shopping";
-import { Pantry } from "../screens/Pantry";
-import { Profile } from "../screens/Profile";
-import { RecipeLayer } from "../screens/RecipeLayer";
-import { CookingLayer } from "../screens/Cooking";
 import { ScreenSkeleton } from "../components/Skeleton";
-import { DocLayer, Learn, Onboarding, PollSheet } from "../screens/Extras";
+import { lazyScreen, preload } from "./lazy";
+
+// Home and search come with the page; the rest loads when first opened (and quietly in the background).
+const loadChat = () => import("../screens/Chat");
+const loadRecipe = () => import("../screens/RecipeLayer");
+const loadCooking = () => import("../screens/Cooking");
+const loadExtras = () => import("../screens/Extras");
+const Chat = lazyScreen(() => loadChat().then((m) => ({ default: m.Chat })));
+const loadMenu = () => import("../screens/Menu");
+const loadShopping = () => import("../screens/Shopping");
+const loadPantry = () => import("../screens/Pantry");
+const loadProfile = () => import("../screens/Profile");
+const Menu = lazyScreen(() => loadMenu().then((m) => ({ default: m.Menu })));
+const Shopping = lazyScreen(() => loadShopping().then((m) => ({ default: m.Shopping })));
+const Pantry = lazyScreen(() => loadPantry().then((m) => ({ default: m.Pantry })));
+const Profile = lazyScreen(() => loadProfile().then((m) => ({ default: m.Profile })));
+const RecipeLayer = lazyScreen(() => loadRecipe().then((m) => ({ default: m.RecipeLayer })));
+const CookingLayer = lazyScreen(() => loadCooking().then((m) => ({ default: m.CookingLayer })));
+const DocLayer = lazyScreen(() => loadExtras().then((m) => ({ default: m.DocLayer })));
+const Learn = lazyScreen(() => loadExtras().then((m) => ({ default: m.Learn })));
+const Onboarding = lazyScreen(() => loadExtras().then((m) => ({ default: m.Onboarding })));
+const PollSheet = lazyScreen(() => loadExtras().then((m) => ({ default: m.PollSheet })));
 import { Boundary, ChefAvatar, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
 import { useUpdateCheck } from "./updates";
 
@@ -106,6 +120,9 @@ function Shell() {
     ]);
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { window.scrollTo(0, 0); }, [route.tab]);
+  // The other screens are fetched quietly once the first one is on screen — then they open at once, and work
+  // without the internet later (the shopping list in the shop).
+  useEffect(() => { if (ready) preload([loadRecipe, loadChat, loadCooking, loadShopping, loadMenu, loadPantry, loadProfile, loadExtras]); }, [ready]);
 
   // --nav-h: the height of what is fixed at the bottom (the bar and the mini-player), for toasts and page padding.
   useLayoutEffect(() => {
@@ -144,10 +161,12 @@ function Shell() {
 
       <main className={cx("sm:pl-20 lg:pl-64", !chat && "pb-[calc(var(--nav-h)+2rem)]")}>
         {chat ? (
-          <Boundary resetKey="chat">{screen}</Boundary>
+          <Boundary resetKey="chat"><Suspense fallback={<div className="min-h-[100dvh]" />}>{screen}</Suspense></Boundary>
         ) : (
           <div className="mx-auto w-full max-w-3xl px-4 pt-2 sm:px-6 sm:pt-4 lg:max-w-[1200px] lg:px-8 lg:pt-8">
-            <Boundary resetKey={route.tab}>{ready ? screen : <ScreenSkeleton home={route.tab === "home"} />}</Boundary>
+            <Boundary resetKey={route.tab}>
+              <Suspense fallback={<ScreenSkeleton />}>{ready ? screen : <ScreenSkeleton home={route.tab === "home"} />}</Suspense>
+            </Boundary>
           </div>
         )}
       </main>
@@ -158,13 +177,17 @@ function Shell() {
       </div>
 
       <Boundary resetKey={(route.recipe ?? "") + route.cook}>
-        {route.recipe && <RecipeLayer id={route.recipe} onClose={closeRecipe} />}
-        {route.cook && <CookingLayer onClose={closeTop} />}
+        <Suspense fallback={<LayerSkeleton />}>
+          {route.recipe && <RecipeLayer id={route.recipe} onClose={closeRecipe} />}
+          {route.cook && <CookingLayer onClose={closeTop} />}
+        </Suspense>
       </Boundary>
-      {route.tab === "learn" && <Learn onClose={closeTop} />}
-      {route.doc && <DocLayer doc={route.doc} onClose={closeTop} />}
-      {poll && <PollSheet token={poll} onClose={() => setPoll(null)} />}
-      {onboarding && <Onboarding onDone={() => setOnboarding(false)} />}
+      <Suspense fallback={route.tab === "learn" || route.doc ? <LayerSkeleton /> : null}>
+        {route.tab === "learn" && <Learn onClose={closeTop} />}
+        {route.doc && <DocLayer doc={route.doc} onClose={closeTop} />}
+        {poll && <PollSheet token={poll} onClose={() => setPoll(null)} />}
+        {onboarding && <Onboarding onDone={() => setOnboarding(false)} />}
+      </Suspense>
       <Toast message={message} onClose={clearToast} />
     </div>
   );
@@ -327,6 +350,20 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
         </button>
       </div>
     </aside>
+  );
+}
+
+/** While a page-over-the-page (recipe, cooking, school) is still loading: its shape in grey. */
+function LayerSkeleton() {
+  return (
+    <div className="fixed inset-0 z-40 bg-paper lg:left-64" role="status" aria-label="Загрузка">
+      <div className="mx-auto max-w-3xl px-4 pt-[calc(env(safe-area-inset-top)+4rem)]">
+        <span className="skeleton block aspect-[4/3] w-full rounded-card" />
+        <span className="skeleton mt-5 block h-8 w-3/4" />
+        <span className="skeleton mt-3 block h-4 w-full" />
+        <span className="skeleton mt-2 block h-4 w-5/6" />
+      </div>
+    </div>
   );
 }
 

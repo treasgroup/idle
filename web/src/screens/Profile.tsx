@@ -11,7 +11,7 @@ import { useReminders } from "../app/reminders";
 import { GOALS, LEVELS } from "../app/profile";
 import { openLayer, openRecipesView, routeHash } from "../app/router";
 import { Chip, Section, Sheet, Stepper, Toggle, cx } from "../components/ui";
-import { ShareOptions } from "./RecipeLayer";
+import { ShareOptions } from "../components/ShareOptions";
 import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 

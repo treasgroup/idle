@@ -4,10 +4,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
-  Timer, BellRing, Lightbulb, Users, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send, Printer } from "lucide-react";
+  Timer, BellRing, Lightbulb, Users, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X } from "lucide-react";
 import {
-  LABELS, canShare, clampServings, copyText, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
-  recipeById, recipePageUrl, reviewsWord, scaleIngredient, shareLink, similarRecipes, suggestSides, needsSide, withSide, yieldText, SHARE_TARGETS,
+  LABELS, clampServings, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
+  recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide, yieldText,
   type Recipe, type RecipeIngredient,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -25,6 +25,7 @@ import { RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { AskSheet, accusative, askStarters, type AskRequest } from "../components/AskSheet";
 import { ServeBySheet } from "../components/ServeBy";
+import { ShareOptions } from "../components/ShareOptions";
 import { TimerStrip } from "../components/TimerStrip";
 import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { Reviews, Stars, useReviews } from "./Reviews";
@@ -699,35 +700,6 @@ function Note({ id }: { id: string }) {
   );
 }
 
-/** Ways to send a link or a text: the phone's share sheet, messengers, copy. Also used by Меню and Покупки. */
-export function ShareOptions({ text, title, url, onDone, onPrint }: { text: string; title: string; url?: string; onDone: (copied?: boolean) => void; onPrint?: () => void }) {
-  return (
-    <div className="grid gap-2">
-      {canShare() && (
-        <button className="btn-primary btn-bar" onClick={() => navigator.share({ title, text, ...(url ? { url } : {}) }).then(() => onDone()).catch(() => {})}>
-          <Send size={18} />Отправить…
-        </button>
-      )}
-      <div className="grid grid-cols-2 gap-2">
-        {SHARE_TARGETS.map((t) => (
-          <button key={t.id} className="btn-outline" onClick={async () => {
-            const l = shareLink(t.id, text);
-            if (l.copyFirst) await copyText(text);
-            window.open(l.url, "_blank", "noopener");
-            onDone();
-          }}>{t.label}{t.id === "whatsapp" && "*"}</button>
-        ))}
-      </div>
-      <div className="flex flex-wrap justify-center">
-        <button className="btn-ghost" onClick={async () => { await copyText(url ?? text); onDone(true); }}><Link2 size={18} />{url ? "Скопировать ссылку" : "Скопировать текст"}</button>
-        {onPrint !== undefined && <button className="btn-ghost" onClick={() => { onPrint(); onDone(); }}><Printer size={18} />Распечатать</button>}
-      </div>
-      {SHARE_TARGETS.some((t) => t.id === "whatsapp") && (
-        <p className="text-center text-caption text-ink-faint">*WhatsApp принадлежит компании Meta, которая признана экстремистской и запрещена на территории РФ.</p>
-      )}
-    </div>
-  );
-}
 
 /** «У вас другая форма?»: products are recounted by the form's area. */
 function PanSheet({ open, onClose, pan, onPick }: { open: boolean; onClose: () => void; pan: Pan; onPick: (p: Pan) => void }) {

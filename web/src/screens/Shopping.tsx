@@ -8,7 +8,7 @@ import {
 import { useStore } from "../app/store";
 import { replace, routeHash } from "../app/router";
 import { Empty, Sheet, cx, haptic } from "../components/ui";
-import { ShareOptions } from "./RecipeLayer";
+import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
 import { cue } from "../app/feedback";
 
