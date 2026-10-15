@@ -44,7 +44,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const size = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
 
   return (
-    <div className="pt-4 sm:pt-6">
+    <div className="pt-4 sm:pt-6 lg:max-w-[960px]">
       <div className="flex items-center gap-4">
         <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink"><UserRound size={30} /></span>
         <div>

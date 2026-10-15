@@ -20,7 +20,7 @@ export function haveIds(s: EngineState): string[] {
 }
 
 export function useActions() {
-  const { s, update, toast, setProfile, catalog } = useStore();
+  const { s, update, toast, profile, setProfile, catalog } = useStore();
 
   const openRecipe = useCallback((r: Recipe | string) => {
     const id = typeof r === "string" ? r : r.id;
@@ -96,6 +96,19 @@ export function useActions() {
     if (removed) toast("Отметил в «Мои продукты»: продукты для блюда израсходованы");
   }, [update, toast, catalog.source]);
 
+  /** «Прекратить готовку»: changed one's mind — the cooking bar goes away, with «Отменить» just in case. */
+  const stopCooking = useCallback((quiet = false) => {
+    const before = { cooking: s.cooking, parallel: profile.parallel };
+    if (before.cooking) stopTimersFor(before.cooking.recipe.id);
+    if (before.parallel) stopTimersFor(before.parallel.recipeId);
+    update((st) => ({ ...st, cooking: null }));
+    setProfile((p) => (p.parallel ? { ...p, parallel: null } : p));
+    if (!quiet) toast("Готовка остановлена", { label: "Отменить", run: () => {
+      update((st) => ({ ...st, cooking: before.cooking }));
+      setProfile((p) => ({ ...p, parallel: before.parallel }));
+    } });
+  }, [s.cooking, profile.parallel, update, setProfile, toast]);
+
   const markHave = useCallback((ids: string[]) => {
     update((st) => ({ ...st, fridge: addToFridge(st.fridge, ids) }));
   }, [update]);
@@ -105,5 +118,5 @@ export function useActions() {
     return r.ingredients.filter((i) => !i.optional && !have.some((h) => ingredientMatches(i.id, h)));
   }, [s]);
 
-  return { openRecipe, closeRecipe, isFavorite, toggleFavorite, addRecipeToShopping, startCooking, finishCooking, markHave, missingFor };
+  return { openRecipe, closeRecipe, isFavorite, toggleFavorite, addRecipeToShopping, startCooking, finishCooking, stopCooking, markHave, missingFor };
 }

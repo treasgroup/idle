@@ -46,12 +46,13 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
   recipe: Recipe; note?: string; onOpen: () => void; onMenu?: () => void; onSave?: () => void; saved?: boolean;
 }) {
   return (
-    <article className="card overflow-hidden">
-      <button className="relative block w-full text-left" onClick={onOpen} aria-label={"Открыть рецепт: " + recipe.title}>
-        <RecipeImage recipe={recipe} className="aspect-video w-full" rounded="rounded-none" />
+    // Wider than a phone: photo on the left, so one answer does not fill the whole screen.
+    <article className="card overflow-hidden sm:flex">
+      <button className="relative block w-full text-left sm:w-[42%] sm:shrink-0" onClick={onOpen} aria-label={"Открыть рецепт: " + recipe.title}>
+        <RecipeImage recipe={recipe} className="aspect-video w-full sm:aspect-auto sm:h-full sm:min-h-[200px]" rounded="rounded-none" />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-2.5 py-1 text-micro font-semibold text-ink shadow-e1">Лучше всего подходит</span>
       </button>
-      <div className="p-4">
+      <div className="p-4 sm:flex sm:flex-1 sm:flex-col sm:justify-center sm:p-5">
         <button className="block text-left" onClick={onOpen}>
           <h3 className="line-clamp-2 text-[1.125rem] font-semibold leading-snug">{recipe.title}</h3>
         </button>

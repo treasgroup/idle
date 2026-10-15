@@ -81,7 +81,7 @@ function useWakeLock(on: boolean) {
 
 export function CookingLayer({ onClose }: { onClose: () => void }) {
   const { s, update, profile, setProfile, toast } = useStore();
-  const { finishCooking } = useActions();
+  const { finishCooking, stopCooking } = useActions();
   const timers = useTimers();
   const c = s.cooking;
   const par = profile.parallel;
@@ -225,6 +225,12 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     if (e.clientX - box.left < box.width * 0.3) { if (dish.step > 0) go(-1); }
     else if (dish.step < total - 1) go(1);
   };
+  // Opened and closed straight away (first step, no timer): nothing was started, so nothing stays at the bottom.
+  const closeCook = () => {
+    const untouched = !!c && !c.done && c.step === 0 && !par && !timers.some((t) => t.recipeId === c.recipe.id);
+    if (untouched) stopCooking(true);
+    onClose();
+  };
   const toggleVoice = () => {
     const on = !handsFree;
     setHandsFree(on);
@@ -261,7 +267,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   );
 
   return (
-    <Layer onClose={onClose} closeIcon="close" width={WIDTH} label={"Готовка: " + r.title}
+    <Layer onClose={closeCook} closeIcon="close" width={WIDTH} full label={"Готовка: " + r.title}
       title={
         <span className="block min-w-0">
           <span className="block truncate leading-tight">{r.title}</span>
@@ -341,23 +347,22 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
               </h2>
               <div className="mt-1"><Ingredients compact dish={dish} checked={checked[r.id] ?? []} onToggle={(k) => toggleChecked(r.id, k)} /></div>
             </section>
+            {/* Everything besides the products in one small card, so the column fits the screen. */}
             <section className="card p-4">
-              <h2 className="font-sans text-title">Второе блюдо</h2>
+              <div className="flex flex-wrap gap-2">{voice}</div>
               {second ? (
-                <div className="mt-2 flex items-center gap-2">
-                  <div className="min-w-0 flex-1"><RecipeMini recipe={second} note={"Шаг " + (par!.step + 1) + " из " + second.steps.length} onOpen={() => setTab("second")} /></div>
+                <div className="mt-3 flex items-center gap-2 border-t border-line pt-3">
+                  <div className="min-w-0 flex-1"><RecipeMini recipe={second} note={"Второе блюдо · шаг " + (par!.step + 1) + " из " + second.steps.length} onOpen={() => setTab("second")} /></div>
                   <button className="icon-btn" onClick={removeSecond} aria-label="Убрать второе блюдо"><X size={20} /></button>
                 </div>
               ) : (
-                <>
-                  <p className="mt-1 text-body-sm text-ink-soft">Гарнир или салат параллельно — у каждого блюда свой шаг и таймер.</p>
-                  <button className="btn-outline mt-3 w-full" onClick={() => setSheet("second")}><Plus size={18} aria-hidden />Добавить блюдо</button>
-                </>
+                <button className="mt-3 flex min-h-[44px] w-full items-center gap-2 border-t border-line pt-3 text-left text-body-sm text-ink hover:text-brand" onClick={() => setSheet("second")}>
+                  <Plus size={18} className="shrink-0 text-ink-soft" aria-hidden /><span className="flex-1">Готовить второе блюдо</span>
+                </button>
               )}
-            </section>
-            <section className="card p-4">
-              <h2 className="font-sans text-title">Голос</h2>
-              <div className="mt-3 flex flex-wrap gap-2">{voice}</div>
+              <button className="flex min-h-[44px] w-full items-center gap-2 text-left text-body-sm text-ink-soft hover:text-ink" onClick={() => { stopCooking(); onClose(); }}>
+                <X size={18} className="shrink-0" aria-hidden /><span className="flex-1">Прекратить готовку</span>
+              </button>
             </section>
           </div>
         </aside>
@@ -387,6 +392,13 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
               <span className="block text-caption text-ink-soft">{second ? "«" + second.title + "»" : "Например, гарнир — подскажу, когда что начинать"}</span>
             </span>
             {second ? <X size={20} className="shrink-0 text-ink-soft" aria-hidden /> : <Plus size={20} className="shrink-0 text-ink-soft" aria-hidden />}
+          </button>
+          <button className="flex min-h-[64px] w-full items-center gap-3 py-2 text-left" onClick={() => { setSheet(null); stopCooking(); onClose(); }}>
+            <span className="min-w-0 flex-1">
+              <span className="block text-body-sm font-medium">Прекратить готовку</span>
+              <span className="block text-caption text-ink-soft">Передумали — закрою без отметки «готово»</span>
+            </span>
+            <X size={20} className="shrink-0 text-ink-soft" aria-hidden />
           </button>
         </div>
       </Sheet>
@@ -426,7 +438,7 @@ function BottomBar({ children, listening }: { children: ReactNode; listening: { 
     return () => { ro.disconnect(); root.setProperty("--dock", "0px"); };
   }, []);
   return (
-    <div ref={ref} className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper lg:left-64">
+    <div ref={ref} className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper">
       {listening && (
         <div className="bg-brand-fill text-white" role="status">
           <div className={cx("mx-auto flex min-h-[44px] items-center gap-2.5 px-4 sm:px-6 lg:px-8", WIDTH)}>
@@ -700,7 +712,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const tomorrow = () => { void a.ask("что приготовить завтра", { fresh: true }); goChat(); };
 
   return (
-    <Layer title={r.title} onClose={close} closeIcon="close" label="Блюдо готово">
+    <Layer title={r.title} onClose={close} closeIcon="close" full label="Блюдо готово">
       <div className="mx-auto max-w-md px-4 pb-16 pt-6 sm:pt-12">
         <div className="text-center">
           <span className="anim-rise mx-auto grid h-20 w-20 place-items-center rounded-full bg-herb-soft text-herb"><CircleCheck size={44} strokeWidth={1.75} aria-hidden /></span>

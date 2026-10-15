@@ -197,7 +197,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
         {mode === "favorites" && <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length }} />}
       </div>
 
-      <div className="mt-6 lg:mt-8 xl:grid xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-8">
+      <div className={cx("mt-6 lg:mt-8", !bare && "xl:grid xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-8")}>
         {desktop && !bare && (
           <aside aria-label="Фильтры" className="self-start xl:sticky xl:top-8">
             <div className="flex min-h-[44px] items-center justify-between gap-2">
@@ -205,8 +205,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
               {filtered && <button className="-mr-2 h-11 rounded-full px-3 text-small font-semibold text-brand hover:bg-brand-soft" onClick={reset}>Сбросить</button>}
             </div>
             <div className="mt-3">
-              <Group title="Блюда">{dishChips}</Group>
-              <div className="mt-6"><FilterFields f={f} set={setF} devices={devices} /></div>
+              {!sections && <Group title="Блюда">{dishChips}</Group>}
+              <div className={sections ? "" : "mt-6"}><FilterFields f={f} set={setF} devices={devices} /></div>
             </div>
           </aside>
         )}
@@ -236,9 +236,9 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
           )}
 
           {sections && (
-            <section className="mt-5" aria-label="Разделы">
+            <section className="mt-5 xl:mt-0" aria-label="Разделы">
               <h2 className="label mb-2">Разделы</h2>
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(112px,1fr))]">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(112px,1fr))] xl:grid-cols-9">
                 {SECTIONS.map((x) => (
                   <button key={x.view} onClick={() => {
                     if (x.view.startsWith("dish:")) setDish(x.view.slice(5));

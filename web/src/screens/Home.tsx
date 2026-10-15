@@ -93,9 +93,10 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         <ProfileButton className="-mr-1.5 lg:hidden" />
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         {today && <TodayCard r={today} onOpen={() => openRecipe(today)} />}
-        <div className="grid content-start gap-3">
+        {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
+        <div className="grid content-start gap-3 lg:flex lg:flex-col lg:[&>*]:flex-1">
           <RepeatCard />
           <button onClick={() => setDecide(true)} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Shuffle size={20} /></span>
@@ -134,17 +135,19 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
   const { profile } = useStore();
   return (
-    <article className="overflow-hidden rounded-card border border-line bg-card">
-      <button className="relative block w-full text-left" onClick={onOpen} aria-label={"Рецепт дня: " + r.title}>
-        <RecipeImage recipe={r} className="aspect-[16/10] w-full" rounded="rounded-none" eager />
+    // Phones: photo on top. Wide screens: photo on the left, so the card is not a screen-high block.
+    <article className="overflow-hidden rounded-card border border-line bg-card lg:flex">
+      <button className="relative block w-full text-left lg:w-[46%] lg:shrink-0" onClick={onOpen} aria-label={"Рецепт дня: " + r.title}>
+        <RecipeImage recipe={r} className="aspect-[16/10] w-full lg:aspect-auto lg:h-full lg:min-h-[260px]" rounded="rounded-none" eager />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">Рецепт дня</span>
       </button>
-      <div className="p-4">
-        <h2 className="text-h2">{r.title}</h2>
-        <p className="mt-1 flex flex-wrap items-center gap-x-2 text-body-sm text-ink-soft">
+      <div className="p-4 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-6">
+        <h2 className="text-h2 lg:text-h1">{r.title}</h2>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 text-body-sm text-ink-soft lg:mt-2">
           <Clock size={16} aria-hidden />{formatMinutes(r.totalMinutes)}<span aria-hidden>·</span>{DIFF[r.difficulty]}<span aria-hidden>·</span>на {people(profile.eaters)}
         </p>
-        <button className="btn-primary btn-bar mt-4 w-full" onClick={onOpen}>Открыть рецепт</button>
+        {r.summary && <p className="mt-3 hidden text-body-sm text-ink-soft lg:line-clamp-3">{r.summary}</p>}
+        <button className="btn-primary btn-bar mt-4 w-full lg:mt-5" onClick={onOpen}>Открыть рецепт</button>
       </div>
     </article>
   );

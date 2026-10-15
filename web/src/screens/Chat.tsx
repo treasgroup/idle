@@ -1,6 +1,6 @@
 // The conversation with Шеф (#/chat): full screen on phones, a centred column next to the sidebar on desktop.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { SquarePen, Timer, MessageCircle, History } from "lucide-react";
+import { SquarePen, Timer, MessageCircle, History, X } from "lucide-react";
 import { cleanMessage, parseMessage, type ChatOption } from "../engine";
 import { useStore } from "../app/store";
 import { useAssistant } from "../app/assistant";
@@ -11,7 +11,7 @@ import { Composer } from "../components/Composer";
 import { TimerStrip } from "../components/TimerStrip";
 import { ConditionBar, Message, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
 import { ChefAvatar, Chip, Sheet, cx, useScrolled } from "../components/ui";
-import { useChats } from "../app/chats";
+import { removeChat, useChats } from "../app/chats";
 import { cue } from "../app/feedback";
 
 /** A message that names new food or a new mood, and does not continue the topic ("а без лука?"), starts over. */
@@ -134,8 +134,8 @@ export function Chat() {
       <Sheet open={history} title="Прошлые разговоры" onClose={() => setHistory(false)}>
         <ul className="grid gap-1.5">
           {chats.map((c) => (
-            <li key={c.id}>
-              <button className="flex min-h-[56px] w-full items-center gap-3 rounded-input border border-line bg-card px-4 text-left hover:border-line-strong"
+            <li key={c.id} className="flex items-center rounded-input border border-line bg-card hover:border-line-strong">
+              <button className="flex min-h-[56px] min-w-0 flex-1 items-center gap-3 px-4 text-left"
                 onClick={() => { a.restore(c.id); setHistory(false); }}>
                 <MessageCircle size={20} className="shrink-0 text-ink-soft" aria-hidden />
                 <span className="min-w-0 flex-1">
@@ -143,6 +143,7 @@ export function Chat() {
                   <span className="block text-caption text-ink-soft">{new Date(c.at).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</span>
                 </span>
               </button>
+              <button className="icon-btn mr-1 shrink-0 text-ink-faint hover:text-ink" onClick={() => removeChat(c.id)} aria-label={"Удалить разговор «" + c.title + "»"}><X size={18} /></button>
             </li>
           ))}
         </ul>

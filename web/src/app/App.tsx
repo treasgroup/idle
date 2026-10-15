@@ -9,9 +9,7 @@ import {
 import { expiringSoon, recipeById, usePwa } from "../engine";
 import { useStore } from "./store";
 import { useActions } from "./actions";
-import { AssistantProvider, useAssistant } from "./assistant";
-import { goChat } from "./chatNav";
-import { removeChat, useChats } from "./chats";
+import { AssistantProvider } from "./assistant";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
@@ -283,12 +281,9 @@ function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
 /** Desktop: logo, destinations, the week plan and products, recent conversations, the dish on the stove, Школа, Профиль. */
 function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const { s, profile } = useStore();
-  const a = useAssistant();
-  const chats = useChats();
   const badges = useBadges();
   const nav = useNav();
   const cooking = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
-  const current = s.conversation.find((m) => m.role === "user")?.text;
   const rowCls = (on: boolean) => cx("flex h-11 items-center gap-3 rounded-xl px-3 text-body-sm transition-colors", on ? "bg-brand-soft font-semibold text-brand-ink" : "text-ink hover:bg-sunken");
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-4 pt-5 lg:flex" aria-label="Меню сайта">
@@ -302,7 +297,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
           return (
             <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined} className={rowCls(on)}>
               <NavIcon tab={tab} icon={icon} on={on} size={20} />
-              <span className={cx("flex-1 text-left", tab === "chat" && !on && "text-brand")}>{label}</span>
+              <span className="flex-1 text-left">{label}</span>
               {tab === "shopping" && <Badge n={badges.shopping} />}
             </button>
           );
@@ -322,34 +317,9 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
           </>
         )}
       </nav>
-      {(current || chats.length > 0) && (
-        <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
-          <p className="label px-3">Разговоры с Шефом</p>
-          <ul className="mt-1.5 grid gap-0.5">
-            {current && (
-              <li>
-                <button onClick={() => goChat()} className={cx("flex h-9 w-full items-center rounded-lg px-3 text-left text-small", route.tab === "chat" ? "bg-sunken font-semibold" : "hover:bg-sunken")}>
-                  <span className="truncate">{current}</span>
-                </button>
-              </li>
-            )}
-            {chats.slice(0, current ? 5 : 6).map((c) => (
-              <li key={c.id} className="group relative">
-                <button onClick={() => { a.restore(c.id); goChat(); }} className="flex h-9 w-full items-center rounded-lg px-3 pr-9 text-left text-small text-ink-soft hover:bg-sunken hover:text-ink">
-                  <span className="truncate">{c.title}</span>
-                </button>
-                <button onClick={() => removeChat(c.id)} aria-label={"Удалить разговор «" + c.title + "»"}
-                  className="absolute right-1 top-0.5 grid h-8 w-8 place-items-center rounded-full text-ink-faint opacity-0 hover:bg-line hover:text-ink focus-visible:opacity-100 group-hover:opacity-100">
-                  <X size={14} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       <div className="mt-auto grid gap-0.5 pt-4">
         {cooking && <MiniPlayer card />}
-        <button onClick={() => openLayer(routeHash({ tab: "learn" }))} className={rowCls(false)}><GraduationCap size={20} className="text-ink-soft" />Школа готовки</button>
+        <button onClick={() => openLayer(routeHash({ tab: "learn" }))} aria-current={route.tab === "learn" ? "page" : undefined} className={rowCls(route.tab === "learn")}><GraduationCap size={20} className={route.tab === "learn" ? "text-brand" : "text-ink-soft"} />Школа готовки</button>
         <button onClick={() => go("profile")} aria-current={route.tab === "profile" ? "page" : undefined} className={rowCls(route.tab === "profile")}>
           <UserRound size={20} className={route.tab === "profile" ? "text-brand" : "text-ink-soft"} />Профиль
         </button>
@@ -361,6 +331,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
 /** The dish on the stove: one tap back into cooking mode, with the nearest timer. */
 function MiniPlayer({ card }: { card?: boolean }) {
   const { s, profile } = useStore();
+  const { stopCooking } = useActions();
   const timers = useTimers();
   // The main dish, or the second one when the main is already done.
   const main = s.cooking && !s.cooking.done ? s.cooking : null;
@@ -374,21 +345,28 @@ function MiniPlayer({ card }: { card?: boolean }) {
   const where = "шаг " + (c.step + 1) + " из " + c.recipe.steps.length;
   if (card)
     return (
-      <button onClick={open} className="mb-2 flex items-center gap-3 rounded-input bg-ink p-3 text-left text-paper">
-        <Flame size={20} className="shrink-0 text-brand-soft" aria-hidden />
-        <span className="min-w-0 flex-1">
-          <span className="block truncate text-small font-semibold">{c.recipe.title}</span>
-          <span className="block text-caption opacity-80">{where}{left != null && " · " + mmss(left)}</span>
-        </span>
-      </button>
+      <div className="mb-2 flex items-center rounded-input bg-brand-soft text-ink">
+        <button onClick={open} className="flex min-w-0 flex-1 items-center gap-3 p-3 text-left">
+          <Flame size={20} className="shrink-0 text-brand" aria-hidden />
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-small font-medium">{c.recipe.title}</span>
+            <span className="block text-caption text-ink-soft">{where}{left != null && " · " + mmss(left)}</span>
+          </span>
+        </button>
+        <button onClick={() => stopCooking()} className="mr-1 grid h-10 w-10 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-white/50 hover:text-ink" aria-label="Прекратить готовку"><X size={18} /></button>
+      </div>
     );
   return (
     // Light, so that a toast (dark) above it never merges with it into one heavy block.
-    <button onClick={open} className="flex h-[52px] w-full items-center gap-3 border-t border-brand/20 bg-brand-soft px-4 text-left text-ink">
-      <Flame size={20} className="shrink-0 text-brand" aria-hidden />
-      <span className="min-w-0 flex-1 truncate text-small"><b className="font-medium">{c.recipe.title}</b> · {where}</span>
-      {left != null && <span className="shrink-0 rounded-full bg-card px-2 py-0.5 text-small font-medium tabular-nums">{mmss(left)}</span>}
-      <span className="shrink-0 text-small font-medium text-brand-ink">Вернуться</span>
-    </button>
+    <div className="flex h-[52px] w-full items-center border-t border-brand/20 bg-brand-soft text-ink">
+      <button onClick={open} className="flex h-full min-w-0 flex-1 items-center gap-3 pl-4 pr-2 text-left">
+        <Flame size={20} className="shrink-0 text-brand" aria-hidden />
+        <span className="min-w-0 flex-1 truncate text-small"><b className="font-medium">{c.recipe.title}</b> · {where}</span>
+        {left != null && <span className="shrink-0 rounded-full bg-card px-2 py-0.5 text-small font-medium tabular-nums">{mmss(left)}</span>}
+        <span className="shrink-0 text-small font-medium text-brand-ink">Вернуться</span>
+      </button>
+      {/* Changed one's mind: the bar can always be closed (with «Отменить»). */}
+      <button onClick={() => stopCooking()} className="grid h-full w-12 shrink-0 place-items-center border-l border-brand/15 text-ink-soft hover:text-ink" aria-label="Прекратить готовку"><X size={20} /></button>
+    </div>
   );
 }
