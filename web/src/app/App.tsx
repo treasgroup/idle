@@ -116,7 +116,12 @@ function Shell() {
   const layer = !!(route.recipe || route.cook || route.doc || route.tab === "learn");
   const chat = route.tab === "chat";
   const cookingNow = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
-  const go = (tab: Tab) => { clearToast(); replace(routeHash({ tab })); };
+  // Tapping the current tab again scrolls it back to the top, as in phone apps.
+  const go = (tab: Tab) => {
+    clearToast();
+    if (route.tab === tab && !route.recipe) return window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    replace(routeHash({ tab }));
+  };
 
   const screen = {
     home: <Home pwa={pwa} />, chat: <Chat />, recipes: <Recipes />, menu: <Menu />, shopping: <Shopping />, pantry: <Pantry />,
