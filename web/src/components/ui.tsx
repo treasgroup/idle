@@ -1,6 +1,9 @@
 import { Component, useEffect, useId, useRef, useState, type ErrorInfo, type ReactNode } from "react";
 import { X, Minus, Plus, ChevronLeft, ChevronRight, ChefHat } from "lucide-react";
 
+/** A light tap of vibration for actions that change something (Android; ignored elsewhere). */
+export const haptic = (): void => { try { navigator.vibrate?.(10); } catch { /* not allowed */ } };
+
 export function cx(...parts: (string | false | null | undefined)[]): string {
   return parts.filter(Boolean).join(" ");
 }
@@ -91,17 +94,30 @@ export function Layer({ title, onClose, children, actions, width = "max-w-3xl", 
 /** A bottom sheet on phones, a centred dialog on desktop. `footer` sticks to the bottom with the main action. */
 export function Sheet({ open, title, onClose, children, footer, tall }: { open: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; tall?: boolean }) {
   useOverlay(open, onClose, true);
+  // Phones: drag the top of the sheet down to close it, as in native apps.
+  const [dy, setDy] = useState(0);
+  const start = useRef<number | null>(null);
+  useEffect(() => { if (!open) setDy(0); }, [open]);
   if (!open) return null;
+  const drag = {
+    onTouchStart: (e: React.TouchEvent) => { start.current = e.touches[0].clientY; },
+    onTouchMove: (e: React.TouchEvent) => { if (start.current !== null) setDy(Math.max(0, e.touches[0].clientY - start.current)); },
+    onTouchEnd: () => { if (dy > 90) onClose(); else setDy(0); start.current = null; },
+  };
   return (
     <div className="scrim anim-fade fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" onClick={onClose}>
       <div role="dialog" aria-modal="true" aria-label={title}
-        className={cx("anim-sheet flex max-h-[90vh] w-full flex-col rounded-t-sheet bg-paper shadow-e2 sm:max-w-lg sm:rounded-[24px]", tall && "min-h-[70vh]")}
+        className={cx("anim-sheet flex max-h-[90vh] w-full flex-col rounded-t-sheet bg-paper shadow-e2 sm:max-w-lg sm:rounded-[24px]", tall && "min-h-[70vh]", !dy && "transition-transform duration-200")}
+        style={dy ? { transform: `translateY(${dy}px)` } : undefined}
         onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-4">
-          <h2 className="text-h2">{title}</h2>
-          <button className="icon-btn -mr-2" onClick={onClose} aria-label="Закрыть"><X size={20} /></button>
+        <div {...drag} className="touch-none sm:touch-auto">
+          <div className="flex justify-center pt-2 sm:hidden" aria-hidden><span className="h-1.5 w-10 rounded-full bg-line-strong/40" /></div>
+          <div className="flex items-center justify-between gap-3 px-5 pb-2 pt-2 sm:pt-4">
+            <h2 className="text-h2">{title}</h2>
+            <button className="icon-btn -mr-2" onClick={onClose} aria-label="Закрыть"><X size={20} /></button>
+          </div>
         </div>
-        <div className={cx("flex-1 overflow-y-auto px-5", footer ? "pb-4" : "pb-[calc(env(safe-area-inset-bottom)+1.25rem)]")}>{children}</div>
+        <div className={cx("flex-1 overflow-y-auto overscroll-contain px-5", footer ? "pb-4" : "pb-[calc(env(safe-area-inset-bottom)+1.25rem)]")}>{children}</div>
         {footer && <div className="border-t border-line px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">{footer}</div>}
       </div>
     </div>

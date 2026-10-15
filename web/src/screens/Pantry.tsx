@@ -203,7 +203,7 @@ function ReceiptImport({ open, onClose }: { open: boolean; onClose: () => void }
       {picked === null ? (
         <>
           <p className="text-body-sm text-ink-soft">Скопируйте чек из приложения банка, «Проверки чеков» ФНС или из письма магазина и вставьте сюда. Подойдёт и обычный список продуктов.</p>
-          <textarea className="input mt-3 h-auto min-h-[160px] py-3 text-body-sm" placeholder={"СМЕТАНА 20% 300Г   89,90\nФАРШ ДОМАШНИЙ 400Г  259,00\nморковь, лук, кефир"} value={text} onChange={(e) => setText(e.target.value)} />
+          <textarea className="input mt-3 h-auto min-h-[160px] py-3" placeholder={"СМЕТАНА 20% 300Г   89,90\nФАРШ ДОМАШНИЙ 400Г  259,00\nморковь, лук, кефир"} value={text} onChange={(e) => setText(e.target.value)} />
           <button className="btn-primary mt-3 w-full" disabled={!text.trim()} onClick={() => { const r = parseReceipt(text, ids); if (!r.length) toast("Не нашёл знакомых продуктов — попробуйте написать названия проще"); setPicked(r); }}>Найти продукты</button>
         </>
       ) : (

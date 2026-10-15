@@ -14,6 +14,8 @@ import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
 import { printPage } from "../app/print";
+import { stepTips } from "../app/stepTips";
+import { ChefSecret } from "../components/ChefSecret";
 import { goChat } from "../app/chatNav";
 import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
@@ -183,6 +185,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const side = sides.find((x) => x.id === sideId) ?? null;
   // One recipe with the side merged in, for cooking and the shopping list.
   const recipe = useMemo(() => (side ? withSide(base, side) : base), [base, side]);
+  const tips = useMemo(() => stepTips(recipe), [recipe]);
   // The same for questions, with its own version so nutrition is not mixed up with the dish alone.
   const askRecipe = useMemo(() => (side ? { ...recipe, version: base.version + "+" + side.id } : base), [recipe, base, side]);
   const nutrition = nutritionOf(base).perServing;
@@ -353,6 +356,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                               })}
                             </ul>
                           )}
+                          {tips[n] && <ChefSecret text={tips[n]!} className="mt-3" />}
                           {!!st.timerSeconds && <TimerChip recipe={base} step={n} text={st.text} seconds={st.timerSeconds} />}
                         </div>
                       </li>

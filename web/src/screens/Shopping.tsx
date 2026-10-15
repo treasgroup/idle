@@ -7,7 +7,7 @@ import {
 } from "../engine";
 import { useStore } from "../app/store";
 import { replace, routeHash } from "../app/router";
-import { Empty, Sheet, cx } from "../components/ui";
+import { Empty, Sheet, cx, haptic } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
 import { printText } from "../app/print";
 
@@ -37,7 +37,7 @@ export function Shopping() {
   const pinches = toBuy.filter(isPinch);
   const bought = s.shopping.filter((i) => i.checked);
   const set = (fn: (l: ShoppingItem[]) => ShoppingItem[]) => update((st) => ({ ...st, shopping: fn(st.shopping) }));
-  const toggle = (key: string) => set((l) => l.map((x) => (x.key === key ? { ...x, checked: !x.checked } : x)));
+  const toggle = (key: string) => { haptic(); set((l) => l.map((x) => (x.key === key ? { ...x, checked: !x.checked } : x))); };
   const withUndo = (text: string, fn: (l: ShoppingItem[]) => ShoppingItem[]) => {
     const before = s.shopping;
     set(fn);

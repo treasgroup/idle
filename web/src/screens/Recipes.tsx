@@ -206,11 +206,14 @@ export function Recipes() {
 
         <div className="min-w-0">
           {!desktop && (
-            <div className="scroller fade-x -mx-4 !gap-2 px-4 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none]" aria-label="Блюда и фильтры">
+            // On phones the row stays under the header while the list scrolls.
+            <div className="sticky top-[calc(env(safe-area-inset-top)+3.5rem)] z-20 -mx-4 bg-paper/95 py-2 backdrop-blur sm:static sm:mx-0 sm:bg-transparent sm:py-0 sm:backdrop-blur-none">
+            <div className="scroller fade-x !gap-2 px-4 sm:flex-wrap sm:overflow-visible sm:px-0 sm:[mask-image:none]" aria-label="Блюда и фильтры">
               <button type="button" className={cx("chip", active.length > 0 && "chip-on")} onClick={() => setSheet(true)} aria-haspopup="dialog">
                 <SlidersHorizontal size={18} aria-hidden />Фильтры{active.length > 0 && " · " + active.length}
               </button>
               {dishChips}
+            </div>
             </div>
           )}
 

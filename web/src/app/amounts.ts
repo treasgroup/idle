@@ -21,7 +21,7 @@ const SPOONS: [RegExp, number | null, number, number | null][] = [
   [/flour$/, 8, 25, 160],
   [/^semolina$/, 8, 25, 200],
   [/oil$/, 5, 17, null],
-  [/^(milk|kefir|cream|heavy-cream|water)$/, 5, 18, 250],
+  [/^(milk|kefir|cream|heavy-cream)$/, 5, 18, 250],
   [/^(sour-cream|mayonnaise|tomato-ketchup)$/, 10, 25, null],
   [/^tomato-paste$/, 10, 30, null],
   [/^honey$|condensed-milk$/, 12, 30, null],
@@ -46,13 +46,13 @@ const glasses = (n: number) => frac(n) + " " + (n <= 1 && n !== 1 ? "стака�
 
 /** «2 ст. л.» / «1½ стакана» for flour, sugar, oil, milk, grains…; nothing when it would be a rough guess. */
 export function spoonHint(id: string, amount: number, unit: string): string | undefined {
-  if ((unit !== "г" && unit !== "мл") || amount <= 0) return undefined;
+  if ((unit !== "г" && unit !== "мл") || amount <= 0 || id === "water") return undefined;
   const row = SPOONS.find(([re]) => re.test(id));
   if (!row) return undefined;
   const [, tsp, tbsp, glass] = unit === "мл" ? [null, 5, 15, 250] as const : row;
   const ok = (got: number, per: number) => Math.abs(got * per - amount) / amount <= 0.26;
   if (glass && amount >= glass * 0.45) {
-    const g = roundTo(amount / glass, 0.25);
+    const g = roundTo(amount / glass, 0.5);
     if (g <= 5 && ok(g, glass)) return glasses(g);
     return undefined;
   }

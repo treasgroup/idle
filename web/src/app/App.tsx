@@ -119,8 +119,8 @@ function Shell() {
   const go = (tab: Tab) => { clearToast(); replace(routeHash({ tab })); };
 
   const screen = {
-    home: <Home />, chat: <Chat />, recipes: <Recipes />, menu: <Menu />, shopping: <Shopping />, pantry: <Pantry />,
-    profile: <Profile pwa={pwa} />, learn: <Home />,
+    home: <Home pwa={pwa} />, chat: <Chat />, recipes: <Recipes />, menu: <Menu />, shopping: <Shopping />, pantry: <Pantry />,
+    profile: <Profile pwa={pwa} />, learn: <Home pwa={pwa} />,
   }[route.tab];
 
   return (

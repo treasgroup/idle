@@ -25,6 +25,8 @@ import { TimerRing, TimerStrip } from "../components/TimerStrip";
 import { StepTimer } from "../components/StepTimer";
 import { AskSheet } from "../components/AskSheet";
 import { homeAmount, mergeSame } from "../app/amounts";
+import { stepTips } from "../app/stepTips";
+import { ChefSecret } from "../components/ChefSecret";
 
 type Key = "main" | "second";
 /** A dish on the stove: the one from the recipe (main) or the one cooked alongside (second, kept in the profile). */
@@ -235,6 +237,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
 
   const r = dish.recipe;
   const cur = r.steps[dish.step] ?? r.steps[0];
+  const tip = stepTips(r)[dish.step] ?? null;
   const last = dish.step >= total - 1;
   const uses = (cur.uses || []).map((id) => r.ingredients.find((i) => i.id === id)).filter((i): i is NonNullable<typeof i> => !!i).map((i) => scaleIngredient(i, r, dish.servings));
   const running = timers.find((t) => t.recipeId === r.id && t.step === dish.step);
@@ -291,6 +294,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
                 ))}
               </ul>
             )}
+            {tip && <ChefSecret text={tip} className="mt-5" large />}
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
             )}

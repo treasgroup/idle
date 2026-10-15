@@ -1,7 +1,7 @@
 // Шеф home (#/): the assistant first — a big question, the message box, example requests; then what is going on today.
 // Anything sent from here starts a new conversation and opens it (#/chat).
-import { useMemo } from "react";
-import { ChevronRight, CalendarDays, ShoppingCart, GraduationCap, Flame, MessageCircle, Clock, Refrigerator, Smile } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ChevronRight, CalendarDays, ShoppingCart, GraduationCap, Flame, MessageCircle, Clock, Refrigerator, Smile, X } from "lucide-react";
 import {
   DEFAULT_PREFERENCES, LABELS, conditionLabel, dateKey, expiryLabel, expiringSoon, freshConditions, rankRecipes, recipeById, recipes, resultNote,
   shortName, type Conditions, type Recipe,
@@ -20,6 +20,7 @@ import { MoodTiles, SuggestionCards, useSuggestions } from "../components/ChatPa
 import { RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { Chip, ScrollRow, Section, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
+import type { Pwa } from "./Profile";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -31,7 +32,7 @@ export const mealNow = (): "breakfast" | "lunch" | "dinner" => {
 };
 const MEAL_WORD = { breakfast: "на завтрак", lunch: "на обед", dinner: "на ужин" };
 
-export function Home() {
+export function Home({ pwa }: { pwa?: Pwa }) {
   const { s, profile } = useStore();
   const a = useAssistant();
   const send = (text: string, opts: { voice?: boolean; shown?: string; source?: string } = {}) => {
@@ -83,6 +84,7 @@ export function Home() {
         )}
 
         <SuggestionCards items={suggestions} className="mt-6" />
+        {pwa && <InstallCard pwa={pwa} />}
 
         <div className="mt-5 flex flex-wrap gap-2">
           {chips.map((c) => <Chip key={c.label} onClick={c.run}>{c.label}</Chip>)}
@@ -298,6 +300,31 @@ function RailBlock({ title, icon, children }: { title: string; icon: JSX.Element
     <section className="rounded-card border border-line bg-card p-3">
       <h2 className="mb-2 flex items-center gap-2 px-1.5 text-small font-semibold text-ink-soft"><span aria-hidden className="text-brand">{icon}</span>{title}</h2>
       {children}
+    </section>
+  );
+}
+
+/** Phones, from the second visit: «put Шеф on the home screen» — once, and it can be dismissed. */
+function InstallCard({ pwa }: { pwa: Pwa }) {
+  const { s, update, toast } = useStore();
+  const [visits] = useState(() => {
+    try { const n = Number(localStorage.getItem("cook-visits") || 0) + 1; localStorage.setItem("cook-visits", String(n)); return n; } catch { return 0; }
+  });
+  const phone = typeof matchMedia !== "undefined" && matchMedia("(max-width: 1023px)").matches;
+  if (!phone || pwa.installed || s.installDismissed || visits < 2 || !(pwa.canInstall || pwa.ios)) return null;
+  const close = () => update((st) => ({ ...st, installDismissed: true }));
+  return (
+    <section className="mt-5 flex items-center gap-3 rounded-card border border-line bg-card p-3 pr-2 shadow-e1" aria-label="Установить приложение">
+      <img src="icons/icon-192.png" alt="" className="h-11 w-11 shrink-0 rounded-input" />
+      <span className="min-w-0 flex-1">
+        <span className="block text-body-sm font-semibold">Шеф на экране телефона</span>
+        <span className="block text-caption text-ink-soft">Открывается как приложение и работает без интернета</span>
+      </span>
+      <button className="btn-soft h-10 shrink-0 px-4" onClick={() => {
+        if (pwa.canInstall) void pwa.install().then((ok) => { if (ok) close(); });
+        else toast("В Safari нажмите «Поделиться», затем «На экран Домой»");
+      }}>Добавить</button>
+      <button className="icon-btn shrink-0 text-ink-soft" onClick={close} aria-label="Не показывать"><X size={18} /></button>
     </section>
   );
 }
