@@ -714,13 +714,16 @@ export function ShareOptions({ text, title, url, onDone, onPrint }: { text: stri
             if (l.copyFirst) await copyText(text);
             window.open(l.url, "_blank", "noopener");
             onDone();
-          }}>{t.label}</button>
+          }}>{t.label}{t.id === "whatsapp" && "*"}</button>
         ))}
       </div>
       <div className="flex flex-wrap justify-center">
         <button className="btn-ghost" onClick={async () => { await copyText(url ?? text); onDone(true); }}><Link2 size={18} />{url ? "Скопировать ссылку" : "Скопировать текст"}</button>
         {onPrint !== undefined && <button className="btn-ghost" onClick={() => { onPrint(); onDone(); }}><Printer size={18} />Распечатать</button>}
       </div>
+      {SHARE_TARGETS.some((t) => t.id === "whatsapp") && (
+        <p className="text-center text-caption text-ink-faint">*WhatsApp принадлежит компании Meta, которая признана экстремистской и запрещена на территории РФ.</p>
+      )}
     </div>
   );
 }
