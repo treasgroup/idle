@@ -1,15 +1,16 @@
-// The app shell: the bottom bar on phones, a rail on tablets, a sidebar with recent conversations on desktop.
-// Шеф (the assistant) is the first destination and the one coloured item everywhere.
+// The app shell: the bottom bar on phones, a rail on tablets, a sidebar on desktop.
+// Five destinations: Главная · Поиск · Шеф · Избранное · Покупки (Шеф is the coloured one, level with the rest).
+// Simple mode keeps three: Главная · Шеф · Избранное. Everything else lives in Профиль.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
-  BookOpen, CalendarDays, ChefHat, Flame, GraduationCap, MessageCircle, Refrigerator, ShoppingCart, SquarePen, UserRound, WifiOff, X,
+  CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
 import { expiringSoon, recipeById, usePwa } from "../engine";
 import { useStore } from "./store";
 import { useActions } from "./actions";
 import { AssistantProvider, useAssistant } from "./assistant";
-import { goChat, useOpenChat } from "./chatNav";
+import { goChat } from "./chatNav";
 import { removeChat, useChats } from "./chats";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
@@ -25,14 +26,19 @@ import { CookingLayer } from "../screens/Cooking";
 import { DocLayer, Learn, Onboarding, PollSheet } from "../screens/Extras";
 import { Boundary, ChefAvatar, Toast, cx, mmss, useScrolled } from "../components/ui";
 
-const NAV: { tab: Tab; label: string; icon: LucideIcon }[] = [
-  { tab: "home", label: "Шеф", icon: ChefHat },
-  { tab: "recipes", label: "Рецепты", icon: BookOpen },
-  { tab: "menu", label: "Меню", icon: CalendarDays },
+const NAV: { tab: Tab; label: string; icon: LucideIcon; simple?: boolean }[] = [
+  { tab: "home", label: "Главная", icon: House, simple: true },
+  { tab: "recipes", label: "Поиск", icon: Search },
+  { tab: "chat", label: "Шеф", icon: ChefHat, simple: true },
+  { tab: "favorites", label: "Избранное", icon: Heart, simple: true },
   { tab: "shopping", label: "Покупки", icon: ShoppingCart },
-  { tab: "pantry", label: "Дома", icon: Refrigerator },
 ];
-const isOn = (route: Route, tab: Tab) => route.tab === tab || (tab === "home" && route.tab === "chat");
+const useNav = () => {
+  const { profile } = useStore();
+  return profile.simple ? NAV.filter((n) => n.simple) : NAV;
+};
+/** Screens opened from Профиль: their header leads back there. */
+const FROM_PROFILE: Tab[] = ["menu", "pantry"];
 
 // The address the page was opened with (the links below are removed from it once handled).
 const OPENED_WITH = new URLSearchParams(location.search);
@@ -124,15 +130,15 @@ function Shell() {
   };
 
   const screen = {
-    home: <Home pwa={pwa} />, chat: <Chat />, recipes: <Recipes />, menu: <Menu />, shopping: <Shopping />, pantry: <Pantry />,
-    profile: <Profile pwa={pwa} />, learn: <Home pwa={pwa} />,
+    home: <Home pwa={pwa} />, chat: <Chat />, recipes: <Recipes />, favorites: <Recipes mode="favorites" />, menu: <Menu />,
+    shopping: <Shopping />, pantry: <Pantry />, profile: <Profile pwa={pwa} />, learn: <Home pwa={pwa} />,
   }[route.tab];
 
   return (
     <div className="min-h-screen">
       <Sidebar route={route} go={go} />
       <Rail route={route} go={go} />
-      {!chat && <Header route={route} go={go} />}
+      {!chat && route.tab !== "home" && <Header route={route} go={go} />}
 
       <main className={cx("sm:pl-20 lg:pl-64", !chat && "pb-[calc(var(--nav-h)+2rem)]")}>
         {chat ? (
@@ -146,7 +152,7 @@ function Shell() {
 
       <div ref={bottom} className="fixed inset-x-0 bottom-0 z-30 sm:left-20 lg:hidden">
         {cookingNow && !layer && !chat && !keyboard && <MiniPlayer />}
-        {!layer && !chat && !keyboard && <BottomNav route={route} go={go} />}
+        {!layer && !keyboard && <BottomNav route={route} go={go} />}
       </div>
 
       <Boundary resetKey={(route.recipe ?? "") + route.cook}>
@@ -175,26 +181,31 @@ function Badge({ n, warn, className }: { n: number; warn?: boolean; className?: 
   );
 }
 
-/** Phones: five destinations; Шеф is always the coloured one. */
+/** The icon of a destination; Шеф is a coloured circle of the same size as the other icons. */
+function NavIcon({ tab, icon: Icon, on, size = 24 }: { tab: Tab; icon: LucideIcon; on: boolean; size?: number }) {
+  if (tab === "chat")
+    return <span className="grid place-items-center rounded-full bg-brand-fill text-white" style={{ width: size + 6, height: size + 6 }}><ChefHat size={size - 6} strokeWidth={2.25} /></span>;
+  return <Icon size={size} strokeWidth={on ? 2.25 : 1.75} className={on ? "text-brand" : "text-ink-soft"} />;
+}
+
+/** Phones: the bottom bar; every item is an icon with a word under it. */
 function BottomNav({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const badges = useBadges();
+  const nav = useNav();
+  const { profile } = useStore();
   return (
     <nav className="pb-safe border-t border-line bg-paper sm:hidden" aria-label="Разделы">
       <div className="flex">
-        {NAV.map(({ tab, label, icon: Icon }) => {
-          const on = isOn(route, tab);
-          const chef = tab === "home";
+        {nav.map(({ tab, label, icon }) => {
+          const on = route.tab === tab;
           return (
             <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined}
-              className="relative flex h-16 flex-1 flex-col items-center justify-center gap-1">
+              className={cx("relative flex flex-1 flex-col items-center justify-center gap-1", profile.simple ? "h-[4.5rem]" : "h-16")}>
               <span className={cx("grid h-8 w-14 place-items-center rounded-full transition-colors", on && "bg-brand-soft")}>
-                {chef
-                  ? <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-fill text-white"><ChefHat size={16} strokeWidth={2.25} /></span>
-                  : <Icon size={24} strokeWidth={on ? 2.25 : 1.75} className={on ? "text-brand" : "text-ink-soft"} />}
+                <NavIcon tab={tab} icon={icon} on={on} size={profile.simple ? 26 : 24} />
               </span>
-              <span className={cx("text-micro", on ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
+              <span className={cx(profile.simple ? "text-small" : "text-micro", on || tab === "chat" ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
               {tab === "shopping" && <Badge n={badges.shopping} className="absolute left-1/2 top-1.5 ml-2" />}
-              {tab === "pantry" && <Badge n={badges.pantry} warn className="absolute left-1/2 top-1.5 ml-2" />}
             </button>
           );
         })}
@@ -203,107 +214,115 @@ function BottomNav({ route, go }: { route: Route; go: (t: Tab) => void }) {
   );
 }
 
-/** Phones and tablets: on Шеф the assistant's name; elsewhere a box that opens the conversation. */
+/** Phones and tablets: the name on the left (or «Назад» on screens opened from Профиль), the profile on the right. */
 function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const { online } = useStore();
-  const openChat = useOpenChat();
   const scrolled = useScrolled();
-  const home = route.tab === "home";
+  const sub = FROM_PROFILE.includes(route.tab) || route.tab === "profile";
   return (
     <header className={cx("pt-safe sticky top-0 z-30 border-b bg-paper transition-colors lg:hidden", scrolled ? "border-line" : "border-transparent", "sm:ml-20")}>
       <div className="mx-auto flex h-14 max-w-3xl items-center gap-2 px-4 sm:px-6">
-        {home ? (
-          <span className="flex flex-1 items-center gap-2.5">
-            <ChefAvatar size={32} />
-            <span className="text-[1.125rem] font-semibold">Шеф</span>
-          </span>
+        {sub ? (
+          <button className="-ml-2 inline-flex h-11 items-center gap-0.5 rounded-full pl-1 pr-3 text-body font-medium hover:bg-sunken"
+            onClick={() => close(routeHash({ tab: route.tab === "profile" ? "home" : "profile" }))}>
+            <ChevronLeft size={24} aria-hidden />Назад
+          </button>
         ) : (
-          <>
-            <button className="-ml-1.5 grid h-11 w-11 shrink-0 place-items-center rounded-full sm:hidden" onClick={() => go("home")} aria-label="Шеф — главная"><ChefAvatar size={32} /></button>
-            <button className="flex h-10 min-w-0 flex-1 items-center gap-2 rounded-full bg-sunken px-4 text-body-sm text-ink-soft transition-colors hover:bg-line" onClick={() => openChat("auto")}>
-              <MessageCircle size={18} className="shrink-0 text-brand" aria-hidden />
-              <span className="truncate">Спросить Шефа…</span>
-            </button>
-          </>
+          <button className="-ml-1 flex items-center gap-2.5 rounded-full pr-2" onClick={() => go("home")} aria-label="На главную">
+            <ChefAvatar size={30} />
+            <span className="text-title">Что приготовить?</span>
+          </button>
         )}
+        <span className="flex-1" />
         {!online && <span className="flex h-7 shrink-0 items-center gap-1 rounded-full bg-sunken px-2.5 text-caption text-ink-soft" title="Нет интернета: рецепты, меню и покупки работают"><WifiOff size={14} aria-hidden />офлайн</span>}
-        <button className={cx("-mr-1.5 grid h-11 w-11 shrink-0 place-items-center rounded-full sm:hidden")} onClick={() => go("profile")} aria-label="Профиль" aria-current={route.tab === "profile" ? "page" : undefined}>
-          <span className={cx("grid h-8 w-8 place-items-center rounded-full", route.tab === "profile" ? "bg-brand-soft text-brand-ink" : "bg-sunken text-ink-soft")}><UserRound size={18} /></span>
-        </button>
+        {route.tab !== "profile" && <ProfileButton className="-mr-1.5 sm:hidden" />}
       </div>
     </header>
   );
 }
 
-/** Tablets: a narrow rail with «Новый разговор» on top. */
-function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
-  const openChat = useOpenChat();
-  const badges = useBadges();
+/** The round profile button (top right on phones). */
+export function ProfileButton({ className }: { className?: string }) {
+  const { s } = useStore();
+  const soon = expiringSoon(s.fridge).length;
   return (
-    <nav className="pt-safe fixed inset-y-0 left-0 z-30 hidden w-20 flex-col items-center gap-1 border-r border-line bg-paper pb-4 sm:flex lg:hidden" aria-label="Разделы">
-      <button className="mb-3 mt-4 grid h-14 w-14 place-items-center rounded-full bg-brand-fill text-white shadow-e1 transition-transform active:scale-95" onClick={() => openChat("new")} aria-label="Новый разговор с Шефом" title="Новый разговор">
-        <SquarePen size={22} />
-      </button>
-      {NAV.map(({ tab, label, icon: Icon }) => {
-        const on = isOn(route, tab);
+    <button className={cx("relative grid h-11 w-11 shrink-0 place-items-center rounded-full", className)} onClick={() => openLayer(routeHash({ tab: "profile" }))} aria-label="Профиль и ещё">
+      <span className="grid h-9 w-9 place-items-center rounded-full bg-sunken text-ink-soft"><UserRound size={20} /></span>
+      {soon > 0 && <span className="absolute right-1 top-1 h-3 w-3 rounded-full border-2 border-paper bg-warn" aria-label="Есть продукты, которые пора использовать" />}
+    </button>
+  );
+}
+
+/** Tablets: a narrow rail with the same destinations. */
+function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
+  const badges = useBadges();
+  const nav = useNav();
+  return (
+    <nav className="pt-safe fixed inset-y-0 left-0 z-30 hidden w-20 flex-col items-center gap-1 border-r border-line bg-paper pb-4 pt-4 sm:flex lg:hidden" aria-label="Разделы">
+      <button className="mb-3" onClick={() => go("home")} aria-label="На главную"><ChefAvatar size={40} /></button>
+      {nav.map(({ tab, label, icon }) => {
+        const on = route.tab === tab;
         return (
-          <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined} className="relative flex h-14 w-full flex-col items-center justify-center gap-1">
-            <span className={cx("grid h-8 w-14 place-items-center rounded-full", on && "bg-brand-soft")}>
-              {tab === "home"
-                ? <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-fill text-white"><ChefHat size={16} strokeWidth={2.25} /></span>
-                : <Icon size={22} strokeWidth={on ? 2.25 : 1.75} className={on ? "text-brand" : "text-ink-soft"} />}
-            </span>
-            <span className={cx("text-micro", on ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
-            {tab === "shopping" && <Badge n={badges.shopping} className="absolute right-3 top-0.5" />}
-            {tab === "pantry" && <Badge n={badges.pantry} warn className="absolute right-3 top-0.5" />}
+          <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined} className="relative flex h-16 w-full flex-col items-center justify-center gap-1">
+            <span className={cx("grid h-8 w-14 place-items-center rounded-full", on && "bg-brand-soft")}><NavIcon tab={tab} icon={icon} on={on} size={22} /></span>
+            <span className={cx("text-micro", on || tab === "chat" ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
+            {tab === "shopping" && <Badge n={badges.shopping} className="absolute right-3 top-1" />}
           </button>
         );
       })}
       <span className="flex-1" />
-      <button onClick={() => openLayer(routeHash({ tab: "learn" }))} className="grid h-11 w-11 place-items-center rounded-full text-ink-soft hover:bg-sunken" aria-label="Школа готовки" title="Школа готовки"><GraduationCap size={22} /></button>
-      <button onClick={() => go("profile")} aria-label="Профиль" aria-current={route.tab === "profile" ? "page" : undefined} className="grid h-11 w-11 place-items-center rounded-full">
+      <button onClick={() => go("profile")} aria-label="Профиль и ещё" aria-current={route.tab === "profile" ? "page" : undefined} className="grid h-11 w-11 place-items-center rounded-full">
         <span className={cx("grid h-9 w-9 place-items-center rounded-full", route.tab === "profile" ? "bg-brand-soft text-brand-ink" : "bg-sunken text-ink-soft")}><UserRound size={18} /></span>
       </button>
     </nav>
   );
 }
 
-/** Desktop: logo, «Новый разговор», destinations, recent conversations, the dish on the stove, Школа and Профиль. */
+/** Desktop: logo, destinations, the week plan and products, recent conversations, the dish on the stove, Школа, Профиль. */
 function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
-  const { s } = useStore();
+  const { s, profile } = useStore();
   const a = useAssistant();
-  const openChat = useOpenChat();
   const chats = useChats();
   const badges = useBadges();
-  const { profile } = useStore();
+  const nav = useNav();
   const cooking = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
   const current = s.conversation.find((m) => m.role === "user")?.text;
+  const rowCls = (on: boolean) => cx("flex h-11 items-center gap-3 rounded-xl px-3 text-body-sm transition-colors", on ? "bg-brand-soft font-semibold text-brand-ink" : "text-ink hover:bg-sunken");
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-4 pt-5 lg:flex" aria-label="Меню сайта">
       <button className="flex items-center gap-2.5 rounded-input px-2 py-1 text-left" onClick={() => go("home")}>
         <ChefAvatar size={32} />
-        <span className="text-[1.125rem] font-semibold leading-tight">Что приготовить?</span>
+        <span className="text-title leading-tight">Что приготовить?</span>
       </button>
-      <button className="btn-primary mt-5 w-full" onClick={() => openChat("new")}><SquarePen size={18} />Новый разговор</button>
-      <nav className="mt-4 grid gap-0.5" aria-label="Разделы">
-        {NAV.map(({ tab, label, icon: Icon }) => {
-          const on = isOn(route, tab);
+      <nav className="mt-6 grid gap-0.5" aria-label="Разделы">
+        {nav.map(({ tab, label, icon }) => {
+          const on = route.tab === tab;
           return (
-            <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined}
-              className={cx("flex h-11 items-center gap-3 rounded-xl px-3 text-body-sm transition-colors", on ? "bg-brand-soft font-semibold text-brand-ink" : "text-ink hover:bg-sunken")}>
-              {tab === "home"
-                ? <span className="grid h-6 w-6 place-items-center rounded-full bg-brand-fill text-white"><ChefHat size={14} strokeWidth={2.25} /></span>
-                : <Icon size={20} strokeWidth={on ? 2.25 : 1.75} className={on ? "text-brand" : "text-ink-soft"} />}
-              <span className="flex-1 text-left">{label}</span>
+            <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined} className={rowCls(on)}>
+              <NavIcon tab={tab} icon={icon} on={on} size={20} />
+              <span className={cx("flex-1 text-left", tab === "chat" && !on && "text-brand")}>{label}</span>
               {tab === "shopping" && <Badge n={badges.shopping} />}
-              {tab === "pantry" && <Badge n={badges.pantry} warn />}
             </button>
           );
         })}
+        {!profile.simple && (
+          <>
+            <span className="mx-3 my-2 h-px bg-line" aria-hidden />
+            <button onClick={() => go("menu")} aria-current={route.tab === "menu" ? "page" : undefined} className={rowCls(route.tab === "menu")}>
+              <CalendarDays size={20} className="text-ink-soft" />
+              <span className="flex-1 text-left">План на неделю</span>
+            </button>
+            <button onClick={() => go("pantry")} aria-current={route.tab === "pantry" ? "page" : undefined} className={rowCls(route.tab === "pantry")}>
+              <Refrigerator size={20} className="text-ink-soft" />
+              <span className="flex-1 text-left">Мои продукты</span>
+              <Badge n={badges.pantry} warn />
+            </button>
+          </>
+        )}
       </nav>
       {(current || chats.length > 0) && (
         <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
-          <p className="label px-3">Недавние разговоры</p>
+          <p className="label px-3">Разговоры с Шефом</p>
           <ul className="mt-1.5 grid gap-0.5">
             {current && (
               <li>
@@ -312,7 +331,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
                 </button>
               </li>
             )}
-            {chats.slice(0, current ? 7 : 8).map((c) => (
+            {chats.slice(0, current ? 5 : 6).map((c) => (
               <li key={c.id} className="group relative">
                 <button onClick={() => { a.restore(c.id); goChat(); }} className="flex h-9 w-full items-center rounded-lg px-3 pr-9 text-left text-small text-ink-soft hover:bg-sunken hover:text-ink">
                   <span className="truncate">{c.title}</span>
@@ -328,9 +347,8 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
       )}
       <div className="mt-auto grid gap-0.5 pt-4">
         {cooking && <MiniPlayer card />}
-        <button onClick={() => openLayer(routeHash({ tab: "learn" }))} className="flex h-11 items-center gap-3 rounded-xl px-3 text-body-sm hover:bg-sunken"><GraduationCap size={20} className="text-ink-soft" />Школа готовки</button>
-        <button onClick={() => go("profile")} aria-current={route.tab === "profile" ? "page" : undefined}
-          className={cx("flex h-11 items-center gap-3 rounded-xl px-3 text-body-sm", route.tab === "profile" ? "bg-brand-soft font-semibold text-brand-ink" : "hover:bg-sunken")}>
+        <button onClick={() => openLayer(routeHash({ tab: "learn" }))} className={rowCls(false)}><GraduationCap size={20} className="text-ink-soft" />Школа готовки</button>
+        <button onClick={() => go("profile")} aria-current={route.tab === "profile" ? "page" : undefined} className={rowCls(route.tab === "profile")}>
           <UserRound size={20} className={route.tab === "profile" ? "text-brand" : "text-ink-soft"} />Профиль
         </button>
       </div>

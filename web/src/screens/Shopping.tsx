@@ -1,4 +1,4 @@
-// «Покупки»: the list by shop aisle. A tap on the row marks it bought; bought items move into «Дома» in one go.
+// «Покупки»: the list by shop aisle. A tap on the row marks it bought; bought items move into «Мои продукты» in one go.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronDown, MoreHorizontal, Plus, Share2, ShoppingBag, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
@@ -60,7 +60,7 @@ export function Shopping() {
     const ids = bought.map((i) => i.ingredientId).filter((id) => !id.startsWith("custom-"));
     const before = s;
     update((st) => ({ ...st, fridge: addToFridge(st.fridge, ids), shopping: st.shopping.filter((i) => !i.checked) }));
-    toast("Перенесено в «Дома» — напомню, что пора использовать", { label: "Отменить", run: () => update((st) => ({ ...st, fridge: before.fridge, shopping: before.shopping })) });
+    toast("Перенесено в «Мои продукты» — напомню, что пора использовать", { label: "Отменить", run: () => update((st) => ({ ...st, fridge: before.fridge, shopping: before.shopping })) });
   };
 
   const order = async (p: Partner) => {
@@ -153,9 +153,9 @@ export function Shopping() {
           <div ref={bar} className="fixed inset-x-0 z-20 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64" style={{ bottom: "var(--nav-h)" }}>
             <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-2.5 sm:px-6 lg:max-w-[1200px] lg:px-8">
               {bought.length > 0 ? (
-                <button className="btn-primary min-w-0 flex-1 sm:flex-none" onClick={toPantry}><Refrigerator size={18} /><span className="truncate"><span className="hidden sm:inline">Куплено {bought.length} · </span>Перенести в Дома<span className="sm:hidden"> · {bought.length}</span></span></button>
+                <button className="btn-primary min-w-0 flex-1 sm:flex-none" onClick={toPantry}><Refrigerator size={18} /><span className="truncate"><span className="hidden sm:inline">Куплено {bought.length} · </span>В мои продукты<span className="sm:hidden"> · {bought.length}</span></span></button>
               ) : (
-                <span className="flex-1 text-small text-ink-soft">Отмечайте купленное — потом перенесу его в «Дома»</span>
+                <span className="flex-1 text-small text-ink-soft">Отмечайте купленное — потом перенесу его в «Мои продукты»</span>
               )}
               <button className="btn-ghost shrink-0 px-3 sm:px-5" onClick={() => setClear(true)} aria-label="Очистить список"><Trash2 size={18} /><span className="hidden sm:inline">Очистить</span></button>
             </div>

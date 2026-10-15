@@ -92,7 +92,7 @@ export function useActions() {
         book: [...st.book, { id: crypto.randomUUID().slice(0, 36), recipeId: r.id, title: r.title, at: Date.now(), ...(fromMenu ? { menu: true } : {}) }].slice(-300),
       };
     });
-    if (removed) toast("Отметил в «Дома»: продукты для блюда израсходованы");
+    if (removed) toast("Отметил в «Мои продукты»: продукты для блюда израсходованы");
   }, [update, toast, catalog.source]);
 
   const markHave = useCallback((ids: string[]) => {

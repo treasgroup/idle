@@ -6,8 +6,8 @@
 //   #/doc/<key>   a legal document;  #/learn  the beginner course
 import { useEffect, useState } from "react";
 
-export type Tab = "home" | "chat" | "recipes" | "menu" | "shopping" | "pantry" | "profile" | "learn";
-export const TABS: Tab[] = ["home", "chat", "recipes", "menu", "shopping", "pantry", "profile", "learn"];
+export type Tab = "home" | "chat" | "recipes" | "favorites" | "menu" | "shopping" | "pantry" | "profile" | "learn";
+export const TABS: Tab[] = ["home", "chat", "recipes", "favorites", "menu", "shopping", "pantry", "profile", "learn"];
 
 export interface Route {
   tab: Tab;
@@ -72,7 +72,7 @@ const VIEW_KEY = "cook-recipes-view";
 /** `view`: «saved», «book», «dish:<section>», «filter:<id>» or «time:<minutes>». */
 export function openRecipesView(view: string): void {
   try { sessionStorage.setItem(VIEW_KEY, view); } catch { /* ignore */ }
-  replace(routeHash({ tab: "recipes" }));
+  replace(routeHash({ tab: view === "saved" || view === "book" ? "favorites" : "recipes" }));
 }
 export function takeRecipesView(): string | null {
   try { const v = sessionStorage.getItem(VIEW_KEY); sessionStorage.removeItem(VIEW_KEY); return v; } catch { return null; }

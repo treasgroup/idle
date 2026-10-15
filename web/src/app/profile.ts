@@ -20,6 +20,10 @@ export interface Profile {
   setUp: boolean;
   /** Light by default; dark only on request. "system" follows the device. */
   theme: "light" | "dark" | "system";
+  /** Simple mode: bigger text and only the main things (Главная, Шеф, Избранное). */
+  simple: boolean;
+  /** Text size: normal, large, very large. */
+  textSize: "m" | "l" | "xl";
 }
 
 export const DEFAULT_PROFILE: Profile = {
@@ -32,6 +36,8 @@ export const DEFAULT_PROFILE: Profile = {
   parallel: null,
   setUp: false,
   theme: "light",
+  simple: false,
+  textSize: "m",
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
@@ -76,6 +82,8 @@ export function normalizeProfile(raw: unknown): Profile {
     p.parallel = { recipeId: par.recipeId, servings: par.servings, step: par.step, timerEnd: typeof par.timerEnd === "number" ? par.timerEnd : null };
   p.setUp = r.setUp === true;
   if (r.theme === "dark" || r.theme === "system") p.theme = r.theme;
+  p.simple = r.simple === true;
+  if (r.textSize === "l" || r.textSize === "xl") p.textSize = r.textSize;
   return p;
 }
 

@@ -115,7 +115,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // The taste profile nudges the ranking of every list.
   useEffect(() => { setTasteScorer(tasteScorer(s.taste)); }, [s.taste, catalog.version]);
-  useEffect(() => { document.documentElement.classList.toggle("large-text", s.largeText); }, [s.largeText]);
+  // Text size: the profile's three steps; the synced «large text» flag from older versions counts as «large».
+  const size = profile.textSize !== "m" ? profile.textSize : s.largeText || profile.simple ? "l" : "m";
+  useEffect(() => {
+    const c = document.documentElement.classList;
+    c.toggle("large-text", size === "l");
+    c.toggle("xl-text", size === "xl");
+    c.toggle("simple-mode", profile.simple);
+  }, [size, profile.simple]);
   useEffect(() => applyTheme(profile.theme), [profile.theme]);
 
   const sync = useAccountSync(s, ready, online, update);

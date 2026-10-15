@@ -106,7 +106,7 @@ export function Menu() {
   return (
     <div className="pt-4 sm:pt-6">
       <div className="flex items-start justify-between gap-3">
-        <h1 className="text-h1">Меню на неделю</h1>
+        <h1 className="text-h1">План на неделю</h1>
         {filled && <button className="icon-btn -mr-2" onClick={() => setShare(true)} aria-label="Поделиться меню"><Share2 size={20} /></button>}
       </div>
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -225,7 +225,7 @@ export function Menu() {
         )}
       </Sheet>
       <Sheet open={share} title="Поделиться меню" onClose={() => setShare(false)}>
-        <ShareOptions title="Меню на неделю" text={menuText(days)} onDone={() => setShare(false)} onPrint={() => printText("Меню на неделю", menuText(days))} />
+        <ShareOptions title="План на неделю" text={menuText(days)} onDone={() => setShare(false)} onPrint={() => printText("План на неделю", menuText(days))} />
       </Sheet>
       <Sheet open={!!poll} title="Опрос «Что на ужин?»" onClose={() => setPoll(null)}>
         {poll && (

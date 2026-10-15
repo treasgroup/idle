@@ -1,17 +1,17 @@
 // The conversation with Шеф (#/chat): full screen on phones, a centred column next to the sidebar on desktop.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ArrowLeft, SquarePen, Timer, Sparkles, MessageCircle, GraduationCap } from "lucide-react";
+import { SquarePen, Timer, MessageCircle, History } from "lucide-react";
 import { cleanMessage, parseMessage, type ChatOption } from "../engine";
 import { useStore } from "../app/store";
 import { useAssistant } from "../app/assistant";
 import { CONTINUES_TOPIC } from "../app/chatText";
 import { FOCUS_COMPOSER, takeFocusRequest } from "../app/chatNav";
-import { close, routeHash } from "../app/router";
 import { minutesIn, startTimer } from "../app/timers";
 import { Composer } from "../components/Composer";
 import { TimerStrip } from "../components/TimerStrip";
 import { ConditionBar, Message, MoodTiles, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
-import { ChefAvatar, cx, useScrolled } from "../components/ui";
+import { ChefAvatar, Chip, Sheet, cx, useScrolled } from "../components/ui";
+import { useChats } from "../app/chats";
 
 /** A message that names new food or a new mood, and does not continue the topic ("а без лука?"), starts over. */
 function newTopic(text: string, base: Parameters<typeof parseMessage>[1]): boolean {
@@ -69,26 +69,27 @@ export function Chat() {
     const ids = s.fridge.map((f) => f.id);
     a.show("Из того, что дома", { ...a.base(), servings: s.conditions.servings, available: ids, strictPantry: ids.length >= 4 }, "Из того, что есть, можно приготовить:");
   };
-  const back = () => close(routeHash({ tab: "home" }));
+  const chats = useChats();
+  const [history, setHistory] = useState(false);
 
   return (
     <div className="flex min-h-[100dvh] flex-col">
       <header className={cx("pt-safe sticky top-0 z-30 border-b bg-paper/95 backdrop-blur transition-colors", scrolled ? "border-line" : "border-transparent")}>
         <div className="mx-auto flex h-14 max-w-chat items-center gap-1 px-2 sm:px-4">
-          <button className="icon-btn" onClick={back} aria-label="Назад"><ArrowLeft size={22} /></button>
-          <span className="flex flex-1 items-center gap-2.5 pl-1">
-            <ChefAvatar size={32} />
+          <span className="flex flex-1 items-center gap-2.5 pl-2">
+            <ChefAvatar size={36} />
             <span className="leading-tight">
-              <span className="block text-[1.125rem] font-semibold">Шеф</span>
-              <span className="block text-caption text-ink-soft">{a.busy ? "подбирает…" : "кулинарный помощник"}</span>
+              <span className="block text-title">Шеф</span>
+              <span className="block text-caption text-ink-soft">{a.busy ? "подбирает…" : "ваш помощник"}</span>
             </span>
           </span>
-          {has && <button className="btn-ghost h-10 px-3" onClick={() => { a.newChat(); setFocusKey((k) => k + 1); }}><SquarePen size={18} />Новый</button>}
+          {chats.length > 0 && <button className="inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => setHistory(true)}><History size={18} aria-hidden />История</button>}
+          {has && <button className="inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => { a.newChat(); setFocusKey((k) => k + 1); }}><SquarePen size={18} aria-hidden />Новый</button>}
         </div>
         <div className="mx-auto max-w-chat px-4"><TimerStrip className="pb-2" /></div>
       </header>
 
-      <div className="mx-auto w-full max-w-chat flex-1 px-4" style={{ paddingBottom: "calc(var(--dock) + 24px)" }}>
+      <div className="mx-auto w-full max-w-chat flex-1 px-4" style={{ paddingBottom: "calc(var(--dock) + var(--nav-h) + 24px)" }}>
         {has ? (
           <div className="space-y-5 pt-4" aria-live="polite" aria-relevant="additions">
             {msgs.map((m, i) => {
@@ -115,35 +116,53 @@ export function Chat() {
         )}
       </div>
 
-      <div ref={dock} className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 shadow-e2 backdrop-blur sm:left-20 lg:left-64">
-        <div className="mx-auto max-w-chat px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
+      <div ref={dock} className="fixed inset-x-0 z-30 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64" style={{ bottom: "var(--nav-h)" }}>
+        <div className="mx-auto max-w-chat px-4 pb-3 pt-2">
           <ConditionBar />
           <Composer variant="dock" busy={a.busy} focusKey={focusKey} onSend={(t, o) => send(t, o)}
             placeholder={has ? undefined : "Например: курица и картошка"} />
         </div>
       </div>
       <PantryPicker open={picker} onClose={() => setPicker(false)} />
+      <Sheet open={history} title="Прошлые разговоры" onClose={() => setHistory(false)}>
+        <ul className="grid gap-1.5">
+          {chats.map((c) => (
+            <li key={c.id}>
+              <button className="flex min-h-[56px] w-full items-center gap-3 rounded-input border border-line bg-card px-4 text-left hover:border-line-strong"
+                onClick={() => { a.restore(c.id); setHistory(false); }}>
+                <MessageCircle size={20} className="shrink-0 text-brand" aria-hidden />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-body-sm font-medium">{c.title}</span>
+                  <span className="block text-caption text-ink-soft">{new Date(c.at).toLocaleDateString("ru-RU", { day: "numeric", month: "long" })}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Sheet>
     </div>
   );
 }
 
+/** An empty conversation looks like a messenger chat: Шеф says hello and offers ready answers to tap. */
 function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSuggestions>; send: (t: string, o?: { shown?: string; source?: string }) => void }) {
+  const quick = [
+    ["Что-нибудь быстрое", "что-нибудь быстрое на ужин"], ["Из того, что есть", "что приготовить из того, что есть дома"],
+    ["Хочу суп", "хочу суп"], ["Удиви меня", "удиви меня"],
+  ];
   return (
-    <div className="anim-rise pb-6 pt-8 sm:pt-12">
-      <div className="flex flex-col items-center text-center">
-        <ChefAvatar size={64} />
-        <h1 className="mt-4 text-h1">Спросите что угодно о еде</h1>
-        <p className="mt-2 max-w-md text-body-sm text-ink-soft">Назовите продукты, время или настроение — подберу рецепт. Или задайте кухонный вопрос.</p>
+    <div className="anim-rise space-y-4 pb-6 pt-4">
+      <p className="mx-auto w-fit rounded-full bg-sunken px-3 py-1 text-caption text-ink-soft">Сегодня</p>
+      <p className="max-w-[85%] rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-3 text-body">
+        Здравствуйте! Я Шеф — помогу выбрать, что приготовить. Скажите, что есть дома или чего хочется. Можно голосом — кнопка с микрофоном внизу.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {quick.map(([label, text]) => <Chip key={label} className="border-brand text-brand" onClick={() => send(text, { shown: label, source: "option" })}>{label}</Chip>)}
       </div>
-      <SuggestionCards items={suggestions} className="mt-8" />
-      <h2 className="label mt-8">Под настроение</h2>
-      <div className="mt-3"><MoodTiles send={(t, shown) => send(t, { shown, source: "option" })} /></div>
-      <h2 className="label mt-8">Что я умею</h2>
-      <ul className="mt-3 grid gap-3 text-body-sm">
-        <li className="flex gap-3"><Sparkles size={20} className="mt-0.5 shrink-0 text-brand" aria-hidden />Подбираю блюда из того, что есть, под время, технику и ограничения.</li>
-        <li className="flex gap-3"><MessageCircle size={20} className="mt-0.5 shrink-0 text-brand" aria-hidden />Отвечаю на вопросы: чем заменить, сколько варить, как спасти пересоленный суп.</li>
-        <li className="flex gap-3"><GraduationCap size={20} className="mt-0.5 shrink-0 text-brand" aria-hidden />Помню, что вы не едите, и учусь на ваших оценках.</li>
-      </ul>
+      <h2 className="label pt-4">Или выберите пример</h2>
+      <SuggestionCards items={suggestions} />
+      <h2 className="label pt-4">Под настроение</h2>
+      <MoodTiles send={(t, shown) => send(t, { shown, source: "option" })} />
     </div>
   );
 }

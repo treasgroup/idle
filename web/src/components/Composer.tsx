@@ -80,7 +80,7 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}
-        placeholder={placeholder ?? (hero ? HERO_HINTS[hint] : "Уточните: без лука, побыстрее, на 4 человек…")}
+        placeholder={placeholder ?? (hero ? HERO_HINTS[hint] : "Напишите или скажите…")}
         aria-label="Спросите Шефа"
         {...{ enterkeyhint: "send" }}
         className={cx("min-h-[44px] flex-1 resize-none bg-transparent py-2.5 text-body text-ink outline-none placeholder:text-ink-faint", hero && "sm:text-title sm:font-normal")}
@@ -90,7 +90,7 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
       ) : text.trim() ? (
         <button type="submit" disabled={busy} className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-fill text-white transition-transform active:scale-95 disabled:opacity-50" aria-label="Отправить"><ArrowUp size={20} strokeWidth={2.25} /></button>
       ) : (
-        <button type="button" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink transition-transform active:scale-95" onClick={mic} aria-label="Сказать голосом"><Mic size={20} /></button>
+        <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-fill text-white transition-transform active:scale-95" onClick={mic} aria-label="Сказать голосом"><Mic size={22} /></button>
       )}
     </form>
   );

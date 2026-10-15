@@ -22,7 +22,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
   if (m.role === "user")
     return (
       <article className="anim-rise flex justify-end" aria-label="Вы">
-        <p className="max-w-[80%] whitespace-pre-line rounded-[20px] rounded-br-md bg-brand-soft px-4 py-2.5 text-body text-ink">{m.text}</p>
+        <p className="max-w-[85%] whitespace-pre-line rounded-[20px] rounded-br-md bg-brand-soft px-4 py-2.5 text-body text-ink">{m.text}</p>
       </article>
     );
   // `reason` falls back to the dish summary; only a real "why it fits" gets the green tick.
@@ -33,10 +33,9 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
   const open = (id: string) => { a.opened(id, s.conditions.servings); openRecipe(id); };
   const options = (m.options ?? []).map((o) => ({ ...o, label: chipLabel(o.label) })).filter((o): o is ChatOption => !!o.label);
   return (
-    <article className="anim-rise flex gap-3" aria-label="Шеф">
-      <span className="mt-0.5 hidden sm:block"><ChefAvatar size={28} /></span>
-      <div className="min-w-0 flex-1 space-y-3">
-        <p className={cx("whitespace-pre-line text-body", !results.length && m.text.length > 120 && "rounded-card border border-line bg-card p-4 shadow-e1")}>{tidyReply(m.text)}</p>
+    <article className="anim-rise" aria-label="Шеф">
+      <div className="min-w-0 space-y-3">
+        <p className="w-fit max-w-[85%] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{tidyReply(m.text)}</p>
         {results[0]?.recipe && (
           <RecipeFeatured recipe={results[0].recipe} note={results[0].why || undefined} onOpen={() => open(results[0].id)}
             onMenu={() => setMenuFor(results[0].id)} onSave={() => toggleFavorite(results[0].recipe!)} saved={isFavorite(results[0].id)} />
@@ -151,7 +150,7 @@ export function MoodTiles({ send, compact }: { send: (text: string, shown: strin
   );
 }
 
-/** "Что у вас есть?" — pick products right in the chat; optionally remember them in «Дома». */
+/** "Что у вас есть?" — pick products right in the chat; optionally remember them in «Мои продукты». */
 export function PantryPicker({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { s, update } = useStore();
   const a = useAssistant();
@@ -171,7 +170,7 @@ export function PantryPicker({ open, onClose }: { open: boolean; onClose: () => 
   return (
     <Sheet open={open} title="Что у вас есть?" onClose={onClose} tall
       footer={<div className="flex items-center gap-3">
-        <label className="flex flex-1 items-center gap-2 text-small text-ink-soft"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-5 w-5 accent-[rgb(var(--brand))]" />Запомнить в «Дома»</label>
+        <label className="flex flex-1 items-center gap-2 text-small text-ink-soft"><input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-5 w-5 accent-[rgb(var(--brand))]" />Запомнить в «Мои продукты»</label>
         <button className="btn-primary" disabled={!picked.length} onClick={go}><Sparkles size={18} />Подобрать · {picked.length}</button>
       </div>}>
       <input className="input" placeholder="Найти продукт: фарш, кабачок…" value={q} onChange={(e) => setQ(e.target.value)} />

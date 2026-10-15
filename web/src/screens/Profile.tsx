@@ -1,7 +1,7 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode,
+  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -9,7 +9,7 @@ import {
 import { useStore } from "../app/store";
 import { useReminders } from "../app/reminders";
 import { GOALS, LEVELS } from "../app/profile";
-import { openLayer, routeHash } from "../app/router";
+import { openLayer, openRecipesView, routeHash } from "../app/router";
 import { Chip, Section, Segmented, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
 
@@ -39,17 +39,50 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const stats = nonzero.length >= 2 ? nonzero : [];
   const excludedHint = [prefs.vegetarian ? "без мяса и рыбы" : "", ...prefs.excluded.slice(0, 3).map((x) => (LABELS[x] ?? shortName(x)).toLowerCase())].filter(Boolean).join(", ");
   const close = () => setSheet(null);
+  const size = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
 
   return (
     <div className="pt-4 sm:pt-6">
-      <h1 className="text-h1">Профиль</h1>
-      <p className="mt-1 text-body-sm text-ink-soft">Без регистрации: всё хранится на этом устройстве{sync.status.state === "ok" || sync.status.members > 1 ? " и синхронизируется" : ""}.</p>
+      <div className="flex items-center gap-4">
+        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink"><UserRound size={30} /></span>
+        <div>
+          <h1 className="text-h1">Профиль</h1>
+          <p className="text-body-sm text-ink-soft">Готовлю на {profile.eaters} {plural(profile.eaters, "человека", "человек", "человек")} · без регистрации</p>
+        </div>
+      </div>
 
       {stats.length > 0 && (
         <div className={cx("mt-5 grid gap-2 text-center", stats.length === 3 ? "grid-cols-3" : stats.length === 2 ? "grid-cols-2" : "grid-cols-1")}>
           {stats.map(([l, v]) => <div key={l} className="card py-3"><div className="text-h2">{v}</div><div className="text-caption text-ink-soft">{l}</div></div>)}
         </div>
       )}
+
+      {/* «Ещё»: the bigger tools that are not in the bottom bar. */}
+      <div className="card mt-6 divide-y divide-line overflow-hidden">
+        {!profile.simple && <Row icon={<CalendarDays size={18} />} title="План на неделю" hint="Ужины без повторов и список покупок" onClick={() => openLayer(routeHash({ tab: "menu" }))} />}
+        {!profile.simple && <Row icon={<Refrigerator size={18} />} title="Мои продукты" hint={s.fridge.length ? s.fridge.length + " " + plural(s.fridge.length, "продукт", "продукта", "продуктов") + " дома" : "Что есть дома — подскажу, что приготовить"} onClick={() => openLayer(routeHash({ tab: "pantry" }))} />}
+        {profile.simple && <Row icon={<ShoppingCart size={18} />} title="Список покупок" hint={s.shopping.filter((i) => !i.checked).length ? "Купить: " + s.shopping.filter((i) => !i.checked).length : "Пока пуст"} onClick={() => openLayer(routeHash({ tab: "shopping" }))} />}
+        <Row icon={<BookOpenCheck size={18} />} title="Я готовил(а)" hint={bookCount ? bookCount + " " + plural(bookCount, "блюдо", "блюда", "блюд") : "Здесь будет всё, что вы приготовили"} onClick={() => openRecipesView("book")} />
+        <Row icon={<GraduationCap size={18} />} title="Школа готовки" hint={profile.lessonsDone.length ? "Пройдено уроков: " + profile.lessonsDone.length : "14 коротких уроков для начинающих"} onClick={() => openLayer(routeHash({ tab: "learn" }))} />
+      </div>
+
+      <div className="card mt-3 overflow-hidden">
+        <div className="flex items-center gap-3 px-4 py-3">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink" aria-hidden><Type size={18} /></span>
+          <span className="flex-1 text-body-sm font-semibold">Размер текста</span>
+          <div role="radiogroup" aria-label="Размер текста" className="flex rounded-full bg-sunken p-1">
+            {(["m", "l", "xl"] as const).map((k, i) => (
+              <button key={k} role="radio" aria-checked={size === k} aria-label={["Обычный", "Крупный", "Очень крупный"][i]}
+                onClick={() => { setProfile((p) => ({ ...p, textSize: k })); update((st) => ({ ...st, largeText: k !== "m" })); }}
+                className={cx("grid h-10 w-11 place-items-center rounded-full", size === k ? "bg-card font-semibold shadow-e1" : "text-ink-soft")}
+                style={{ fontSize: ["0.875rem", "1.0625rem", "1.3125rem"][i] }}>А</button>
+            ))}
+          </div>
+        </div>
+        <div className="border-t border-line px-4">
+          <Toggle on={profile.simple} onChange={(v) => setProfile((p) => ({ ...p, simple: v }))} label="Простой режим" hint="Крупно и только главное: Главная, Шеф, Избранное" />
+        </div>
+      </div>
 
       <div className="lg:grid lg:grid-cols-2 lg:gap-x-8">
         <div>
@@ -81,7 +114,6 @@ export function Profile({ pwa }: { pwa: Pwa }) {
                   options={[{ id: "light", label: "Светлая" }, { id: "dark", label: "Тёмная" }, { id: "system", label: "Авто" }]} />
               </div>
               <div className="divide-y divide-line px-4">
-                <Toggle on={s.largeText} onChange={(v) => update((st) => ({ ...st, largeText: v }))} label="Крупный текст" />
                 <Toggle on={s.readAloud} onChange={(v) => update((st) => ({ ...st, readAloud: v }))} label="Читать шаги вслух" hint="В режиме готовки" />
               </div>
               {reminders.supported && <div className="border-t border-line"><Row icon={<Bell size={18} />} title="Напоминания" hint={s.reminders.daily ? "Каждый день в " + s.reminders.daily : "Выключены"} onClick={() => setSheet("reminders")} /></div>}
@@ -176,7 +208,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
             await wipe();
           }}>{wiping ? "Удаляю…" : "Удалить всё"}</button>
         </div>}>
-        <p className="text-body-sm text-ink-soft">Удалятся сохранённые рецепты, «Моя книга», заметки, продукты «Дома», меню, список покупок, ваши отзывы, напоминания и анонимный аккаунт на сервере. Отменить нельзя.</p>
+        <p className="text-body-sm text-ink-soft">Удалятся сохранённые рецепты, «Я готовил(а)», заметки, продукты «Мои продукты», меню, список покупок, ваши отзывы, напоминания и анонимный аккаунт на сервере. Отменить нельзя.</p>
       </Sheet>
     </div>
   );
@@ -210,7 +242,7 @@ function Family() {
   const [link, setLink] = useState("");
   return (
     <div>
-      <p className="text-body-sm text-ink-soft">Меню на неделю, список покупок и продукты «Дома» станут общими: изменения увидят все в семье. Без телефонов и почты — по ссылке-приглашению.</p>
+      <p className="text-body-sm text-ink-soft">Меню на неделю, список покупок и продукты «Мои продукты» станут общими: изменения увидят все в семье. Без телефонов и почты — по ссылке-приглашению.</p>
       <p className="mt-2 text-body-sm">Сейчас в семье: <b>{sync.status.members}</b></p>
       {link ? (
         <div className="mt-4">

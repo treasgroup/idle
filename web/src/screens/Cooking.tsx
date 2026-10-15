@@ -665,7 +665,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const book = () => {
     end();
     try { sessionStorage.setItem("cook-recipes-view", "book"); } catch { /* ignore */ }
-    replace(routeHash({ tab: "recipes" }));
+    replace(routeHash({ tab: "favorites" }));
   };
   const tomorrow = () => { void a.ask("что приготовить завтра", { fresh: true }); goChat(); };
 
@@ -697,14 +697,14 @@ function Done({ onClose }: { onClose: () => void }) {
 
         <ul className="card mt-8 divide-y divide-line overflow-hidden">
           <li className="flex items-center">
-            <DoneRow icon={<BookOpenCheck size={20} />} title="Сохранено в «Моей книге»" hint="Все блюда, которые вы готовили" onClick={book} />
+            <DoneRow icon={<BookOpenCheck size={20} />} title="Сохранено в «Я готовил(а)»" hint="Все блюда, которые вы готовили" onClick={book} />
             <button className="icon-btn mr-2" onClick={() => toggleFavorite(r)} aria-pressed={fav} aria-label={fav ? "Убрать из сохранённого" : "Сохранить рецепт"}>
               <Heart size={20} className={cx(fav && "fill-brand text-brand")} />
             </button>
           </li>
           <li><DoneRow icon={<MessageCircle size={20} />} title="Что приготовить завтра?" hint="Спросить Шефа" onClick={tomorrow} chevron /></li>
           <li><DoneRow icon={<CalendarPlus size={20} />} title="В меню" hint="Повторить в другой день" onClick={() => setSheet("menu")} chevron /></li>
-          <li><DoneRow icon={<Refrigerator size={20} />} title="Что осталось → в «Дома»" hint="Отметить продукты, которые остались" onClick={() => setSheet("left")} chevron /></li>
+          <li><DoneRow icon={<Refrigerator size={20} />} title="Что осталось → в «Мои продукты»" hint="Отметить продукты, которые остались" onClick={() => setSheet("left")} chevron /></li>
         </ul>
 
         {askRemind && (
@@ -741,7 +741,7 @@ function DoneRow({ icon, title, hint, onClick, chevron }: { icon: ReactNode; tit
   );
 }
 
-/** After cooking: products that are left over go to «Дома» (the ones sold in bigger packs are pre-selected). */
+/** After cooking: products that are left over go to «Мои продукты» (the ones sold in bigger packs are pre-selected). */
 function LeftoverSheet({ recipe, servings, onClose }: { recipe: Recipe; servings: number; onClose: () => void }) {
   const { s, update, toast } = useStore();
   const items = useMemo(() => {
@@ -758,12 +758,12 @@ function LeftoverSheet({ recipe, servings, onClose }: { recipe: Recipe; servings
   const save = () => {
     const ids = [...on];
     update((st) => ({ ...st, fridge: addToFridge(st.fridge, ids) }));
-    toast("В «Дома»: " + ids.length + " " + plural(ids.length, "продукт", "продукта", "продуктов"), { label: "Открыть", run: () => replace(routeHash({ tab: "pantry" })) });
+    toast("В «Мои продукты»: " + ids.length + " " + plural(ids.length, "продукт", "продукта", "продуктов"), { label: "Открыть", run: () => replace(routeHash({ tab: "pantry" })) });
     onClose();
   };
   return (
     <Sheet open title="Что осталось?" onClose={onClose}
-      footer={<button className="btn-primary h-13 w-full text-body" disabled={!on.size} onClick={save}>{on.size ? "Добавить в «Дома» · " + on.size : "Отметьте продукты"}</button>}>
+      footer={<button className="btn-primary h-13 w-full text-body" disabled={!on.size} onClick={save}>{on.size ? "Добавить в «Мои продукты» · " + on.size : "Отметьте продукты"}</button>}>
       <p className="text-body-sm text-ink-soft">Отметьте, что осталось после готовки, — Шеф подскажет, что из этого приготовить.</p>
       <ul className="mt-2 divide-y divide-line">
         {items.map((i) => (

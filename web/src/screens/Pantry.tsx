@@ -1,4 +1,4 @@
-// «Дома»: what is in the fridge and cupboards, what has to be used soon, and Шеф's ideas from it.
+// «Мои продукты»: what is in the fridge and cupboards, what has to be used soon, and Шеф's ideas from it.
 import { useMemo, useState } from "react";
 import { Plus, ScanText, Search, X, Refrigerator, Clock, ChevronRight, Trash2, UtensilsCrossed } from "lucide-react";
 import {
@@ -66,7 +66,7 @@ export function Pantry() {
     <div className="pt-4 sm:pt-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-h1">Дома</h1>
+          <h1 className="text-h1">Мои продукты</h1>
           <p className="mt-1 text-body-sm text-ink-soft">{s.fridge.length ? products(s.fridge.length) : "Что есть в холодильнике и шкафу"}</p>
         </div>
         {s.fridge.length > 0 && (

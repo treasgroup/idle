@@ -9,6 +9,7 @@ import {
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
 import { archiveChat, markChatActive, takeChat } from "./chats";
+import { plainWords } from "./colloquial";
 
 const lastShown = (conv: ChatMessage[]) => [...conv].reverse().find((m) => m.role === "assistant" && !!m.results?.length) ?? null;
 
@@ -144,7 +145,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         }
       }
       if (id !== turn.current) return;
-      const cleaned = cleanMessage(text);
+      const cleaned = cleanMessage(plainWords(text));
       const local = parseMessage(cleaned, st.conditions);
       const isLocal = !patch;
       if (!patch) { patch = local; reply = local.reply; }

@@ -1,24 +1,24 @@
-// Шеф home (#/): the assistant first — a big question, the message box, example requests; then what is going on today.
-// Anything sent from here starts a new conversation and opens it (#/chat).
+// Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Решите за меня», collections that
+// scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useMemo, useState } from "react";
-import { ChevronRight, CalendarDays, ShoppingCart, GraduationCap, Flame, MessageCircle, Clock, Refrigerator, Smile, X } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, ChefHat } from "lucide-react";
 import {
-  DEFAULT_PREFERENCES, LABELS, conditionLabel, dateKey, expiryLabel, expiringSoon, freshConditions, rankRecipes, recipeById, recipes, resultNote,
-  shortName, type Conditions, type Recipe,
+  courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, rankRecipes, recipeById, recipes, shortName,
+  type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { CHAT_FRESH_MS, lastChatAt } from "../app/chats";
-import { GOALS, goalConditions, type Goal } from "../app/profile";
+import { goalConditions } from "../app/profile";
+import { seasonalCollection } from "../app/seasonal";
 import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
-import { Composer } from "../components/Composer";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
-import { MoodTiles, SuggestionCards, useSuggestions } from "../components/ChatParts";
-import { RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
-import { Chip, ScrollRow, Section, cx } from "../components/ui";
+import { DecideSheet } from "../components/Decide";
+import { RecipeImage, RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
+import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
+import { ProfileButton } from "../app/App";
 import { LESSONS } from "./learn-data";
 import type { Pwa } from "./Profile";
 
@@ -31,111 +31,185 @@ export const mealNow = (): "breakfast" | "lunch" | "dinner" => {
   return h >= 5 && h < 11 ? "breakfast" : h < 16 ? "lunch" : "dinner";
 };
 const MEAL_WORD = { breakfast: "на завтрак", lunch: "на обед", dinner: "на ужин" };
+const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
+const people = (n: number) => n + " " + (n % 10 === 1 && n % 100 !== 11 ? "человека" : "человек");
+
+/** Dishes that suit the person (goals, level, kids) and the meal; stable for the day. */
+function useSuitable() {
+  const { s, profile, catalog } = useStore();
+  return useMemo(() => {
+    const c = goalConditions(profile, { ...freshConditions({ servings: profile.eaters, appliances: s.preferences.appliances, vegetarian: s.preferences.vegetarian }), servings: profile.eaters });
+    if (profile.level === "beginner" && c.maxMinutes == null) c.maxMinutes = 45;
+    return rankRecipes(recipes(), c, s.preferences, 300, { meal: mealNow() }).map((m) => m.recipe)
+      .filter((r) => profile.level !== "beginner" || r.difficulty !== "hard");
+  }, [s.preferences, profile, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+/** The same «recipe of the day» all day long, a new one tomorrow. */
+function dayPick<T>(list: T[], salt = 0): T | null {
+  if (!list.length) return null;
+  const d = new Date();
+  const n = d.getFullYear() * 400 + d.getMonth() * 31 + d.getDate() + salt;
+  return list[(n * 7919) % Math.min(list.length, 25)];
+}
 
 export function Home({ pwa }: { pwa?: Pwa }) {
-  const { s, profile } = useStore();
-  const a = useAssistant();
-  const send = (text: string, opts: { voice?: boolean; shown?: string; source?: string } = {}) => {
-    void a.ask(text, { ...opts, fresh: true });
-    goChat();
-  };
-  const show = (label: string, c: Partial<Conditions>, intro: string) => {
-    a.show(label, { ...a.base(), ...c }, intro, { fresh: true });
-    goChat();
-  };
-  const fromPantry = () => {
-    const ids = s.fridge.map((f) => f.id);
-    show("Из того, что дома", { available: ids, strictPantry: ids.length >= 4 }, "Из того, что есть, можно приготовить:");
-  };
-  const suggestions = useSuggestions((t) => send(t), fromPantry);
+  const { profile } = useStore();
+  const { openRecipe } = useActions();
+  const [decide, setDecide] = useState(false);
+  const all = useSuitable();
+  const meal = mealNow();
+  const today = dayPick(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"));
+  const season = seasonalCollection();
 
-  const CHIPS: { goal?: Goal; label: string; run: () => void }[] = [
-    { goal: "quick", label: "До 20 минут", run: () => show("До 20 минут", { maxMinutes: 20 }, "Успеете за 20 минут:") },
-    { label: "Удиви меня", run: () => send("удиви меня", { source: "option", shown: "Удиви меня" }) },
-    { goal: "light", label: "Полегче", run: () => show("Полегче", { maxKcal: 450 }, "Лёгкое — до 450 ккал на порцию:") },
-    { goal: "protein", label: "Больше белка", run: () => show("Больше белка", { minProtein: 25 }, "Белка от 25 г на порцию:") },
-    { goal: "family", label: "Детям", run: () => show("Детям", { occasion: "kids" } as Partial<Conditions>, "Детям обычно нравится вот это:") },
-    { label: "Гости", run: () => send("придут гости", { source: "option", shown: "Гости" }) },
-  ];
-  const chips = [...CHIPS.filter((c) => c.goal && profile.goals.includes(c.goal)), ...CHIPS.filter((c) => !c.goal || !profile.goals.includes(c.goal))];
+  if (profile.simple) return <SimpleHome today={today} />;
 
-  const firstUser = s.conversation.find((m) => m.role === "user")?.text;
-  const recent = !!firstUser && Date.now() - lastChatAt() < CHAT_FRESH_MS;
+  const quick = all.filter((r) => r.totalMinutes <= 30 && r.id !== today?.id).slice(0, 10);
+  const soups = recipes().filter((r) => courseOf(r) === "soup").sort((a, b) => a.totalMinutes - b.totalMinutes).slice(0, 10);
+  const kids = all.filter((r) => r.kids === true && r.id !== today?.id).slice(0, 10);
+  const seasonal = season ? recipes().filter(season.test).slice(0, 10) : [];
 
   return (
-    <div className="xl:grid xl:grid-cols-[minmax(0,720px)_320px] xl:justify-between xl:gap-10">
-      <div className="min-w-0">
-        <section className="pt-4 sm:pt-8 lg:pt-6" aria-labelledby="home-title">
-          <p className="text-body-sm font-semibold text-brand">{greeting()}!</p>
-          <h1 id="home-title" className="mt-1 text-display sm:text-display-lg">Что приготовим {MEAL_WORD[mealNow()]}?</h1>
-          <p className="mt-3 max-w-xl text-body text-ink-soft">Я Шеф: подберу рецепт из того, что есть, под время и настроение — и отвечу на любой кухонный вопрос.</p>
-          <div className="mt-6">
-            <Composer variant="hero" onSend={(t, o) => send(t, o)} />
-            <Considering />
-          </div>
-        </section>
-
-        {recent && (
-          <button onClick={() => goChat()} className="mt-5 flex min-h-[52px] w-full items-center gap-3 rounded-input border border-line bg-card px-4 text-left hover:border-line-strong/60">
-            <MessageCircle size={20} className="shrink-0 text-brand" aria-hidden />
-            <span className="min-w-0 flex-1 truncate text-body-sm">Продолжить разговор: <b className="font-semibold">«{firstUser}»</b></span>
-            <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
-          </button>
-        )}
-
-        <SuggestionCards items={suggestions} className="mt-6" />
-        {pwa && <InstallCard pwa={pwa} />}
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {chips.map((c) => <Chip key={c.label} onClick={c.run}>{c.label}</Chip>)}
+    <div className="pb-4">
+      <div className="flex items-start justify-between gap-3 pt-3 sm:pt-6">
+        <div>
+          <p className="text-body-sm font-medium text-brand">{greeting()}!</p>
+          <h1 className="mt-1 text-h1 sm:text-display">Что приготовим {MEAL_WORD[meal]}?</h1>
         </div>
-
-        <div className="xl:hidden">
-          <Now />
-          <Rescue />
-        </div>
-        <Sections />
-        <Ideas />
-        <div className="xl:hidden">
-          <CourseCard />
-        </div>
-        <Saved />
+        <ProfileButton className="-mr-1.5 lg:hidden" />
       </div>
 
-      <aside className="hidden xl:block">
-        <div className="sticky top-8 space-y-2 pt-6">
-          <RailBlock title="Под настроение" icon={<Smile size={16} />}>
-            <MoodTiles send={(t, shown) => { void a.ask(t, { fresh: true, shown, source: "option" }); goChat(); }} compact />
-          </RailBlock>
-          <Now rail />
-          <Rescue rail />
-          <CourseCard rail />
+      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        {today && <TodayCard r={today} onOpen={() => openRecipe(today)} />}
+        <div className="grid content-start gap-3">
+          <RepeatCard />
+          <button onClick={() => setDecide(true)} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-brand" aria-hidden><Shuffle size={20} /></span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-body font-medium">Решите за меня</span>
+              <span className="block text-small text-ink-soft">Покажу одно блюдо — не понравится, покажу другое</span>
+            </span>
+            <ChevronRight size={20} className="shrink-0 text-ink-soft" aria-hidden />
+          </button>
+          <button onClick={() => replace(routeHash({ tab: "chat" }))} className="flex min-h-[64px] items-center gap-3 rounded-card bg-brand-soft px-4 py-3 text-left transition-transform active:scale-[.99]">
+            <ChefAvatar size={40} />
+            <span className="min-w-0 flex-1">
+              <span className="block text-body font-medium">Не знаете, что приготовить?</span>
+              <span className="block text-small text-ink-soft">Спросите Шефа — подберёт за минуту</span>
+            </span>
+            <ChevronRight size={20} className="shrink-0 text-brand" aria-hidden />
+          </button>
         </div>
-      </aside>
+      </div>
+      {pwa && <InstallCard pwa={pwa} />}
+
+      <Now />
+      <Rescue />
+      {season && seasonal.length >= 4 && <Shelf title={season.title} hint={season.hint} list={seasonal} />}
+      {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} hint="До 30 минут" list={quick} all={() => openRecipesView("time:30")} />}
+      <Shelf title="Супы" list={soups} all={() => openRecipesView("dish:soup")} />
+      {(profile.kids || profile.goals.includes("family")) && kids.length >= 4 && <Shelf title="Детям нравится" list={kids} all={() => openRecipesView("filter:kids")} />}
+      <Saved />
+      <CourseCard />
+      <DecideSheet open={decide} onClose={() => setDecide(false)} meal={meal} />
     </div>
   );
 }
 
-/** «Учитываю: 4 порции · без свинины · без духовки · Изменить» — only what differs from the defaults. */
-function Considering() {
-  const { s, profile } = useStore();
-  const p = s.preferences;
-  const parts: string[] = [profile.eaters + " " + (profile.eaters === 1 ? "порцию" : profile.eaters < 5 ? "порции" : "порций")];
-  if (p.vegetarian) parts.push("вегетарианское");
-  for (const e of p.excluded.slice(0, 3)) parts.push("без: " + conditionLabel(e).toLowerCase());
-  if (p.excluded.length > 3) parts.push("ещё " + (p.excluded.length - 3) + " исключ.");
-  if (!p.appliances.includes("oven")) parts.push("без духовки");
-  for (const ap of ["multicooker", "airfryer"]) if (p.appliances.includes(ap) && !DEFAULT_PREFERENCES.appliances.includes(ap)) parts.push((LABELS[ap] ?? ap).toLowerCase());
-  for (const g of profile.goals) if (g !== "tasty") parts.push((GOALS.find((x) => x.id === g)?.label ?? g).toLowerCase());
+/** The recipe of the day: a big card with one action. */
+function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
+  const { profile } = useStore();
   return (
-    <p className="mt-2.5 px-1 text-caption text-ink-soft">
-      Учитываю: {parts.join(" · ")} ·{" "}
-      <button className="link font-semibold" onClick={() => replace(routeHash({ tab: "profile" }))}>Изменить</button>
-    </p>
+    <article className="overflow-hidden rounded-card border border-line bg-card">
+      <button className="relative block w-full text-left" onClick={onOpen} aria-label={"Рецепт дня: " + r.title}>
+        <RecipeImage recipe={r} className="aspect-[16/10] w-full" rounded="rounded-none" eager />
+        <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">Рецепт дня</span>
+      </button>
+      <div className="p-4">
+        <h2 className="text-h2">{r.title}</h2>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 text-body-sm text-ink-soft">
+          <Clock size={16} aria-hidden />{formatMinutes(r.totalMinutes)}<span aria-hidden>·</span>{DIFF[r.difficulty]}<span aria-hidden>·</span>на {people(profile.eaters)}
+        </p>
+        <button className="btn-primary btn-bar mt-4 w-full" onClick={onOpen}><ChefHat size={20} />Готовить</button>
+      </div>
+    </article>
   );
 }
 
-/** What is going on today: the dish on the stove, today's menu, the shopping list. */
+/** «Неделю назад вы готовили котлеты — повторить?»: a dish the person liked or saved, cooked 5+ days ago. */
+function RepeatCard() {
+  const { s } = useStore();
+  const { openRecipe } = useActions();
+  const pick = useMemo(() => {
+    const liked = new Set([...(s.taste.liked ?? []), ...s.favorites.map((f) => f.id)]);
+    const old = [...s.book].reverse().find((b) => liked.has(b.recipeId) && Date.now() - b.at > 5 * 864e5);
+    return old ? { r: recipeById(old.recipeId), at: old.at } : null;
+  }, [s.book, s.taste, s.favorites]);
+  if (!pick?.r) return null;
+  const ago = Math.round((Date.now() - pick.at) / 864e5);
+  const when = ago < 10 ? "Неделю назад" : ago < 25 ? "Пару недель назад" : "Недавно";
+  return (
+    <button onClick={() => openRecipe(pick.r!)} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card p-2 pr-4 text-left transition-transform active:scale-[.99]">
+      <RecipeImage recipe={pick.r} className="h-14 w-14 shrink-0" />
+      <span className="min-w-0 flex-1">
+        <span className="block text-small text-ink-soft">{when} вы готовили</span>
+        <span className="block truncate text-body font-medium">{pick.r.title}</span>
+      </span>
+      <span className="inline-flex shrink-0 items-center gap-1 text-small font-medium text-brand"><Repeat2 size={18} aria-hidden />Повторить</span>
+    </button>
+  );
+}
+
+/** A collection that scrolls sideways, like a shelf in a streaming app. */
+function Shelf({ title, hint, list, all }: { title: string; hint?: string; list: Recipe[]; all?: () => void }) {
+  const { openRecipe } = useActions();
+  if (!list.length) return null;
+  return (
+    <Section title={title} action={all ? "Все" : undefined} onAction={all}>
+      {hint && <p className="-mt-2 mb-3 text-small text-ink-soft">{hint}</p>}
+      <ScrollRow label={title}>
+        {list.map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className="w-[168px] shrink-0 snap-start sm:w-[200px]" />)}
+      </ScrollRow>
+    </Section>
+  );
+}
+
+/** Simple mode: a greeting, one big voice button, two big ideas. */
+function SimpleHome({ today }: { today: Recipe | null }) {
+  const { openRecipe } = useActions();
+  const a = useAssistant();
+  const all = useSuitable();
+  const second = dayPick(all.filter((r) => r.id !== today?.id && r.difficulty === "easy"), 3);
+  const ideas = [today, second].filter((r): r is Recipe => !!r);
+  return (
+    <div className="pb-4">
+      <div className="flex items-start justify-between gap-3 pt-3">
+        <h1 className="text-display">{greeting()}!</h1>
+        <ProfileButton className="-mr-1.5 lg:hidden" />
+      </div>
+      <button onClick={() => { a.newChat(); goChat(true); }} className="mt-5 flex w-full items-center gap-4 rounded-card bg-brand-soft p-4 text-left">
+        <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand-fill text-white" aria-hidden><Mic size={30} /></span>
+        <span>
+          <span className="block text-h2">Спросить Шефа</span>
+          <span className="block text-body text-ink-soft">«Что сварить из курицы?»</span>
+        </span>
+      </button>
+      <h2 className="mt-8 text-h2">Идеи на сегодня</h2>
+      <div className="mt-3 grid gap-4">
+        {ideas.map((r) => (
+          <button key={r.id} onClick={() => openRecipe(r)} className="overflow-hidden rounded-card border border-line bg-card text-left">
+            <RecipeImage recipe={r} className="aspect-[16/9] w-full" rounded="rounded-none" />
+            <span className="block px-4 pb-4 pt-3">
+              <span className="block text-h2">{r.title}</span>
+              <span className="block text-body text-ink-soft">{formatMinutes(r.totalMinutes)} · {DIFF[r.difficulty].toLowerCase()}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Now({ rail }: { rail?: boolean }) {
   const { s } = useStore();
   const { openRecipe } = useActions();
@@ -168,11 +242,11 @@ function Now({ rail }: { rail?: boolean }) {
       )}
     </div>
   );
-  return rail ? <RailBlock title="Сейчас" icon={<CalendarDays size={16} />}>{rows}</RailBlock> : <Section title="Сейчас">{rows}</Section>;
+  return <Section title="Сейчас">{rows}</Section>;
 }
 
 /** Perishables that run out today or tomorrow, and what to cook with them. */
-function Rescue({ rail }: { rail?: boolean }) {
+function Rescue() {
   const { s } = useStore();
   const { openRecipe } = useActions();
   const a = useAssistant();
@@ -194,14 +268,7 @@ function Rescue({ rail }: { rail?: boolean }) {
       <span>{soon.slice(0, 4).map((f, i) => <span key={f.id}>{i > 0 && ", "}{shortName(f.id)} — <b className="font-semibold">{expiryLabel(f)}</b></span>)}</span>
     </div>
   );
-  if (rail)
-    return (
-      <RailBlock title="Спасите продукты" icon={<Refrigerator size={16} />}>
-        {strip}
-        <div className="mt-1 grid gap-1">{ideas.slice(0, 3).map((r) => <RecipeMini key={r.id} recipe={r} onOpen={() => openRecipe(r)} />)}</div>
-        <button className="link mt-1 px-1.5 text-small font-semibold" onClick={more}>Ещё варианты</button>
-      </RailBlock>
-    );
+
   return (
     <Section title="Спасите продукты" action="Ещё варианты" onAction={more}>
       {strip}
@@ -210,31 +277,9 @@ function Rescue({ rail }: { rail?: boolean }) {
   );
 }
 
-function Ideas() {
-  const { s, profile, update, catalog } = useStore();
-  const { openRecipe } = useActions();
-  const today = dateKey(new Date());
-  const skip = s.today.date === today ? s.today.skip : [];
-  const list = useMemo(() => {
-    const c = goalConditions(profile, { ...freshConditions({ servings: profile.eaters, appliances: s.preferences.appliances, vegetarian: s.preferences.vegetarian }), servings: profile.eaters });
-    if (profile.level === "beginner" && c.maxMinutes == null) c.maxMinutes = 45;
-    return rankRecipes(recipes(), c, s.preferences, 40, { meal: mealNow() })
-      .filter((m) => !skip.includes(m.recipe.id) && (profile.level !== "beginner" || m.recipe.difficulty === "easy"))
-      .slice(0, 6);
-  }, [s.preferences, profile, skip, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
-  if (!list.length) return null;
-  const shown = list.slice(0, 6);
-  const other = () => update((st) => ({ ...st, today: { date: today, skip: [...(st.today.date === today ? st.today.skip : []), ...shown.map((m) => m.recipe.id)].slice(-60) } }));
-  return (
-    <Section title="Идеи на сегодня" action="Показать другие" onAction={other}>
-      <div className="grid gap-2 lg:hidden">{shown.slice(0, 4).map((m) => <RecipeRow key={m.recipe.id} recipe={m.recipe} note={resultNote(m) || m.recipe.summary} onOpen={() => openRecipe(m.recipe)} />)}</div>
-      <div className="hidden gap-4 lg:grid lg:grid-cols-3">{shown.map((m) => <RecipeTile key={m.recipe.id} recipe={m.recipe} note={resultNote(m) || undefined} onOpen={() => openRecipe(m.recipe)} />)}</div>
-    </Section>
-  );
-}
 
 // Browsing without a question: the catalog by kind of dish, as on any big recipe site.
-const SECTIONS: { view: string; label: string; emoji: string; tint: string }[] = [
+export const SECTIONS: { view: string; label: string; emoji: string; tint: string }[] = [
   { view: "dish:soup", label: "Супы", emoji: "🍲", tint: "#F8E4C8" },
   { view: "dish:main", label: "Вторые блюда", emoji: "🍗", tint: "#F6DDD2" },
   { view: "dish:salad", label: "Салаты", emoji: "🥗", tint: "#E3EFD5" },
@@ -246,7 +291,7 @@ const SECTIONS: { view: string; label: string; emoji: string; tint: string }[] =
   { view: "filter:veg", label: "Без мяса", emoji: "🥦", tint: "#DFEFE3" },
 ];
 
-function Sections() {
+export function Sections() {
   return (
     <Section title="Рецепты по разделам" action="Все рецепты" onAction={() => replace(routeHash({ tab: "recipes" }))}>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(112px,1fr))]">
@@ -295,14 +340,6 @@ function Saved() {
   );
 }
 
-function RailBlock({ title, icon, children }: { title: string; icon: JSX.Element; children: React.ReactNode }) {
-  return (
-    <section className="rounded-card border border-line bg-card p-3">
-      <h2 className="mb-2 flex items-center gap-2 px-1.5 text-small font-semibold text-ink-soft"><span aria-hidden className="text-brand">{icon}</span>{title}</h2>
-      {children}
-    </section>
-  );
-}
 
 /** Phones, from the second visit: «put Шеф on the home screen» — once, and it can be dismissed. */
 function InstallCard({ pwa }: { pwa: Pwa }) {

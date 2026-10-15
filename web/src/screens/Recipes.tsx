@@ -9,7 +9,9 @@ import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { takeRecipesView } from "../app/router";
+import { replace, routeHash, takeRecipesView } from "../app/router";
+import { SECTIONS } from "./Home";
+import { plainWords } from "../app/colloquial";
 import { RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { ChefAvatar, Chip, Empty, Sheet, cx } from "../components/ui";
 import { mealNow } from "./Home";
@@ -86,15 +88,16 @@ function useMedia(query: string): boolean {
   return on;
 }
 
-export function Recipes() {
+/** «Поиск» (the whole catalog) and «Избранное» (saved and cooked) are one screen with two modes. */
+export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) {
   const { s, catalog, online, profile } = useStore();
   const { openRecipe, isFavorite } = useActions();
   const a = useAssistant();
   const tiles = useMedia("(min-width: 640px)");
   const desktop = useMedia("(min-width: 1280px)");
-  const [view, setView] = useState<View>("all");
+  const [view, setView] = useState<View>(mode === "favorites" ? "saved" : "all");
   const [q, setQ] = useState("");
-  const query = useDeferredValue(q.trim());
+  const query = useDeferredValue(plainWords(q.trim()));
   const [dish, setDish] = useState<string | null>(null);
   const [f, setF] = useState<Filters>(NONE);
   const [sheet, setSheet] = useState(false);
@@ -105,7 +108,7 @@ export function Recipes() {
   // The home screen's «Все» under «Сохранённое» opens this tab on the saved view.
   useLayoutEffect(() => {
     const v = takeRecipesView();
-    if (v === "saved" || v === "book") setView(v);
+    if ((v === "saved" || v === "book") && mode === "favorites") setView(v);
     else if (v?.startsWith("dish:")) setDish(v.slice(5));
     else if (v?.startsWith("filter:")) setF({ ...NONE, on: [v.slice(7)] });
     else if (v?.startsWith("time:")) setF({ ...NONE, time: Number(v.slice(5)) || null });
@@ -176,7 +179,7 @@ export function Recipes() {
 
   return (
     <div className="pb-4">
-      <h1 className="pt-2 text-h1 sm:pt-0">Рецепты</h1>
+      <h1 className="pt-2 text-h1 sm:pt-0">{mode === "favorites" ? "Избранное" : "Поиск"}</h1>
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-4">
         <form role="search" onSubmit={(e) => { e.preventDefault(); input.current?.blur(); }} className="relative">
@@ -187,7 +190,7 @@ export function Recipes() {
             className="h-12 w-full rounded-input bg-sunken pl-11 pr-12 text-body text-ink outline-none transition-colors duration-150 placeholder:text-ink-faint hover:bg-line/60 focus:bg-card focus:ring-2 focus:ring-brand/30" />
           {q && <button type="button" className="icon-btn absolute right-0.5 top-1/2 -translate-y-1/2" onClick={() => { setQ(""); input.current?.focus(); }} aria-label="Очистить поиск"><X size={20} /></button>}
         </form>
-        <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length }} />
+        {mode === "favorites" && <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length }} />}
       </div>
 
       <div className="mt-6 lg:mt-8 xl:grid xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-8">
@@ -228,17 +231,34 @@ export function Recipes() {
             </div>
           )}
 
+          {mode === "search" && !query && !dish && !active.length && (
+            <section className="mt-5" aria-label="Разделы">
+              <h2 className="label mb-2">Разделы</h2>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(112px,1fr))]">
+                {SECTIONS.map((x) => (
+                  <button key={x.view} onClick={() => {
+                    if (x.view.startsWith("dish:")) setDish(x.view.slice(5));
+                    else if (x.view.startsWith("filter:")) setF({ ...NONE, on: [x.view.slice(7)] });
+                    else if (x.view.startsWith("time:")) setF({ ...NONE, time: Number(x.view.slice(5)) });
+                  }} className="flex min-h-[88px] flex-col items-center justify-center gap-1.5 rounded-input border border-line bg-card p-2 text-center transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.97]">
+                    <span className="grid h-11 w-11 place-items-center rounded-full text-2xl leading-none dark:!bg-sunken" style={{ background: x.tint }} aria-hidden>{x.emoji}</span>
+                    <span className="text-small font-medium leading-tight">{x.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
           <p className={cx("text-small text-ink-soft", desktop ? "flex min-h-[44px] items-center" : "mt-4")} aria-live="polite">{countLine}</p>
 
           {list.length === 0 ? (
             view === "saved" && !query && !filtered ? (
               <Empty icon={<Heart size={48} strokeWidth={1.5} />} title="Здесь будут сохранённые рецепты"
-                actions={<button className="btn-outline" onClick={() => setView("all")}>Смотреть все рецепты</button>}>
+                actions={<button className="btn-outline" onClick={() => replace(routeHash({ tab: "recipes" }))}>Найти рецепт</button>}>
                 Сохраняйте понравившиеся блюда сердечком на странице рецепта.
               </Empty>
             ) : view === "book" && !query && !filtered ? (
-              <Empty icon={<BookOpen size={48} strokeWidth={1.5} />} title="«Моя книга» пока пуста"
-                actions={<button className="btn-outline" onClick={() => setView("all")}>Выбрать рецепт</button>}>
+              <Empty icon={<BookOpen size={48} strokeWidth={1.5} />} title="Здесь будет то, что вы приготовили"
+                actions={<button className="btn-outline" onClick={() => replace(routeHash({ tab: "recipes" }))}>Выбрать рецепт</button>}>
                 Всё, что вы приготовите в режиме готовки, появится здесь — с датой и вашими заметками.
               </Empty>
             ) : (
@@ -298,7 +318,7 @@ export function Recipes() {
 /** Все / Сохранённые / Моя книга: a radio group; the label width does not jump when it turns bold. */
 function ViewSwitch({ value, onChange, counts }: { value: View; onChange: (v: View) => void; counts: { saved: number; book: number } }) {
   const opts: { id: View; label: string; count?: number }[] = [
-    { id: "all", label: "Все" }, { id: "saved", label: "Сохранённые", count: counts.saved }, { id: "book", label: "Моя книга", count: counts.book },
+    { id: "saved", label: "Сохранённые", count: counts.saved }, { id: "book", label: "Я готовил(а)", count: counts.book },
   ];
   const ref = useRef<HTMLDivElement>(null);
   const key = (e: KeyboardEvent) => {
