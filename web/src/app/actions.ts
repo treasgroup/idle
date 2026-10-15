@@ -5,9 +5,9 @@ import {
   type EngineState, type Recipe,
 } from "../engine";
 import { useStore } from "./store";
-import { haptic } from "../components/ui";
 import { openLayer, close, routeHash, parseRoute } from "./router";
 import { stopTimersFor } from "./timers";
+import { cue } from "./feedback";
 
 /** Ingredient ids the person has: the conditions they named plus the home pantry and staples. */
 export function haveIds(s: EngineState): string[] {
@@ -42,7 +42,7 @@ export function useActions() {
 
   const toggleFavorite = useCallback((r: Recipe) => {
     const on = s.favorites.some((f) => f.id === r.id);
-    haptic();
+    cue(on ? "tap" : "success");
     if (!on) track({ type: "favorite", recipeId: r.id });
     update((st) => ({
       ...st,
@@ -60,7 +60,7 @@ export function useActions() {
     const items = ingredientsToBuy(r, clampServings(r, servings), has).filter((i) => !i.optional);
     if (!items.length) return toast("Всё для этого блюда уже есть дома.");
     track({ type: "cart", recipeId: r.id });
-    haptic();
+    cue("success");
     update((st) => ({ ...st, shopping: addToShopping(st.shopping, items, r.title) }));
     toast("В списке покупок: " + items.length + " " + (items.length === 1 ? "продукт" : items.length < 5 ? "продукта" : "продуктов"));
   }, [s, update, toast]);

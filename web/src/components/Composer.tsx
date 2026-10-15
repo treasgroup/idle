@@ -4,6 +4,7 @@ import { ArrowUp, Mic, Square } from "lucide-react";
 import { useVoiceInput } from "../engine";
 import { useStore } from "../app/store";
 import { cx } from "./ui";
+import { cue } from "../app/feedback";
 
 const HERO_HINTS = ["Курица и картошка", "Мне грустно — хочу уютного", "Сколько варить яйца?", "Ужин без духовки на 4 человек", "Что приготовить из фарша?"];
 
@@ -23,6 +24,14 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
   const area = useRef<HTMLTextAreaElement>(null);
   const voice = useVoiceInput((t) => onSend(t, { voice: true }), toast, ensureSession, server.voiceReady && online);
   const listening = voice.state === "recording" || voice.state === "transcribing";
+
+  // A rising blip when the microphone starts listening, a falling one when it stops — like phone assistants.
+  const was = useRef(voice.state);
+  useEffect(() => {
+    if (voice.state === "recording" && was.current !== "recording") cue("listen");
+    else if (was.current === "recording" && voice.state !== "recording") cue("stop");
+    was.current = voice.state;
+  }, [voice.state]);
 
   // Rotating examples in the big box, paused while typing or for people who prefer less motion.
   useEffect(() => {
@@ -62,7 +71,6 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
   const mic = () => {
     if (!online) return toast("Для голосового ввода нужен интернет — напишите текстом.");
     if (!voice.available) return toast("В этом браузере голосовой ввод не работает. Откройте сайт в Chrome или Safari — или напишите текстом.");
-    navigator.vibrate?.(20);
     voice.start();
   };
 

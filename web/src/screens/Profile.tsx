@@ -13,6 +13,7 @@ import { openLayer, openRecipesView, routeHash } from "../app/router";
 import { Chip, Section, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
 import { FamilyMembers } from "../components/FamilyMembers";
+import { cue } from "../app/feedback";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
 const APPLIANCES = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"];
@@ -82,6 +83,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         </div>
         <div className="border-t border-line px-4">
           <Toggle on={profile.simple} onChange={(v) => setProfile((p) => ({ ...p, simple: v }))} label="Простой режим" hint="Крупно и только главное: Главная, Шеф, Избранное" />
+          <Toggle on={profile.sounds} onChange={(v) => { setProfile((p) => ({ ...p, sounds: v })); if (v) setTimeout(() => cue("success"), 50); }} label="Звуки и вибрация" hint="Тихие сигналы при готовке и ответах Шефа. Таймер звенит всегда" />
         </div>
       </div>
 

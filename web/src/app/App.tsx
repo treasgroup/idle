@@ -25,7 +25,7 @@ import { RecipeLayer } from "../screens/RecipeLayer";
 import { CookingLayer } from "../screens/Cooking";
 import { ScreenSkeleton } from "../components/Skeleton";
 import { DocLayer, Learn, Onboarding, PollSheet } from "../screens/Extras";
-import { Boundary, ChefAvatar, Toast, cx, mmss, useScrolled } from "../components/ui";
+import { Boundary, ChefAvatar, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
 
 const NAV: { tab: Tab; label: string; icon: LucideIcon; simple?: boolean }[] = [
   { tab: "home", label: "Главная", icon: House, simple: true },
@@ -126,6 +126,7 @@ function Shell() {
   // Tapping the current tab again scrolls it back to the top, as in phone apps.
   const go = (tab: Tab) => {
     clearToast();
+    haptic();
     if (route.tab === tab && !route.recipe) return window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     replace(routeHash({ tab }));
   };
@@ -382,11 +383,12 @@ function MiniPlayer({ card }: { card?: boolean }) {
       </button>
     );
   return (
-    <button onClick={open} className="flex h-[52px] w-full items-center gap-3 bg-ink px-4 text-left text-paper">
-      <Flame size={20} className="shrink-0 text-brand-soft" aria-hidden />
-      <span className="min-w-0 flex-1 truncate text-small"><b className="font-semibold">{c.recipe.title}</b> · {where}</span>
-      {left != null && <span className="shrink-0 rounded-full bg-white/15 px-2 py-0.5 text-small font-semibold tabular-nums">{mmss(left)}</span>}
-      <span className="shrink-0 text-small font-semibold text-brand-soft">Вернуться</span>
+    // Light, so that a toast (dark) above it never merges with it into one heavy block.
+    <button onClick={open} className="flex h-[52px] w-full items-center gap-3 border-t border-brand/20 bg-brand-soft px-4 text-left text-ink">
+      <Flame size={20} className="shrink-0 text-brand" aria-hidden />
+      <span className="min-w-0 flex-1 truncate text-small"><b className="font-medium">{c.recipe.title}</b> · {where}</span>
+      {left != null && <span className="shrink-0 rounded-full bg-card px-2 py-0.5 text-small font-medium tabular-nums">{mmss(left)}</span>}
+      <span className="shrink-0 text-small font-medium text-brand-ink">Вернуться</span>
     </button>
   );
 }

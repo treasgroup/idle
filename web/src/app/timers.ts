@@ -2,6 +2,7 @@
 // («Таймер на 10 мин»). Several can run at once; they live on the device (localStorage) and survive a reload.
 import { useEffect, useState } from "react";
 import { cancelNativeTimer, isNativeApp, scheduleNativeTimer } from "../engine";
+import { audio as getAudio } from "./feedback";
 
 export interface CookTimer {
   id: string;
@@ -105,11 +106,10 @@ export function timerTitle(t: CookTimer): string {
 
 // ——— Ringing ———
 
-let audio: AudioContext | null = null;
 export function beep(): void {
   try {
-    audio ??= new AudioContext();
-    if (audio.state === "suspended") void audio.resume();
+    const audio = getAudio();
+    if (!audio) return;
     const t0 = audio.currentTime + 0.05;
     for (let n = 0; n < 3; n++)
       for (const [k, f] of [[0, 880], [1, 660], [2, 880]] as const) {

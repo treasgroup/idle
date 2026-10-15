@@ -1,8 +1,9 @@
 import { Component, useEffect, useId, useRef, useState, type ErrorInfo, type ReactNode } from "react";
 import { X, Minus, Plus, ChevronLeft, ChevronRight, ChefHat } from "lucide-react";
+import { cue } from "../app/feedback";
 
 /** A light tap of vibration for actions that change something (Android; ignored elsewhere). */
-export const haptic = (): void => { try { navigator.vibrate?.(10); } catch { /* not allowed */ } };
+export const haptic = (): void => cue("tap");
 
 export function cx(...parts: (string | false | null | undefined)[]): string {
   return parts.filter(Boolean).join(" ");
@@ -182,7 +183,7 @@ export function Toggle({ on, onChange, label, hint }: { on: boolean; onChange: (
         <span className="block text-body-sm">{label}</span>
         {hint && <span className="block text-caption text-ink-faint">{hint}</span>}
       </span>
-      <input type="checkbox" className="peer sr-only" checked={on} onChange={(e) => onChange(e.target.checked)} />
+      <input type="checkbox" className="peer sr-only" checked={on} onChange={(e) => { haptic(); onChange(e.target.checked); }} />
       <span aria-hidden className={cx("relative h-6 w-11 shrink-0 rounded-full transition-colors duration-150 peer-focus-visible:ring-2 peer-focus-visible:ring-brand", on ? "bg-brand-fill" : "bg-line-strong/60")}>
         <span className={cx("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all duration-150", on ? "left-[22px]" : "left-0.5")} />
       </span>
@@ -229,7 +230,7 @@ export function Toast({ message, onClose, raised }: { message: ToastMsg | null; 
   if (!message) return null;
   return (
     <div role="status" aria-live="polite" className={cx("pointer-events-none fixed inset-x-0 z-[60] flex justify-center px-4",
-      top ? "top-[calc(env(safe-area-inset-top)+0.75rem)]" : cx("lg:left-64", raised ? "bottom-[calc(var(--nav-h)+var(--dock,0px)+4.5rem)]" : "bottom-[calc(var(--nav-h)+var(--dock,0px)+0.75rem)]"))}>
+      top ? "top-[calc(env(safe-area-inset-top)+0.75rem)]" : cx("lg:left-64", raised ? "bottom-[calc(var(--nav-h)+var(--dock,0px)+4.5rem)]" : "bottom-[calc(var(--nav-h)+var(--dock,0px)+1rem)]"))}>
       <div className="anim-sheet pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl bg-ink py-2.5 pl-4 pr-2 text-small text-paper shadow-e2">
         <span className="py-1">{message.text}</span>
         {message.action && <button className="h-9 shrink-0 rounded-full px-3 font-semibold text-brand-soft hover:bg-white/10" onClick={() => { message.action!.run(); onClose(); }}>{message.action.label}</button>}

@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { apiUrl, ingredientOptions, searchIngredients } from "../engine";
+import { cue } from "../app/feedback";
 
 type Detector = { detect: (v: HTMLVideoElement) => Promise<{ rawValue: string }[]> };
 type DetectorClass = new (o: { formats: string[] }) => Detector;
@@ -50,9 +51,11 @@ export function BarcodeScan({ onFound, onClose }: { onFound: (r: { id: string | 
         const j = await r.json().catch(() => ({}));
         if (!r.ok) throw new Error(j.error || "Не получилось узнать продукт.");
         const name = typeof j.name === "string" ? j.name : null;
-        onFound({ id: name ? matchProduct(name) : null, name });
+        const id = name ? matchProduct(name) : null;
+        cue(id ? "success" : "error");
+        onFound({ id, name });
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Не получилось узнать продукт."); setState("error");
+        cue("error"); setError(e instanceof Error ? e.message : "Не получилось узнать продукт."); setState("error");
       }
     };
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })

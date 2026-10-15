@@ -1,7 +1,7 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, MoreHorizontal, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
+  CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
 } from "lucide-react";
 import {
   MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
@@ -39,7 +39,6 @@ export function Menu() {
   const { openRecipe } = useActions();
   const [settings, setSettings] = useState(false);
   const [share, setShare] = useState(false);
-  const [dayMenu, setDayMenu] = useState<string | null>(null);
   const [itemMenu, setItemMenu] = useState<{ date: string; index: number } | null>(null);
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
   const [noWaste, setNoWaste] = useState(false);
@@ -130,10 +129,7 @@ export function Menu() {
           <div className="mt-6 grid gap-3 xl:grid-cols-2">
             {days.map((d) => (
               <section key={d.date} className="card p-3" aria-label={dayLabel(d.date)}>
-                <div className="flex items-center justify-between gap-2 pl-1">
-                  <h2 className={cx("text-title", d.date === today && "text-brand")}>{dayLabel(d.date)}</h2>
-                  <button className="icon-btn -mr-1" onClick={() => setDayMenu(d.date)} aria-label={"Действия: " + dayLabel(d.date)}><MoreHorizontal size={20} /></button>
-                </div>
+                <h2 className={cx("flex min-h-[44px] items-center pl-1 text-title", d.date === today && "text-brand")}>{dayLabel(d.date)}</h2>
                 {d.items.length === 0 ? (
                   <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                     <button className="btn-soft" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
@@ -152,8 +148,10 @@ export function Menu() {
                           {!it.leftover && <RecipeMeta recipe={r} size="caption" showDifficulty={false} />}
                         </span>
                       </button>
-                      {!it.leftover && <button className="inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-2 text-small text-ink-soft hover:bg-sunken" onClick={() => { save(replaceMenuItem(days, d.date, n, s.preferences, servings, Date.now(), enginePlan)); withUndo("Блюдо заменено"); }}><RefreshCw size={16} aria-hidden />Заменить</button>}
-                      <button className="icon-btn -mr-1 shrink-0" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Ещё: " + r.title}><MoreHorizontal size={18} /></button>
+                      {/* One clear button per dish: replace, remove and the day's actions are inside. */}
+                      <button className="inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-2.5 text-small text-ink-soft hover:bg-sunken" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Изменить: " + r.title}>
+                        <Pencil size={16} aria-hidden />Изменить
+                      </button>
                     </div>
                   );
                 })}
@@ -202,20 +200,15 @@ export function Menu() {
         <PlanSettings plan={plan} servings={servings}
           onChange={(p, n) => { update((st) => ({ ...st, menuPlan: p })); setProfile((x) => ({ ...x, eaters: n })); }} />
       </Sheet>
-      <Sheet open={!!dayMenu} title={dayMenu ? dayLabel(dayMenu) : ""} onClose={() => setDayMenu(null)}>
-        {dayMenu && (
-          <div className="grid gap-2">
-            <button className="btn-outline justify-start" onClick={() => { save(regenerateDay(days, dayMenu, s.preferences, servings, Date.now(), enginePlan)); withUndo("День пересобран"); setDayMenu(null); }}><RefreshCw size={18} />Пересобрать день</button>
-            <button className="btn-outline justify-start" onClick={() => { setDayMenu(null); replace(routeHash({ tab: "recipes" })); }}><Plus size={18} />Добавить блюдо из рецептов</button>
-            <button className="btn-outline justify-start" onClick={() => { const d = dayMenu; setDayMenu(null); void startPoll(d); }}><Vote size={18} />Спросить семью</button>
-          </div>
-        )}
-      </Sheet>
       <Sheet open={!!itemMenu} title={itemMenu ? recipeById(days.find((d) => d.date === itemMenu.date)?.items[itemMenu.index]?.recipeId ?? "")?.title ?? "Блюдо" : ""} onClose={() => setItemMenu(null)}>
         {itemMenu && (
           <div className="grid gap-2">
-            <button className="btn-outline justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), enginePlan)); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
-            <button className="btn-outline justify-start text-brand" onClick={() => { save(removeMenuItem(days, itemMenu.date, itemMenu.index, servings)); withUndo("Блюдо убрано"); setItemMenu(null); }}><Trash2 size={18} />Убрать из плана</button>
+            <button className="btn-primary justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), enginePlan)); withUndo("Блюдо заменено"); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
+            <button className="btn-outline justify-start" onClick={() => { save(removeMenuItem(days, itemMenu.date, itemMenu.index, servings)); withUndo("Блюдо убрано"); setItemMenu(null); }}><Trash2 size={18} />Убрать из плана</button>
+            <p className="label mt-3">{dayLabel(itemMenu.date)}</p>
+            <button className="btn-outline justify-start" onClick={() => { save(regenerateDay(days, itemMenu.date, s.preferences, servings, Date.now(), enginePlan)); withUndo("День пересобран"); setItemMenu(null); }}><Sparkles size={18} />Подобрать весь день заново</button>
+            <button className="btn-outline justify-start" onClick={() => { setItemMenu(null); replace(routeHash({ tab: "recipes" })); }}><Plus size={18} />Добавить блюдо из рецептов</button>
+            <button className="btn-outline justify-start" onClick={() => { const d = itemMenu.date; setItemMenu(null); void startPoll(d); }}><Vote size={18} />Спросить семью, что приготовить</button>
           </div>
         )}
       </Sheet>
