@@ -67,7 +67,7 @@ export function Chat() {
   const fromPantry = () => {
     if (!s.fridge.length) return setPicker(true);
     const ids = s.fridge.map((f) => f.id);
-    a.show("Из того, что дома", { ...a.base(), servings: s.conditions.servings, available: ids, strictPantry: ids.length >= 4 }, "Вот что приготовить из того, что есть:");
+    a.show("Из того, что дома", { ...a.base(), servings: s.conditions.servings, available: ids, strictPantry: ids.length >= 4 }, "Из того, что есть, можно приготовить:");
   };
   const back = () => close(routeHash({ tab: "home" }));
 

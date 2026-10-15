@@ -53,7 +53,7 @@ export function Pantry() {
     const ids = s.fridge.map((f) => f.id);
     const c = { ...a.base(), available: ids, ...(focus ? { desired: focus } : { strictPantry: ids.length >= 4 }) };
     a.show(focus ? "Использовать: " + focus.map((id) => shortName(id).toLowerCase()).join(", ") : "Из того, что дома", c,
-      focus ? "Вот что приготовить, чтобы продукты не пропали:" : "Вот что можно приготовить из того, что есть:", { fresh: true });
+      focus ? "Чтобы ничего не пропало, приготовьте:" : "Из того, что есть, можно приготовить:", { fresh: true });
     goChat();
   };
   const remove = (id: string) => {

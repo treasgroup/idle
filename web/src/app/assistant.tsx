@@ -193,7 +193,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     const more = list.length ? [] : relaxOptions(c, stateRef.current.preferences);
     push([
       { role: "user", text: o.label },
-      { role: "assistant", text: list.length ? "Готово, вот что подходит теперь:" : "И так пока ничего не находится." + (more.length ? " Можно ослабить ещё одно условие:" : ""),
+      { role: "assistant", text: list.length ? "Готово, так подходит:" : "Всё ещё ничего не нашёл." + (more.length ? " Можно убрать ещё одно условие:" : ""),
         results: toStoredResults(list), ...(more.length ? { options: more } : {}) },
     ], c);
   }, [ask, push, found]);
@@ -204,7 +204,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     const more = list.length ? [] : relaxOptions(c, stateRef.current.preferences);
     push([
       { role: "user", text: label },
-      { role: "assistant", text: list.length ? "Учёл. Вот что подходит теперь:" : "Так ничего не находится." + (more.length ? " Можно ослабить ещё одно условие:" : ""),
+      { role: "assistant", text: list.length ? "Учёл — вот что подходит:" : "Так ничего не находится." + (more.length ? " Можно убрать ещё одно условие:" : ""),
         results: toStoredResults(list), ...(more.length ? { options: more } : {}) },
     ], c);
   }, [push, found]);
@@ -216,7 +216,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     track({ type: "query", text: "[кнопка] " + label, count: list.length, source: "option" });
     push([
       { role: "user", text: label },
-      { role: "assistant", text: list.length ? intro : "По этим условиям пока ничего нет. Напишите по-другому — например, назовите продукты.", results: toStoredResults(list),
+      { role: "assistant", text: list.length ? intro : "Под это пока ничего нет. Попробуйте по-другому — например, назовите продукты.", results: toStoredResults(list),
         ...(list.length ? {} : { options: relaxOptions(c, stateRef.current.preferences) }) },
     ], c, !!opts.fresh);
   }, [push, found, newChat]);

@@ -44,16 +44,16 @@ export function Home() {
   };
   const fromPantry = () => {
     const ids = s.fridge.map((f) => f.id);
-    show("Из того, что дома", { available: ids, strictPantry: ids.length >= 4 }, "Вот что приготовить из того, что есть:");
+    show("Из того, что дома", { available: ids, strictPantry: ids.length >= 4 }, "Из того, что есть, можно приготовить:");
   };
   const suggestions = useSuggestions((t) => send(t), fromPantry);
 
   const CHIPS: { goal?: Goal; label: string; run: () => void }[] = [
-    { goal: "quick", label: "До 20 минут", run: () => show("До 20 минут", { maxMinutes: 20 }, "Вот что успеете за 20 минут:") },
+    { goal: "quick", label: "До 20 минут", run: () => show("До 20 минут", { maxMinutes: 20 }, "Успеете за 20 минут:") },
     { label: "Удиви меня", run: () => send("удиви меня", { source: "option", shown: "Удиви меня" }) },
-    { goal: "light", label: "Полегче", run: () => show("Полегче", { maxKcal: 450 }, "Лёгкие блюда — до 450 ккал на порцию:") },
-    { goal: "protein", label: "Больше белка", run: () => show("Больше белка", { minProtein: 25 }, "Блюда, где от 25 г белка на порцию:") },
-    { goal: "family", label: "Детям", run: () => show("Детям", { occasion: "kids" } as Partial<Conditions>, "Вот что обычно нравится детям:") },
+    { goal: "light", label: "Полегче", run: () => show("Полегче", { maxKcal: 450 }, "Лёгкое — до 450 ккал на порцию:") },
+    { goal: "protein", label: "Больше белка", run: () => show("Больше белка", { minProtein: 25 }, "Белка от 25 г на порцию:") },
+    { goal: "family", label: "Детям", run: () => show("Детям", { occasion: "kids" } as Partial<Conditions>, "Детям обычно нравится вот это:") },
     { label: "Гости", run: () => send("придут гости", { source: "option", shown: "Гости" }) },
   ];
   const chips = [...CHIPS.filter((c) => c.goal && profile.goals.includes(c.goal)), ...CHIPS.filter((c) => !c.goal || !profile.goals.includes(c.goal))];

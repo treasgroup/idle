@@ -165,7 +165,7 @@ export function PantryPicker({ open, onClose }: { open: boolean; onClose: () => 
   const go = () => {
     if (remember) update((st) => ({ ...st, fridge: addToFridge(st.fridge, picked.filter((id) => !st.fridge.some((f) => f.id === id))) }));
     const c = { ...freshConditions({ servings: s.conditions.servings, appliances: DEFAULT_CONDITIONS.appliances, vegetarian: s.preferences.vegetarian }), available: picked, strictPantry: picked.length >= 4 };
-    a.show("Есть: " + picked.slice(0, 5).map((id) => shortName(id).toLowerCase()).join(", ") + (picked.length > 5 ? "…" : ""), c, "Вот что можно приготовить из этого:");
+    a.show("Есть: " + picked.slice(0, 5).map((id) => shortName(id).toLowerCase()).join(", ") + (picked.length > 5 ? "…" : ""), c, "Из этого можно приготовить:");
     onClose();
   };
   return (
