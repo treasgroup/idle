@@ -50,7 +50,7 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
       </button>
       <div className="p-4">
         <button className="block text-left" onClick={onOpen}>
-          <h3 className="line-clamp-2 font-serif text-[1.125rem] font-semibold leading-snug">{recipe.title}</h3>
+          <h3 className="line-clamp-2 text-[1.125rem] font-semibold leading-snug">{recipe.title}</h3>
         </button>
         <div className="mt-1.5"><RecipeMeta recipe={recipe} /></div>
         {note

@@ -176,18 +176,18 @@ function seo_footer(): string {
     return "</main>\n<footer class=\"wrap foot\"><p><a href=\"$p\">«" . h(SEO_SITE) . "»</a> — подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, без регистрации.</p>"
         . "<p><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a> · <a href=\"{$p}#info\">Откуда сведения</a> · <a href=\"{$p}#privacy\">Конфиденциальность</a></p></footer>\n</body>\n</html>\n";
 }
-/** The site's own fonts (Golos Text for text, Lora for headings), served from /fonts next to the app. */
+/** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
     $f = seo_path() . 'fonts/';
     return "@font-face{font-family:'Golos Text';font-style:normal;font-weight:400 900;font-display:swap;src:url({$f}GolosText-cyrillic.woff2) format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}"
         . "@font-face{font-family:'Golos Text';font-style:normal;font-weight:400 900;font-display:swap;src:url({$f}GolosText-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}"
-        . "@font-face{font-family:Lora;font-style:normal;font-weight:400 700;font-display:swap;src:url({$f}Lora-Variable.ttf) format('truetype')}";
+        ;
 }
 function seo_css(): string {
     return ':root{--bg:#faf7f0;--card:#fff;--ink:#211d1a;--muted:#5c544d;--line:#e8e1d5;--accent:#b7432f;--accent-ink:#fff;--soft:#f8e7e0;color-scheme:only light}'
         . seo_fonts()
         . '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}'
-        . 'h1,h2,.brand{font-family:Lora,Georgia,serif;letter-spacing:-.01em}'
+        . 'h1,h2,.brand{letter-spacing:-.015em;font-weight:600}'
         . 'a{color:var(--accent)}img{max-width:100%;display:block}.wrap{max-width:860px;margin:0 auto;padding:0 16px}'
         . '.top{background:var(--card);border-bottom:1px solid var(--line)}.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap}'
         . '.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);text-decoration:none}.top nav{display:flex;gap:14px;align-items:center;font-size:15px;white-space:nowrap}'

@@ -284,7 +284,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <h1 className="sr-only">{r.title}</h1>
           <p className="sr-only" aria-live="polite">Шаг {dish.step + 1} из {total}. {cur.text}</p>
           <div key={dish.key + dish.step} className="anim-rise">
-            <p className="mt-5 font-serif text-step font-medium md:text-step-lg lg:mt-8">{cur.text}</p>
+            <p className="mt-5 text-step md:text-step-lg lg:mt-8">{cur.text}</p>
             {uses.length > 0 && (
               <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
                 {uses.map((i) => (

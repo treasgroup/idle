@@ -77,10 +77,16 @@ export function Layer({ title, onClose, children, actions, width = "max-w-3xl", 
       className="anim-fade fixed inset-0 z-40 flex flex-col bg-paper outline-none lg:left-64">
       <div className={cx("pt-safe absolute inset-x-0 top-0 z-20 transition-colors duration-150", solid ? "border-b border-line bg-paper" : "bg-transparent")}>
         <div className={cx("mx-auto flex h-14 items-center gap-1 px-2", width)}>
-          <button className={cx("icon-btn", !solid && "bg-card/90 text-ink shadow-e1 backdrop-blur hover:bg-card")} onClick={onClose} aria-label={closeIcon === "close" ? "Закрыть" : "Назад"}>
-            {closeIcon === "close" ? <X size={22} /> : <ChevronLeft size={24} />}
+          {/* A labelled control: «Назад» or «Закрыть», easy to find for anyone. */}
+          <button onClick={onClose}
+            className={cx("inline-flex h-11 shrink-0 items-center gap-0.5 rounded-full pl-2 pr-4 text-body font-medium text-ink transition-colors duration-150 hover:bg-sunken",
+              !solid && "bg-card/90 shadow-e1 backdrop-blur hover:bg-card")}>
+            {closeIcon === "close" ? <X size={22} aria-hidden /> : <ChevronLeft size={24} aria-hidden />}
+            <span className={cx(closeIcon === "close" && title ? "sr-only" : "")}>{closeIcon === "close" ? "Закрыть" : "Назад"}</span>
           </button>
-          <div className={cx("min-w-0 flex-1 truncate px-1 font-serif text-title transition-opacity duration-150", solid ? "opacity-100" : "opacity-0")}>{title}</div>
+          {/* Phones: «Назад» is enough when the page's own H1 is right below; the title appears once it scrolls away. */}
+          <div className={cx("min-w-0 flex-1 truncate px-1 text-title transition-opacity duration-150", solid ? "opacity-100" : "opacity-0",
+            closeIcon === "back" && transparentUntil === undefined && "invisible sm:visible")}>{title}</div>
           {actions && <div className={cx("flex items-center gap-1", !solid && "[&>.icon-btn]:bg-card/90 [&>.icon-btn]:text-ink [&>.icon-btn]:shadow-e1 [&>.icon-btn]:backdrop-blur")}>{actions}</div>}
         </div>
       </div>

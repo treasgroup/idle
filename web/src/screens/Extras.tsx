@@ -63,7 +63,7 @@ export function DocLayer({ doc, onClose }: { doc: string; onClose: () => void })
   useEffect(() => { legalInfo().then(setInfo); }, []);
   const key = (["privacy", "rules", "terms", "info"].includes(doc) ? doc : "privacy") as LegalKey;
   const d = info ? legalDoc(key, info) : null;
-  const fix = (s: string) => s.replace(/\bг\.\./g, "г.");
+  const fix = (s: string) => s.replace(/(?<![а-яё])г\.\./g, "г.");
   return (
     <Layer title={d?.title ?? "Документ"} onClose={onClose}>
       <article className="mx-auto max-w-2xl px-4 pb-16 pt-2 text-body leading-relaxed sm:px-6">
@@ -168,6 +168,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <Stepper value={eaters} min={1} max={12} onChange={setEaters} label="Едоков" />
       </div>
       <div className="mt-2 rounded-card border border-line bg-card px-4"><Toggle on={kids} onChange={setKids} label="Есть дети" hint="Чаще покажу то, что нравится детям" /></div>
+      <div className="mt-2 rounded-card border border-line bg-card px-4"><Toggle on={s.largeText} onChange={(v) => update((st) => ({ ...st, largeText: v }))} label="Крупный текст" hint="Удобнее читать с телефона" /></div>
     </div>,
     <div key="level">
       <h1 className="text-h1">Как часто готовите?</h1>

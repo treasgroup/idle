@@ -115,7 +115,7 @@ function Summary({ sum }: { sum: ReviewList["summary"] }) {
   return (
     <div className="card flex items-center gap-5 p-4 sm:gap-8 sm:px-6">
       <div className="shrink-0 text-center">
-        <div className="font-serif text-display tabular-nums">{ratingText(sum.avg)}</div>
+        <div className="text-display tabular-nums">{ratingText(sum.avg)}</div>
         <Stars value={sum.avg} size={14} />
         <div className="mt-1 text-caption text-ink-soft">{reviewsWord(sum.count)}</div>
       </div>

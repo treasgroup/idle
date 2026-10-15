@@ -215,7 +215,7 @@ function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
         {home ? (
           <span className="flex flex-1 items-center gap-2.5">
             <ChefAvatar size={32} />
-            <span className="font-serif text-[1.125rem] font-semibold">Шеф</span>
+            <span className="text-[1.125rem] font-semibold">Шеф</span>
           </span>
         ) : (
           <>
@@ -282,7 +282,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-4 pt-5 lg:flex" aria-label="Меню сайта">
       <button className="flex items-center gap-2.5 rounded-input px-2 py-1 text-left" onClick={() => go("home")}>
         <ChefAvatar size={32} />
-        <span className="font-serif text-[1.125rem] font-semibold leading-tight">Что приготовить?</span>
+        <span className="text-[1.125rem] font-semibold leading-tight">Что приготовить?</span>
       </button>
       <button className="btn-primary mt-5 w-full" onClick={() => openChat("new")}><SquarePen size={18} />Новый разговор</button>
       <nav className="mt-4 grid gap-0.5" aria-label="Разделы">

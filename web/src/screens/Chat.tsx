@@ -75,11 +75,11 @@ export function Chat() {
     <div className="flex min-h-[100dvh] flex-col">
       <header className={cx("pt-safe sticky top-0 z-30 border-b bg-paper/95 backdrop-blur transition-colors", scrolled ? "border-line" : "border-transparent")}>
         <div className="mx-auto flex h-14 max-w-chat items-center gap-1 px-2 sm:px-4">
-          <button className="icon-btn lg:hidden" onClick={back} aria-label="Назад"><ArrowLeft size={22} /></button>
+          <button className="icon-btn" onClick={back} aria-label="Назад"><ArrowLeft size={22} /></button>
           <span className="flex flex-1 items-center gap-2.5 pl-1">
             <ChefAvatar size={32} />
             <span className="leading-tight">
-              <span className="block font-serif text-[1.125rem] font-semibold">Шеф</span>
+              <span className="block text-[1.125rem] font-semibold">Шеф</span>
               <span className="block text-caption text-ink-soft">{a.busy ? "подбирает…" : "кулинарный помощник"}</span>
             </span>
           </span>
