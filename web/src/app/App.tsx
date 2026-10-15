@@ -24,6 +24,7 @@ import { CookingLayer } from "../screens/Cooking";
 import { ScreenSkeleton } from "../components/Skeleton";
 import { DocLayer, Learn, Onboarding, PollSheet } from "../screens/Extras";
 import { Boundary, ChefAvatar, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
+import { useUpdateCheck } from "./updates";
 
 const NAV: { tab: Tab; label: string; icon: LucideIcon; simple?: boolean }[] = [
   { tab: "home", label: "Главная", icon: House, simple: true },
@@ -94,6 +95,7 @@ function Shell() {
   const bottom = useRef<HTMLDivElement>(null);
   useIncomingLinks(setPoll);
   useTimerAlarm(toast, s.readAloud);
+  useUpdateCheck(toast);
   useEffect(() => {
     if (!ready) return;
     if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=")) setOnboarding(true);

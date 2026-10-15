@@ -2,7 +2,7 @@
 // Owner's admin panel: login, anonymous statistics, catalog files, hidden recipes, photos.
 // Compatible with PHP 7.4+. All admin routes need the admin cookie; changes also need a same-origin request.
 
-const EVENT_TYPES = ['visit', 'query', 'open', 'cart', 'favorite', 'cook_start', 'cook_done'];
+const EVENT_TYPES = ['visit', 'query', 'open', 'cart', 'favorite', 'cook_start', 'cook_done', 'wrong', 'share'];
 const EVENT_SOURCES = ['chat', 'voice', 'search', 'filters', 'option', 'mobile', 'desktop', 'pwa', 'app', ''];
 const ENTRY_KINDS = ['home', 'recipe-link', 'recipe-page', 'poll', 'family', 'login', 'tab', 'app'];
 const CATALOG_NAME = '/^[0-9A-Za-z][0-9A-Za-z._-]{0,60}\.json$/';

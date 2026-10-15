@@ -10,8 +10,9 @@ require __DIR__ . '/_private/push.php';
 require __DIR__ . '/_private/polls.php';
 require __DIR__ . '/_private/partners.php';
 require __DIR__ . '/_private/barcode.php';
+require __DIR__ . '/_private/ops.php';
 
-const VERSION = '0.33.4';
+const VERSION = '0.34.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
 try { config(); } catch (Throwable $e) {}
 $route = isset($_GET['r']) ? (string)$_GET['r'] : '';
@@ -20,7 +21,8 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 try {
     if ($route === 'status' && $method === 'GET') {
         // Reminders without cron: after answering, a few due ones are sent (at most once a minute).
-        register_shutdown_function(function () { if (function_exists('fastcgi_finish_request')) fastcgi_finish_request(); push_opportunistic(); });
+        // And once a day, a copy of the database (after the answer has gone, so nobody waits for it).
+        register_shutdown_function(function () { if (function_exists('fastcgi_finish_request')) fastcgi_finish_request(); push_opportunistic(); try { backup_daily(); } catch (Throwable $e) {} });
         $dbOk = true;
         try { db(); } catch (Throwable $e) { $dbOk = false; }
         send_json(['aiReady' => $dbOk && intent_ready(), 'voiceReady' => $dbOk && speech_ready(), 'version' => VERSION]);
@@ -122,6 +124,8 @@ try {
     elseif ($route === 'poll.get' && $method === 'POST') poll_get(read_json_body(1000));
     elseif ($route === 'poll.vote' && $method === 'POST') poll_vote(read_json_body(1000));
     // ---------- Delivery partners for the shopping list ----------
+    elseif ($route === 'error' && $method === 'POST') client_error(read_json_body(6000));
+    elseif ($route === 'admin.insights' && $method === 'GET') { require_admin(); admin_insights((int)($_GET['days'] ?? 30)); }
     elseif ($route === 'barcode' && $method === 'POST') { require_same_origin(); barcode_lookup((string)(read_json_body(500)['code'] ?? '')); }
     elseif ($route === 'partners' && $method === 'GET') partners_route();
     elseif ($route === 'go' && $method === 'GET') partner_go((string)($_GET['to'] ?? ''));

@@ -1,0 +1,100 @@
+<?php
+// Looking after the site without cron: a daily copy of the database, errors from people's phones,
+// and the numbers the owner needs (how many cook to the end, how many come back). No paid services.
+declare(strict_types=1);
+
+const BACKUPS_KEEP = 7;
+
+function db_backups_dir(): string { return rtrim(config()['storage_dir'], '/\\') . '/backups'; }
+
+/** Once a day, after some request has been answered: a consistent copy of the database; the last 7 are kept. */
+function backup_daily(): void {
+    $today = date('Y-m-d');
+    if (setting('backup_day') === $today) return;
+    $dir = db_backups_dir();
+    if (!is_dir($dir) && !@mkdir($dir, 0700, true)) return;
+    $lock = @fopen($dir . '/.lock', 'c');
+    if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) return;
+    try {
+        if (setting('backup_day') === $today) return;
+        $file = $dir . '/what-to-cook-' . $today . '.sqlite';
+        if (!is_file($file)) {
+            try { db()->exec('VACUUM INTO ' . db()->quote($file)); }
+            catch (Throwable $e) {
+                // Older SQLite without VACUUM INTO: a plain copy (the database is small and writes are short).
+                @copy(rtrim(config()['storage_dir'], '/\\') . '/what-to-cook.sqlite', $file);
+            }
+            @chmod($file, 0600);
+        }
+        if (is_file($file)) set_setting('backup_day', $today);
+        $all = glob($dir . '/what-to-cook-*.sqlite') ?: [];
+        rsort($all);
+        foreach (array_slice($all, BACKUPS_KEEP) as $old) @unlink($old);
+    } finally { flock($lock, LOCK_UN); fclose($lock); }
+}
+
+function backups_list(): array {
+    $out = [];
+    foreach (glob(db_backups_dir() . '/what-to-cook-*.sqlite') ?: [] as $p) $out[] = ['name' => basename($p), 'size' => filesize($p), 'mtime' => filemtime($p) * 1000];
+    usort($out, fn($a, $b) => $b['mtime'] <=> $a['mtime']);
+    return $out;
+}
+
+// ---------- Errors from people's browsers ----------
+function errors_schema(): void {
+    db()->exec('CREATE TABLE IF NOT EXISTS client_errors (key TEXT PRIMARY KEY, day TEXT NOT NULL, message TEXT NOT NULL, place TEXT, version TEXT, agent TEXT, n INTEGER NOT NULL, last INTEGER NOT NULL)');
+}
+
+/** One row per error per day (repeats only add to the count), so a loop on one phone cannot fill the base. */
+function client_error(array $b): void {
+    require_same_origin();
+    $msg = trim((string)($b['message'] ?? ''));
+    if ($msg === '' || strlen($msg) > 2000) throw new ApiError(400, 'validation', 'Нет текста ошибки.');
+    if (!bump('err|' . client_ip() . '|' . date('Y-m-d-H'), 30) || !bump('err|all|' . date('Y-m-d'), 3000)) { send_json(['saved' => false]); return; }
+    errors_schema();
+    $cut = fn($v, $n) => mb_substr(trim((string)$v), 0, $n);
+    $place = $cut($b['place'] ?? '', 300);
+    $day = date('Y-m-d');
+    $key = substr(hash('sha256', $day . '|' . $msg . '|' . $place), 0, 32);
+    // Works on old SQLite too (no UPSERT): add the row if new, then count it.
+    db()->prepare('INSERT OR IGNORE INTO client_errors (key, day, message, place, version, agent, n, last) VALUES (?, ?, ?, ?, ?, ?, 0, ?)')
+        ->execute([$key, $day, $cut($msg, 500), $place, $cut($b['version'] ?? '', 20), $cut($_SERVER['HTTP_USER_AGENT'] ?? '', 200), now_ms()]);
+    db()->prepare('UPDATE client_errors SET n = n + 1, last = ? WHERE key = ?')->execute([now_ms(), $key]);
+    if (mt_rand(1, 50) === 1) db()->prepare('DELETE FROM client_errors WHERE day < ?')->execute([date('Y-m-d', time() - 30 * 86400)]);
+    send_json(['saved' => true]);
+}
+
+// ---------- The owner's view: funnel, return, errors, «Не то», copies ----------
+function admin_insights(int $days): void {
+    $days = max(1, min(90, $days));
+    $from = date('Y-m-d', time() - ($days - 1) * 86400);
+    $pdo = db();
+    $one = function (string $sql, array $args = []) use ($pdo) { $st = $pdo->prepare($sql); $st->execute($args); return $st->fetchColumn(); };
+    $all = function (string $sql, array $args = []) use ($pdo) { $st = $pdo->prepare($sql); $st->execute($args); return $st->fetchAll(); };
+    $people = fn(string $types) => (int)$one("SELECT COUNT(DISTINCT visitor) FROM events WHERE day >= ? AND type IN ($types)", [$from]);
+    $funnel = [
+        ['label' => 'Зашли на сайт', 'n' => $people("'visit','query','open'")],
+        ['label' => 'Открыли рецепт', 'n' => $people("'open'")],
+        ['label' => 'Начали готовить', 'n' => $people("'cook_start'")],
+        ['label' => 'Дошли до «Готово!»', 'n' => $people("'cook_done'")],
+    ];
+    // Came back: people whose first day was at least N days ago, and how many of them were seen N days later or more.
+    $returned = function (int $n) use ($one, $from) {
+        $cut = date('Y-m-d', time() - $n * 86400);
+        $base = (int)$one('SELECT COUNT(*) FROM (SELECT visitor, MIN(day) AS first FROM events GROUP BY visitor) f WHERE f.first >= ? AND f.first <= ?', [$from, $cut]);
+        $back = (int)$one("SELECT COUNT(*) FROM (SELECT visitor, MIN(day) AS first FROM events GROUP BY visitor) f
+            WHERE f.first >= ? AND f.first <= ? AND EXISTS (SELECT 1 FROM events e WHERE e.visitor = f.visitor AND e.day >= date(f.first, '+$n day'))", [$from, $cut]);
+        return ['base' => $base, 'back' => $back];
+    };
+    errors_schema();
+    send_json([
+        'days' => $days,
+        'funnel' => $funnel,
+        'return1' => $returned(1),
+        'return7' => $returned(7),
+        'wrong' => $all("SELECT norm AS text, COUNT(*) AS n, MAX(ts) AS last FROM events WHERE type = 'wrong' AND day >= ? GROUP BY norm ORDER BY n DESC, last DESC LIMIT 50", [$from]),
+        'shares' => (int)$one("SELECT COUNT(*) FROM events WHERE type = 'share' AND day >= ?", [$from]),
+        'errors' => $all('SELECT day, message, place, version, agent, n, last FROM client_errors WHERE day >= ? ORDER BY last DESC LIMIT 60', [$from]),
+        'backups' => backups_list(),
+    ]);
+}

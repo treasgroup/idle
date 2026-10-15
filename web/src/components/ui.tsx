@@ -1,6 +1,7 @@
 import { Component, useEffect, useId, useRef, useState, type ErrorInfo, type ReactNode } from "react";
 import { X, Minus, Plus, ChevronLeft, ChevronRight, ChefHat } from "lucide-react";
 import { cue } from "../app/feedback";
+import { reportError } from "../app/errors";
 
 /** A light tap of vibration for actions that change something (Android; ignored elsewhere). */
 export const haptic = (): void => cue("tap");
@@ -261,7 +262,10 @@ export const mmss = (sec: number): string => {
 export class Boundary extends Component<{ children: ReactNode; resetKey?: string }, { error: Error | null }> {
   state = { error: null as Error | null };
   static getDerivedStateFromError(error: Error) { return { error }; }
-  componentDidCatch(error: Error, info: ErrorInfo) { console.error(error, info.componentStack); }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error(error, info.componentStack);
+    reportError(error, "screen: " + (info.componentStack ?? "").trim().split("\n")[0]?.trim().slice(0, 120));
+  }
   componentDidUpdate(prev: { resetKey?: string }) { if (prev.resetKey !== this.props.resetKey && this.state.error) this.setState({ error: null }); }
   render() {
     if (!this.state.error) return this.props.children;
