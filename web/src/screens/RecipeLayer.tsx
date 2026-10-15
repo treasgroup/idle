@@ -4,8 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
-  Timer, BellRing, Lightbulb, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send,
-} from "lucide-react";
+  Timer, BellRing, Lightbulb, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Link2, Send, Printer } from "lucide-react";
 import {
   LABELS, canShare, clampServings, copyText, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, shareLink, similarRecipes, suggestSides, needsSide, withSide, yieldText, SHARE_TARGETS,
@@ -13,7 +12,8 @@ import {
 } from "../engine";
 import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
-import { homeQuantity, mergeSame } from "../app/amounts";
+import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
+import { printPage } from "../app/print";
 import { goChat } from "../app/chatNav";
 import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
@@ -344,6 +344,15 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                         <div className="min-w-0 flex-1 pt-0.5">
                           {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
                           <p className="text-body">{part.text}</p>
+                          {(st.uses?.length ?? 0) > 0 && (
+                            <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Продукты для шага">
+                              {[...new Set(st.uses)].map((id) => {
+                                const row = (part.side ? [...groups].reverse() : groups).flatMap((g) => g.rows).find((x) => x.id === id);
+                                if (!row) return null;
+                                return <li key={id} className="rounded-full bg-sunken px-2.5 py-1 text-small text-ink-soft">{displayName(row.id, row.name)} <b className="whitespace-nowrap font-semibold text-ink">{homeAmount(row)}</b></li>;
+                              })}
+                            </ul>
+                          )}
                           {!!st.timerSeconds && <TimerChip recipe={base} step={n} text={st.text} seconds={st.timerSeconds} />}
                         </div>
                       </li>
@@ -396,7 +405,13 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
       {menuOpen && <AddToMenuSheet recipeId={base.id} servings={servings} onClose={() => setMenuOpen(false)} />}
       <Sheet open={shareOpen} title="Поделиться рецептом" onClose={() => setShareOpen(false)}>
         <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)}
-          onDone={(copied) => { setShareOpen(false); toast(copied ? "Ссылка скопирована" : "Ссылка готова"); }} />
+          onDone={(copied) => { setShareOpen(false); if (copied !== undefined) toast(copied ? "Ссылка скопирована" : "Ссылка готова"); }}
+          onPrint={() => printPage(base.title + " — на " + servings + " " + plural(servings, "порцию", "порции", "порций"), [
+            ...(base.summary ? [{ text: base.summary + " Время: " + formatMinutes(base.totalMinutes) + "." }] : []),
+            ...groups.map((g) => ({ title: g.title ?? "Продукты", items: g.rows.map((r) => displayName(r.id, r.name) + " — " + homeAmount(r) + (r.optional ? " (по желанию)" : "")) })),
+            { title: "Шаги", ordered: true, items: recipe.steps.map((st) => st.text) },
+            ...(base.tips.length ? [{ title: "Советы", items: base.tips }] : []),
+          ], recipePageUrl(base.id))} />
       </Sheet>
       <AskSheet open={askOpen} onClose={() => setAskOpen(false)} recipe={askRecipe} servings={servings} prefs={s.preferences} request={askReq}
         onServings={(n) => { setServings(clampServings(base, n)); window.setTimeout(() => go("recipe-products"), 80); }} />
@@ -502,7 +517,10 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
           {swaps.length > 0 && <span className="block text-caption text-ink-faint">можно заменить: {swaps.join(", ").toLowerCase()}</span>}
           {own && <span className="sr-only"> — есть дома</span>}
         </span>
-        <span className={cx("shrink-0 whitespace-nowrap pl-2 text-body-sm tabular-nums", q.toTaste ? "text-ink-faint" : "text-ink-soft")}>{q.text}</span>
+        <span className="shrink-0 pl-2 text-right">
+          <span className={cx("block whitespace-nowrap text-body-sm tabular-nums", q.toTaste ? "text-ink-faint" : "text-ink-soft")}>{q.text}</span>
+          {q.hint && <span className="block whitespace-nowrap text-caption text-ink-faint">≈ {q.hint}</span>}
+        </span>
       </button>
     </li>
   );
@@ -595,7 +613,7 @@ function Note({ id }: { id: string }) {
 }
 
 /** Ways to send a link or a text: the phone's share sheet, messengers, copy. Also used by Меню and Покупки. */
-export function ShareOptions({ text, title, url, onDone }: { text: string; title: string; url?: string; onDone: (copied?: boolean) => void }) {
+export function ShareOptions({ text, title, url, onDone, onPrint }: { text: string; title: string; url?: string; onDone: (copied?: boolean) => void; onPrint?: () => void }) {
   return (
     <div className="grid gap-2">
       {canShare() && (
@@ -613,7 +631,10 @@ export function ShareOptions({ text, title, url, onDone }: { text: string; title
           }}>{t.label}</button>
         ))}
       </div>
-      <button className="btn-ghost" onClick={async () => { await copyText(url ?? text); onDone(true); }}><Link2 size={18} />{url ? "Скопировать ссылку" : "Скопировать текст"}</button>
+      <div className="flex flex-wrap justify-center">
+        <button className="btn-ghost" onClick={async () => { await copyText(url ?? text); onDone(true); }}><Link2 size={18} />{url ? "Скопировать ссылку" : "Скопировать текст"}</button>
+        {onPrint !== undefined && <button className="btn-ghost" onClick={() => { onPrint(); onDone(); }}><Printer size={18} />Распечатать</button>}
+      </div>
     </div>
   );
 }

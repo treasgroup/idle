@@ -92,6 +92,7 @@ export function Home() {
           <Now />
           <Rescue />
         </div>
+        <Sections />
         <Ideas />
         <div className="lg:hidden">
           <CourseCard />
@@ -226,6 +227,35 @@ function Ideas() {
     <Section title="Идеи на сегодня" action="Показать другие" onAction={other}>
       <div className="grid gap-2 lg:hidden">{shown.slice(0, 4).map((m) => <RecipeRow key={m.recipe.id} recipe={m.recipe} note={resultNote(m) || m.recipe.summary} onOpen={() => openRecipe(m.recipe)} />)}</div>
       <div className="hidden gap-4 lg:grid lg:grid-cols-3">{shown.map((m) => <RecipeTile key={m.recipe.id} recipe={m.recipe} note={resultNote(m) || undefined} onOpen={() => openRecipe(m.recipe)} />)}</div>
+    </Section>
+  );
+}
+
+// Browsing without a question: the catalog by kind of dish, as on any big recipe site.
+const SECTIONS: { view: string; label: string; emoji: string; tint: string }[] = [
+  { view: "dish:soup", label: "Супы", emoji: "🍲", tint: "#F8E4C8" },
+  { view: "dish:main", label: "Вторые блюда", emoji: "🍗", tint: "#F6DDD2" },
+  { view: "dish:salad", label: "Салаты", emoji: "🥗", tint: "#E3EFD5" },
+  { view: "dish:breakfast", label: "Завтраки", emoji: "🍳", tint: "#FAEDC2" },
+  { view: "dish:baking", label: "Выпечка", emoji: "🥧", tint: "#F5E6CC" },
+  { view: "dish:sweet", label: "Сладкое", emoji: "🍰", tint: "#F8E0E5" },
+  { view: "time:30", label: "До 30 минут", emoji: "⏱️", tint: "#E6E9F4" },
+  { view: "filter:kids", label: "Детям", emoji: "🧸", tint: "#F3E6F2" },
+  { view: "filter:veg", label: "Без мяса", emoji: "🥦", tint: "#DFEFE3" },
+];
+
+function Sections() {
+  return (
+    <Section title="Рецепты по разделам" action="Все рецепты" onAction={() => replace(routeHash({ tab: "recipes" }))}>
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(112px,1fr))]">
+        {SECTIONS.map((x) => (
+          <button key={x.view} onClick={() => openRecipesView(x.view)}
+            className="flex min-h-[92px] flex-col items-center justify-center gap-1.5 rounded-input border border-line bg-card p-2 text-center transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.97]">
+            <span className="grid h-11 w-11 place-items-center rounded-full text-2xl leading-none dark:!bg-sunken" style={{ background: x.tint }} aria-hidden>{x.emoji}</span>
+            <span className="text-small font-semibold leading-tight">{x.label}</span>
+          </button>
+        ))}
+      </div>
     </Section>
   );
 }

@@ -9,6 +9,7 @@ import { useStore } from "../app/store";
 import { replace, routeHash } from "../app/router";
 import { Empty, Sheet, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
+import { printText } from "../app/print";
 
 interface Partner { id: string; label: string; note?: string }
 
@@ -164,7 +165,7 @@ export function Shopping() {
 
       <AddItem open={adding} onClose={() => setAdding(false)} onAdd={(item) => set((l) => [...l, item])} />
       <Sheet open={share} title="Отправить список" onClose={() => setShare(false)}>
-        <ShareOptions title="Список покупок" text={shoppingText(s.shopping)} onDone={() => setShare(false)} />
+        <ShareOptions title="Список покупок" text={shoppingText(s.shopping)} onDone={() => setShare(false)} onPrint={() => printText("Список покупок", shoppingText(s.shopping))} />
       </Sheet>
       <Sheet open={clear} title="Очистить список?" onClose={() => setClear(false)}>
         <div className="grid gap-2">

@@ -16,6 +16,7 @@ import type { Profile } from "../app/profile";
 import { RecipeImage, RecipeMeta } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
+import { printText } from "../app/print";
 
 /** The person's goals narrow the dishes a menu is made of (passed to the engine only, never stored). */
 function goalFilter(p: Profile): ((r: Recipe) => boolean) | undefined {
@@ -224,7 +225,7 @@ export function Menu() {
         )}
       </Sheet>
       <Sheet open={share} title="Поделиться меню" onClose={() => setShare(false)}>
-        <ShareOptions title="Меню на неделю" text={menuText(days)} onDone={() => setShare(false)} />
+        <ShareOptions title="Меню на неделю" text={menuText(days)} onDone={() => setShare(false)} onPrint={() => printText("Меню на неделю", menuText(days))} />
       </Sheet>
       <Sheet open={!!poll} title="Опрос «Что на ужин?»" onClose={() => setPoll(null)}>
         {poll && (

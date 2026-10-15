@@ -103,7 +103,13 @@ export function Recipes() {
   const input = useRef<HTMLInputElement>(null);
 
   // The home screen's «Все» under «Сохранённое» opens this tab on the saved view.
-  useLayoutEffect(() => { const v = takeRecipesView(); if (v === "saved" || v === "book") setView(v); }, []);
+  useLayoutEffect(() => {
+    const v = takeRecipesView();
+    if (v === "saved" || v === "book") setView(v);
+    else if (v?.startsWith("dish:")) setDish(v.slice(5));
+    else if (v?.startsWith("filter:")) setF({ ...NONE, on: [v.slice(7)] });
+    else if (v?.startsWith("time:")) setF({ ...NONE, time: Number(v.slice(5)) || null });
+  }, []);
   useEffect(() => { if (online) reviewsApi.ratings().then(setRatings).catch(() => {}); }, [online]);
   useEffect(() => setLimit(PAGE), [query, dish, f, view]);
 

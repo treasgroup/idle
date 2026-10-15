@@ -1,28 +1,24 @@
 import { useState } from "react";
 import { Clock, Flame, Heart, CalendarPlus, Check } from "lucide-react";
-import { courseOf, formatMinutes, nutritionOf, photoUrl, type Recipe } from "../engine";
+import { formatMinutes, nutritionOf, photoUrl, type Recipe } from "../engine";
+import { dishEmoji, dishTint, dishVariant } from "./dishArt";
 import { cx } from "./ui";
 
-const COURSE_EMOJI: Record<string, string> = {
-  soup: "🍲", main: "🍛", side: "🍚", salad: "🥗", breakfast: "🍳", baking: "🥧", dessert: "🍰", snack: "🥪", sauce: "🫙", drink: "🥤",
-};
-// Flat course colours for dishes without a photo (22 % over the card in the dark theme).
-const COURSE_TINT: Record<string, string> = {
-  soup: "#F3D9B8", main: "#F1CDBF", side: "#E5DCCB", salad: "#D6E6C3", breakfast: "#F6E3A8", baking: "#EED9B5", dessert: "#F2D0D6",
-  snack: "#EBDCC8", sauce: "#EFC7B8", drink: "#CFE3E3",
-};
-
-/** The dish photo; without one, a flat tile in the course colour with the dish's emoji. */
+/** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
 export function RecipeImage({ recipe, className, rounded = "rounded-img", eager }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean }) {
   const src = photoUrl(recipe.id);
   const [failed, setFailed] = useState(false);
-  const course = courseOf(recipe);
   if (src && !failed)
     return <img src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" onError={() => setFailed(true)} className={cx("bg-sunken object-cover", rounded, className)} />;
+  const [a, b] = dishTint(recipe);
+  const v = dishVariant(recipe);
   return (
     <div aria-hidden className={cx("relative grid place-items-center overflow-hidden", rounded, className)} style={{ containerType: "size" }}>
-      <span className="absolute inset-0 dark:opacity-[.22]" style={{ background: COURSE_TINT[course] ?? COURSE_TINT.main }} />
-      <span className="relative leading-none" style={{ fontSize: "40cqh" }}>{COURSE_EMOJI[course] ?? "🍽️"}</span>
+      <span className="absolute inset-0 dark:opacity-25" style={{ background: `radial-gradient(120% 120% at ${v.x}% 15%, ${a} 0%, ${b} 100%)` }} />
+      <span className="absolute rounded-full bg-white/80 shadow-[0_4px_14px_rgba(60,30,10,.12)] dark:bg-white/10"
+        style={{ width: "min(74cqh, 74cqw)", height: "min(74cqh, 74cqw)" }} />
+      <span className="absolute rounded-full border border-black/5 dark:border-white/10" style={{ width: "min(56cqh, 56cqw)", height: "min(56cqh, 56cqw)" }} />
+      <span className="relative leading-none drop-shadow-[0_3px_4px_rgba(60,30,10,.18)]" style={{ fontSize: "min(38cqh, 38cqw)", transform: `rotate(${v.tilt}deg)` }}>{dishEmoji(recipe)}</span>
     </div>
   );
 }

@@ -10,6 +10,58 @@ export interface HomeAmount {
   /** «2 шт.», «150 г», «по вкусу». */
   text: string;
   toTaste: boolean;
+  /** The same in spoons or glasses, for kitchens without scales: «2 ст. л.», «1½ стакана». */
+  hint?: string;
+}
+
+// Grams (or ml) in a teaspoon, a tablespoon and a 250 ml glass, for products measured that way at home.
+const SPOONS: [RegExp, number | null, number, number | null][] = [
+  [/^salt$/, 10, 30, null],
+  [/^sugar$/, 8, 25, 200],
+  [/flour$/, 8, 25, 160],
+  [/^semolina$/, 8, 25, 200],
+  [/oil$/, 5, 17, null],
+  [/^(milk|kefir|cream|heavy-cream|water)$/, 5, 18, 250],
+  [/^(sour-cream|mayonnaise|tomato-ketchup)$/, 10, 25, null],
+  [/^tomato-paste$/, 10, 30, null],
+  [/^honey$|condensed-milk$/, 12, 30, null],
+  [/starch$/, 10, 30, null],
+  [/^cocoa-powder$/, 7, 20, null],
+  [/^prepared-mustard$/, 7, 20, null],
+  [/soy-sauce$|vinegar/, 5, 15, null],
+  [/rice$|^pearl-barley$|^millet$/, null, 25, 230],
+  [/^buckwheat$|lentil$/, null, 25, 210],
+  [/^(couscous|bulgur)$/, null, 25, 200],
+  [/^oat-flakes$/, null, 12, 90],
+];
+
+const frac = (n: number) => {
+  const whole = Math.floor(n + 1e-9), rest = n - whole;
+  const f = rest < 0.125 ? "" : rest < 0.375 ? "¼" : rest < 0.625 ? "½" : rest < 0.875 ? "¾" : "";
+  const w = rest >= 0.875 ? whole + 1 : whole;
+  return (w ? String(w) : "") + f || "0";
+};
+const roundTo = (n: number, step: number) => Math.round(n / step) * step;
+const glasses = (n: number) => frac(n) + " " + (n <= 1 && n !== 1 ? "стакана" : n === 1 ? "стакан" : n < 5 ? "стакана" : "стаканов");
+
+/** «2 ст. л.» / «1½ стакана» for flour, sugar, oil, milk, grains…; nothing when it would be a rough guess. */
+export function spoonHint(id: string, amount: number, unit: string): string | undefined {
+  if ((unit !== "г" && unit !== "мл") || amount <= 0) return undefined;
+  const row = SPOONS.find(([re]) => re.test(id));
+  if (!row) return undefined;
+  const [, tsp, tbsp, glass] = unit === "мл" ? [null, 5, 15, 250] as const : row;
+  const ok = (got: number, per: number) => Math.abs(got * per - amount) / amount <= 0.26;
+  if (glass && amount >= glass * 0.45) {
+    const g = roundTo(amount / glass, 0.25);
+    if (g <= 5 && ok(g, glass)) return glasses(g);
+    return undefined;
+  }
+  if (tsp && amount < tbsp * 0.75) {
+    const n = roundTo(amount / tsp, 0.5);
+    return n >= 0.5 && ok(n, tsp) ? frac(n) + " ч. л." : undefined;
+  }
+  const n = roundTo(amount / tbsp, 0.5);
+  return n >= 0.5 && n <= 8 && ok(n, tbsp) ? frac(n) + " ст. л." : undefined;
 }
 
 /** Grams in one piece, for products people count rather than weigh. */
@@ -40,12 +92,13 @@ export function homeQuantity(i: Item): HomeAmount {
     if (i.amount < 5 && !EXACT.test(name) && aisleOf({ ingredientId: id, name: i.name }) === "spices")
       return { amount: i.amount, unit: i.unit, text: "по вкусу", toTaste: true };
   }
-  return { amount: i.amount, unit: i.unit, text: formatAmount(i.amount, i.unit), toTaste: false };
+  return { amount: i.amount, unit: i.unit, text: formatAmount(i.amount, i.unit), toTaste: false, hint: spoonHint(id, i.amount, i.unit) };
 }
 
-/** «2 шт.», «150 г», «по вкусу» — the amount as it is shown on a recipe. */
+/** «2 шт.», «150 г · 6 ст. л.», «по вкусу» — the amount as it is shown on a recipe. */
 export function homeAmount(i: Item): string {
-  return homeQuantity(i).text;
+  const q = homeQuantity(i);
+  return q.hint ? q.text + " · " + q.hint : q.text;
 }
 
 /** The same product with the same unit listed twice («масло для жарки» and «масло в соус») becomes one row. */

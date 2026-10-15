@@ -69,7 +69,8 @@ export function openLayer(hash: string): void {
 
 /** Opens «Рецепты» on a given view (the home screen's «Все» under «Сохранённое»). */
 const VIEW_KEY = "cook-recipes-view";
-export function openRecipesView(view: "saved" | "book"): void {
+/** `view`: «saved», «book», «dish:<section>», «filter:<id>» or «time:<minutes>». */
+export function openRecipesView(view: string): void {
   try { sessionStorage.setItem(VIEW_KEY, view); } catch { /* ignore */ }
   replace(routeHash({ tab: "recipes" }));
 }
