@@ -6716,6 +6716,9 @@ var d0 = { easy: "простой", medium: "средней сложности", 
     pot: "кастрюля",
     oven: "духовка",
     blender: "блендер",
+    multicooker: "мультиварка",
+    airfryer: "аэрогриль",
+    microwave: "микроволновка",
   },
   al = (e) => (me(e)?.aliases[0] || me(e)?.name || e).toLowerCase();
 function f0(e, t) {
@@ -7166,9 +7169,16 @@ function Jp(e, t, n) {
       return u ? "• " + l.title + " — " + u.short : null;
     })
     .filter(Boolean);
+  // About the oven, say the answer first, then the list.
+  let hd = "";
+  if (r === "cookware" && o.length) {
+    let shown = t.slice(0, 4),
+      ov = shown.filter((l) => l.appliances.includes("oven")).length;
+    hd = ov === 0 ? "Духовка не нужна ни одному из них:\n" : ov === shown.length ? "Для всех нужна духовка:\n" : "Духовка нужна не всем:\n";
+  }
   return o.length
     ? {
-        text: o.join(`
+        text: hd + o.join(`
 `),
         options: t.slice(0, 3).map(Fp),
       }
