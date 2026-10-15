@@ -81,6 +81,9 @@ export function ConditionBar() {
   if (!c.appliances.includes("oven") && s.preferences.appliances.includes("oven")) items.push({ label: "без духовки", relax: "appliances:all" });
   if (c.available.length) items.push({ label: "есть: " + c.available.slice(0, 3).map((id) => shortName(id).toLowerCase()).join(", ") + (c.available.length > 3 ? "…" : ""), next: { ...c, available: [], strictPantry: false } });
   const servings = c.servings !== profile.eaters ? c.servings : null;
+  // Only under a pick of recipes: after a kitchen question («сколько варить гречку») the old conditions are noise.
+  const last = [...s.conversation].reverse().find((m) => m.role === "assistant");
+  if (!last?.results?.length) return null;
   if (!items.length && !servings) return null;
   return (
     <div className="scroller fade-x -mx-4 mb-2 px-4 sm:mx-0 sm:flex-wrap sm:px-0 sm:[mask-image:none]" aria-label="Учитываю">

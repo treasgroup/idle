@@ -593,7 +593,8 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
         <span className="min-w-0 flex-1 py-1.5">
           <span className="text-body-sm">{displayName(i.id, i.name)}</span>
           {i.optional && <span className="text-caption text-ink-faint"> · по желанию</span>}
-          {swaps.length > 0 && <span className="block text-caption text-ink-faint">{own ? "можно заменить" : "нет дома — замените"}: {swaps.join(", ").toLowerCase()}</span>}
+          {/* A swap only matters when the product is missing. */}
+          {swaps.length > 0 && !own && i.id !== "water" && <span className="block text-caption text-ink-faint">нет дома — замените: {swaps.slice(0, 2).join(", ").toLowerCase()}</span>}
           {own && <span className="sr-only"> — есть дома</span>}
         </span>
         <span className="shrink-0 pl-2 text-right">

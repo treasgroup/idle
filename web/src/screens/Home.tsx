@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useMemo, useState } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, ChefHat } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2 } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -53,13 +53,27 @@ function dayPick<T>(list: T[], salt = 0): T | null {
   return list[(n * 7919) % Math.min(list.length, 25)];
 }
 
+/** «Рецепт дня» stays the same all day (per meal), even when the saved data or the catalog changes the list. */
+function useToday(pick: Recipe | null, meal: string): Recipe | null {
+  const key = "cook-today-" + dateKey(new Date()) + "-" + meal;
+  let kept: string | null = null;
+  try { kept = localStorage.getItem(key); } catch { /* private mode */ }
+  const was = kept ? recipeById(kept) : null;
+  if (was) return was;
+  if (pick) try {
+    for (const k of Object.keys(localStorage)) if (k.startsWith("cook-today-") && !k.startsWith("cook-today-" + dateKey(new Date()))) localStorage.removeItem(k);
+    localStorage.setItem(key, pick.id);
+  } catch { /* private mode */ }
+  return pick;
+}
+
 export function Home({ pwa }: { pwa?: Pwa }) {
   const { profile } = useStore();
   const { openRecipe } = useActions();
   const [decide, setDecide] = useState(false);
   const all = useSuitable();
   const meal = mealNow();
-  const today = dayPick(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"));
+  const today = useToday(dayPick(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast")), meal);
   const season = seasonalCollection();
 
   if (profile.simple) return <SimpleHome today={today} />;
@@ -130,7 +144,7 @@ function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-body-sm text-ink-soft">
           <Clock size={16} aria-hidden />{formatMinutes(r.totalMinutes)}<span aria-hidden>·</span>{DIFF[r.difficulty]}<span aria-hidden>·</span>на {people(profile.eaters)}
         </p>
-        <button className="btn-primary btn-bar mt-4 w-full" onClick={onOpen}><ChefHat size={20} />Готовить</button>
+        <button className="btn-primary btn-bar mt-4 w-full" onClick={onOpen}>Открыть рецепт</button>
       </div>
     </article>
   );

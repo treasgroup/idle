@@ -152,7 +152,7 @@ export function Menu() {
                           {!it.leftover && <RecipeMeta recipe={r} size="caption" showDifficulty={false} />}
                         </span>
                       </button>
-                      {!it.leftover && <button className="h-11 shrink-0 rounded-full px-2 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => save(replaceMenuItem(days, d.date, n, s.preferences, servings, Date.now(), enginePlan))}>Заменить</button>}
+                      {!it.leftover && <button className="inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-2 text-small text-ink-soft hover:bg-sunken" onClick={() => { save(replaceMenuItem(days, d.date, n, s.preferences, servings, Date.now(), enginePlan)); withUndo("Блюдо заменено"); }}><RefreshCw size={16} aria-hidden />Заменить</button>}
                       <button className="icon-btn -mr-1 shrink-0" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Ещё: " + r.title}><MoreHorizontal size={18} /></button>
                     </div>
                   );

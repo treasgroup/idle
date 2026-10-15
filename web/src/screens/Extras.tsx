@@ -6,7 +6,6 @@ import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { GOALS, LEVELS, type Goal, type Level } from "../app/profile";
 import { RecipeRow } from "../components/RecipeCard";
 import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
@@ -129,11 +128,10 @@ export function PollSheet({ token, onClose }: { token: string; onClose: () => vo
   );
 }
 
-const APPLIANCE_CHOICES = [["oven", "Духовка"], ["multicooker", "Мультиварка"], ["airfryer", "Аэрогриль"], ["microwave", "Микроволновка"], ["blender", "Блендер"]] as const;
 const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Молочное"], ["gluten", "Глютен"], ["nuts", "Орехи"], ["mushrooms", "Грибы"], ["spicy", "Острое"]] as const;
 
-/** First visit: three short steps to tailor everything, then «Знакомьтесь — Шеф». Can be skipped. */
-const LAST = 4;
+/** First visit: two short steps (how it looks, who eats what), then «Знакомьтесь — Шеф». Can be skipped. */
+const LAST = 2;
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const { s, profile, setProfile, update } = useStore();
@@ -144,17 +142,14 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const setSimple = (v: boolean) => setProfile((p) => ({ ...p, simple: v }));
   const [eaters, setEaters] = useState(2);
   const [kids, setKids] = useState(false);
-  const [level, setLevel] = useState<Level>("confident");
-  const [goals, setGoals] = useState<Goal[]>(["tasty"]);
-  const [apps, setApps] = useState<string[]>(() => s.preferences.appliances);
   const [excluded, setExcluded] = useState<string[]>(() => s.preferences.excluded);
 
   const save = (skip: boolean) => {
-    setProfile((p) => ({ ...p, ...(skip ? {} : { eaters, level, goals, kids }), setUp: true }));
+    setProfile((p) => ({ ...p, ...(skip ? {} : { eaters, kids }), setUp: true }));
     update((st) => ({
       ...st, onboarding: skip ? "skipped" : "done",
       conditions: { ...st.conditions, servings: skip ? st.conditions.servings : eaters },
-      preferences: skip ? st.preferences : { ...st.preferences, appliances: apps.length ? apps : st.preferences.appliances, excluded: [...new Set(excluded)] },
+      preferences: skip ? st.preferences : { ...st.preferences, excluded: [...new Set(excluded)] },
     }));
   };
   const finish = (ask?: string) => {
@@ -207,36 +202,11 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         <Stepper value={eaters} min={1} max={12} onChange={setEaters} label="Едоков" />
       </div>
       <div className="mt-2 rounded-card border border-line bg-card px-4"><Toggle on={kids} onChange={setKids} label="Есть дети" hint="Чаще покажу то, что нравится детям" /></div>
-    </div>,
-    <div key="level">
-      <h1 className="text-h1">Как часто готовите?</h1>
-      <p className="mt-2 text-body-sm text-ink-soft">Подстрою сложность рецептов и подробность подсказок.</p>
-      <div className="mt-6 grid gap-2" role="radiogroup" aria-label="Опыт">
-        {LEVELS.map((l) => (
-          <button key={l.id} role="radio" aria-checked={level === l.id} onClick={() => setLevel(l.id)}
-            className={cx("flex min-h-[64px] items-center gap-3 rounded-card border px-4 py-3 text-left", level === l.id ? "border-brand bg-brand-soft" : "border-line bg-card")}>
-            <span className={cx("grid h-6 w-6 shrink-0 place-items-center rounded-full border-2", level === l.id ? "border-brand" : "border-line-strong")}>{level === l.id && <span className="h-3 w-3 rounded-full bg-brand-fill" />}</span>
-            <span><span className="block text-body-sm font-semibold">{l.label}</span><span className="block text-caption text-ink-soft">{l.hint}</span></span>
-          </button>
-        ))}
-      </div>
-    </div>,
-    <div key="goals">
-      <h1 className="text-h1">Цели и кухня</h1>
-      <p className="mt-2 text-body-sm text-ink-soft">Всё можно поменять потом в профиле.</p>
-      <p className="label mb-2 mt-6">Что важно</p>
-      <div className="flex flex-wrap gap-2">
-        {GOALS.map((g) => <button key={g.id} aria-pressed={goals.includes(g.id)} className={cx("chip", goals.includes(g.id) && "chip-on")}
-          onClick={() => setGoals((x) => { const on = x.includes(g.id); const next = on ? x.filter((y) => y !== g.id) : [...x.filter((y) => y !== "tasty"), g.id]; return next.length ? next : ["tasty"]; })}>{g.label}</button>)}
-      </div>
-      <p className="label mb-2 mt-6">Есть на кухне</p>
-      <div className="flex flex-wrap gap-2">
-        {APPLIANCE_CHOICES.map(([id, label]) => <button key={id} aria-pressed={apps.includes(id)} className={cx("chip gap-1.5", apps.includes(id) && "border-herb bg-herb-soft")} onClick={() => setApps((x) => toggle(x, id))}>{apps.includes(id) && <Check size={14} className="text-herb" aria-hidden />}{label}</button>)}
-      </div>
-      <p className="label mb-2 mt-6">Не едим</p>
+      <p className="label mb-2 mt-6">Чего не едите?</p>
       <div className="flex flex-wrap gap-2">
         {DONT_EAT.map(([id, label]) => <button key={id} aria-pressed={excluded.includes(id)} className={cx("chip", excluded.includes(id) && "border-warn bg-warn-soft line-through decoration-warn")} onClick={() => setExcluded((x) => toggle(x, id))}>{label}</button>)}
       </div>
+      <p className="mt-6 text-small text-ink-soft">Цели, технику и остальное можно настроить потом в профиле.</p>
     </div>,
   ];
 
@@ -253,8 +223,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
           <>
             <div className="flex items-center gap-3">
               <ChefAvatar size={32} />
-              <div className="grid flex-1 grid-cols-4 gap-1.5" aria-label={"Шаг " + (step + 1) + " из " + LAST}>
-                {[0, 1, 2, 3].map((i) => <span key={i} className={cx("h-1.5 rounded-full", i <= step ? "bg-brand-fill" : "bg-sunken")} />)}
+              <div className="grid flex-1 grid-cols-2 gap-1.5" aria-label={"Шаг " + (step + 1) + " из " + LAST}>
+                {[0, 1].map((i) => <span key={i} className={cx("h-1.5 rounded-full", i <= step ? "bg-brand-fill" : "bg-sunken")} />)}
               </div>
             </div>
             <div className="anim-rise mt-8 flex-1" key={step}>{steps[step]}</div>

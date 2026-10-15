@@ -3,13 +3,22 @@
 // The server AI is used only when it is configured; otherwise the local engine answers (the default).
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes,
-  relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions,
+  DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
+  relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
 } from "../engine";
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
 import { archiveChat, markChatActive, takeChat } from "./chats";
 import { plainWords } from "./colloquial";
+
+/** «курица и картошка»: a dish named after the products («Курица с картошкой») goes before one that only contains them. */
+function namedFirst(list: Match[], c: Conditions): Match[] {
+  const stems = c.desired.filter((d) => !d.includes(":")).map((id) => shortName(id).toLowerCase().slice(0, 5)).filter((x) => x.length >= 3);
+  if (stems.length < 2) return list;
+  const hits = (m: Match) => stems.filter((st) => m.recipe.title.toLowerCase().includes(st)).length;
+  const head = list.slice(0, 10).map((m, i) => ({ m, i, n: hits(m) })).sort((a, b) => b.n - a.n || a.i - b.i).map((x) => x.m);
+  return [...head, ...list.slice(10)];
+}
 
 const lastShown = (conv: ChatMessage[]) => [...conv].reverse().find((m) => m.role === "assistant" && !!m.results?.length) ?? null;
 
@@ -170,7 +179,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       const wait = 400 - (Date.now() - started);
       if (wait > 0) await new Promise((r) => setTimeout(r, wait));
       if (id !== turn.current) return;
-      push([{ role: "assistant", text: out.text, results: toStoredResults(out.results.slice(0, 5)), ...(out.options ? { options: out.options } : {}) }], out.conditions);
+      push([{ role: "assistant", text: out.text, results: toStoredResults(namedFirst(out.results, out.conditions).slice(0, 5)), ...(out.options ? { options: out.options } : {}) }], out.conditions);
       if (note) toast(note);
       if (out.open) openRef.current(out.open);
     } catch (e) {

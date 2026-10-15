@@ -10,7 +10,7 @@ import { useStore } from "../app/store";
 import { useReminders } from "../app/reminders";
 import { GOALS, LEVELS } from "../app/profile";
 import { openLayer, openRecipesView, routeHash } from "../app/router";
-import { Chip, Section, Segmented, Sheet, Stepper, Toggle, cx } from "../components/ui";
+import { Chip, Section, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "./RecipeLayer";
 import { FamilyMembers } from "../components/FamilyMembers";
 
@@ -32,7 +32,7 @@ export interface Pwa { installed: boolean; canInstall: boolean; ios: boolean; in
 export function Profile({ pwa }: { pwa: Pwa }) {
   const { s, update, profile, setProfile, sync, toast, wipe } = useStore();
   const reminders = useReminders();
-  const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data">(null);
+  const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs">(null);
   const [wiping, setWiping] = useState(false);
   const prefs = s.preferences;
   const bookCount = new Set(s.book.map((b) => b.recipeId)).size;
@@ -110,8 +110,12 @@ export function Profile({ pwa }: { pwa: Pwa }) {
             <div className="card overflow-hidden">
               <div className="border-b border-line px-4 py-3">
                 <p className="mb-2 text-body-sm font-semibold">Тема</p>
-                <Segmented label="Тема" value={profile.theme} onChange={(v) => setProfile((p) => ({ ...p, theme: v }))}
-                  options={[{ id: "light", label: "Светлая" }, { id: "dark", label: "Тёмная" }, { id: "contrast", label: "Контраст" }, { id: "system", label: "Авто" }]} />
+                <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Тема">
+                  {([["light", "Светлая"], ["dark", "Тёмная"], ["contrast", "Контрастная"], ["system", "Как в телефоне"]] as const).map(([id, label]) => (
+                    <button key={id} role="radio" aria-checked={profile.theme === id} onClick={() => setProfile((p) => ({ ...p, theme: id }))}
+                      className={cx("h-11 rounded-input border px-2 text-small", profile.theme === id ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-card")}>{label}</button>
+                  ))}
+                </div>
                 {profile.theme === "contrast" && <p className="mt-2 text-caption text-ink-soft">Чёрный текст на белом и чёткие рамки — легче читать при слабом зрении.</p>}
               </div>
               <div className="divide-y divide-line px-4">
@@ -127,21 +131,9 @@ export function Profile({ pwa }: { pwa: Pwa }) {
             </div>
           </Section>
 
-          <Section title="Документы">
-            <div className="card flex flex-wrap gap-x-1 gap-y-0 px-2 py-2">
-              {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (
-                <button key={k} className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-small text-ink hover:bg-sunken" onClick={() => openLayer(routeHash({ doc: k }))}>
-                  <Shield size={16} className="text-ink-soft" aria-hidden />{LEGAL_TITLES[k]}
-                </button>
-              ))}
-            </div>
-          </Section>
-
-          <section className="card mt-8 flex items-center gap-3 p-4">
-            <Trash2 size={20} className="shrink-0 text-brand" aria-hidden />
-            <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">Удалить все мои данные</span><span className="block text-caption text-ink-soft">С этого устройства и с сервера</span></span>
-            <button className="btn-outline shrink-0 border-brand text-brand" onClick={() => setSheet("data")}>Удалить</button>
-          </section>
+          <div className="card mt-8 overflow-hidden">
+            <Row icon={<Shield size={18} />} title="Документы и мои данные" hint="Политика, правила, удаление данных" onClick={() => setSheet("docs")} />
+          </div>
         </div>
       </div>
 
@@ -181,6 +173,18 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         </div>
         <ExcludeProduct />
         <FamilyMembers />
+      </Sheet>
+
+      <Sheet open={sheet === "docs"} title="Документы и мои данные" onClose={close}>
+        <div className="grid gap-1">
+          {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (
+            <button key={k} className="flex min-h-[48px] items-center gap-2 rounded-input px-1 text-left text-body-sm hover:bg-sunken" onClick={() => { close(); openLayer(routeHash({ doc: k })); }}>
+              <Shield size={18} className="shrink-0 text-ink-soft" aria-hidden /><span className="flex-1">{LEGAL_TITLES[k]}</span><ChevronRight size={18} className="text-ink-faint" aria-hidden />
+            </button>
+          ))}
+        </div>
+        <button className="btn-outline mt-5 w-full border-brand text-brand" onClick={() => setSheet("data")}><Trash2 size={18} />Удалить все мои данные</button>
+        <p className="mt-2 text-center text-caption text-ink-faint">С этого устройства и с сервера</p>
       </Sheet>
 
       <Sheet open={sheet === "kitchen"} title="Техника" onClose={close}>

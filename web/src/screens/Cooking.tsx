@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
-  MessageCircle, MessageCircleQuestion, Mic, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, Volume2, X,
+  MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
@@ -18,7 +18,7 @@ import { useReminders } from "../app/reminders";
 import { replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, speak, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { amountText } from "../app/nowaste";
-import { Chip, Layer, Sheet, Stepper, cx, mmss } from "../components/ui";
+import { Chip, Layer, Sheet, Stepper, Toggle, cx, mmss } from "../components/ui";
 import { RecipeMini } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { TimerRing, TimerStrip } from "../components/TimerStrip";
@@ -86,7 +86,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const par = profile.parallel;
   const second = par ? findRecipe(par.recipeId) ?? null : null;
   const [tab, setTab] = useState<Key>("main");
-  const [sheet, setSheet] = useState<"ingredients" | "second" | "ask" | null>(null);
+  const [sheet, setSheet] = useState<"ingredients" | "second" | "ask" | "more" | null>(null);
   const [handsFree, setHandsFree] = useState(false);
   const [hint, setHint] = useState(false);
   const [checked, setChecked] = useState<Record<string, string[]>>({});
@@ -311,17 +311,21 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
             )}
           </div>
 
+          {/* Phones: the voice button and «Ещё»; reading aloud and a second dish live inside. */}
           <div className="mt-6 flex flex-wrap gap-2 lg:hidden">
-            {second
-              ? <Chip onClick={removeSecond}><X size={18} aria-hidden />Убрать второе блюдо</Chip>
-              : <Chip onClick={() => setSheet("second")}><Plus size={18} aria-hidden />Второе блюдо</Chip>}
-            {voice}
+            {hf.supported && (
+              <button type="button" aria-pressed={handsFree} onClick={toggleVoice}
+                className={cx("chip", handsFree && "border-brand-fill bg-brand-fill text-white hover:border-brand-fill")}>
+                <Mic size={18} aria-hidden />Голосом
+              </button>
+            )}
+            <Chip onClick={() => setSheet("more")}><MoreHorizontal size={18} aria-hidden />Ещё</Chip>
           </div>
           {hint && <VoiceHint onClose={() => { setHint(false); markHintSeen(); }} />}
 
           {next && (
             <button onClick={() => go(1)} className="mt-8 block w-full border-t border-line pt-4 text-left">
-              <span className="label">Дальше</span>
+              <span className="label">Следующий шаг</span>
               <span className="mt-1 line-clamp-2 block text-body-sm text-ink-soft">{next.text}</span>
             </button>
           )}
@@ -372,6 +376,18 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
 
       <Sheet open={sheet === "ingredients"} title={"Продукты на " + dish.servings + " " + servingsWord(dish.servings, true)} onClose={() => setSheet(null)}>
         <Ingredients dish={dish} checked={checked[r.id] ?? []} onToggle={(k) => toggleChecked(r.id, k)} />
+      </Sheet>
+      <Sheet open={sheet === "more"} title="Ещё" onClose={() => setSheet(null)}>
+        <div className="divide-y divide-line">
+          <Toggle on={s.readAloud} onChange={() => toggleRead()} label="Читать шаги вслух" hint="Телефон прочитает каждый шаг" />
+          <button className="flex min-h-[64px] w-full items-center gap-3 py-2 text-left" onClick={() => { if (second) { removeSecond(); setSheet(null); } else setSheet("second"); }}>
+            <span className="min-w-0 flex-1">
+              <span className="block text-body-sm font-medium">{second ? "Убрать второе блюдо" : "Готовить второе блюдо"}</span>
+              <span className="block text-caption text-ink-soft">{second ? "«" + second.title + "»" : "Например, гарнир — подскажу, когда что начинать"}</span>
+            </span>
+            {second ? <X size={20} className="shrink-0 text-ink-soft" aria-hidden /> : <Plus size={20} className="shrink-0 text-ink-soft" aria-hidden />}
+          </button>
+        </div>
       </Sheet>
       {sheet === "second" && (
         <PickSecond main={c?.recipe ?? r} onClose={() => setSheet(null)}
