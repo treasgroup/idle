@@ -1,52 +1,60 @@
 // Smaller screens: the beginner course, legal documents, the family poll, first-run questions.
 import { useEffect, useState } from "react";
-import { Check, GraduationCap } from "lucide-react";
+import { Check, CircleCheck, ArrowUpRight, Search, Egg, Soup } from "lucide-react";
 import { apiUrl, legalDoc, legalInfo, recipeById, type LegalInfo, type LegalKey } from "../engine";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
+import { useAssistant } from "../app/assistant";
+import { goChat } from "../app/chatNav";
 import { GOALS, LEVELS, type Goal, type Level } from "../app/profile";
 import { RecipeRow } from "../components/RecipeCard";
-import { Chip, Layer, Sheet, Stepper, cx } from "../components/ui";
+import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
 
-export function Learn(_: { onClose?: () => void } = {}) {
+/** «Школа готовки»: short lessons, each with a skill and recipes to practise it. */
+export function Learn({ onClose }: { onClose: () => void }) {
   const { profile, setProfile } = useStore();
   const { openRecipe } = useActions();
   const [open, setOpen] = useState<string | null>(() => LESSONS.find((l) => !profile.lessonsDone.includes(l.id))?.id ?? null);
   const done = profile.lessonsDone.length;
   return (
-    <div className="pb-10">
-      <div className="px-4 pt-4">
-        <h1 className="flex items-center gap-2 text-[26px] font-semibold leading-tight"><GraduationCap className="text-herb" /> Школа готовки</h1>
-        <p className="text-sm text-ink-soft">{LESSONS.length} коротких уроков: навык и рецепт, чтобы сразу попробовать.</p>
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-line"><div className="h-full rounded-full bg-herb transition-all" style={{ width: (done / LESSONS.length) * 100 + "%" }} /></div>
-        <p className="mt-1 text-xs text-ink-faint">Пройдено {done} из {LESSONS.length}</p>
+    <Layer title="Школа готовки" onClose={onClose}>
+      <div className="mx-auto max-w-2xl px-4 pb-16 pt-2 sm:px-6">
+        <h1 className="text-h1">Школа готовки</h1>
+        <p className="mt-1 text-body-sm text-ink-soft">{LESSONS.length} коротких уроков: навык и рецепт, чтобы сразу попробовать.</p>
+        <div className="mt-4 h-2 overflow-hidden rounded-full bg-sunken"><div className="h-full rounded-full bg-herb transition-all" style={{ width: (done / LESSONS.length) * 100 + "%" }} /></div>
+        <p className="mt-1.5 text-caption text-ink-soft">Пройдено {done} из {LESSONS.length}</p>
+        <div className="mt-5 grid gap-2">
+          {LESSONS.map((l, n) => {
+            const isDone = profile.lessonsDone.includes(l.id);
+            const expanded = open === l.id;
+            return (
+              <section key={l.id} className="card overflow-hidden">
+                <button className="flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(expanded ? null : l.id)} aria-expanded={expanded}>
+                  {isDone
+                    ? <CircleCheck size={32} className="shrink-0 text-herb" aria-label="Пройден" />
+                    : <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-herb-soft text-small font-semibold text-herb">{n + 1}</span>}
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-body-sm font-semibold">{l.title}</span>
+                    <span className="block text-caption text-ink-soft">{isDone ? "Пройден · " : ""}{l.skill}</span>
+                  </span>
+                </button>
+                {expanded && (
+                  <div className="border-t border-line px-4 pb-4 pt-3">
+                    <ul className="grid gap-2 text-body-sm">{l.points.map((p) => <li key={p} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-herb" aria-hidden />{p}</li>)}</ul>
+                    <div className="mt-4 grid gap-2">{l.recipes.map((id) => { const r = recipeById(id); return r ? <RecipeRow key={id} recipe={r} note="Попробуйте на практике" onOpen={() => openRecipe(r)} /> : null; })}</div>
+                    <button className={cx("mt-4 w-full", isDone ? "btn-ghost" : "btn-primary")} onClick={() => {
+                      setProfile((p) => ({ ...p, lessonsDone: isDone ? p.lessonsDone.filter((x) => x !== l.id) : [...p.lessonsDone, l.id] }));
+                      if (!isDone) setOpen(LESSONS[n + 1]?.id ?? null);
+                    }}>{isDone ? "Отметить как непройденный" : <><Check size={18} />Урок пройден</>}</button>
+                  </div>
+                )}
+              </section>
+            );
+          })}
+        </div>
       </div>
-      <div className="mt-4 space-y-2 px-4">
-        {LESSONS.map((l, n) => {
-          const isDone = profile.lessonsDone.includes(l.id);
-          const expanded = open === l.id;
-          return (
-            <div key={l.id} className={cx("card overflow-hidden", isDone && "opacity-80")}>
-              <button className="flex w-full items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(expanded ? null : l.id)} aria-expanded={expanded}>
-                <span className={cx("grid h-8 w-8 shrink-0 place-items-center rounded-full text-sm font-semibold", isDone ? "bg-herb text-white" : "bg-herb-soft text-herb")}>{isDone ? <Check size={16} /> : n + 1}</span>
-                <span className="min-w-0 flex-1"><span className="block font-semibold">{l.title}</span><span className="block text-xs text-ink-faint">{l.skill}</span></span>
-              </button>
-              {expanded && (
-                <div className="px-4 pb-4">
-                  <ul className="space-y-2 text-[15px]">{l.points.map((p) => <li key={p} className="flex gap-2"><span className="text-herb">•</span>{p}</li>)}</ul>
-                  <div className="mt-3 space-y-2">{l.recipes.map((id) => { const r = recipeById(id); return r ? <RecipeRow key={id} recipe={r} note="Попробуйте на практике" onOpen={() => openRecipe(r)} /> : null; })}</div>
-                  <button className={cx("mt-3 w-full", isDone ? "btn-ghost" : "btn-primary bg-herb")} onClick={() => {
-                    setProfile((p) => ({ ...p, lessonsDone: isDone ? p.lessonsDone.filter((x) => x !== l.id) : [...p.lessonsDone, l.id] }));
-                    if (!isDone) setOpen(LESSONS[n + 1]?.id ?? null);
-                  }}>{isDone ? "Отметить как непройденный" : "Урок пройден ✓"}</button>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
+    </Layer>
   );
 }
 
@@ -55,15 +63,21 @@ export function DocLayer({ doc, onClose }: { doc: string; onClose: () => void })
   useEffect(() => { legalInfo().then(setInfo); }, []);
   const key = (["privacy", "rules", "terms", "info"].includes(doc) ? doc : "privacy") as LegalKey;
   const d = info ? legalDoc(key, info) : null;
+  const fix = (s: string) => s.replace(/\bг\.\./g, "г.");
   return (
     <Layer title={d?.title ?? "Документ"} onClose={onClose}>
-      <article className="mx-auto max-w-prose px-5 pb-16 pt-4 text-[15px] leading-relaxed">
-        {!d ? <p className="text-ink-faint">Загружаю…</p> : d.sections.map((sec, i) => (
-          <section key={i} className="mb-4">
-            {sec.h && <h2 className="mb-1.5 text-lg font-semibold">{sec.h}</h2>}
-            {sec.p.map((p, j) => <p key={j} className="mb-2">{p}</p>)}
-          </section>
-        ))}
+      <article className="mx-auto max-w-2xl px-4 pb-16 pt-2 text-body leading-relaxed sm:px-6">
+        {!d ? <p className="text-ink-soft">Загружаю…</p> : (
+          <>
+            <h1 className="mb-6 text-h1">{d.title}</h1>
+            {d.sections.map((sec, i) => (
+              <section key={i} className="mb-6">
+                {sec.h && <h2 className="mb-2 text-h2">{fix(sec.h)}</h2>}
+                {sec.p.map((p, j) => <p key={j} className="mb-3 text-ink">{fix(p)}</p>)}
+              </section>
+            ))}
+          </>
+        )}
       </article>
     </Layer>
   );
@@ -89,84 +103,150 @@ export function PollSheet({ token, onClose }: { token: string; onClose: () => vo
   const total = poll ? poll.counts.reduce((a, b) => a + b, 0) : 0;
   return (
     <Sheet open title="Что хотите на ужин?" onClose={onClose}>
-      {error && <p className="text-sm text-ink-soft">{error}</p>}
+      {error && <p className="text-body-sm text-ink-soft">{error}</p>}
       {poll && (
-        <div className="space-y-2">
-          {poll.closed && <p className="text-sm text-ink-soft">Голосование уже закончилось.</p>}
+        <div className="grid gap-2">
+          {poll.closed && <p className="text-body-sm text-ink-soft">Голосование уже закончилось.</p>}
           {poll.options.map((o, i) => {
             const pct = total ? Math.round((poll.counts[i] / total) * 100) : 0;
             const r = recipeById(o.id);
             return (
-              <div key={o.id} className={cx("card relative overflow-hidden", poll.mine === i && "border-brand")}>
-                <div className="absolute inset-y-0 left-0 bg-brand-soft transition-all" style={{ width: (poll.mine !== null ? pct : 0) + "%" }} />
-                <button className="relative flex w-full items-center gap-3 px-4 py-3 text-left disabled:opacity-60" disabled={poll.closed || !voter}
+              <div key={o.id} className={cx("relative flex items-center overflow-hidden rounded-input border bg-card", poll.mine === i ? "border-brand" : "border-line")}>
+                <div className="absolute inset-y-0 left-0 bg-brand-soft transition-all" style={{ width: (poll.mine !== null ? pct : 0) + "%" }} aria-hidden />
+                <button className="relative flex min-h-[56px] flex-1 items-center gap-3 px-4 text-left disabled:opacity-60" disabled={poll.closed || !voter} aria-pressed={poll.mine === i}
                   onClick={() => call("poll.vote", { token, voter, option: i }).then(setPoll).catch((e) => toast(e.message))}>
-                  <span className="flex-1 font-medium">{o.title}</span>
-                  {poll.mine !== null && <span className="text-sm tabular-nums">{poll.counts[i]}</span>}
+                  <span className="flex-1 text-body-sm font-semibold">{o.title}</span>
+                  {poll.mine !== null && <span className="text-small tabular-nums text-ink-soft">{poll.counts[i]}</span>}
                 </button>
-                {r && <button className="relative px-4 pb-2 text-xs text-brand" onClick={() => openRecipe(r)}>Рецепт</button>}
+                {r && <button className="relative mr-1 h-11 shrink-0 rounded-full px-3 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => { onClose(); openRecipe(r); }}>Рецепт</button>}
               </div>
             );
           })}
-          <p className="text-xs text-ink-faint">{poll.mine === null ? "Выберите блюдо — голос можно поменять." : "Ваш голос учтён. Проголосовали: " + total}</p>
+          <p className="text-caption text-ink-soft">{poll.mine === null ? "Выберите блюдо — голос можно поменять." : "Ваш голос учтён. Проголосовали: " + total}</p>
         </div>
       )}
     </Sheet>
   );
 }
 
-/** First visit: three taps to tailor everything. Can be skipped. */
+const APPLIANCE_CHOICES = [["oven", "Духовка"], ["multicooker", "Мультиварка"], ["airfryer", "Аэрогриль"], ["microwave", "Микроволновка"], ["blender", "Блендер"]] as const;
+const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Молочное"], ["gluten", "Глютен"], ["nuts", "Орехи"], ["mushrooms", "Грибы"], ["spicy", "Острое"]] as const;
+
+/** First visit: three short steps to tailor everything, then «Знакомьтесь — Шеф». Can be skipped. */
 export function Onboarding({ onDone }: { onDone: () => void }) {
-  const { setProfile, update } = useStore();
+  const { s, setProfile, update } = useStore();
+  const a = useAssistant();
+  const [step, setStep] = useState(0);
   const [eaters, setEaters] = useState(2);
+  const [kids, setKids] = useState(false);
   const [level, setLevel] = useState<Level>("confident");
   const [goals, setGoals] = useState<Goal[]>(["tasty"]);
-  const [kids, setKids] = useState(false);
-  const [extra, setExtra] = useState<string[]>([]);
-  const finish = (skip: boolean) => {
+  const [apps, setApps] = useState<string[]>(() => s.preferences.appliances);
+  const [excluded, setExcluded] = useState<string[]>(() => s.preferences.excluded);
+
+  const save = (skip: boolean) => {
     setProfile((p) => ({ ...p, ...(skip ? {} : { eaters, level, goals, kids }), setUp: true }));
     update((st) => ({
       ...st, onboarding: skip ? "skipped" : "done",
       conditions: { ...st.conditions, servings: skip ? st.conditions.servings : eaters },
-      preferences: skip ? st.preferences : { ...st.preferences, appliances: [...new Set([...st.preferences.appliances, ...extra])] },
+      preferences: skip ? st.preferences : { ...st.preferences, appliances: apps.length ? apps : st.preferences.appliances, excluded: [...new Set(excluded)] },
     }));
-    onDone();
   };
+  const finish = (ask?: string) => {
+    if (step < 3) save(false);
+    onDone();
+    if (ask) { void a.ask(ask, { fresh: true, source: "onboarding" }); goChat(); }
+  };
+  const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
+
+  const steps = [
+    <div key="who">
+      <h1 className="text-h1">Для кого готовите?</h1>
+      <p className="mt-2 text-body-sm text-ink-soft">Рецепты и списки покупок посчитаю на нужное число порций.</p>
+      <div className="mt-6 flex items-center justify-between gap-3 rounded-card border border-line bg-card p-4">
+        <span><span className="block text-body-sm font-semibold">Сколько человек едят</span><span className="block text-caption text-ink-soft">{eaters === 1 ? "только для себя" : eaters === 2 ? "вдвоём" : "семья"}</span></span>
+        <Stepper value={eaters} min={1} max={12} onChange={setEaters} label="Едоков" />
+      </div>
+      <div className="mt-2 rounded-card border border-line bg-card px-4"><Toggle on={kids} onChange={setKids} label="Есть дети" hint="Чаще покажу то, что нравится детям" /></div>
+    </div>,
+    <div key="level">
+      <h1 className="text-h1">Как часто готовите?</h1>
+      <p className="mt-2 text-body-sm text-ink-soft">Подстрою сложность рецептов и подробность подсказок.</p>
+      <div className="mt-6 grid gap-2" role="radiogroup" aria-label="Опыт">
+        {LEVELS.map((l) => (
+          <button key={l.id} role="radio" aria-checked={level === l.id} onClick={() => setLevel(l.id)}
+            className={cx("flex min-h-[64px] items-center gap-3 rounded-card border px-4 py-3 text-left", level === l.id ? "border-brand bg-brand-soft" : "border-line bg-card")}>
+            <span className={cx("grid h-6 w-6 shrink-0 place-items-center rounded-full border-2", level === l.id ? "border-brand" : "border-line-strong")}>{level === l.id && <span className="h-3 w-3 rounded-full bg-brand-fill" />}</span>
+            <span><span className="block text-body-sm font-semibold">{l.label}</span><span className="block text-caption text-ink-soft">{l.hint}</span></span>
+          </button>
+        ))}
+      </div>
+    </div>,
+    <div key="goals">
+      <h1 className="text-h1">Цели и кухня</h1>
+      <p className="mt-2 text-body-sm text-ink-soft">Всё можно поменять потом в профиле.</p>
+      <p className="label mb-2 mt-6">Что важно</p>
+      <div className="flex flex-wrap gap-2">
+        {GOALS.map((g) => <button key={g.id} aria-pressed={goals.includes(g.id)} className={cx("chip", goals.includes(g.id) && "chip-on")}
+          onClick={() => setGoals((x) => { const on = x.includes(g.id); const next = on ? x.filter((y) => y !== g.id) : [...x.filter((y) => y !== "tasty"), g.id]; return next.length ? next : ["tasty"]; })}>{g.label}</button>)}
+      </div>
+      <p className="label mb-2 mt-6">Есть на кухне</p>
+      <div className="flex flex-wrap gap-2">
+        {APPLIANCE_CHOICES.map(([id, label]) => <button key={id} aria-pressed={apps.includes(id)} className={cx("chip gap-1.5", apps.includes(id) && "border-herb bg-herb-soft")} onClick={() => setApps((x) => toggle(x, id))}>{apps.includes(id) && <Check size={14} className="text-herb" aria-hidden />}{label}</button>)}
+      </div>
+      <p className="label mb-2 mt-6">Не едим</p>
+      <div className="flex flex-wrap gap-2">
+        {DONT_EAT.map(([id, label]) => <button key={id} aria-pressed={excluded.includes(id)} className={cx("chip", excluded.includes(id) && "border-warn bg-warn-soft line-through decoration-warn")} onClick={() => setExcluded((x) => toggle(x, id))}>{label}</button>)}
+      </div>
+    </div>,
+  ];
+
+  const examples = [
+    { icon: <Search size={20} />, text: "Есть курица и картошка — что приготовить?", ask: "курица и картошка" },
+    { icon: <Soup size={20} />, text: "Холодно, хочу горячего", ask: "холодно, хочу горячего" },
+    { icon: <Egg size={20} />, text: "Сколько варить яйца?", ask: "сколько варить яйца?" },
+  ];
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-paper anim-fade">
-      <div className="safe-top mx-auto max-w-md px-5 pb-10 pt-8">
-        <div className="text-4xl">🍳</div>
-        <h1 className="mt-3 text-3xl font-semibold leading-tight">Что приготовить?</h1>
-        <p className="mt-2 text-ink-soft">Подберу блюдо из того, что есть дома, за минуту. Три вопроса — и советы будут под вас.</p>
-
-        <div className="label mb-2 mt-7">Для скольких готовите</div>
-        <div className="flex items-center gap-3"><Stepper value={eaters} min={1} max={12} onChange={setEaters} label="Едоков" /><span className="text-sm text-ink-soft">{eaters === 1 ? "только для себя" : eaters === 2 ? "вдвоём" : "семья"}</span></div>
-        <div className="mt-3 flex flex-wrap gap-2"><Chip on={kids} onClick={() => setKids(!kids)}>👶 Есть дети</Chip></div>
-
-        <div className="label mb-2 mt-6">Как готовите</div>
-        <div className="grid gap-2">
-          {LEVELS.map((l) => (
-            <button key={l.id} className={cx("card px-4 py-3 text-left", level === l.id && "border-brand bg-brand-soft")} onClick={() => setLevel(l.id)}>
-              <span className="block font-medium">{l.label}</span><span className="block text-xs text-ink-faint">{l.hint}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="label mb-2 mt-6">Что важно (можно несколько)</div>
-        <div className="flex flex-wrap gap-2">
-          {GOALS.map((g) => <Chip key={g.id} on={goals.includes(g.id)} onClick={() => setGoals((x) => { const on = x.includes(g.id); const next = on ? x.filter((y) => y !== g.id) : [...x.filter((y) => y !== "tasty"), g.id]; return next.length ? next : ["tasty"]; })}>{g.emoji} {g.label}</Chip>)}
-        </div>
-
-        <div className="label mb-2 mt-6">Есть на кухне</div>
-        <div className="flex flex-wrap gap-2">
-          {[["multicooker", "Мультиварка"], ["airfryer", "Аэрогриль"], ["microwave", "Микроволновка"]].map(([id, label]) => (
-            <Chip key={id} on={extra.includes(id)} onClick={() => setExtra((x) => (x.includes(id) ? x.filter((y) => y !== id) : [...x, id]))}>{label}</Chip>
-          ))}
-        </div>
-
-        <button className="btn-primary mt-8 w-full py-3.5 text-base" onClick={() => finish(false)}>Начать</button>
-        <button className="btn-ghost mt-2 w-full" onClick={() => finish(true)}>Пропустить</button>
-        <p className="mt-4 text-center text-xs text-ink-faint">Без регистрации. Всё хранится на вашем устройстве.</p>
+    <div className="anim-fade fixed inset-0 z-50 overflow-y-auto bg-paper" role="dialog" aria-modal="true" aria-label="Знакомство">
+      <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)]">
+        {step < 3 ? (
+          <>
+            <div className="flex items-center gap-3">
+              <ChefAvatar size={32} />
+              <div className="grid flex-1 grid-cols-3 gap-1.5" aria-label={"Шаг " + (step + 1) + " из 3"}>
+                {[0, 1, 2].map((i) => <span key={i} className={cx("h-1.5 rounded-full", i <= step ? "bg-brand-fill" : "bg-sunken")} />)}
+              </div>
+            </div>
+            <div className="anim-rise mt-8 flex-1" key={step}>{steps[step]}</div>
+            <div className="sticky bottom-0 -mx-5 mt-8 bg-paper px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
+              <button className="btn-primary h-13 w-full" onClick={() => { if (step === 2) save(false); setStep(step + 1); }}>Дальше</button>
+              <div className="mt-1 flex">
+                {step > 0 && <button className="btn-ghost flex-1" onClick={() => setStep(step - 1)}>Назад</button>}
+                <button className="btn-ghost flex-1" onClick={() => { save(true); onDone(); }}>Пропустить</button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="anim-rise flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
+            <div className="flex flex-1 flex-col justify-center py-8">
+              <ChefAvatar size={64} />
+              <h1 className="mt-5 text-display">Знакомьтесь — Шеф</h1>
+              <p className="mt-3 text-body text-ink-soft">Ваш кулинарный помощник. Напишите или скажите, что есть дома, сколько времени и какое настроение, — он подберёт рецепт. И ответит на любой вопрос на кухне.</p>
+              <p className="label mb-2 mt-8">Попробуйте спросить</p>
+              <div className="grid gap-2">
+                {examples.map((e) => (
+                  <button key={e.text} onClick={() => finish(e.ask)} className="flex min-h-[60px] items-center gap-3 rounded-input border border-line bg-card px-3 text-left hover:border-line-strong">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-ink" aria-hidden>{e.icon}</span>
+                    <span className="flex-1 text-body-sm">{e.text}</span>
+                    <ArrowUpRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button className="btn-primary h-13 w-full" onClick={() => finish()}>Начать</button>
+          </div>
+        )}
       </div>
     </div>
   );
