@@ -95,14 +95,14 @@ export function Shopping() {
 
   return (
     <div className="pt-4 sm:pt-6">
-      <div className="flex items-start justify-between gap-3">
-        <div>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
           <h1 className="text-h1">Покупки</h1>
           <p className="mt-1 text-body-sm text-ink-soft">{s.shopping.length ? (toBuy.length ? "Осталось купить: " + products(toBuy.length) : "Всё куплено") : "Список пуст"}</p>
         </div>
-        <div className="flex shrink-0 gap-1">
+        <div className="flex shrink-0 gap-0.5">
           {s.shopping.length > 0 && <button className="icon-btn" onClick={() => setShare(true)} aria-label="Отправить список"><Share2 size={20} /></button>}
-          <button className="btn-soft" onClick={() => setAdding(true)}><Plus size={18} />Добавить</button>
+          <button className="btn-soft px-4" onClick={() => setAdding(true)}><Plus size={18} />Добавить</button>
         </div>
       </div>
 
@@ -152,11 +152,11 @@ export function Shopping() {
           <div ref={bar} className="fixed inset-x-0 z-20 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64" style={{ bottom: "var(--nav-h)" }}>
             <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-2.5 sm:px-6 lg:max-w-[1200px] lg:px-8">
               {bought.length > 0 ? (
-                <button className="btn-primary min-w-0 flex-1 sm:flex-none" onClick={toPantry}><Refrigerator size={18} /><span className="truncate">Куплено {bought.length} · Перенести в Дома</span></button>
+                <button className="btn-primary min-w-0 flex-1 sm:flex-none" onClick={toPantry}><Refrigerator size={18} /><span className="truncate"><span className="hidden sm:inline">Куплено {bought.length} · </span>Перенести в Дома<span className="sm:hidden"> · {bought.length}</span></span></button>
               ) : (
                 <span className="flex-1 text-small text-ink-soft">Отмечайте купленное — потом перенесу его в «Дома»</span>
               )}
-              <button className="btn-ghost shrink-0" onClick={() => setClear(true)}><Trash2 size={18} />Очистить</button>
+              <button className="btn-ghost shrink-0 px-3 sm:px-5" onClick={() => setClear(true)} aria-label="Очистить список"><Trash2 size={18} /><span className="hidden sm:inline">Очистить</span></button>
             </div>
           </div>
         </>
