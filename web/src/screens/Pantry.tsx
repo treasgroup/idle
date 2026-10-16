@@ -85,7 +85,7 @@ export function Pantry() {
 
       {s.fridge.length === 0 ? (
         <div className="mt-6">
-          <Empty icon={<Refrigerator size={48} />} title="Отметьте, что есть дома"
+          <Empty icon={<Refrigerator size={48} />} title="Отметьте, что есть дома" mood="fridge"
             actions={<>
               <button className="btn-primary" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукты</button>
               <button className="btn-outline" onClick={() => setReceipt(true)}><ScanText size={18} />Из чека</button>

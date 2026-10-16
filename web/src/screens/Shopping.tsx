@@ -115,7 +115,7 @@ export function Shopping() {
 
       {s.shopping.length === 0 ? (
         <div className="mt-6">
-          <Empty icon={<ShoppingBag size={48} />} title="Список покупок пуст"
+          <Empty icon={<ShoppingBag size={48} />} title="Список покупок пуст" mood="shopping"
             actions={<>
               <button className="btn-primary" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукт</button>
               <button className="btn-outline" onClick={() => replace(routeHash({ tab: "menu" }))}><CalendarDays size={18} />Составить план</button>

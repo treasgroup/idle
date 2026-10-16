@@ -266,12 +266,12 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
 
           {list.length === 0 ? (
             view === "saved" && !query && !filtered ? (
-              <Empty icon={<Heart size={48} strokeWidth={1.5} />} title="Здесь будут сохранённые рецепты"
+              <Empty icon={<Heart size={48} strokeWidth={1.5} />} title="Здесь будут сохранённые рецепты" mood="smile"
                 actions={<button className="btn-outline" onClick={() => replace(routeHash({ tab: "recipes" }))}>Найти рецепт</button>}>
                 Сохраняйте понравившиеся блюда сердечком на странице рецепта.
               </Empty>
             ) : view === "book" && !query && !filtered ? (
-              <Empty icon={<BookOpen size={48} strokeWidth={1.5} />} title="Здесь будет то, что вы приготовили"
+              <Empty icon={<BookOpen size={48} strokeWidth={1.5} />} title="Здесь будет то, что вы приготовили" mood="book"
                 actions={<button className="btn-outline" onClick={() => replace(routeHash({ tab: "recipes" }))}>Выбрать рецепт</button>}>
                 Всё, что вы приготовите в режиме готовки, появится здесь — с датой и вашими заметками.
               </Empty>

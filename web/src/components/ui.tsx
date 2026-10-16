@@ -179,7 +179,7 @@ export function Empty({ icon, title, children, actions, mood = "think" }: { icon
   return (
     <div className="mt-6 rounded-card border border-dashed border-line-strong/50 px-5 py-8 text-center">
       {/* Шеф himself rather than a grey icon: an empty screen feels like an invitation, not an error. */}
-      <div className="mb-2 flex justify-center">{icon === undefined || icon ? <Mascot size={96} mood={mood} /> : null}</div>
+      <div className="mb-2 flex justify-center">{icon === undefined || icon ? <Mascot size={112} mood={mood} /> : null}</div>
       <h2 className="text-h2">{title}</h2>
       {children && <p className="mx-auto mt-2 max-w-md text-body-sm text-ink-soft">{children}</p>}
       {actions && <div className="mt-5 flex flex-wrap justify-center gap-2">{actions}</div>}

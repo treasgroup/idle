@@ -1,7 +1,7 @@
 // «Праздничный стол»: three short steps — how many guests and when to serve, the dishes (one tap to swap), and the
 // result: one shopping list for everybody and a plan of when to start each dish so all is ready on time.
 import { useMemo, useState } from "react";
-import { BellRing, ChevronLeft, PartyPopper, RefreshCw, ShoppingCart, X } from "lucide-react";
+import { BellRing, ChevronLeft, RefreshCw, ShoppingCart, X } from "lucide-react";
 import {
   CATALOG_SECTIONS, addToShopping, clampServings, courseOf, formatMinutes, freshConditions, ingredientsToBuy, plural, rankRecipes, recipes,
   type Recipe,
@@ -12,6 +12,7 @@ import { startTimer } from "../app/timers";
 import { cue } from "../app/feedback";
 import { RecipeImage } from "./RecipeCard";
 import { Chip, Sheet, Stepper } from "./ui";
+import { Mascot } from "./Mascot";
 
 const SLOTS: { key: string; label: string; courses: string[] }[] = [
   { key: "salad1", label: "Салат", courses: ["salad"] },
@@ -94,7 +95,10 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
           </div>}>
       {step === 0 && (
         <div>
-          <p className="flex items-center gap-2 text-body-sm text-ink-soft"><PartyPopper size={18} aria-hidden />Соберу стол на всех: салаты, закуску, горячее и сладкое.</p>
+          <div className="flex items-center gap-4">
+            <Mascot size={104} mood="feast" className="shrink-0" />
+            <p className="text-body-sm text-ink-soft">Соберу стол на всех: салаты, закуску, горячее и сладкое.</p>
+          </div>
           <div className="mt-5 flex items-center justify-between gap-3 rounded-card border border-line bg-card p-4">
             <span className="text-body-sm font-medium">Сколько человек</span>
             <Stepper value={guests} min={2} max={24} onChange={setGuests} label="Гостей" />

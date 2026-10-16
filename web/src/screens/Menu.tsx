@@ -118,7 +118,7 @@ export function Menu() {
 
       {!filled ? (
         <div className="mt-6">
-          <Empty icon={<CalendarDays size={48} />} title="Составлю план за секунду"
+          <Empty icon={<CalendarDays size={48} />} title="Составлю план за секунду" mood="plan"
             actions={<button className="btn-primary h-13" onClick={make}><Sparkles size={18} />Составить план</button>}>
             Блюда без повторов, в будни — быстрые, с общими продуктами, чтобы ничего не пропадало. Список покупок соберётся сам.
           </Empty>
