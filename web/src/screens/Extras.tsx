@@ -10,6 +10,7 @@ import { RecipeRow } from "../components/RecipeCard";
 import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
 import { SchoolArt } from "../components/SchoolArt";
+import { Mascot } from "../components/Mascot";
 
 /** «Школа готовки»: short lessons, each with a skill and recipes to practise it. */
 export function Learn({ onClose }: { onClose: () => void }) {
@@ -241,8 +242,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         ) : (
           <div className="anim-rise flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
             <div className="flex flex-1 flex-col justify-center py-8">
-              <ChefAvatar size={64} />
-              <h1 className="mt-5 text-display">Знакомьтесь — Шеф</h1>
+              <Mascot size={170} className="-ml-2" />
+              <h1 className="mt-3 text-display">Знакомьтесь — Шеф</h1>
               <p className="mt-3 text-body text-ink-soft">Ваш кулинарный помощник. Напишите или скажите, что есть дома, сколько времени и какое настроение, — он подберёт рецепт. И ответит на любой вопрос на кухне.</p>
               <p className="label mb-2 mt-8">Попробуйте спросить</p>
               <div className="grid gap-2">

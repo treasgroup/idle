@@ -175,7 +175,7 @@ function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSu
   ];
   return (
     <div className="anim-rise space-y-4 pb-6 pt-4">
-      <div className="flex justify-center pt-2"><Mascot size={104} mood="happy" /></div>
+      <div className="flex justify-center pt-2"><Mascot size={128} mood="happy" /></div>
       <p className="mx-auto w-fit rounded-full bg-sunken px-3 py-1 text-caption text-ink-soft">Сегодня</p>
       <p className="max-w-[85%] rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-3 text-body">
         Здравствуйте! Я Шеф — помогу выбрать, что приготовить. Скажите, что есть дома или чего хочется. Можно голосом — кнопка с микрофоном внизу.

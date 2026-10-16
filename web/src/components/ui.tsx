@@ -1,8 +1,8 @@
 import { Component, useEffect, useId, useRef, useState, type ErrorInfo, type ReactNode } from "react";
-import { X, Minus, Plus, ChevronLeft, ChevronRight, ChefHat } from "lucide-react";
+import { X, Minus, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { cue } from "../app/feedback";
 import { reportError } from "../app/errors";
-import { Mascot, type Mood } from "./Mascot";
+import { AVATAR, Mascot, type Mood } from "./Mascot";
 
 /** A light tap of vibration for actions that change something (Android; ignored elsewhere). */
 export const haptic = (): void => cue("tap");
@@ -45,16 +45,10 @@ function useOverlay(active: boolean, close: () => void, sheet = false) {
 }
 
 /** Шеф's round avatar. */
-export function ChefAvatar({ size = 32, mood }: { size?: number; mood?: Mood }) {
-  // Small sizes keep the plain hat (a face would be a blur); from 36 px Шеф is the character.
-  if (size < 36) return (
-    <span aria-hidden className="inline-grid shrink-0 place-items-center rounded-full bg-brand-fill text-white" style={{ width: size, height: size }}>
-      <ChefHat size={Math.round(size * 0.56)} strokeWidth={2} />
-    </span>
-  );
+export function ChefAvatar({ size = 32 }: { size?: number; mood?: Mood }) {
   return (
-    <span aria-hidden className="inline-grid shrink-0 place-items-end justify-center overflow-hidden rounded-full bg-brand-soft" style={{ width: size, height: size }}>
-      <Mascot size={Math.round(size * 1.05)} mood={mood} className="-mb-[6%]" />
+    <span aria-hidden className="inline-block shrink-0 overflow-hidden rounded-full bg-brand-soft" style={{ width: size, height: size }}>
+      <img src={AVATAR} alt="" width={size} height={size} decoding="async" draggable={false} className="h-full w-full object-cover" />
     </span>
   );
 }
