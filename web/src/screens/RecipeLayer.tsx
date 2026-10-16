@@ -302,7 +302,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         <div className="mx-auto max-w-3xl sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+4rem)] lg:max-w-[1120px] lg:px-8 lg:pt-[calc(env(safe-area-inset-top)+4.5rem)]">
           {/* Top: photo, title, facts, nutrition (and the actions on wide screens) */}
           <div className="lg:grid lg:grid-cols-[minmax(0,560px)_minmax(340px,1fr)] lg:items-start lg:gap-8 xl:gap-10">
-            <RecipeImage recipe={base} eager className="aspect-[4/3] w-full sm:aspect-[3/2]" rounded="rounded-none sm:rounded-card" />
+            <RecipeImage recipe={base} eager hero className="aspect-[4/3] w-full sm:aspect-[3/2]" rounded="rounded-none sm:rounded-card" />
             <div className="px-4 pt-5 sm:px-0 sm:pt-6 lg:pt-1">
               <h1 ref={h1} className="text-h1 xl:text-display">{base.title}</h1>
               {(!!sum?.count || cookedTimes > 0) && (

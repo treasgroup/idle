@@ -2,6 +2,7 @@ import { Component, useEffect, useId, useRef, useState, type ErrorInfo, type Rea
 import { X, Minus, Plus, ChevronLeft, ChevronRight, ChefHat } from "lucide-react";
 import { cue } from "../app/feedback";
 import { reportError } from "../app/errors";
+import { Mascot, type Mood } from "./Mascot";
 
 /** A light tap of vibration for actions that change something (Android; ignored elsewhere). */
 export const haptic = (): void => cue("tap");
@@ -44,10 +45,16 @@ function useOverlay(active: boolean, close: () => void, sheet = false) {
 }
 
 /** Шеф's round avatar. */
-export function ChefAvatar({ size = 32 }: { size?: number }) {
-  return (
+export function ChefAvatar({ size = 32, mood }: { size?: number; mood?: Mood }) {
+  // Small sizes keep the plain hat (a face would be a blur); from 36 px Шеф is the character.
+  if (size < 36) return (
     <span aria-hidden className="inline-grid shrink-0 place-items-center rounded-full bg-brand-fill text-white" style={{ width: size, height: size }}>
       <ChefHat size={Math.round(size * 0.56)} strokeWidth={2} />
+    </span>
+  );
+  return (
+    <span aria-hidden className="inline-grid shrink-0 place-items-end justify-center overflow-hidden rounded-full bg-brand-soft" style={{ width: size, height: size }}>
+      <Mascot size={Math.round(size * 1.05)} mood={mood} className="-mb-[6%]" />
     </span>
   );
 }
@@ -168,10 +175,11 @@ export function Section({ title, icon, action, onAction, children, className, id
   );
 }
 
-export function Empty({ icon, title, children, actions }: { icon?: ReactNode; title: string; children?: ReactNode; actions?: ReactNode }) {
+export function Empty({ icon, title, children, actions, mood = "think" }: { icon?: ReactNode; title: string; children?: ReactNode; actions?: ReactNode; mood?: Mood }) {
   return (
     <div className="mt-6 rounded-card border border-dashed border-line-strong/50 px-5 py-8 text-center">
-      {icon && <div className="mb-3 flex justify-center text-ink-faint">{icon}</div>}
+      {/* Шеф himself rather than a grey icon: an empty screen feels like an invitation, not an error. */}
+      <div className="mb-2 flex justify-center">{icon === undefined || icon ? <Mascot size={96} mood={mood} /> : null}</div>
       <h2 className="text-h2">{title}</h2>
       {children && <p className="mx-auto mt-2 max-w-md text-body-sm text-ink-soft">{children}</p>}
       {actions && <div className="mt-5 flex flex-wrap justify-center gap-2">{actions}</div>}
@@ -271,6 +279,7 @@ export class Boundary extends Component<{ children: ReactNode; resetKey?: string
     if (!this.state.error) return this.props.children;
     return (
       <div className="mx-4 mt-8 rounded-card border border-line p-6 text-center">
+        <div className="mb-2 flex justify-center"><Mascot size={88} mood="oops" /></div>
         <h2 className="text-h2">Что-то пошло не так</h2>
         <p className="mt-1 text-body-sm text-ink-soft">Обновите страницу — ваши рецепты, план и покупки сохранены.</p>
         <button className="btn-primary mt-4" onClick={() => location.reload()}>Обновить</button>

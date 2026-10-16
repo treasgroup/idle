@@ -8,6 +8,7 @@ import { useStore } from "./store";
 import { openLayer, close, routeHash, parseRoute } from "./router";
 import { stopTimersFor } from "./timers";
 import { cue } from "./feedback";
+import { withPhotoTransition } from "./transition";
 
 /** Ingredient ids the person has: the conditions they named plus the home pantry and staples. */
 export function haveIds(s: EngineState): string[] {
@@ -30,7 +31,7 @@ export function useActions() {
     track({ type: "open", recipeId: id });
     if (recipe) update((st) => ({ ...st, engaged: true, recent: [recipe, ...st.recent.filter((x) => x.id !== id)].slice(0, 20) }));
     const route = parseRoute(location.hash);
-    openLayer(routeHash({ tab: route.tab, recipe: id }));
+    withPhotoTransition(id, () => openLayer(routeHash({ tab: route.tab, recipe: id })));
   }, [update, toast, catalog.source]);
 
   const closeRecipe = useCallback(() => {

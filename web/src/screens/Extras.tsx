@@ -9,6 +9,7 @@ import { goChat } from "../app/chatNav";
 import { RecipeRow } from "../components/RecipeCard";
 import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
+import { SchoolArt } from "../components/SchoolArt";
 
 /** «Школа готовки»: short lessons, each with a skill and recipes to practise it. */
 export function Learn({ onClose }: { onClose: () => void }) {
@@ -40,6 +41,7 @@ export function Learn({ onClose }: { onClose: () => void }) {
                 </button>
                 {expanded && (
                   <div className="border-t border-line px-4 pb-4 pt-3">
+                    <SchoolArt lesson={l.id} />
                     <ul className="grid gap-2 text-body-sm">{l.points.map((p) => <li key={p} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-herb" aria-hidden />{p}</li>)}</ul>
                     <div className="mt-4 grid gap-2">{l.recipes.map((id) => { const r = recipeById(id); return r ? <RecipeRow key={id} recipe={r} note="Попробуйте на практике" onOpen={() => openRecipe(r)} /> : null; })}</div>
                     <button className={cx("mt-4 w-full", isDone ? "btn-ghost" : "btn-primary")} onClick={() => {

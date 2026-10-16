@@ -1,13 +1,14 @@
 // «Семейная книга»: the family's own recipes — typed in or read from a photo of a notebook page — kept with the
 // person's other things and sent to children and grandchildren as a link that opens straight into their book.
 import { useRef, useState } from "react";
-import { BookHeart, Camera, Clock, PenLine, Printer, Send, Trash2, Users } from "lucide-react";
+import { Camera, Clock, PenLine, Printer, Send, Trash2, Users } from "lucide-react";
 import { canShare, copyText, plural, type MyRecipe } from "../engine";
 import { useStore } from "../app/store";
 import { lines, newRecipe, recipeText, removeRecipe, saveRecipe, shareLink } from "../app/myRecipes";
 import { cue } from "../app/feedback";
 import { printPage } from "../app/print";
 import { Layer, Sheet, Stepper, cx } from "./ui";
+import { Mascot } from "./Mascot";
 
 export function FamilyBook() {
   const { s } = useStore();
@@ -19,7 +20,7 @@ export function FamilyBook() {
     <div className="mt-6">
       {list.length === 0 ? (
         <div className="rounded-card border border-dashed border-line-strong/50 px-5 py-8 text-center">
-          <BookHeart size={48} strokeWidth={1.5} className="mx-auto text-ink-faint" aria-hidden />
+          <Mascot size={96} mood="happy" className="mx-auto" />
           <h2 className="mt-3 text-h2">Семейная книга рецептов</h2>
           <p className="mx-auto mt-2 max-w-md text-body-sm text-ink-soft">Бабушкин наполеон, мамины котлеты, ваш фирменный салат — сохраните их здесь и отправьте детям и внукам. Можно сфотографировать страницу тетради — текст распознается сам.</p>
         </div>

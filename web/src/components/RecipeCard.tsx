@@ -6,17 +6,19 @@ import { useStore } from "../app/store";
 import { cx } from "./ui";
 
 /** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
-export function RecipeImage({ recipe, className, rounded = "rounded-img", eager }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean }) {
+export function RecipeImage({ recipe, className, rounded = "rounded-img", eager, hero }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean; hero?: boolean }) {
+  // data-photo: the card's picture that flows into the recipe page; hero: the page's own picture (see app/transition).
+  const vt = hero ? { "data-photo-hero": "1", style: { viewTransitionName: "recipe-photo" } } : { "data-photo": recipe.id };
   const src = photoUrl(recipe.id);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   if (src && !failed)
-    return <img src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" onError={() => setFailed(true)} onLoad={() => setLoaded(true)}
+    return <img {...vt} src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" onError={() => setFailed(true)} onLoad={() => setLoaded(true)}
       className={cx("object-cover", loaded ? "img-in bg-sunken" : "skeleton", rounded, className)} />;
   const [a, b] = dishTint(recipe);
   const v = dishVariant(recipe);
   return (
-    <div aria-hidden className={cx("relative grid place-items-center overflow-hidden", rounded, className)} style={{ containerType: "size" }}>
+    <div aria-hidden {...vt} className={cx("relative grid place-items-center overflow-hidden", rounded, className)} style={{ containerType: "size", ...(hero ? { viewTransitionName: "recipe-photo" } : {}) }}>
       <span className="absolute inset-0 dark:opacity-25" style={{ background: `radial-gradient(120% 120% at ${v.x}% 15%, ${a} 0%, ${b} 100%)` }} />
       <span className="absolute rounded-full bg-white/80 shadow-[0_4px_14px_rgba(60,30,10,.12)] dark:bg-white/10"
         style={{ width: "min(74cqh, 74cqw)", height: "min(74cqh, 74cqw)" }} />
