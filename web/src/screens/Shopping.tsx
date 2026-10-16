@@ -90,9 +90,8 @@ export function Shopping() {
               <span className={cx(i.checked && "text-ink-faint line-through")}>{name}</span>
               {!i.checked && <span className="whitespace-nowrap text-ink-soft"> · {hint ?? formatAmount(i.amount, i.unit)}</span>}
             </span>
-            {!i.checked && (hint || i.recipes?.length) && (
-              <span className="block truncate text-caption text-ink-soft">{[hint ? formatAmount(i.amount, i.unit) : "", i.recipes?.slice(0, 2).join(", ")].filter(Boolean).join(" · ")}</span>
-            )}
+            {/* Under the name only how much is really needed when a whole pack is bought; which dishes — in «…». */}
+            {!i.checked && hint && <span className="block truncate text-caption text-ink-soft">нужно {formatAmount(i.amount, i.unit)}</span>}
           </span>
         </button>
         <button className="icon-btn mr-1 shrink-0 text-ink-soft" onClick={() => setMore(i)} aria-label={"Ещё: " + name}><MoreHorizontal size={18} /></button>
@@ -183,6 +182,7 @@ export function Shopping() {
       <Sheet open={!!more} title={more ? shoppingName(more.ingredientId, more.name) : ""} onClose={() => setMore(null)}>
         {more && (
           <div className="grid gap-2">
+            {!!more.recipes?.length && <p className="mb-1 text-small text-ink-soft">{formatAmount(more.amount, more.unit)} · для: {more.recipes.join(", ")}</p>}
             <button className="btn-outline justify-start" onClick={() => { toggle(more.key); setMore(null); }}><Check size={18} />{more.checked ? "Вернуть в список" : "Отметить купленным"}</button>
             <button className="btn-outline justify-start text-brand" onClick={() => { const k = more.key; withUndo("Удалено из списка", (l) => l.filter((x) => x.key !== k)); setMore(null); }}><Trash2 size={18} />Удалить</button>
           </div>

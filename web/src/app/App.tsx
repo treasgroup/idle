@@ -181,14 +181,17 @@ function Shell() {
         {!layer && !keyboard && <BottomNav route={route} go={go} />}
       </div>
 
+      {/* Школа first: a recipe opened from a lesson lies over it, and «Назад» returns to the same lesson. */}
+      <Suspense fallback={route.tab === "learn" && !route.recipe ? <LayerSkeleton /> : null}>
+        {route.tab === "learn" && <Learn onClose={closeTop} />}
+      </Suspense>
       <Boundary resetKey={(route.recipe ?? "") + route.cook}>
         <Suspense fallback={<LayerSkeleton />}>
           {route.recipe && <RecipeLayer id={route.recipe} onClose={closeRecipe} />}
           {route.cook && <CookingLayer onClose={closeTop} />}
         </Suspense>
       </Boundary>
-      <Suspense fallback={route.tab === "learn" || route.doc ? <LayerSkeleton /> : null}>
-        {route.tab === "learn" && <Learn onClose={closeTop} />}
+      <Suspense fallback={route.doc ? <LayerSkeleton /> : null}>
         {route.doc && <DocLayer doc={route.doc} onClose={closeTop} />}
         {poll && <PollSheet token={poll} onClose={() => setPoll(null)} />}
         {onboarding && <Onboarding onDone={() => setOnboarding(false)} />}

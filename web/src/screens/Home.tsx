@@ -83,7 +83,6 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   if (profile.simple) return <SimpleHome today={today} />;
 
   const quick = all.filter((r) => r.totalMinutes <= 30 && r.id !== today?.id).slice(0, 10);
-  const soups = recipes().filter((r) => courseOf(r) === "soup").sort((a, b) => a.totalMinutes - b.totalMinutes).slice(0, 10);
   const kids = all.filter((r) => r.kids === true && r.id !== today?.id).slice(0, 10);
   const seasonal = season ? recipes().filter(season.test).slice(0, 10) : [];
 
@@ -124,11 +123,10 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 
       <Now />
       <Rescue />
-      {season && seasonal.length >= 4 && <Shelf title={season.title} hint={season.hint} list={seasonal}
+      {season && seasonal.length >= 4 && <Shelf title={season.title} list={seasonal}
         extra={FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />Собрать праздничный стол</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
-      {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} hint="До 30 минут" list={quick} all={() => openRecipesView("time:30")} />}
-      <Shelf title="Супы" list={soups} all={() => openRecipesView("dish:soup")} />
+      {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} list={quick} all={() => openRecipesView("time:30")} />}
       {(profile.kids || profile.goals.includes("family")) && kids.length >= 4 && <Shelf title="Детям нравится" list={kids} all={() => openRecipesView("filter:kids")} />}
       <Saved />
       <CourseCard />
@@ -184,12 +182,11 @@ function RepeatCard() {
 }
 
 /** A collection that scrolls sideways, like a shelf in a streaming app. */
-function Shelf({ title, hint, list, all, extra }: { title: string; hint?: string; list: Recipe[]; all?: () => void; extra?: ReactNode }) {
+function Shelf({ title, list, all, extra }: { title: string; list: Recipe[]; all?: () => void; extra?: ReactNode }) {
   const { openRecipe } = useActions();
   if (!list.length) return null;
   return (
     <Section title={title} action={all ? "Все" : undefined} onAction={all}>
-      {hint && <p className="-mt-2 mb-3 text-small text-ink-soft">{hint}</p>}
       <ScrollRow label={title}>
         {list.map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className="w-[168px] shrink-0 snap-start sm:w-[200px]" />)}
       </ScrollRow>

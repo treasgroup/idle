@@ -1,7 +1,7 @@
 // Reviews of a recipe: the average with a star breakdown, the list (sorting, «Полезно», complaints)
 // and the form in a sheet. The rules open in a sheet over the form, so a half-written review is kept.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Star, ThumbsUp, Flag, Camera, X, PenLine, MessageSquare, RotateCw } from "lucide-react";
+import { Star, ThumbsUp, Flag, Camera, X, PenLine, RotateCw } from "lucide-react";
 import { legalDoc, legalInfo, plural, reviewsApi, reviewsWord, ratingText, type Recipe, type Review, type ReviewList } from "../engine";
 import { useStore } from "../app/store";
 import { Section, Segmented, Sheet, cx } from "../components/ui";
@@ -79,11 +79,9 @@ export function Reviews({ recipe, state, id, className }: { recipe: Recipe; stat
       )}
 
       {data && count === 0 && !data.reviews.length && (
-        <div className="rounded-card border border-dashed border-line-strong/50 px-5 py-6 text-center">
-          <MessageSquare size={32} className="mx-auto text-ink-faint" aria-hidden />
-          <h3 className="mt-2 text-title">Отзывов пока нет</h3>
-          <p className="mx-auto mt-1 max-w-sm text-body-sm text-ink-soft">Приготовили? Расскажите, как получилось, — это поможет другим.</p>
-          <button className="btn-primary mt-4" onClick={() => setWriting(true)}><Star size={18} />Оценить рецепт</button>
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-line bg-card px-4 py-3">
+          <span className="text-body-sm text-ink-soft">Отзывов пока нет</span>
+          <button className="btn-outline h-11" onClick={() => setWriting(true)}><Star size={18} />Оценить</button>
         </div>
       )}
 

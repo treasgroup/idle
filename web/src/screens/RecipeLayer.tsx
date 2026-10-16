@@ -3,10 +3,10 @@
 // facts and actions right, the products column sticks while the steps scroll.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
-  Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
-  Timer, BellRing, Lightbulb, Users, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon } from "lucide-react";
+  Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Clock, Flame,
+  Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon } from "lucide-react";
 import {
-  LABELS, clampServings, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
+  LABELS, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide, yieldText,
   type Recipe, type RecipeIngredient,
 } from "../engine";
@@ -23,7 +23,7 @@ import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
-import { AskSheet, accusative, askStarters, type AskRequest } from "../components/AskSheet";
+import { AskSheet, accusative, type AskRequest } from "../components/AskSheet";
 import { shareRecipeCard } from "../app/shareCard";
 import { ServeBySheet } from "../components/ServeBy";
 import { ShareOptions } from "../components/ShareOptions";
@@ -32,7 +32,6 @@ import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../c
 import { Reviews, Stars, useReviews } from "./Reviews";
 
 const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
-const SIZE_NAMES = { m: "обычный", l: "крупный", xl: "очень крупный" } as const;
 const ANCHORS = [
   { id: "recipe-products", label: "Продукты" },
   { id: "recipe-steps", label: "Шаги" },
@@ -168,18 +167,11 @@ function stepLabel(text: string): string {
 interface Group { key: string; title: string | null; rows: RecipeIngredient[]; added?: boolean }
 
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
-  const { s, profile, setProfile, update, toast, online } = useStore();
+  const { s, profile, toast, online } = useStore();
   const [haveHint, haveSeen] = useHint("recipe-have");
   const [serveOpen, setServeOpen] = useState(false);
   const [panOpen, setPanOpen] = useState(false);
   const pan = useMemo(() => panOf(base), [base]);
-  const textSize = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
-  const bigger = () => {
-    const next = textSize === "m" ? "l" : textSize === "l" ? "xl" : "m";
-    setProfile((p) => ({ ...p, textSize: next }));
-    update((st) => ({ ...st, largeText: next !== "m" }));
-    toast("Текст: " + SIZE_NAMES[next]);
-  };
   const { isFavorite, toggleFavorite, addRecipeToShopping, startCooking, openRecipe } = useActions();
   const reviews = useReviews(base.id);
   const [servings, setServings] = useState(() => clampServings(base, s.conditions.servings || profile.eaters));
@@ -209,7 +201,6 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const nutrition = nutritionOf(base).perServing;
   const fav = isFavorite(base.id);
   const related = useMemo(() => similarRecipes(base, (r) => !s.preferences.excluded.some((e) => r.allergens.includes(e)), 8), [base, s.preferences.excluded]);
-  const starters = useMemo(() => askStarters(askRecipe, servings, s.preferences), [askRecipe, servings, s.preferences]);
   const cookedTimes = s.book.filter((b) => b.recipeId === base.id).length;
   const cookingThis = !!s.cooking && !s.cooking.done && s.cooking.recipe.id === base.id;
 
@@ -257,20 +248,11 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const ask = (text?: string) => { setAskReq(text ? { text, key: Date.now() } : null); setAskOpen(true); };
   const cook = () => (cookingThis ? openLayer(routeHash({ cook: true })) : startCooking(recipe, servings));
 
-  // The three things people ask first, as big tiles; the rest as small pills under them.
-  const facts: { icon: ReactNode; label: string; value: string; more?: string; onClick?: () => void }[] = [
-    { icon: <Clock size={20} />, label: "Время", value: formatMinutes(recipe.totalMinutes), more: "к сроку", onClick: () => setServeOpen(true) },
-    { icon: <Gauge size={20} />, label: "Сложность", value: DIFF[base.difficulty] ?? base.difficulty },
-    { icon: <Users size={20} />, label: "Порции", value: "на " + servings + " " + plural(servings, "человека", "человека", "человек"), onClick: () => go("recipe-products") },
-  ];
-  const flags: { icon: ReactNode; label: string }[] = [
-    ...(base.budget === "low" ? [{ icon: <ShoppingBasket size={16} />, label: "Из простых продуктов" }] : []),
-    ...(base.tags.includes("vegetarian") ? [{ icon: <Leaf size={16} />, label: "Без мяса" }] : []),
-    ...(isLenten(base) ? [{ icon: <Sprout size={16} />, label: "Постное" }] : []),
-    ...(base.kids ? [{ icon: <Baby size={16} />, label: "Можно детям" }] : []),
-    ...(base.storageDays ? [{ icon: <Refrigerator size={16} />, label: "Хранится " + base.storageDays + " " + plural(base.storageDays, "день", "дня", "дней") }] : []),
-    ...(base.freezerDays ? [{ icon: <Snowflake size={16} />, label: "Можно заморозить" }] : []),
-  ];
+  // How long it keeps: shown with the tips (the top of the page stays short).
+  const keeps = [
+    base.storageDays ? "Хранится в холодильнике " + base.storageDays + " " + plural(base.storageDays, "день", "дня", "дней") : "",
+    base.freezerDays ? "можно заморозить" : "",
+  ].filter(Boolean).join(", ").replace(/^м/, "М") + (base.storageDays || base.freezerDays ? "." : "");
   // Гарнир: before the products on phones, above the steps next to the products column on wide screens.
   const sidePicker = sides.length > 0 && (
     <Section title="Гарнир">
@@ -287,9 +269,6 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   return (
     <Layer title={base.title} onClose={onClose} width="max-w-none" transparentUntil={header.until} label={base.title} actions={
       <>
-        <button className="icon-btn text-body-sm font-medium" onClick={bigger} aria-label={"Размер текста: " + SIZE_NAMES[textSize]} title="Размер текста">
-          <span className="flex items-baseline" aria-hidden><span className="text-title">А</span><span className="text-small">а</span></span>
-        </button>
         <button className="icon-btn" onClick={() => setShareOpen(true)} aria-label="Поделиться"><Share2 size={20} /></button>
         <button className="icon-btn" onClick={() => toggleFavorite(base)} aria-label={fav ? "Убрать из сохранённого" : "Сохранить"} aria-pressed={fav}>
           <Heart size={20} className={cx(fav && "fill-brand text-brand")} />
@@ -321,29 +300,11 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <PenLine size={18} className="mt-0.5 shrink-0 text-ink-soft" aria-hidden /><span><span className="text-ink-soft">Ваша заметка: </span>{s.notes[base.id]}</span>
                 </button>
               )}
-              <dl className="mt-4 grid grid-cols-3 gap-2">
-                {facts.map((f) => {
-                  const inner = (
-                    <>
-                      <span className="text-ink-soft" aria-hidden>{f.icon}</span>
-                      <dt className="text-caption text-ink-soft">{f.label}</dt>
-                      <dd className="text-body-sm font-medium leading-snug">{f.value}</dd>
-                      {f.more && <span className="text-caption text-ink-faint underline decoration-dotted underline-offset-2">{f.more}</span>}
-                    </>
-                  );
-                  const cls = "flex h-full min-h-[88px] flex-col items-center justify-center gap-0.5 rounded-input border border-line bg-card px-1.5 py-2.5 text-center";
-                  return f.onClick
-                    ? <div key={f.label}><button className={cx(cls, "w-full hover:border-line-strong")} onClick={f.onClick}>{inner}</button></div>
-                    : <div key={f.label} className={cls}>{inner}</div>;
-                })}
-              </dl>
-              {flags.length > 0 && <ul className="mt-3 flex flex-wrap gap-2" aria-label="Коротко о блюде">
-                {flags.map((f) => (
-                  <li key={f.label} className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-full bg-sunken px-3 text-small text-ink">
-                    <span className="text-ink-soft" aria-hidden>{f.icon}</span>{f.label}
-                  </li>
-                ))}
-              </ul>}
+              <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-body text-ink-soft">
+                <Clock size={18} aria-hidden /><span className="text-ink">{formatMinutes(recipe.totalMinutes)}</span>
+                <span aria-hidden>·</span>{DIFF[base.difficulty] ?? base.difficulty}
+                <span aria-hidden>·</span>на {servings} {plural(servings, "человека", "человека", "человек")}
+              </p>
               {nutrition.kcal > 0 && <Nutrition recipe={base} n={nutrition} side={!!side} />}
               <div className="mt-6 hidden gap-3 lg:flex">
                 <button className="btn-primary btn-bar flex-1" onClick={cook}><ChefHat size={20} />{cookingThis ? "Продолжить готовить" : "Начать готовить"}</button>
@@ -363,7 +324,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <h2 className="text-h2">Продукты</h2>
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
-                {(!!base.yields || haveHint) && <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}{haveHint && "Отметьте, что уже есть дома."}</p>}
+                {(!!base.yields || haveHint) && <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}</p>}
                 <HaveBar owned={owned} total={needed.length} missing={missing} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (
@@ -395,7 +356,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
 
             <div className="min-w-0">
               {sidePicker && <div className="hidden lg:block">{sidePicker}</div>}
-              <AskCard starters={starters} ask={ask} />
+              <AskCard ask={ask} />
 
               <Section id="recipe-steps" className={UNDER_HEADER} title="Шаги"
                 action={<span className="text-small text-ink-soft">{recipe.steps.length} {plural(recipe.steps.length, "шаг", "шага", "шагов")} · {formatMinutes(recipe.totalMinutes)}</span>}>
@@ -409,15 +370,6 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                         <div className="min-w-0 flex-1 pt-0.5">
                           {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
                           <p className="text-body">{part.text}</p>
-                          {(st.uses?.length ?? 0) > 0 && (
-                            <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="Продукты для шага">
-                              {[...new Set(st.uses)].map((id) => {
-                                const row = (part.side ? [...groups].reverse() : groups).flatMap((g) => g.rows).find((x) => x.id === id);
-                                if (!row) return null;
-                                return <li key={id} className="rounded-full bg-sunken px-2.5 py-1 text-small text-ink-soft">{displayName(row.id, row.name)} <b className="whitespace-nowrap font-semibold text-ink">{homeAmount(row)}</b></li>;
-                              })}
-                            </ul>
-                          )}
                           {tips[n] && <ChefSecret text={tips[n]!} className="mt-3" />}
                           {!!st.timerSeconds && <TimerChip recipe={base} step={n} text={st.text} seconds={st.timerSeconds} />}
                         </div>
@@ -425,12 +377,17 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                     );
                   })}
                 </ol>
+                <button className="mt-5 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60" onClick={() => setServeOpen(true)}>
+                  <Clock size={18} className="shrink-0" aria-hidden />
+                  <span className="flex-1">Нужно успеть к определённому часу? Подскажу, когда начинать</span>
+                  <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+                </button>
               </Section>
 
-              {base.tips.length > 0 && (
+              {(base.tips.length > 0 || keeps) && (
                 <Section title="Советы">
                   <ul className="card space-y-3 p-4">
-                    {base.tips.map((t) => <li key={t} className="flex gap-3 text-body-sm"><Lightbulb size={20} className="mt-px shrink-0 text-ink-soft" aria-hidden />{t}</li>)}
+                    {[...(keeps ? [keeps] : []), ...base.tips].map((t) => <li key={t} className="flex gap-3 text-body-sm"><Lightbulb size={20} className="mt-px shrink-0 text-ink-soft" aria-hidden />{t}</li>)}
                   </ul>
                 </Section>
               )}
@@ -600,7 +557,6 @@ function HaveBar({ owned, total, missing, onBuy }: { owned: number; total: numbe
 /** One product: tap marks «есть дома». */
 function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boolean; flash?: boolean; first: boolean; onToggle: () => void }) {
   const q = homeQuantity(i);
-  const swaps = (i.swap || []).map((x) => ingredient(x)?.name).filter(Boolean) as string[];
   return (
     <li className={cx(!first && "border-t border-line")}>
       <button className={cx("flex min-h-[52px] w-full items-center gap-1 rounded-input py-1 pr-3 text-left lg:min-h-[44px] lg:py-0.5", flash && "anim-flash")} onClick={onToggle} aria-pressed={own}>
@@ -613,7 +569,6 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
           <span className="text-body-sm">{displayName(i.id, i.name)}</span>
           {i.optional && <span className="text-caption text-ink-faint"> · по желанию</span>}
           {/* A swap only matters when the product is missing. */}
-          {swaps.length > 0 && !own && i.id !== "water" && <span className="block text-caption text-ink-faint">нет дома — замените: {swaps.slice(0, 2).join(", ").toLowerCase()}</span>}
           {own && <span className="sr-only"> — есть дома</span>}
         </span>
         <span className="shrink-0 pl-2 text-right">
@@ -625,23 +580,16 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
   );
 }
 
-/** «Спросить Шефа» about this recipe: the card opens the sheet; a chip asks right away. */
-function AskCard({ starters, ask }: { starters: string[]; ask: (text?: string) => void }) {
+/** «Спросить Шефа» about this recipe: opens the sheet with ready questions. */
+function AskCard({ ask }: { ask: (text?: string) => void }) {
   return (
-    <section className="card mt-8 p-4" aria-label="Спросить Шефа">
-      <button className="-m-2 flex w-[calc(100%+1rem)] items-center gap-3 rounded-input p-2 text-left hover:bg-sunken/60" onClick={() => ask()}>
-        <ChefAvatar size={40} />
-        <span className="min-w-0 flex-1">
-          <span className="block text-title">Спросить Шефа</span>
-          <span className="block text-small text-ink-soft">Замены, порции, хранение — отвечу про этот рецепт</span>
-        </span>
-        <ChevronRight size={20} className="shrink-0 text-ink-faint" aria-hidden />
+    // One line; the ready questions are in the sheet it opens.
+    <section className="mt-8" aria-label="Спросить Шефа">
+      <button className="flex min-h-[56px] w-full items-center gap-3 rounded-card bg-brand-soft px-3 py-2 text-left" onClick={() => ask()}>
+        <ChefAvatar size={36} />
+        <span className="min-w-0 flex-1 text-body-sm font-medium">Спросить Шефа про этот рецепт</span>
+        <ChevronRight size={20} className="shrink-0 text-brand" aria-hidden />
       </button>
-      {starters.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {starters.slice(0, 3).map((q) => <Chip key={q} onClick={() => ask(q)} className="h-auto min-h-[40px] max-w-full whitespace-normal py-2 text-left">{q}</Chip>)}
-        </div>
-      )}
     </section>
   );
 }

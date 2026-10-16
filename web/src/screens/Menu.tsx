@@ -1,10 +1,10 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, PartyPopper, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
+  CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
 } from "lucide-react";
 import {
-  MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
+  MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, formatMinutes, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
   rankRecipes, recipeById, recipes, regenerateDay, removeMenuItem, replaceMenuItem, sharedPerishables, siteBase, weekDays,
   type MenuDay, type MenuPlan, type Recipe,
 } from "../engine";
@@ -13,11 +13,10 @@ import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
 import { replace, routeHash } from "../app/router";
 import type { Profile } from "../app/profile";
-import { RecipeImage, RecipeMeta } from "../components/RecipeCard";
+import { RecipeImage } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
-import { FeastSheet } from "../components/Feast";
 
 /** The person's goals narrow the dishes a menu is made of (passed to the engine only, never stored). */
 function goalFilter(p: Profile): ((r: Recipe) => boolean) | undefined {
@@ -39,7 +38,6 @@ export function Menu() {
   const { s, update, profile, setProfile, toast } = useStore();
   const { openRecipe } = useActions();
   const [settings, setSettings] = useState(false);
-  const [feast, setFeast] = useState(false);
   const [share, setShare] = useState(false);
   const [itemMenu, setItemMenu] = useState<{ date: string; index: number } | null>(null);
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
@@ -109,12 +107,11 @@ export function Menu() {
         <h1 className="text-h1">План на неделю</h1>
         {filled && <button className="icon-btn -mr-2" onClick={() => setShare(true)} aria-label="Поделиться планом"><Share2 size={20} /></button>}
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        {planChips.map((c) => <span key={c} className="inline-flex h-9 items-center rounded-full bg-sunken px-3 text-small text-ink-soft">{c}</span>)}
-        <button className="inline-flex h-9 items-center gap-1.5 rounded-full px-2 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => setSettings(true)}><Settings2 size={16} aria-hidden />Настроить</button>
-        <button className="inline-flex h-9 items-center gap-1.5 rounded-full px-2 text-small text-ink-soft hover:bg-sunken" onClick={() => setFeast(true)}><PartyPopper size={16} aria-hidden />Праздничный стол</button>
+      {/* One quiet line: what the plan is for, and where to change it. */}
+      <div className="mt-1 flex items-center justify-between gap-2">
+        <p className="min-w-0 text-body-sm text-ink-soft">{planChips.join(" · ")}</p>
+        <button className="-mr-2 inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-3 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => setSettings(true)}><Settings2 size={16} aria-hidden />Настроить</button>
       </div>
-      <FeastSheet open={feast} onClose={() => setFeast(false)} />
 
       {!filled ? (
         <div className="mt-6">
@@ -130,38 +127,45 @@ export function Menu() {
             <button className="btn-outline" onClick={make}><RefreshCw size={18} />Заново</button>
           </div>
 
-          <div className="mt-6 grid gap-3 xl:grid-cols-2">
+          {/* The week as one calm list: a row per dish, the day written small above its name. */}
+          <ul className="card mt-6 divide-y divide-line overflow-hidden">
             {days.map((d) => (
-              <section key={d.date} className="card p-3" aria-label={dayLabel(d.date)}>
-                <h2 className={cx("flex min-h-[44px] items-center pl-1 text-title", d.date === today && "text-brand")}>{dayLabel(d.date)}</h2>
+              <li key={d.date} aria-label={dayLabel(d.date)}>
                 {d.items.length === 0 ? (
-                  <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                    <button className="btn-soft" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
-                    <button className="btn-outline" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={16} />Выбрать из рецептов</button>
+                  <div className="px-3 py-3">
+                    <span className={cx("label block", d.date === today && "text-brand")}>{dayLabel(d.date)}</span>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
+                      <button className="btn-outline h-11" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={16} />Из рецептов</button>
+                    </div>
                   </div>
                 ) : d.items.map((it, n) => {
                   const r = recipeById(it.recipeId);
                   if (!r) return null;
+                  const meal = (it.meal ?? "dinner") !== "dinner" ? MEAL_LABELS[it.meal!] : "";
                   return (
-                    <div key={n} className="flex items-center gap-2 border-t border-line py-2 first-of-type:border-0">
+                    <div key={n} className={cx("flex items-center gap-2 py-2 pl-2 pr-1", n > 0 && "border-t border-line")}>
                       <button className="flex min-w-0 flex-1 items-center gap-3 rounded-input text-left" onClick={() => openRecipe(r)}>
                         <RecipeImage recipe={r} className="h-14 w-14 shrink-0" />
                         <span className="min-w-0">
-                          <span className="label block">{MEAL_LABELS[it.meal ?? "dinner"] ?? "Ужин"}{it.leftover ? " · разогреть" : " · " + it.servings + " порц."}</span>
+                          <span className={cx("block text-caption", d.date === today ? "font-semibold text-brand" : "text-ink-soft")}>
+                            {n === 0 ? dayLabel(d.date) : ""}{meal ? (n === 0 ? " · " : "") + meal : ""}
+                          </span>
                           <span className="line-clamp-2 text-body-sm font-semibold leading-snug">{r.title}</span>
-                          {!it.leftover && <RecipeMeta recipe={r} size="caption" showDifficulty={false} />}
+                          <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : formatMinutes(r.totalMinutes)}</span>
                         </span>
                       </button>
                       {/* One clear button per dish: replace, remove and the day's actions are inside. */}
-                      <button className="inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-2.5 text-small text-ink-soft hover:bg-sunken" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Изменить: " + r.title}>
-                        <Pencil size={16} aria-hidden />Изменить
+                      {/* Phones: just the pencil (the row has no room for the word next to a long day and dish). */}
+                      <button className="inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-small text-ink-soft hover:bg-sunken" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Изменить: " + r.title}>
+                        <Pencil size={18} aria-hidden /><span className="hidden sm:inline">Изменить</span>
                       </button>
                     </div>
                   );
                 })}
-              </section>
+              </li>
             ))}
-          </div>
+          </ul>
           {days.some((d) => !d.items.length) && <button className="btn-ghost mt-3" onClick={fill}><Plus size={18} />Заполнить пустые дни</button>}
 
           {(shared.length > 0 || leftovers.length > 0) && (

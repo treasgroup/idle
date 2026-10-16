@@ -43,7 +43,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
         )}
         {results.length > 1 && (
           <div className="grid gap-2 lg:grid-cols-2">
-            {results.slice(1).map((r) => <RecipeRow key={r.id} recipe={r.recipe!} note={r.why || r.recipe!.summary} favorite={isFavorite(r.id)} onOpen={() => open(r.id)} />)}
+            {results.slice(1).map((r) => <RecipeRow key={r.id} recipe={r.recipe!} note={r.why} favorite={isFavorite(r.id)} onOpen={() => open(r.id)} />)}
           </div>
         )}
         {last && options.length > 0 && (

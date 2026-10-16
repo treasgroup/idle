@@ -173,7 +173,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     ? "Нашлось: " + list.length + " " + recipesWord(list.length)
     : view === "saved" ? "Сохранено: " + list.length + " " + recipesWord(list.length)
       : view === "book" ? "Приготовлено: " + list.length + " " + recipesWord(list.length)
-        : "Подходит вам: " + list.length + " " + recipesWord(list.length);
+        : sections ? "Все рецепты" : list.length + " " + recipesWord(list.length);
 
   const dishChips = (
     <>
@@ -300,7 +300,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
                 )}
                 {list.slice(0, limit).map((r) => tiles
                   ? <RecipeTile key={r.id} recipe={r} note={tileNote(r)} onOpen={() => openRecipe(r)} />
-                  : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} rating={ratings[r.id]} note={note(r) ?? r.summary} onOpen={() => openRecipe(r)} />)}
+                  : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} rating={ratings[r.id]} note={note(r)} onOpen={() => openRecipe(r)} />)}
               </div>
               {list.length > limit && (
                 <div className="mt-6 flex justify-center">

@@ -36,10 +36,10 @@ export function RecipeMeta({ recipe, size = "small", showDifficulty = true }: { 
   const kcal = nutritionOf(recipe).perServing.kcal;
   const icon = size === "caption" ? 14 : 16;
   return (
-    <div className={cx("flex flex-wrap items-center gap-x-3 gap-y-0.5 text-ink-soft", size === "caption" ? "text-caption" : "text-small")}>
+    <div className={cx("flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-ink-soft", size === "caption" ? "text-caption" : "text-small")}>
       <span className="inline-flex items-center gap-1"><Clock size={icon} aria-hidden />{formatMinutes(recipe.totalMinutes)}</span>
       {kcal > 0 && <span className="inline-flex items-center gap-1"><Flame size={icon} aria-hidden />{kcal} ккал</span>}
-      {showDifficulty && <span>{DIFF[recipe.difficulty]}</span>}
+      {showDifficulty && recipe.difficulty !== "easy" && <span>{DIFF[recipe.difficulty]}</span>}
     </div>
   );
 }
@@ -85,7 +85,7 @@ export function RecipeRow({ recipe, note, onOpen, favorite, rating }: { recipe: 
         </span>
         <span className="mt-0.5 block"><RecipeMeta recipe={recipe} size="caption" /></span>
         {(note || (rating && rating.count > 0)) && (
-          <span className="mt-0.5 line-clamp-2 block text-caption text-ink-soft">
+          <span className="mt-0.5 line-clamp-1 block text-caption text-ink-soft">
             {rating && rating.count > 0 && <span className="mr-1.5 font-semibold text-warn">★ {rating.avg.toFixed(1).replace(".", ",")}</span>}
             {note}
           </span>
@@ -105,7 +105,8 @@ export function RecipeTile({ recipe, note, onOpen, className }: { recipe: Recipe
       {cooked && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-card/95 px-2 py-0.5 text-caption text-ink shadow-e1"><Check size={12} className="text-herb" aria-hidden />Вы готовили</span>}
       <span className="flex flex-1 flex-col p-3">
         <span className="line-clamp-2 min-h-[3rem] text-title leading-snug">{recipe.title}</span>
-        <span className="mt-1"><RecipeMeta recipe={recipe} size="caption" showDifficulty={false} /></span>
+        {/* Narrow tile: one short line, no icons (time first, calories quietly after it). */}
+        <span className="mt-1 truncate text-caption text-ink-soft">{formatMinutes(recipe.totalMinutes)}{nutritionOf(recipe).perServing.kcal > 0 && " · " + nutritionOf(recipe).perServing.kcal + " ккал"}</span>
         {note && <span className="mt-1 line-clamp-2 text-caption text-ink-soft">{note}</span>}
       </span>
     </button>
