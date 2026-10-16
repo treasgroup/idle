@@ -60,25 +60,6 @@ function stepLabel(r: Recipe, i: number): string {
   return ing ? displayName(ing.id, ing.name).toLowerCase() : shortDish(r.title);
 }
 
-/** Keeps the screen on while cooking. */
-function useWakeLock(on: boolean) {
-  useEffect(() => {
-    if (!on) return;
-    let lock: { release: () => Promise<void> } | null = null, gone = false;
-    const take = async () => {
-      try {
-        const wl = (navigator as Navigator & { wakeLock?: { request: (t: string) => Promise<{ release: () => Promise<void> }> } }).wakeLock;
-        if (wl && document.visibilityState === "visible") lock = await wl.request("screen");
-        if (gone) await lock?.release();
-      } catch { /* not allowed */ }
-    };
-    void take();
-    const vis = () => { if (document.visibilityState === "visible") void take(); };
-    document.addEventListener("visibilitychange", vis);
-    return () => { gone = true; document.removeEventListener("visibilitychange", vis); lock?.release().catch(() => {}); };
-  }, [on]);
-}
-
 export function CookingLayer({ onClose }: { onClose: () => void }) {
   const { s, update, profile, setProfile, toast } = useStore();
   const { finishCooking, stopCooking } = useActions();
@@ -99,7 +80,6 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   // When the first dish is finished, the second one stays on screen until it is done too.
   const dish = live.find((d) => d.key === tab) ?? live[0] ?? null;
   const cookingNow = (!!c && !c.done) || !!second;
-  useWakeLock(cookingNow);
 
   const setStep = useCallback((key: Key, n: number) => {
     if (key === "second") setProfile((p) => {

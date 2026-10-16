@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -22,6 +22,7 @@ import { ProfileButton } from "../app/App";
 import { LESSONS } from "./learn-data";
 import type { Pwa } from "./Profile";
 import { FeastSheet } from "../components/Feast";
+import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -96,6 +97,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         <ProfileButton className="-mr-1.5 lg:hidden" />
       </div>
 
+      <ContinueCard />
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         {today && <TodayCard r={today} onOpen={() => openRecipe(today)} />}
         {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
@@ -154,6 +156,30 @@ function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
         <button className="btn-primary btn-bar mt-4 w-full lg:mt-5" onClick={onOpen}>Открыть рецепт</button>
       </div>
     </article>
+  );
+}
+
+/** «Вы смотрели: Борщ › Продолжить» — the recipe left open last time (one line, can be closed). */
+function ContinueCard() {
+  const { s } = useStore();
+  const { openRecipe } = useActions();
+  const [last, setLast] = useState(lastRecipe);
+  const r = last ? recipeById(last.id) : null;
+  const cookedSince = !!last && s.book.some((b) => b.recipeId === last.id && b.at > last.at);
+  const cookingIt = !!s.cooking && !s.cooking.done;
+  if (!last || !r || cookedSince || cookingIt) return null;
+  return (
+    <div className="mt-4 flex min-h-[60px] items-center gap-2 rounded-card border border-line bg-card p-2">
+      <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => { forgetRecipe(); openRecipe(r); }}>
+        <RecipeImage recipe={r} className="h-11 w-11 shrink-0" rounded="rounded-input" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-small text-ink-soft">Вы смотрели</span>
+          <span className="block truncate text-body-sm font-medium">{r.title}</span>
+        </span>
+        <span className="shrink-0 pr-1 text-small font-semibold text-brand">Продолжить</span>
+      </button>
+      <button className="icon-btn shrink-0 text-ink-soft" onClick={() => { forgetRecipe(); setLast(null); }} aria-label="Скрыть"><X size={18} /></button>
+    </div>
   );
 }
 
@@ -232,15 +258,27 @@ function SimpleHome({ today }: { today: Recipe | null }) {
 }
 
 function Now({ rail }: { rail?: boolean }) {
-  const { s } = useStore();
+  const { s, profile } = useStore();
   const { openRecipe } = useActions();
   const today = dateKey(new Date());
   const menu = (s.menu.find((d) => d.date === today)?.items ?? []).map((i) => ({ i, r: recipeById(i.recipeId) })).filter((x): x is { i: typeof x.i; r: Recipe } => !!x.r);
   const toBuy = s.shopping.filter((i) => !i.checked).length;
   const cooking = s.cooking && !s.cooking.done ? s.cooking : null;
   const timers = useTimers().length;
+  // The week plan is not in the bottom bar: from here it is one tap away (or one tap to make it).
+  const planned = s.menu.filter((d) => d.date >= today && d.items.length > 0).length;
+  const plan = !rail && !profile.simple && (
+    <button onClick={() => openLayer(routeHash({ tab: "menu" }))} className="flex min-h-[56px] items-center gap-3 rounded-input border border-line bg-card px-3 py-2 text-left hover:border-line-strong/60">
+      <CalendarDays size={20} className="shrink-0 text-ink-soft" aria-hidden />
+      <span className="min-w-0 flex-1">
+        <span className="block text-body-sm font-medium">{planned ? "План на неделю" : "Составить план на неделю"}</span>
+        <span className="block text-small text-ink-soft">{planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") + " — посмотреть или поменять" : "Ужины без повторов и сразу список покупок"}</span>
+      </span>
+      <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+    </button>
+  );
   // On phones and tablets the dish on the stove is in the bar above the nav.
-  if (!(cooking && rail) && !menu.length && !toBuy && !timers) return null;
+  if (!(cooking && rail) && !menu.length && !toBuy && !timers && !plan) return null;
   const rows = (
     <div className={cx("grid grid-cols-[minmax(0,1fr)] gap-2", rail && "gap-1")}>
       {timers > 0 && <TimerStrip flush={rail} />}
@@ -254,6 +292,7 @@ function Now({ rail }: { rail?: boolean }) {
       {menu.map(({ i, r }) => rail
         ? <RecipeMini key={r.id + i.servings} recipe={r} note={i.leftover ? "Только разогреть" : "По плану · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />
         : <RecipeRow key={r.id + i.servings} recipe={r} note={i.leftover ? "Приготовлено вчера — только разогреть" : "По плану на сегодня · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />)}
+      {plan}
       {toBuy > 0 && (
         <button onClick={() => replace(routeHash({ tab: "shopping" }))} className="flex min-h-[52px] items-center gap-3 rounded-input border border-line bg-card px-3 text-left hover:border-line-strong/60">
           <ShoppingCart size={20} className="shrink-0 text-ink-soft" aria-hidden />
@@ -263,7 +302,7 @@ function Now({ rail }: { rail?: boolean }) {
       )}
     </div>
   );
-  return <Section title="Сейчас">{rows}</Section>;
+  return <Section title="На сегодня">{rows}</Section>;
 }
 
 /** Perishables that run out today or tomorrow, and what to cook with them. */
@@ -291,7 +330,7 @@ function Rescue() {
   );
 
   return (
-    <Section title="Спасите продукты" action="Ещё варианты" onAction={more}>
+    <Section title="Пора использовать" action="Ещё рецепты" onAction={more}>
       {strip}
       {ideas.length > 0 && <div className="mt-3 grid grid-cols-2 gap-3">{ideas.slice(0, 2).map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} />)}</div>}
     </Section>

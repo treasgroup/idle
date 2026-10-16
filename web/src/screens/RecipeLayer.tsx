@@ -25,6 +25,7 @@ import { RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { AskSheet, accusative, type AskRequest } from "../components/AskSheet";
 import { shareRecipeCard } from "../app/shareCard";
+import { rememberRecipe } from "../app/lastSeen";
 import { ServeBySheet } from "../components/ServeBy";
 import { ShareOptions } from "../components/ShareOptions";
 import { TimerStrip } from "../components/TimerStrip";
@@ -168,6 +169,7 @@ interface Group { key: string; title: string | null; rows: RecipeIngredient[]; a
 
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const { s, profile, toast, online } = useStore();
+  useEffect(() => rememberRecipe(base.id), [base.id]);
   const [haveHint, haveSeen] = useHint("recipe-have");
   const [serveOpen, setServeOpen] = useState(false);
   const [panOpen, setPanOpen] = useState(false);
@@ -324,7 +326,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <h2 className="text-h2">Продукты</h2>
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
-                {(!!base.yields || haveHint) && <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}</p>}
+                {(!!base.yields || haveHint) && <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
                 <HaveBar owned={owned} total={needed.length} missing={missing} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (
@@ -533,13 +535,13 @@ function Nutrition({ recipe, n, side }: { recipe: Recipe; n: { kcal: number; pro
   );
 }
 
-/** «Есть дома 5 из 7» with a progress line, and «Докупить 2 продукта». */
+/** «У вас есть 5 из 7» with a progress line, and «Добавить 2 продукта в покупки». */
 function HaveBar({ owned, total, missing, onBuy }: { owned: number; total: number; missing: number; onBuy: () => void }) {
   return (
     <div className="rounded-input bg-herb-soft p-3 pl-4 sm:flex sm:items-center sm:gap-4 lg:block">
       <div className="flex min-h-[32px] min-w-0 flex-1 items-center gap-3">
         <span className="flex shrink-0 items-center gap-2 whitespace-nowrap text-body-sm font-semibold text-herb">
-          <Check size={18} aria-hidden />{missing ? "Есть дома " + owned + " из " + total : "Всё есть дома"}
+          <Check size={18} aria-hidden />{missing ? "У вас есть " + owned + " из " + total : "Всё есть — можно готовить"}
         </span>
         <span className="h-1.5 min-w-[48px] flex-1 overflow-hidden rounded-full bg-herb/15" aria-hidden>
           <span className="block h-full rounded-full bg-herb transition-[width] duration-150" style={{ width: (total ? (owned / total) * 100 : 100) + "%" }} />
@@ -547,7 +549,7 @@ function HaveBar({ owned, total, missing, onBuy }: { owned: number; total: numbe
       </div>
       {missing > 0 && (
         <button className="btn mt-3 h-11 w-full shrink-0 border border-line bg-card px-4 text-ink shadow-e1 hover:border-line-strong sm:mt-0 sm:w-auto lg:mt-3 lg:w-full" onClick={onBuy}>
-          <ShoppingCart size={18} className="text-brand" />Докупить {missing} {plural(missing, "продукт", "продукта", "продуктов")}
+          <ShoppingCart size={18} className="text-brand" />Добавить {missing} {plural(missing, "продукт", "продукта", "продуктов")} в покупки
         </button>
       )}
     </div>

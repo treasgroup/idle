@@ -31,8 +31,9 @@ export default {
         body: ["1rem", { lineHeight: "1.5rem" }],
         "body-sm": ["0.9375rem", { lineHeight: "1.375rem" }],
         small: ["0.875rem", { lineHeight: "1.25rem" }],
-        caption: ["0.8125rem", { lineHeight: "1.125rem" }],
-        micro: ["0.75rem", { lineHeight: "1rem" }],
+        // Nothing smaller than 14 px for reading (older eyes); 13 px only for tab names and little counters.
+        caption: ["0.875rem", { lineHeight: "1.25rem" }],
+        micro: ["0.8125rem", { lineHeight: "1.125rem" }],
         step: ["1.375rem", { lineHeight: "2rem" }],
         "step-lg": ["1.75rem", { lineHeight: "2.5rem" }],
         timer: ["2.5rem", { lineHeight: "1", fontWeight: "500" }],

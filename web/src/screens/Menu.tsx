@@ -124,7 +124,7 @@ export function Menu() {
         <>
           <div className="mt-4 flex gap-2">
             <button className="btn-primary flex-1 sm:flex-none" onClick={toShopping}><ShoppingCart size={18} />В покупки</button>
-            <button className="btn-outline" onClick={make}><RefreshCw size={18} />Заново</button>
+            <button className="btn-outline" onClick={make}><RefreshCw size={18} />Составить заново</button>
           </div>
 
           {/* The week as one calm list: a row per dish, the day written small above its name. */}
@@ -173,7 +173,7 @@ export function Menu() {
               <button className="flex min-h-[56px] w-full items-center gap-3 px-4 text-left" onClick={() => setNoWaste((v) => !v)} aria-expanded={noWaste}>
                 <Recycle size={20} className="shrink-0 text-herb" aria-hidden />
                 <span className="flex-1">
-                  <span className="block text-title">Без остатков</span>
+                  <span className="block text-title">Что останется от продуктов</span>
                   <span className="block text-caption text-ink-soft">{leftovers.length ? "Что останется в упаковках и куда это деть" : "Одни продукты на несколько блюд"}</span>
                 </span>
                 <ChevronDown size={20} className={cx("shrink-0 text-ink-soft transition-transform", noWaste && "rotate-180")} aria-hidden />

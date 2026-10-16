@@ -77,7 +77,7 @@ export function Pantry() {
         </div>
         {s.fridge.length > 0 && (
           <div className="flex gap-2">
-            <button className="btn-outline" onClick={() => setReceipt(true)}><ScanText size={18} />Из чека</button>
+            <button className="btn-outline" onClick={() => setReceipt(true)}><ScanText size={18} />Добавить по чеку</button>
             <button className="btn-soft" onClick={() => setAdding(true)}><Plus size={18} />Добавить</button>
           </div>
         )}
@@ -88,7 +88,7 @@ export function Pantry() {
           <Empty icon={<Refrigerator size={48} />} title="Отметьте, что есть дома" mood="fridge"
             actions={<>
               <button className="btn-primary" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукты</button>
-              <button className="btn-outline" onClick={() => setReceipt(true)}><ScanText size={18} />Из чека</button>
+              <button className="btn-outline" onClick={() => setReceipt(true)}><ScanText size={18} />Добавить по чеку</button>
             </>}>
             Шеф будет подбирать рецепты из ваших продуктов, считать, что докупить, и напоминать о сроках — чтобы ничего не выбрасывать.
           </Empty>

@@ -1,6 +1,6 @@
 // «Покупки»: the list by shop aisle. A tap on the row marks it bought; bought items move into «Мои продукты» in one go.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, MoreHorizontal, Plus, Share2, ShoppingBag, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
+import { Check, ChevronDown, MoreHorizontal, Plus, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, packageHint, plural, searchIngredients, shoppingName, shoppingText,
   shortName, type ShoppingItem,
@@ -11,6 +11,7 @@ import { Empty, Sheet, cx, haptic } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
 import { cue } from "../app/feedback";
+import { StoreMode } from "../components/StoreMode";
 
 interface Partner { id: string; label: string; note?: string }
 
@@ -26,6 +27,7 @@ export function Shopping() {
   const [more, setMore] = useState<ShoppingItem | null>(null);
   const [showPinch, setShowPinch] = useState(false);
   const [showBought, setShowBought] = useState(false);
+  const [store, setStore] = useState(false);
   const [partners, setPartners] = useState<Partner[]>([]);
   const bar = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -112,6 +114,13 @@ export function Shopping() {
         </div>
       </div>
 
+      {toBuy.length > 0 && (
+        <button className="btn-outline mt-4 w-full sm:w-auto" onClick={() => setStore(true)}>
+          <ShoppingBasket size={20} className="text-brand" />Я в магазине — крупный список
+        </button>
+      )}
+      {store && <StoreMode items={s.shopping} onToggle={toggle} onToPantry={toPantry} onClose={() => setStore(false)} />}
+
       {s.shopping.length === 0 ? (
         <div className="mt-6">
           <Empty icon={<ShoppingBag size={48} />} title="Список покупок пуст" mood="shopping"
@@ -119,7 +128,7 @@ export function Shopping() {
               <button className="btn-primary" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукт</button>
               <button className="btn-outline" onClick={() => replace(routeHash({ tab: "menu" }))}><CalendarDays size={18} />Составить план</button>
             </>}>
-            Нажмите «Докупить» в рецепте или «В покупки» в плане на неделю — продукты сложатся по отделам магазина, с подсказкой, сколько упаковок брать.
+            Добавляйте продукты из рецепта или из плана на неделю — они сложатся по отделам магазина, с подсказкой, сколько упаковок брать.
           </Empty>
         </div>
       ) : (

@@ -16,6 +16,7 @@ import { Home } from "../screens/Home";
 import { Recipes } from "../screens/Recipes";
 import { ScreenSkeleton } from "../components/Skeleton";
 import { lazyScreen, preload } from "./lazy";
+import { useWakeLock } from "./wakeLock";
 import { preloadMascots } from "../components/Mascot";
 
 // Home and search come with the page; the rest loads when first opened (and quietly in the background).
@@ -114,6 +115,9 @@ function Shell() {
   const [incoming, setIncoming] = useState<Partial<MyRecipe> | null>(null);
   useIncomingLinks(setPoll, setIncoming);
   useTimerAlarm(toast, s.readAloud);
+  // The screen stays on while something is on the stove or a timer is counting.
+  const anyTimer = useTimers().some((t) => !!t.end && !t.rang);
+  useWakeLock((!!s.cooking && !s.cooking.done) || !!profile.parallel || anyTimer);
   useUpdateCheck(toast);
   useEffect(() => {
     if (!ready) return;

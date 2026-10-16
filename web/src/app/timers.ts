@@ -21,6 +21,8 @@ export interface CookTimer {
   total: number;
   /** Already rang; kept on screen until dismissed. */
   rang?: boolean;
+  /** When it rang: the alarm repeats for a minute unless the timer is dismissed. */
+  rangAt?: number;
 }
 
 const KEY = "cook-timers-v1";
@@ -106,6 +108,8 @@ export function timerTitle(t: CookTimer): string {
 
 // ——— Ringing ———
 
+const REPEAT_MS = 60000;
+
 export function beep(): void {
   try {
     const audio = getAudio();
@@ -157,7 +161,7 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
       const now = Date.now();
       const done = current().filter((t) => t.end && !t.rang && t.end <= now);
       if (!done.length) return;
-      save(current().map((t) => (done.some((d) => d.id === t.id) ? { ...t, rang: true } : t)));
+      save(current().map((t) => (done.some((d) => d.id === t.id) ? { ...t, rang: true, rangAt: now } : t)));
       const what = done.map((t) => (t.dish && t.dish !== "Таймер" ? "«" + t.dish + "»" + (t.label ? ", " + t.label : "") : t.label || "таймер")).join("; ");
       toast("Время вышло: " + what);
       beep();
@@ -169,6 +173,19 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
     const t = setInterval(tick, 500);
     return () => clearInterval(t);
   }, [running.length, nearest, toast, readAloud]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // The phone may be on the table across the kitchen: ring again every few seconds for a minute, until «×».
+  const ringing = list.filter((t) => t.rang && t.rangAt && Date.now() - t.rangAt < REPEAT_MS).length;
+  useEffect(() => {
+    if (!ringing) return;
+    const again = setInterval(() => {
+      const now = Date.now();
+      if (!current().some((t) => t.rang && t.rangAt && now - t.rangAt < REPEAT_MS)) return clearInterval(again);
+      beep();
+      navigator.vibrate?.([300, 120, 300]);
+    }, 6000);
+    return () => clearInterval(again);
+  }, [ringing]);
 
   useEffect(() => {
     if (!isNativeApp() || !nearest || nearest <= Date.now()) return;
