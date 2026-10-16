@@ -28,6 +28,9 @@ if (isset($_GET['setup'])) {
     $url = seo_origin() . dirname($_SERVER['REQUEST_URI'] ? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) : '/bot/') . '/telegram.php';
     $r = tg('setWebhook', ['url' => $url, 'secret_token' => $secret, 'allowed_updates' => ['message', 'callback_query'], 'drop_pending_updates' => true]);
     tg('setMyCommands', ['commands' => [['command' => 'start', 'description' => 'Как пользоваться'], ['command' => 'idea', 'description' => 'Случайная идея на ужин']]]);
+    // The bot's @name, so the site can show «Шеф в Telegram» in the profile.
+    $me = tg('getMe', []);
+    if (is_string($me['result']['username'] ?? null)) set_setting('telegram_username', $me['result']['username']);
     exit(($r['ok'] ?? false) ? "Готово: вебхук $url\n" : 'Telegram ответил: ' . json_encode($r, JSON_UNESCAPED_UNICODE) . "\n");
 }
 

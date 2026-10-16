@@ -174,7 +174,7 @@ function seo_header(): string {
 function seo_footer(): string {
     $p = h(seo_path());
     return "</main>\n<footer class=\"wrap foot\"><p><a href=\"$p\">«" . h(SEO_SITE) . "»</a> — подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, без регистрации.</p>"
-        . "<p><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a> · <a href=\"{$p}#info\">Откуда сведения</a> · <a href=\"{$p}#privacy\">Конфиденциальность</a></p></footer>\n</body>\n</html>\n";
+        . "<p><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a> · <a href=\"" . h(seo_path() . (seo_pretty() ? 'podborka/' : 'podborka.php')) . "\">Подборки</a> · <a href=\"{$p}#info\">Откуда сведения</a> · <a href=\"{$p}#privacy\">Конфиденциальность</a></p></footer>\n</body>\n</html>\n";
 }
 /** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
@@ -374,6 +374,10 @@ function seo_sitemap(): void {
     $courses = [];
     foreach ($all as $r) $courses[$r['_course']] = max($courses[$r['_course']] ?? 0, (int)$r['_mtime']);
     foreach (SEO_COURSES as $c => $_) if (isset($courses[$c])) $url(seo_abs(seo_list_path($c)), $courses[$c]);
+    if (function_exists('seo_collection_list')) {
+        $url(seo_abs(seo_collection_path()), $newest);
+        foreach (seo_collection_list() as $k => $_) $url(seo_abs(seo_collection_path($k)), $newest);
+    }
     $url(seo_abs(seo_combo_path('')), $newest);
     foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
     foreach (seo_combo_pairs() as [$a, $b]) $url(seo_abs(seo_combo_path($a, $b)), $newest);

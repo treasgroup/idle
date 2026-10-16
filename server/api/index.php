@@ -25,7 +25,11 @@ try {
         register_shutdown_function(function () { if (function_exists('fastcgi_finish_request')) fastcgi_finish_request(); push_opportunistic(); try { backup_daily(); } catch (Throwable $e) {} });
         $dbOk = true;
         try { db(); } catch (Throwable $e) { $dbOk = false; }
-        send_json(['aiReady' => $dbOk && intent_ready(), 'voiceReady' => $dbOk && speech_ready(), 'version' => VERSION]);
+        // The bots people can also talk to (shown in the profile only when they are really set up).
+        $tgName = ''; try { $tgName = $dbOk && (config()['telegram']['token'] ?? '') !== '' ? (string)setting('telegram_username', '') : ''; } catch (Throwable $e) {}
+        $alice = trim((string)(config()['alice']['name'] ?? ''));
+        send_json(['aiReady' => $dbOk && intent_ready(), 'voiceReady' => $dbOk && speech_ready(), 'version' => VERSION,
+            'bots' => ['telegram' => preg_match('/^[A-Za-z0-9_]{5,32}$/', $tgName) ? $tgName : null, 'alice' => $alice !== '' ? mb_substr($alice, 0, 60) : null]]);
     }
     elseif ($route === 'health' && $method === 'GET') {
         // Setup check for the site owner. Shows no secrets.

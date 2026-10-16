@@ -1,7 +1,7 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart,
+  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -32,7 +32,7 @@ function Row({ icon, title, hint, onClick }: { icon: JSX.Element; title: string;
 export interface Pwa { installed: boolean; canInstall: boolean; ios: boolean; install: () => Promise<boolean> }
 
 export function Profile({ pwa }: { pwa: Pwa }) {
-  const { s, update, profile, setProfile, sync, toast, wipe } = useStore();
+  const { s, update, profile, setProfile, sync, toast, wipe, server } = useStore();
   const reminders = useReminders();
   const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs">(null);
   const [wiping, setWiping] = useState(false);
@@ -106,6 +106,15 @@ export function Profile({ pwa }: { pwa: Pwa }) {
           <Section title="Семья и устройства">
             <div className="card divide-y divide-line overflow-hidden">
               <Row icon={<Users size={18} />} title="Семья" hint={sync.status.members > 1 ? "В семье: " + sync.status.members + " — общий план и покупки" : "Общий план и список покупок"} onClick={() => setSheet("family")} />
+              {server.telegram && <a className="flex min-h-[64px] items-center gap-3 px-4 py-2.5 hover:bg-sunken/60" href={"https://t.me/" + server.telegram} target="_blank" rel="noopener">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Send size={18} /></span>
+                <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">Шеф в Telegram</span><span className="block truncate text-caption text-ink-soft">Спросить, что приготовить, прямо в мессенджере</span></span>
+                <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
+              </a>}
+              {server.alice && <div className="flex min-h-[64px] items-center gap-3 px-4 py-2.5">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Mic size={18} /></span>
+                <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">Шеф в Алисе</span><span className="block text-caption text-ink-soft">Скажите: «Алиса, запусти навык {server.alice}»</span></span>
+              </div>}
               <Row icon={<KeyRound size={18} />} title="Другое устройство" hint="Перенести рецепты на телефон или компьютер" onClick={() => setSheet("login")} />
             </div>
           </Section>

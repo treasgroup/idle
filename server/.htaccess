@@ -38,6 +38,8 @@ AddType text/javascript .js
   RewriteRule ^iz/?$ combo.php [L,QSA]
   RewriteRule ^iz/([a-z0-9-]+)/?$ combo.php?a=$1 [L,QSA]
   RewriteRule ^iz/([a-z0-9-]+)/([a-z0-9-]+)/?$ combo.php?a=$1&b=$2 [L,QSA]
+  RewriteRule ^podborka/?$ podborka.php [L,QSA]
+  RewriteRule ^podborka/([a-z-]+)/?$ podborka.php?k=$1 [L,QSA]
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
 </IfModule>
 

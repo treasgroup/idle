@@ -9,7 +9,7 @@ import { applyTheme, loadProfile, saveProfile, type Profile } from "./profile";
 import type { ToastMsg } from "../components/ui";
 
 export interface CatalogStatus { version: number; source: string; problem?: string; count: number }
-export interface Server { aiReady: boolean; voiceReady: boolean }
+export interface Server { aiReady: boolean; voiceReady: boolean; telegram?: string | null; alice?: string | null }
 
 interface Store {
   s: EngineState;
@@ -91,7 +91,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
     const onLate = () => setCatalog((c) => ({ ...c, version: Date.now(), source: "server", problem: undefined, count: recipes().length }));
     window.addEventListener(CATALOG_EVENT, onLate);
-    fetch(apiUrl("status")).then((r) => r.json()).then((j) => setServer({ aiReady: !!j.aiReady, voiceReady: !!j.voiceReady })).catch(() => {});
+    fetch(apiUrl("status")).then((r) => r.json()).then((j) => setServer({ aiReady: !!j.aiReady, voiceReady: !!j.voiceReady, telegram: j.bots?.telegram ?? null, alice: j.bots?.alice ?? null })).catch(() => {});
     void loadIntentModel();
     track({ type: "visit", source: deviceSource() });
     const net = () => setOnline(navigator.onLine);
