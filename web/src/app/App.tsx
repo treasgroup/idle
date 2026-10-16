@@ -16,6 +16,7 @@ import { Home } from "../screens/Home";
 import { Recipes } from "../screens/Recipes";
 import { ScreenSkeleton } from "../components/Skeleton";
 import { lazyScreen, preload } from "./lazy";
+import { preloadMascots } from "../components/Mascot";
 
 // Home and search come with the page; the rest loads when first opened (and quietly in the background).
 const loadChat = () => import("../screens/Chat");
@@ -126,7 +127,7 @@ function Shell() {
   useEffect(() => { window.scrollTo(0, 0); }, [route.tab]);
   // The other screens are fetched quietly once the first one is on screen — then they open at once, and work
   // without the internet later (the shopping list in the shop).
-  useEffect(() => { if (ready) preload([loadRecipe, loadChat, loadCooking, loadShopping, loadMenu, loadPantry, loadProfile, loadExtras]); }, [ready]);
+  useEffect(() => { if (ready) preload([loadRecipe, loadChat, loadCooking, loadShopping, loadMenu, loadPantry, loadProfile, loadExtras, preloadMascots]); }, [ready]);
 
   // --nav-h: the height of what is fixed at the bottom (the bar and the mini-player), for toasts and page padding.
   useLayoutEffect(() => {

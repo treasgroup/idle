@@ -22,6 +22,7 @@ export declare const R0: any;
 export declare const N0: any;
 export declare const KC: any;
 export declare const pm: any;
+export declare const pmSmall: any;
 export declare const YC: any;
 export declare const XC: any;
 export declare const QC: any;

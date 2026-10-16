@@ -17,5 +17,14 @@ export function Mascot({ size = 96, mood = "smile", className }: { size?: number
   return <img src={"./mascot/" + f + ".webp"} alt="" aria-hidden width={Math.round(size * (RATIO[f] ?? 1))} height={size} decoding="async" draggable={false} className={className} />;
 }
 
+/** Fetches all poses a few seconds after start, so an empty screen or a sheet shows Шеф at once (the hosting is slow
+ *  to answer the first request; ~350 KB in all, then from the cache). */
+export function preloadMascots(): Promise<void> {
+  return new Promise((done) => window.setTimeout(() => {
+    for (const f of new Set(Object.values(FILE))) { const i = new Image(); i.decoding = "async"; i.src = "./mascot/" + f + ".webp"; }
+    done();
+  }, 4000));
+}
+
 /** Шеф's face for the avatar (chat, cards, hints). */
 export const AVATAR = "./mascot/chef-avatar.webp";

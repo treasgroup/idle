@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Clock, Flame, Heart, CalendarPlus, Check } from "lucide-react";
-import { formatMinutes, nutritionOf, photoUrl, type Recipe } from "../engine";
+import { formatMinutes, nutritionOf, photoSmallUrl, photoUrl, type Recipe } from "../engine";
 import { dishEmoji, dishTint, dishVariant } from "./dishArt";
 import { useStore } from "../app/store";
 import { cx } from "./ui";
 
 /** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
-export function RecipeImage({ recipe, className, rounded = "rounded-img", eager, hero }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean; hero?: boolean }) {
+export function RecipeImage({ recipe, className, rounded = "rounded-img", eager, hero, full }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean; hero?: boolean; full?: boolean }) {
   // data-photo: the card's picture that flows into the recipe page; hero: the page's own picture (see app/transition).
   const vt = hero ? { "data-photo-hero": "1", style: { viewTransitionName: "recipe-photo" } } : { "data-photo": recipe.id };
-  const src = photoUrl(recipe.id);
+  // Cards take the smaller copy; the recipe page and the few big pictures the full photo.
+  const src = hero || full ? photoUrl(recipe.id) : photoSmallUrl(recipe.id);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
   if (src && !failed)
@@ -51,7 +52,7 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
     // Wider than a phone: photo on the left, so one answer does not fill the whole screen.
     <article className="card overflow-hidden sm:flex">
       <button className="relative block w-full text-left sm:w-[42%] sm:shrink-0" onClick={onOpen} aria-label={"Открыть рецепт: " + recipe.title}>
-        <RecipeImage recipe={recipe} className="aspect-video w-full sm:aspect-auto sm:h-full sm:min-h-[200px]" rounded="rounded-none" />
+        <RecipeImage recipe={recipe} full className="aspect-video w-full sm:aspect-auto sm:h-full sm:min-h-[200px]" rounded="rounded-none" />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-2.5 py-1 text-micro font-semibold text-ink shadow-e1">Лучше всего подходит</span>
       </button>
       <div className="p-4 sm:flex sm:flex-1 sm:flex-col sm:justify-center sm:p-5">

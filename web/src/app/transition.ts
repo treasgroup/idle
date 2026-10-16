@@ -14,12 +14,16 @@ export function withPhotoTransition(recipeId: string, change: () => void): void 
   const from = (near?.querySelector(`[data-photo="${recipeId}"]`) ?? document.querySelector(`[data-photo="${recipeId}"]`)) as HTMLElement | null;
   if (from) from.style.setProperty("view-transition-name", "recipe-photo");
   const t = d.startViewTransition(() => new Promise<void>((done) => {
+    // The old picture is already taken; the card stays under the recipe page, and two photos with one name abort it.
+    from?.style.removeProperty("view-transition-name");
     change();
-    // The recipe page may still be loading: never hold the screen longer than a moment.
-    let n = 0;
-    const wait = () => (document.querySelector('[data-photo-hero="1"]') || ++n > 18 ? done() : requestAnimationFrame(wait));
-    requestAnimationFrame(wait);
+    // The recipe page may still be loading: never hold the screen longer than a moment. The browser does not draw
+    // frames while it waits for us (requestAnimationFrame would never come and the screen would freeze for 4 s),
+    // so plain timers.
+    const start = performance.now();
+    const wait = () => (document.querySelector('[data-photo-hero="1"]') || performance.now() - start > 250 ? done() : window.setTimeout(wait, 16));
+    window.setTimeout(wait, 0);
   }));
   t.ready.catch(() => {});
-  t.finished.catch(() => {}).finally(() => from?.style.removeProperty("view-transition-name"));
+  t.finished.catch(() => {});
 }

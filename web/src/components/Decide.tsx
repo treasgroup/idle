@@ -34,7 +34,7 @@ export function DecideSheet({ open, onClose, meal }: { open: boolean; onClose: (
       ) : undefined}>
       {r ? (
         <div key={r.id} className="anim-rise">
-          <RecipeImage recipe={r} className="aspect-[4/3] w-full" rounded="rounded-card" eager />
+          <RecipeImage recipe={r} full className="aspect-[4/3] w-full" rounded="rounded-card" eager />
           <h3 className="mt-4 text-h2">{r.title}</h3>
           <p className="mt-1 flex items-center gap-1.5 text-body text-ink-soft"><Clock size={18} aria-hidden />{formatMinutes(r.totalMinutes)} · {DIFF[r.difficulty]}</p>
           {r.summary && <p className="mt-3 text-body text-ink-soft">{r.summary}</p>}

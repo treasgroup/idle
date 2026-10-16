@@ -595,6 +595,19 @@ function pm(e) {
   let t = N0[e];
   return t ? hu() + "photos/" + e + ".jpg?v=" + t : null;
 }
+// The smaller copy for cards (server/api/_private/ops.php): the plain file once made, else the server makes it.
+var pmT = new Set();
+function pmSetThumbs(e) {
+  pmT = new Set(e);
+}
+function pmSmall(e) {
+  if (!N0) return pm(e);
+  let t = N0[e];
+  if (!t) return null;
+  return pmT.has(e)
+    ? hu() + "photos/s/" + e + "-" + t + ".jpg"
+    : hu() + "api/index.php?r=thumb&id=" + encodeURIComponent(e) + "&v=" + t;
+}
 var YC = new Set();
 function XC(e) {
   YC = new Set(e);
@@ -836,6 +849,8 @@ function aA(e, t) {
       ),
     Array.isArray(e.realPhotos) &&
       XC(e.realPhotos.filter((i) => typeof i == "string")),
+    Array.isArray(e.thumbs) &&
+      pmSetThumbs(e.thumbs.filter((i) => typeof i == "string")),
     e.photos &&
       typeof e.photos == "object" &&
       KC(
@@ -3728,6 +3743,7 @@ export {
   N0,
   KC,
   pm,
+  pmSmall,
   YC,
   XC,
   QC,

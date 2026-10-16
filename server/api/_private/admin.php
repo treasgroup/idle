@@ -364,6 +364,7 @@ function admin_photo_delete(array $b): void {
     if (!preg_match(RECIPE_ID, $id)) throw new ApiError(400, 'validation', 'Неверный рецепт.');
     $p = photos_dir() . '/' . $id . '.jpg';
     if (is_file($p) && !@unlink($p)) throw new ApiError(500, 'write', 'Не удалось удалить фото.');
+    foreach (glob(photos_dir() . '/s/' . $id . '-*.jpg') ?: [] as $t) @unlink($t);
     send_json(['deleted' => true]);
 }
 

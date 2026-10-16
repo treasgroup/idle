@@ -105,7 +105,10 @@ try {
         // Recipes hidden by the owner and photo versions (so a replaced photo is not taken from the browser cache).
         $hidden = []; $taught = []; try { $hidden = setting('hidden', []); $taught = setting('taught', []); } catch (Throwable $e) {}
         $photos = photo_versions();
-        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . '}';
+        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . '}';
+    }
+    elseif ($route === 'thumb' && $method === 'GET') {
+        photo_thumb((string)($_GET['id'] ?? ''));
     }
     elseif ($route === 'event' && $method === 'POST') {
         require_same_origin();

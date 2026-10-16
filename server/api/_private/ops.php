@@ -98,3 +98,50 @@ function admin_insights(int $days): void {
         'backups' => backups_list(),
     ]);
 }
+
+// ---------- Photos for cards: a smaller copy made once ----------
+// Cards are 50–360 px wide; shrinking a 1400 px photo that much in the browser costs bandwidth on a slow line and
+// looks grainy in some browsers. photos/s/<id>-<version>.jpg is made from the owner's photo on first request
+// (a new photo has a new version, so its copy is made again); the photo page itself keeps the full photo.
+const THUMB_W = 640;
+function thumbs_dir(): string { return photos_dir() . '/s'; }
+/** Ids whose copy for the current photo already exists (the app then asks for the plain file). */
+function thumb_ready(array $versions): array {
+    $out = [];
+    foreach ($versions as $id => $v) if (is_file(thumbs_dir() . '/' . $id . '-' . $v . '.jpg')) $out[] = (string)$id;
+    return $out;
+}
+function thumb_make(string $src, string $dst): bool {
+    if (!function_exists('imagecreatefromjpeg') || !function_exists('imagecopyresampled')) return false;
+    $dir = dirname($dst);
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true)) return false;
+    $img = @imagecreatefromjpeg($src);
+    if (!$img) return false;
+    $w = imagesx($img); $h = imagesy($img);
+    if ($w > THUMB_W) {
+        $nh = (int)round($h * THUMB_W / $w);
+        $out = imagecreatetruecolor(THUMB_W, $nh);
+        imagecopyresampled($out, $img, 0, 0, 0, 0, THUMB_W, $nh, $w, $h);
+        imagedestroy($img); $img = $out;
+    }
+    imageinterlace($img, true);
+    $tmp = $dst . '.' . bin2hex(random_bytes(4)) . '.tmp';
+    $ok = @imagejpeg($img, $tmp, 84) && @rename($tmp, $dst);
+    imagedestroy($img);
+    if (!$ok) @unlink($tmp);
+    return $ok;
+}
+function photo_thumb(string $id): void {
+    $src = photos_dir() . '/' . $id . '.jpg';
+    if (!preg_match(RECIPE_ID, $id) || strlen($id) > 60 || !is_file($src)) { http_response_code(404); header('Content-Type: text/plain; charset=utf-8'); echo 'Нет фото.'; return; }
+    $v = (string)filemtime($src);
+    $dst = thumbs_dir() . '/' . $id . '-' . $v . '.jpg';
+    if (!is_file($dst) && thumb_make($src, $dst)) {
+        foreach (glob(thumbs_dir() . '/' . $id . '-*.jpg') ?: [] as $old) if ($old !== $dst) @unlink($old);
+    }
+    $file = is_file($dst) ? $dst : $src; // no image library on the hosting: the full photo, as before
+    header('Content-Type: image/jpeg');
+    header('Cache-Control: public, max-age=31536000, immutable');
+    header('Content-Length: ' . filesize($file));
+    readfile($file);
+}

@@ -144,7 +144,7 @@ function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
     // Phones: photo on top. Wide screens: photo on the left, so the card is not a screen-high block.
     <article className="overflow-hidden rounded-card border border-line bg-card lg:flex">
       <button className="relative block w-full text-left lg:w-[46%] lg:shrink-0" onClick={onOpen} aria-label={"Рецепт дня: " + r.title}>
-        <RecipeImage recipe={r} className="aspect-[16/10] w-full lg:aspect-auto lg:h-full lg:min-h-[260px]" rounded="rounded-none" eager />
+        <RecipeImage recipe={r} full className="aspect-[16/10] w-full lg:aspect-auto lg:h-full lg:min-h-[260px]" rounded="rounded-none" eager />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">Рецепт дня</span>
       </button>
       <div className="p-4 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-6">
