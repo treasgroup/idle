@@ -2232,6 +2232,7 @@ var zp = {
     noticeOk: !1,
     book: [],
     notes: {},
+    myRecipes: [],
     rewards: !0,
     seenBadges: [],
     reminders: { daily: null, weekly: !1 },
@@ -10064,6 +10065,25 @@ var w0 = D.object({
       .min(2)
       .max(4),
   });
+// «Семейная книга»: the person's own recipes (free text), checked like everything else that is saved or synced.
+function MyR(e) {
+  if (!Array.isArray(e)) return [];
+  let str = (v, n) => (typeof v == "string" ? v.slice(0, n) : "");
+  return e
+    .filter((r) => r && typeof r == "object" && typeof r.id == "string" && /^[a-z0-9-]{4,40}$/.test(r.id) && typeof r.title == "string" && r.title.trim())
+    .slice(-200)
+    .map((r) => ({
+      id: r.id,
+      title: str(r.title, 120).trim(),
+      from: str(r.from, 80),
+      people: Number.isInteger(r.people) && r.people > 0 && r.people <= 50 ? r.people : null,
+      minutes: Number.isInteger(r.minutes) && r.minutes > 0 && r.minutes <= 2880 ? r.minutes : null,
+      ingredients: str(r.ingredients, 4000),
+      steps: str(r.steps, 8000),
+      note: str(r.note, 1000),
+      at: typeof r.at == "number" ? r.at : 0,
+    }));
+}
 function C0(e) {
   let t = {};
   if (!e || typeof e != "object" || Array.isArray(e)) return t;
@@ -10162,6 +10182,7 @@ function vu(e) {
     : []),
     (t.book = a("book", T0, 2e3).slice(-bu)),
     (t.notes = C0(n.notes)),
+    (t.myRecipes = MyR(n.myRecipes)),
     (t.rewards = n.rewards !== !1),
     (t.seenBadges = Array.isArray(n.seenBadges)
       ? n.seenBadges
@@ -10287,6 +10308,7 @@ async function IC() {
 }
 
 export {
+  MyR,
   bS,
   zp,
   GE,

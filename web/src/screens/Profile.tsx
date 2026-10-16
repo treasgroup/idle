@@ -1,7 +1,7 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper,
+  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -64,6 +64,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       {/* «Ещё»: the bigger tools that are not in the bottom bar. */}
       <div className="card mt-6 divide-y divide-line overflow-hidden">
         {!profile.simple && <Row icon={<CalendarDays size={18} />} title="План на неделю" hint="Ужины без повторов и список покупок" onClick={() => openLayer(routeHash({ tab: "menu" }))} />}
+        <Row icon={<BookHeart size={18} />} title="Семейная книга" hint={s.myRecipes?.length ? "Рецептов: " + s.myRecipes.length : "Бабушкины и свои рецепты — и с фото тетради"} onClick={() => openRecipesView("mine")} />
         <Row icon={<PartyPopper size={18} />} title="Праздничный стол" hint="Гости, блюда, покупки и когда что начинать" onClick={() => setFeast(true)} />
         {!profile.simple && <Row icon={<Refrigerator size={18} />} title="Мои продукты" hint={s.fridge.length ? s.fridge.length + " " + plural(s.fridge.length, "продукт", "продукта", "продуктов") + " дома" : "Что есть дома — подскажу, что приготовить"} onClick={() => openLayer(routeHash({ tab: "pantry" }))} />}
         {profile.simple && <Row icon={<ShoppingCart size={18} />} title="Список покупок" hint={s.shopping.filter((i) => !i.checked).length ? "Купить: " + s.shopping.filter((i) => !i.checked).length : "Пока пуст"} onClick={() => openLayer(routeHash({ tab: "shopping" }))} />}

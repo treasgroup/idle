@@ -15,8 +15,9 @@ import { plainWords } from "../app/colloquial";
 import { RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { ChefAvatar, Chip, Empty, Sheet, cx } from "../components/ui";
 import { mealNow } from "./Home";
+import { FamilyBook } from "../components/FamilyBook";
 
-type View = "all" | "saved" | "book";
+type View = "all" | "saved" | "book" | "mine";
 type Test = (r: Recipe) => boolean;
 interface Filter { id: string; label: string; test: Test; device?: boolean }
 interface Filters { time: number | null; on: string[] }
@@ -108,7 +109,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   // The home screen's «Все» under «Сохранённое» opens this tab on the saved view.
   useLayoutEffect(() => {
     const v = takeRecipesView();
-    if ((v === "saved" || v === "book") && mode === "favorites") setView(v);
+    if ((v === "saved" || v === "book" || v === "mine") && mode === "favorites") setView(v);
     else if (v?.startsWith("dish:")) setDish(v.slice(5));
     else if (v?.startsWith("filter:")) setF({ ...NONE, on: [v.slice(7)] });
     else if (v?.startsWith("time:")) setF({ ...NONE, time: Number(v.slice(5)) || null });
@@ -181,6 +182,15 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     </>
   );
 
+  // «Семейные»: the family's own recipes — their own screen, without the catalog's search and filters.
+  if (mode === "favorites" && view === "mine") return (
+    <div className="pb-4">
+      <h1 className="pt-2 text-h1 sm:pt-0">Избранное</h1>
+      <div className="mt-4 lg:max-w-[520px]"><ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length, mine: s.myRecipes?.length ?? 0 }} /></div>
+      <FamilyBook />
+    </div>
+  );
+
   return (
     <div className="pb-4">
       <h1 className="pt-2 text-h1 sm:pt-0">{mode === "favorites" ? "Избранное" : "Поиск"}</h1>
@@ -194,7 +204,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
             className="h-12 w-full rounded-input bg-sunken pl-11 pr-12 text-body text-ink outline-none transition-colors duration-150 placeholder:text-ink-faint hover:bg-line/60 focus:bg-card focus:ring-2 focus:ring-brand/30" />
           {q && <button type="button" className="icon-btn absolute right-0.5 top-1/2 -translate-y-1/2" onClick={() => { setQ(""); input.current?.focus(); }} aria-label="Очистить поиск"><X size={20} /></button>}
         </form>}
-        {mode === "favorites" && <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length }} />}
+        {mode === "favorites" && <ViewSwitch value={view} onChange={setView} counts={{ saved: saved.length, book: book.length, mine: s.myRecipes?.length ?? 0 }} />}
       </div>
 
       <div className={cx("mt-6 lg:mt-8", !bare && "xl:grid xl:grid-cols-[240px_minmax(0,1fr)] xl:gap-8")}>
@@ -320,9 +330,10 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
 }
 
 /** Все / Сохранённые / Моя книга: a radio group; the label width does not jump when it turns bold. */
-function ViewSwitch({ value, onChange, counts }: { value: View; onChange: (v: View) => void; counts: { saved: number; book: number } }) {
+function ViewSwitch({ value, onChange, counts }: { value: View; onChange: (v: View) => void; counts: { saved: number; book: number; mine: number } }) {
   const opts: { id: View; label: string; count?: number }[] = [
     { id: "saved", label: "Сохранённые", count: counts.saved }, { id: "book", label: "Я готовил(а)", count: counts.book },
+    { id: "mine", label: "Семейные", count: counts.mine },
   ];
   const ref = useRef<HTMLDivElement>(null);
   const key = (e: KeyboardEvent) => {

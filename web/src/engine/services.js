@@ -43,6 +43,7 @@ import {
   lm,
   S0,
   C0,
+  MyR,
   vu,
 } from "./core.js";
 
@@ -1395,6 +1396,7 @@ function wm(e) {
     disliked: e.taste.disliked || [],
     book: e.book,
     notes: e.notes,
+    myRecipes: e.myRecipes || [],
     rewards: e.rewards,
     joined: e.joined,
   };
@@ -1442,6 +1444,7 @@ function gA(e, t, n) {
           disliked: wu(e.disliked || [], t.disliked || [], n.disliked || []),
           book: D0(Tu(e.book || [], t.book || [], n.book || [], (a) => a.id)),
           notes: kO(e.notes || {}, t.notes || {}, n.notes || {}),
+          myRecipes: Tu(e.myRecipes || [], t.myRecipes || [], n.myRecipes || [], (a) => a.id),
           rewards: rl(e.rewards, t.rewards, n.rewards),
           joined: wu(e.joined || [], t.joined || [], n.joined || []),
         }
@@ -1459,6 +1462,7 @@ function gA(e, t, n) {
           ],
           book: D0(Tu([], t.book || [], n.book || [], (a) => a.id)),
           notes: { ...(n.notes || {}), ...(t.notes || {}) },
+          myRecipes: Tu([], t.myRecipes || [], n.myRecipes || [], (a) => a.id),
           rewards: n.rewards ?? t.rewards,
           joined: [...new Set([...(n.joined || []), ...(t.joined || [])])],
         }
@@ -1547,6 +1551,7 @@ function _0(e, t) {
         )
       : e.book,
     l = t.notes ? C0(t.notes) : e.notes,
+    mr = Array.isArray(t.myRecipes) ? MyR(t.myRecipes) : e.myRecipes || [],
     u = Array.isArray(t.joined)
       ? t.joined
           .filter((f) => typeof f == "string" && /^\d{4}-\d{2}$/.test(f))
@@ -1556,6 +1561,7 @@ function _0(e, t) {
     ...e,
     book: o,
     notes: l,
+    myRecipes: mr,
     joined: u,
     rewards: typeof t.rewards == "boolean" ? t.rewards : e.rewards,
     favorites: s.favorites,

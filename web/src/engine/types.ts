@@ -153,6 +153,8 @@ export interface EngineState {
   noticeOk: boolean;
   book: BookEntry[];
   notes: Record<string, string>;
+  /** «Семейная книга»: own recipes in free text. */
+  myRecipes: MyRecipe[];
   rewards: boolean;
   seenBadges: string[];
   reminders: { daily: string | null; weekly: boolean };
@@ -182,4 +184,19 @@ export interface BuiltCatalog {
   errors: CatalogIssue[];
   warnings: CatalogIssue[];
   files: { name: string; recipes: number; ingredients: number }[];
+}
+
+export interface MyRecipe {
+  id: string;
+  title: string;
+  /** Whose recipe it is: «от бабушки Нины». */
+  from: string;
+  people: number | null;
+  minutes: number | null;
+  /** One product per line. */
+  ingredients: string;
+  /** One step per line (or paragraphs). */
+  steps: string;
+  note: string;
+  at: number;
 }

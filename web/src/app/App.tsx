@@ -6,7 +6,7 @@ import {
   CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
-import { expiringSoon, recipeById, usePwa } from "../engine";
+import { expiringSoon, recipeById, usePwa, type MyRecipe } from "../engine";
 import { useStore } from "./store";
 import { useActions } from "./actions";
 import { AssistantProvider } from "./assistant";
@@ -37,6 +37,7 @@ const DocLayer = lazyScreen(() => loadExtras().then((m) => ({ default: m.DocLaye
 const Learn = lazyScreen(() => loadExtras().then((m) => ({ default: m.Learn })));
 const Onboarding = lazyScreen(() => loadExtras().then((m) => ({ default: m.Onboarding })));
 const PollSheet = lazyScreen(() => loadExtras().then((m) => ({ default: m.PollSheet })));
+const IncomingRecipe = lazyScreen(() => import("../components/FamilyBook").then((m) => ({ default: m.IncomingRecipe })));
 import { Boundary, ChefAvatar, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
 import { useUpdateCheck } from "./updates";
 
@@ -58,7 +59,7 @@ const FROM_PROFILE: Tab[] = ["menu", "pantry"];
 const OPENED_WITH = new URLSearchParams(location.search);
 
 /** Links from the old site and from shared messages: ?recipe=, ?tab=, #poll=, #family=, #login=, #privacy. */
-function useIncomingLinks(onPoll: (t: string) => void) {
+function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRecipe>) => void) {
   const { sync, toast, ready, catalog } = useStore();
   const { openRecipe } = useActions();
   const loaded = catalog.version > 0;
@@ -69,6 +70,8 @@ function useIncomingLinks(onPoll: (t: string) => void) {
     const h = location.hash;
     const clean = () => history.replaceState(null, "", location.pathname + routeHash({ tab: "home" }));
     const poll = h.match(/^#poll=([0-9a-f]{32})$/), family = h.match(/^#family=([0-9a-f]{32})$/), login = h.match(/^#login=(\d{16})$/), doc = h.match(/^#(privacy|rules|terms|info)$/);
+    const book = h.match(/^#book=([jz][A-Za-z0-9_-]{10,})$/);
+    if (book) { clean(); void import("./myRecipes").then((m) => m.readLink(book[1])).then((r) => (r ? onBook(r) : toast("Ссылка на рецепт повреждена — попросите прислать её ещё раз"))); }
     if (poll) { clean(); onPoll(poll[1]); }
     else if (family) { clean(); sync.join(family[1]).then(() => toast("Вы в семье: план и покупки теперь общие")).catch((e: Error) => toast(e.message)); }
     else if (login) { clean(); sync.login(login[1]).then(() => toast("Готово — данные объединены")).catch((e: Error) => toast(e.message)); }
@@ -107,12 +110,13 @@ function Shell() {
   const [onboarding, setOnboarding] = useState(false);
   const keyboard = useKeyboardOpen();
   const bottom = useRef<HTMLDivElement>(null);
-  useIncomingLinks(setPoll);
+  const [incoming, setIncoming] = useState<Partial<MyRecipe> | null>(null);
+  useIncomingLinks(setPoll, setIncoming);
   useTimerAlarm(toast, s.readAloud);
   useUpdateCheck(toast);
   useEffect(() => {
     if (!ready) return;
-    if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=")) setOnboarding(true);
+    if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=") && !location.hash.startsWith("#book=")) setOnboarding(true);
     const c = s.cooking;
     migrateOldTimer([
       ...(c ? [{ title: c.recipe.title, recipeId: c.recipe.id, end: c.timerEnd, step: c.timerStep }] : []),
@@ -187,6 +191,7 @@ function Shell() {
         {route.doc && <DocLayer doc={route.doc} onClose={closeTop} />}
         {poll && <PollSheet token={poll} onClose={() => setPoll(null)} />}
         {onboarding && <Onboarding onDone={() => setOnboarding(false)} />}
+        {incoming && <IncomingRecipe data={incoming} onClose={() => setIncoming(null)} />}
       </Suspense>
       <Toast message={message} onClose={clearToast} />
     </div>
