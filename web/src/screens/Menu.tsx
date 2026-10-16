@@ -1,7 +1,7 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
+  CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus, Repeat2, Bookmark, X,
 } from "lucide-react";
 import {
   MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, formatMinutes, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
@@ -12,6 +12,8 @@ import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
 import { replace, routeHash } from "../app/router";
+import { downloadIcs, planIcs } from "../app/calendar";
+import { applyWeek, removeWeek, saveWeek, savedWeeks } from "../app/savedWeeks";
 import type { Profile } from "../app/profile";
 import { RecipeImage } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
@@ -42,6 +44,8 @@ export function Menu() {
   const [itemMenu, setItemMenu] = useState<{ date: string; index: number } | null>(null);
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
   const [noWaste, setNoWaste] = useState(false);
+  const [again, setAgain] = useState(false);
+  const [weeks, setWeeks] = useState(savedWeeks);
   const servings = profile.eaters;
   const today = dateKey(new Date());
   const days = weekDays(s.menu);
@@ -116,7 +120,10 @@ export function Menu() {
       {!filled ? (
         <div className="mt-6">
           <Empty icon={<CalendarDays size={48} />} title="Составлю план за секунду" mood="plan"
-            actions={<button className="btn-primary h-13" onClick={make}><Sparkles size={18} />Составить план</button>}>
+            actions={<>
+              <button className="btn-primary h-13" onClick={make}><Sparkles size={18} />Составить план</button>
+              {weeks.length > 0 && <button className="btn-outline h-13" onClick={() => setAgain(true)}><Repeat2 size={18} />Повторить свою неделю</button>}
+            </>}>
             Блюда без повторов, в будни — быстрые, с общими продуктами, чтобы ничего не пропадало. Список покупок соберётся сам.
           </Empty>
         </div>
@@ -124,7 +131,7 @@ export function Menu() {
         <>
           <div className="mt-4 flex gap-2">
             <button className="btn-primary flex-1 sm:flex-none" onClick={toShopping}><ShoppingCart size={18} />В покупки</button>
-            <button className="btn-outline" onClick={make}><RefreshCw size={18} />Составить заново</button>
+            <button className="btn-outline" onClick={() => (weeks.length ? setAgain(true) : make())}><RefreshCw size={18} />Составить заново</button>
           </div>
 
           {/* The week as one calm list: a row per dish, the day written small above its name. */}
@@ -166,7 +173,11 @@ export function Menu() {
               </li>
             ))}
           </ul>
-          {days.some((d) => !d.items.length) && <button className="btn-ghost mt-3" onClick={fill}><Plus size={18} />Заполнить пустые дни</button>}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {days.some((d) => !d.items.length) && <button className="btn-ghost" onClick={fill}><Plus size={18} />Заполнить пустые дни</button>}
+            {/* A week that went well: keep it and repeat it later from «Составить заново». */}
+            <button className="btn-ghost" onClick={() => { saveWeek(days); setWeeks(savedWeeks()); toast("Неделя сохранена — повторить можно в «Составить заново»"); }}><Bookmark size={18} />Сохранить эту неделю</button>
+          </div>
 
           {(shared.length > 0 || leftovers.length > 0) && (
             <section className="card mt-6 overflow-hidden">
@@ -222,6 +233,21 @@ export function Menu() {
       </Sheet>
       <Sheet open={share} title="Поделиться планом" onClose={() => setShare(false)}>
         <ShareOptions title="План на неделю" text={menuText(days)} onDone={() => setShare(false)} onPrint={() => printText("План на неделю", menuText(days))} />
+        <button className="btn-ghost mt-2 w-full" onClick={() => { downloadIcs(planIcs(days, siteBase())); setShare(false); toast("Откройте файл — блюда появятся в календаре с напоминанием"); }}><CalendarPlus size={18} />В календарь телефона</button>
+      </Sheet>
+      <Sheet open={again} title="Составить план" onClose={() => setAgain(false)}>
+        <div className="grid gap-2">
+          <button className="btn-primary justify-start" onClick={() => { setAgain(false); make(); }}><Sparkles size={18} />Новый план — подберу блюда</button>
+          {weeks.map((w) => (
+            <div key={w.id} className="flex items-center gap-1">
+              <button className="btn-outline min-w-0 flex-1 justify-start" onClick={() => {
+                const had = filled; setAgain(false); save(applyWeek(w, days, servings));
+                if (had) withUndo("Повторяю «" + w.name + "»"); else toast("Повторяю «" + w.name + "»");
+              }}><Repeat2 size={18} /><span className="truncate">Повторить: {w.name}</span></button>
+              <button className="icon-btn" onClick={() => { removeWeek(w.id); setWeeks(savedWeeks()); }} aria-label={"Удалить: " + w.name}><X size={18} /></button>
+            </div>
+          ))}
+        </div>
       </Sheet>
       <Sheet open={!!poll} title="Опрос «Что на ужин?»" onClose={() => setPoll(null)}>
         {poll && (

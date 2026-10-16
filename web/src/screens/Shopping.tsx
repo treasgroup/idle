@@ -1,9 +1,9 @@
 // «Покупки»: the list by shop aisle. A tap on the row marks it bought; bought items move into «Мои продукты» in one go.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Check, ChevronDown, MoreHorizontal, Plus, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
+import { Check, ChevronDown, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, packageHint, plural, searchIngredients, shoppingName, shoppingText,
-  shortName, type ShoppingItem,
+  shortName, useVoiceInput, type ShoppingItem,
 } from "../engine";
 import { useStore } from "../app/store";
 import { replace, routeHash } from "../app/router";
@@ -218,7 +218,30 @@ function Collapsible({ title, hint, open, onToggle, children }: { title: string;
 
 const LIQUID = /молок|кефир|сливк|сок|вод|масло растит|ряженк|йогурт питьев|бульон|квас|морс/i;
 
+/** «Молоко, хлеб, десяток яиц и сметана» → four rows; each name is matched to a known product when it is clearly one. */
+function splitList(text: string, ids: string[]): { ingredientId: string; name: string; amount: number; unit: string }[] {
+  const UNIT: Record<string, string> = { кг: "кг", кило: "кг", килограмм: "кг", г: "г", грамм: "г", л: "л", литр: "л", литра: "л", литров: "л", мл: "мл", шт: "шт.", штук: "шт.", штуки: "шт.", пачка: "пачка", пачки: "пачка", банка: "банка", банки: "банка", бутылка: "бутылка", бутылки: "бутылка" };
+  return text.split(/\s*(?:,|;|\n|\s+и\s+|\s+а ещё\s+|\s+еще\s+|\s+ещё\s+)\s*/i).map((p) => p.trim().replace(/[.!?]+$/, "")).filter((p) => p.length > 1).slice(0, 20).map((part) => {
+    let amount = 1, unit = "", name = part;
+    const ten = name.match(/^десяток\s+(.+)$/i);
+    const lead = name.match(/^(\d+(?:[.,]\d+)?)\s*([а-яё.]+)?\s+(.+)$/i);
+    const tail = name.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)\s*([а-яё.]+)?$/i);
+    if (ten) { amount = 10; unit = "шт."; name = ten[1]; }
+    else if (lead) { amount = Number(lead[1].replace(",", ".")) || 1; const u = UNIT[(lead[2] ?? "").replace(/\.$/, "").toLowerCase()]; unit = u ?? ""; name = u ? lead[3] : ((lead[2] ? lead[2] + " " : "") + lead[3]); }
+    else if (tail) { amount = Number(tail[2].replace(",", ".")) || 1; unit = UNIT[(tail[3] ?? "").replace(/\.$/, "").toLowerCase()] ?? ""; name = tail[1]; }
+    // Said in the genitive after a number («десяток яиц», «2 пачки масла»): the usual words back to the product.
+    const ALIAS: Record<string, string> = { "яиц": "яйца", "яйца": "яйца", "картошки": "картофель", "картошку": "картофель", "картошка": "картофель", "молока": "молоко", "хлеба": "хлеб", "масла": "масло", "сметаны": "сметана", "муки": "мука", "сахара": "сахар", "сыра": "сыр", "лука": "лук", "кефира": "кефир" };
+    name = ALIAS[name.toLowerCase()] ?? name;
+    const word = name.toLowerCase();
+    const stem = word.slice(0, Math.max(3, word.length - 2));
+    const hit = searchIngredients(word, ids, 5).find((id) => shortName(id).toLowerCase().startsWith(stem) || word.startsWith(shortName(id).toLowerCase().slice(0, Math.max(3, shortName(id).length - 2))));
+    const label = hit ? shortName(hit) : name.charAt(0).toUpperCase() + name.slice(1);
+    return { ingredientId: hit ?? "custom-" + Math.random().toString(36).slice(2, 9), name: label.slice(0, 120), amount, unit: unit || (LIQUID.test(label) ? "л" : "шт.") };
+  });
+}
+
 function AddItem({ open, onClose, onAdd }: { open: boolean; onClose: () => void; onAdd: (i: ShoppingItem) => void }) {
+  const { server, online, ensureSession, toast } = useStore();
   const [q, setQ] = useState("");
   const [amount, setAmount] = useState("");
   const [last, setLast] = useState<string | null>(null);
@@ -238,15 +261,32 @@ function AddItem({ open, onClose, onAdd }: { open: boolean; onClose: () => void;
     onAdd({ key: crypto.randomUUID(), ingredientId, name: name.slice(0, 120), amount: m ? Number(m[1].replace(",", ".")) || 1 : 1, unit, checked: false });
     setLast(name); setQ(""); setAmount("");
   };
+  // A whole list at once: said aloud or typed with commas.
+  const addMany = (text: string) => {
+    const rows = splitList(text, ids);
+    if (!rows.length) return;
+    for (const r of rows) onAdd({ key: crypto.randomUUID(), checked: false, ...r });
+    setLast(rows.map((r) => r.name).join(", ")); setQ(""); setAmount("");
+  };
+  const voice = useVoiceInput(addMany, toast, ensureSession, server.voiceReady && online);
+  const listening = voice.state === "recording" || voice.state === "transcribing";
+  const many = /,|\s и\s/.test(q.trim()) ? splitList(q, ids).length : 0;
   return (
     <Sheet open={open} title="Добавить в список" onClose={() => { setLast(null); onClose(); }} tall
       footer={<button className="btn-primary w-full" onClick={() => { setLast(null); onClose(); }}>Готово</button>}>
       {last && <p className="mb-3 flex items-center gap-1.5 text-small font-semibold text-herb" role="status"><Check size={16} aria-hidden />Добавлено: {last}</p>}
-      <input className="input" placeholder="Что купить? Например, кефир" value={q} maxLength={120} onChange={(e) => setQ(e.target.value)} autoFocus />
+      <div className="flex gap-2">
+        <input className="input min-w-0 flex-1" placeholder="Что купить? Например, кефир" value={listening ? voice.interim || "Слушаю… скажите списком" : q} maxLength={300} onChange={(e) => setQ(e.target.value)} readOnly={listening} autoFocus />
+        <button type="button" className={cx("grid h-12 w-12 shrink-0 place-items-center rounded-full", listening ? "listening bg-brand-fill text-white" : "bg-brand-soft text-brand")}
+          onClick={() => (listening ? voice.stop() : voice.available ? voice.start() : toast("В этом браузере голосовой ввод не работает — напишите через запятую."))}
+          aria-label={listening ? "Остановить" : "Сказать списком: молоко, хлеб, яйца"}>{listening ? <Square size={18} /> : <Mic size={20} />}</button>
+      </div>
+      {!q && !listening && <p className="mt-1.5 text-small text-ink-soft">Можно сразу списком: «молоко, хлеб, десяток яиц» — голосом или через запятую.</p>}
       <input className="input mt-2" placeholder="Сколько? Например, 1 л или 2 шт." value={amount} maxLength={40} onChange={(e) => setAmount(e.target.value)} />
       <div className="mt-3 grid gap-1.5">
         {found.map((id) => <button key={id} className="flex min-h-[48px] items-center rounded-input border border-line bg-card px-4 text-left text-body-sm hover:border-line-strong" onClick={() => add(id, shortName(id))}>{shortName(id)}</button>)}
-        {q.trim() && <button className="btn-soft" onClick={() => add("custom-" + Date.now().toString(36), q.trim())}><Plus size={18} />Добавить «{q.trim().slice(0, 40)}»</button>}
+        {many > 1 ? <button className="btn-primary" onClick={() => addMany(q)}><Plus size={18} />Добавить списком · {many}</button>
+          : q.trim() && <button className="btn-soft" onClick={() => add("custom-" + Date.now().toString(36), q.trim())}><Plus size={18} />Добавить «{q.trim().slice(0, 40)}»</button>}
       </div>
     </Sheet>
   );

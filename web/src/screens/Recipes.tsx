@@ -103,6 +103,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   const [f, setF] = useState<Filters>(NONE);
   const [sheet, setSheet] = useState(false);
   const [limit, setLimit] = useState(PAGE);
+  // The first screen of Поиск: sections and ten popular dishes, the whole catalog one tap further.
+  const [browseAll, setBrowseAll] = useState(false);
   const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({});
   const input = useRef<HTMLInputElement>(null);
 
@@ -115,7 +117,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     else if (v?.startsWith("time:")) setF({ ...NONE, time: Number(v.slice(5)) || null });
   }, []);
   useEffect(() => { if (online) reviewsApi.ratings().then(setRatings).catch(() => {}); }, [online]);
-  useEffect(() => setLimit(PAGE), [query, dish, f, view]);
+  useEffect(() => { setLimit(PAGE); setBrowseAll(false); }, [query, dish, f, view]);
 
   // Default order: dishes for the current meal first, then the best rated, then the engine's own ranking.
   const ranked = useMemo(() => {
@@ -173,7 +175,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     ? "Нашлось: " + list.length + " " + recipesWord(list.length)
     : view === "saved" ? "Сохранено: " + list.length + " " + recipesWord(list.length)
       : view === "book" ? "Приготовлено: " + list.length + " " + recipesWord(list.length)
-        : sections ? "Все рецепты" : list.length + " " + recipesWord(list.length);
+        : sections ? (browseAll ? "Все рецепты" : "Популярное") : list.length + " " + recipesWord(list.length);
 
   const dishChips = (
     <>
@@ -298,11 +300,15 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
                     <ArrowUpRight size={20} className="shrink-0 text-brand" aria-hidden />
                   </button>
                 )}
-                {list.slice(0, limit).map((r) => tiles
+                {list.slice(0, sections && !browseAll ? 10 : limit).map((r) => tiles
                   ? <RecipeTile key={r.id} recipe={r} note={tileNote(r)} onOpen={() => openRecipe(r)} />
                   : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} rating={ratings[r.id]} note={note(r)} onOpen={() => openRecipe(r)} />)}
               </div>
-              {list.length > limit && (
+              {sections && !browseAll ? (
+                <div className="mt-6 flex justify-center">
+                  <button className="btn-outline w-full sm:w-auto" onClick={() => setBrowseAll(true)}>Все рецепты · {list.length}</button>
+                </div>
+              ) : list.length > limit && (
                 <div className="mt-6 flex justify-center">
                   <button className="btn-outline w-full sm:w-auto" onClick={() => setLimit((n) => n + PAGE)}>
                     Показать ещё {Math.min(PAGE, list.length - limit)}

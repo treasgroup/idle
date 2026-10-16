@@ -2,7 +2,7 @@
 // worker asks the server what to show, and the server answers from the plan this device sent (menu, expiring food).
 // In the Android app the same reminders are scheduled as local notifications.
 import { useCallback, useEffect } from "react";
-import { apiUrl, dateKey, expiringSoon, isNativeApp, recipeById, shortName, type EngineState } from "../engine";
+import { apiUrl, dateKey, displayName, expiringSoon, ingredient, isNativeApp, recipeById, shortName, type EngineState } from "../engine";
 import * as core from "../engine/core.js";
 import { useStore } from "./store";
 
@@ -11,6 +11,19 @@ const GENERIC = [
   "Скажите, что есть дома, — подберу блюдо за минуту.",
   "Загляните: для вас есть идея на сегодня.",
 ];
+
+const FROZEN = ["meat", "poultry", "fish", "seafood"];
+/** «Завтра по плану котлеты»: the meat or fish of tomorrow's dish, which often waits in the freezer. */
+export function thawTomorrow(s: EngineState, day: Date): { title: string; what: string } | null {
+  const next = dateKey(new Date(day.getFullYear(), day.getMonth(), day.getDate() + 1));
+  for (const it of s.menu.find((m) => m.date === next)?.items ?? []) {
+    if (it.leftover) continue;
+    const r = recipeById(it.recipeId);
+    const ing = r?.ingredients.find((i) => !i.optional && !/заморож/i.test(i.name) && (ingredient(i.id)?.groups ?? []).some((g) => FROZEN.includes(g)));
+    if (r && ing) return { title: r.title, what: displayName(ing.id, ing.name).toLowerCase() };
+  }
+  return null;
+}
 
 /** What each of the next 8 days' reminder says: the menu, or food that has to be used, or a general idea. */
 export function reminderPlan(s: EngineState, now = new Date()): { date: string; body: string }[] {
@@ -24,13 +37,15 @@ export function reminderPlan(s: EngineState, now = new Date()): { date: string; 
     const soon = expiringSoon(s.fridge, day.getTime())
       .filter((f) => f.until != null && [date, next].includes(dateKey(new Date(f.until))))
       .map((f) => shortName(f.id).toLowerCase());
+    const thaw = thawTomorrow(s, day);
+    const thawText = thaw ? " Завтра «" + thaw.title + "»: если " + thaw.what + " в морозилке — переложите в холодильник." : "";
     out.push({
       date,
-      body: titles.length
+      body: (titles.length
         ? "Сегодня по плану: «" + titles[0] + "»" + (titles.length > 1 ? " и ещё " + (titles.length - 1) : "") + ". Рецепт и продукты — в одно касание."
         : soon.length
           ? "Пора использовать: " + soon.slice(0, 2).join(" и ") + ". Загляните — подскажу, что приготовить."
-          : GENERIC[day.getDate() % 3],
+          : thaw ? "" : GENERIC[day.getDate() % 3]).concat(thawText).trim().slice(0, 200),
     });
   }
   return out;

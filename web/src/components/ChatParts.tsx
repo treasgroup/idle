@@ -22,7 +22,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
   const [menuFor, setMenuFor] = useState<string | null>(null);
   if (m.role === "user")
     return (
-      <article className="anim-rise flex justify-end" aria-label="Вы">
+      <article className="anim-rise flex justify-end" aria-label="Вы" data-private>
         <p className="max-w-[85%] whitespace-pre-line rounded-[20px] rounded-br-md bg-brand-soft px-4 py-2.5 text-body text-ink">{m.text}</p>
       </article>
     );

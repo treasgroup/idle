@@ -1,6 +1,7 @@
 // Шеф, the assistant: what the person typed or said → conditions → recipes and a reply.
 // One provider for the whole app, so the home screen and the conversation share the same turn and "typing" state.
 // The server AI is used only when it is configured; otherwise the local engine answers (the default).
+import { measureAnswer, roastAnswer } from "./kitchenMath";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
@@ -127,6 +128,9 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       : opts.reset ? { ...stateRef.current, conditions: { ...base(), servings: stateRef.current.conditions.servings } } : stateRef.current;
     const started = Date.now();
     push([{ role: "user", text: opts.shown || text }], opts.fresh || opts.reset ? st.conditions : undefined, !!opts.fresh);
+    // Kitchen arithmetic is answered here at once: grams in a glass, how long to roast by weight.
+    const local = measureAnswer(text) ?? roastAnswer(text);
+    if (local) { push([{ role: "assistant", text: local }]); setBusy(false); return; }
     let patch: Record<string, unknown> | null = null;
     let reply = "";
     let note = "";

@@ -7,6 +7,7 @@ import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { RecipeRow } from "../components/RecipeCard";
+import { KitchenTools } from "../components/KitchenTools";
 import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { LESSONS } from "./learn-data";
 import { SchoolArt } from "../components/SchoolArt";
@@ -55,6 +56,7 @@ export function Learn({ onClose }: { onClose: () => void }) {
             );
           })}
         </div>
+        <KitchenTools />
       </div>
     </Layer>
   );

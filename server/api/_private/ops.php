@@ -64,6 +64,33 @@ function client_error(array $b): void {
     send_json(['saved' => true]);
 }
 
+// ---------- Where people get lost: taps on things that are not buttons, and rapid repeated taps ----------
+// The page sends a short label of what was tapped (a heading, a picture) and the section — no texts people typed.
+function taps_schema(): void {
+    db()->exec('CREATE TABLE IF NOT EXISTS ux_taps (key TEXT PRIMARY KEY, day TEXT NOT NULL, route TEXT NOT NULL, kind TEXT NOT NULL, label TEXT NOT NULL, n INTEGER NOT NULL, last INTEGER NOT NULL)');
+}
+function client_taps(array $b): void {
+    require_same_origin();
+    $list = array_slice(is_array($b['taps'] ?? null) ? $b['taps'] : [], 0, 20);
+    if (!$list) { send_json(['saved' => 0]); return; }
+    if (!bump('taps|' . client_ip() . '|' . date('Y-m-d-H'), 60) || !bump('taps|all|' . date('Y-m-d'), 20000)) { send_json(['saved' => 0]); return; }
+    taps_schema();
+    $day = date('Y-m-d'); $n = 0;
+    foreach ($list as $t) {
+        if (!is_array($t)) continue;
+        $kind = in_array($t['kind'] ?? '', ['dead', 'rage'], true) ? $t['kind'] : null;
+        $route = mb_substr(preg_replace('/[^a-z0-9:_-]/', '', strtolower((string)($t['route'] ?? ''))), 0, 40);
+        $label = mb_substr(trim(preg_replace('/\s+/u', ' ', (string)($t['label'] ?? ''))), 0, 60);
+        if (!$kind || $route === '' || $label === '') continue;
+        $key = substr(hash('sha256', $day . '|' . $route . '|' . $kind . '|' . $label), 0, 32);
+        db()->prepare('INSERT OR IGNORE INTO ux_taps (key, day, route, kind, label, n, last) VALUES (?, ?, ?, ?, ?, 0, ?)')->execute([$key, $day, $route, $kind, $label, now_ms()]);
+        db()->prepare('UPDATE ux_taps SET n = n + 1, last = ? WHERE key = ?')->execute([now_ms(), $key]);
+        $n++;
+    }
+    if (mt_rand(1, 50) === 1) db()->prepare('DELETE FROM ux_taps WHERE day < ?')->execute([date('Y-m-d', time() - 60 * 86400)]);
+    send_json(['saved' => $n]);
+}
+
 // ---------- The owner's view: funnel, return, errors, «Не то», copies ----------
 function admin_insights(int $days): void {
     $days = max(1, min(90, $days));
@@ -95,6 +122,7 @@ function admin_insights(int $days): void {
         'wrong' => $all("SELECT norm AS text, COUNT(*) AS n, MAX(ts) AS last FROM events WHERE type = 'wrong' AND day >= ? GROUP BY norm ORDER BY n DESC, last DESC LIMIT 50", [$from]),
         'shares' => (int)$one("SELECT COUNT(*) FROM events WHERE type = 'share' AND day >= ?", [$from]),
         'errors' => $all('SELECT day, message, place, version, agent, n, last FROM client_errors WHERE day >= ? ORDER BY last DESC LIMIT 60', [$from]),
+        'taps' => (function () use ($all, $from) { taps_schema(); return $all('SELECT route, kind, label, SUM(n) AS n, MAX(last) AS last FROM ux_taps WHERE day >= ? GROUP BY route, kind, label ORDER BY n DESC, last DESC LIMIT 40', [$from]); })(),
         'backups' => backups_list(),
     ]);
 }

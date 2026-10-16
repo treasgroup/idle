@@ -6,7 +6,7 @@ import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Clock, Flame,
   Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon } from "lucide-react";
 import {
-  LABELS, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
+  LABELS, basics, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide, yieldText,
   type Recipe, type RecipeIngredient,
 } from "../engine";
@@ -183,6 +183,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const [shareOpen, setShareOpen] = useState(false);
   const [making, setMaking] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [askReq, setAskReq] = useState<AskRequest | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const h1 = useRef<HTMLHeadingElement>(null);
@@ -345,14 +346,13 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                     <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
                   </button>
                 )}
-                {missing > 0 && (
-                  <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60"
-                    onClick={() => ask(swapQuestion)}>
-                    <Lightbulb size={18} className="shrink-0" aria-hidden />
-                    <span className="flex-1">Чего-то нет дома? Подскажу, чем заменить</span>
-                    <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
-                  </button>
-                )}
+                {/* One quiet line for both «нет дома» (a swap) and «не ем» (never offer it again). */}
+                <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60"
+                  onClick={() => setHelpOpen(true)}>
+                  <Lightbulb size={18} className="shrink-0" aria-hidden />
+                  <span className="flex-1">Чего-то нет дома или не едите? Подскажу</span>
+                  <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+                </button>
               </Section>
             </aside>
 
@@ -456,12 +456,13 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)}
           onDone={(copied) => { setShareOpen(false); if (copied !== undefined) toast(copied ? "Ссылка скопирована" : "Ссылка готова"); }}
           onPrint={() => printPage(base.title + " — на " + servings + " " + plural(servings, "порцию", "порции", "порций"), [
-            ...(base.summary ? [{ text: base.summary + " Время: " + formatMinutes(base.totalMinutes) + "." }] : []),
-            ...groups.map((g) => ({ title: g.title ?? "Продукты", items: g.rows.map((r) => displayName(r.id, r.name) + " — " + homeAmount(r) + (r.optional ? " (по желанию)" : "")) })),
-            { title: "Шаги", ordered: true, items: recipe.steps.map((st) => st.text) },
+            { title: "Как готовить · " + formatMinutes(base.totalMinutes), ordered: true, items: recipe.steps.map((st) => st.text) },
             ...(base.tips.length ? [{ title: "Советы", items: base.tips }] : []),
-          ], recipePageUrl(base.id))} />
+          ], recipePageUrl(base.id),
+          groups.map((g) => ({ title: g.title ?? "Продукты", items: g.rows.map((r) => displayName(r.id, r.name) + " — " + homeAmount(r) + (r.optional ? " (по желанию)" : "")) })))} />
       </Sheet>
+      <ProductHelp open={helpOpen} onClose={() => setHelpOpen(false)} rows={groups.flatMap((g) => g.rows)} canSwap={missing > 0}
+        onSwap={() => { setHelpOpen(false); ask(swapQuestion); }} />
       <AskSheet open={askOpen} onClose={() => setAskOpen(false)} recipe={askRecipe} servings={servings} prefs={s.preferences} request={askReq}
         onServings={(n) => { setServings(clampServings(base, n)); window.setTimeout(() => go("recipe-products"), 80); }} />
     </Layer>
@@ -553,6 +554,30 @@ function HaveBar({ owned, total, missing, onBuy }: { owned: number; total: numbe
         </button>
       )}
     </div>
+  );
+}
+
+/** «Чего-то нет дома или не едите?»: ask Шеф for a swap, or mark products never to be offered again. */
+function ProductHelp({ open, onClose, rows, canSwap, onSwap }: { open: boolean; onClose: () => void; rows: RecipeIngredient[]; canSwap: boolean; onSwap: () => void }) {
+  const { s, update } = useStore();
+  const staples = basics(s.preferences);
+  const list = [...new Map(rows.filter((r) => r.id !== "water" && !staples.has(r.id)).map((r) => [r.id, r])).values()];
+  const ex = s.preferences.excluded;
+  const toggle = (id: string) => update((st) => ({ ...st, preferences: { ...st.preferences,
+    excluded: st.preferences.excluded.includes(id) ? st.preferences.excluded.filter((x) => x !== id) : [...st.preferences.excluded, id] } }));
+  return (
+    <Sheet open={open} title="Подскажу" onClose={onClose}>
+      {canSwap && <button className="btn-outline w-full justify-start" onClick={onSwap}><MessageCircle size={18} />Чем заменить то, чего нет дома</button>}
+      <h3 className={cx("text-title", canSwap && "mt-6")}>Что-то не едите?</h3>
+      <p className="mt-1 text-body-sm text-ink-soft">Отметьте — больше не буду предлагать блюда с этим. Вернуть можно в профиле, в «Ограничениях».</p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {list.map((r) => {
+          const on = ex.includes(r.id);
+          return <button key={r.id} aria-pressed={on} className={cx("chip", on && "border-warn bg-warn-soft line-through")} onClick={() => toggle(r.id)}>{displayName(r.id, r.name)}</button>;
+        })}
+      </div>
+      <button className="btn-primary mt-6 w-full" onClick={onClose}>Готово</button>
+    </Sheet>
   );
 }
 

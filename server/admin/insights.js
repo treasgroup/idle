@@ -1,4 +1,4 @@
-// «Как идут дела»: the funnel, return of visitors, «Не то» from Шеф's answers, errors from phones, database copies.
+// «Как идут дела»: the funnel, return of visitors, «Не то» from Шеф's answers, errors from phones, where people get lost, database copies.
 (function () {
   var out = document.getElementById("out");
   var days = document.getElementById("days");
@@ -35,6 +35,15 @@
         + '<div class="muted" style="font-size:12px">' + esc(e.agent || "") + '</div></div><span class="num">×' + e.n + "</span></div>";
     });
     h += "</div>";
+
+    var KIND = { dead: "нажимают, а это не кнопка", rage: "нажимают много раз подряд" };
+    var PLACE = { home: "Главная", recipes: "Поиск", chat: "Шеф", favorites: "Избранное", shopping: "Покупки", menu: "План", pantry: "Мои продукты", profile: "Профиль", learn: "Школа", recipe: "Рецепт", cook: "Готовка" };
+    h += '<h2>Где путаются</h2><div class="card">';
+    if (!d.taps || !d.taps.length) h += '<p class="empty">Пока ничего: люди нажимают туда, куда нужно.</p>';
+    (d.taps || []).forEach(function (t) {
+      h += '<div class="row"><div style="flex:1"><div>«' + esc(t.label) + '»</div><div class="muted">' + esc(PLACE[t.route] || t.route) + " · " + esc(KIND[t.kind] || t.kind) + '</div></div><span class="num">×' + t.n + "</span></div>";
+    });
+    h += '<p class="muted">Если в списке часто одно и то же место — значит, люди ждут, что там можно нажать, или кнопка не отзывается. Такое стоит переделать.</p></div>';
 
     h += '<h2>Копии базы</h2><div class="card">';
     if (!d.backups.length) h += '<p class="empty">Копий пока нет: первая появится сегодня, после первого посещения сайта.</p>';

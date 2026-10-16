@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -23,6 +23,7 @@ import { LESSONS } from "./learn-data";
 import type { Pwa } from "./Profile";
 import { FeastSheet } from "../components/Feast";
 import { forgetRecipe, lastRecipe } from "../app/lastSeen";
+import { thawTomorrow } from "../app/reminders";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -265,6 +266,8 @@ function Now({ rail }: { rail?: boolean }) {
   const toBuy = s.shopping.filter((i) => !i.checked).length;
   const cooking = s.cooking && !s.cooking.done ? s.cooking : null;
   const timers = useTimers().length;
+  // In the afternoon: tomorrow's meat or fish may be in the freezer.
+  const thaw = new Date().getHours() >= 15 ? thawTomorrow(s, new Date()) : null;
   // The week plan is not in the bottom bar: from here it is one tap away (or one tap to make it).
   const planned = s.menu.filter((d) => d.date >= today && d.items.length > 0).length;
   const plan = !rail && !profile.simple && (
@@ -278,7 +281,7 @@ function Now({ rail }: { rail?: boolean }) {
     </button>
   );
   // On phones and tablets the dish on the stove is in the bar above the nav.
-  if (!(cooking && rail) && !menu.length && !toBuy && !timers && !plan) return null;
+  if (!(cooking && rail) && !menu.length && !toBuy && !timers && !plan && !thaw) return null;
   const rows = (
     <div className={cx("grid grid-cols-[minmax(0,1fr)] gap-2", rail && "gap-1")}>
       {timers > 0 && <TimerStrip flush={rail} />}
@@ -292,6 +295,12 @@ function Now({ rail }: { rail?: boolean }) {
       {menu.map(({ i, r }) => rail
         ? <RecipeMini key={r.id + i.servings} recipe={r} note={i.leftover ? "Только разогреть" : "По плану · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />
         : <RecipeRow key={r.id + i.servings} recipe={r} note={i.leftover ? "Приготовлено вчера — только разогреть" : "По плану на сегодня · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />)}
+      {thaw && (
+        <p className="flex items-start gap-3 rounded-input bg-sunken px-3 py-2.5 text-body-sm">
+          <Snowflake size={20} className="mt-0.5 shrink-0 text-ink-soft" aria-hidden />
+          <span>Завтра «{thaw.title}»: если {thaw.what} в морозилке — переложите сегодня в холодильник.</span>
+        </p>
+      )}
       {plan}
       {toBuy > 0 && (
         <button onClick={() => replace(routeHash({ tab: "shopping" }))} className="flex min-h-[52px] items-center gap-3 rounded-input border border-line bg-card px-3 text-left hover:border-line-strong/60">

@@ -63,11 +63,13 @@ export function Logo({ size = 32 }: { size?: number }) {
  * A full-height layer over the app (recipe, cooking, documents, school). On desktop it sits next to the
  * sidebar like a page. `transparentUntil`: the header stays clear over a hero image until this many px are scrolled.
  */
-export function Layer({ title, onClose, children, actions, width = "max-w-3xl", transparentUntil, closeIcon = "back", label, full }: {
+export function Layer({ title, onClose, children, actions, width = "max-w-3xl", transparentUntil, closeIcon = "back", label, full, private: own }: {
   title?: ReactNode; onClose: () => void; children: ReactNode; actions?: ReactNode; width?: string; transparentUntil?: number;
   closeIcon?: "back" | "close"; label?: string;
   /** Over the whole window, the site menu included (cooking: nothing else on screen). */
   full?: boolean;
+  /** The person's own content (family recipes): never described in «Где путаются». */
+  private?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
@@ -84,7 +86,7 @@ export function Layer({ title, onClose, children, actions, width = "max-w-3xl", 
     return () => el.removeEventListener("scroll", on);
   }, [transparentUntil]);
   return (
-    <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label ?? (typeof title === "string" ? title : undefined)}
+    <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label ?? (typeof title === "string" ? title : undefined)} data-private={own || undefined}
       className={cx("anim-fade fixed inset-0 z-40 flex flex-col bg-paper outline-none", !full && "lg:left-64")}>
       <div className={cx("pt-safe absolute inset-x-0 top-0 z-20 transition-colors duration-150", solid ? "border-b border-line bg-paper" : "bg-transparent")}>
         <div className={cx("mx-auto flex h-14 items-center gap-1 px-2", width)}>
@@ -145,12 +147,12 @@ export function Chip({ on, onClick, children, className, label }: { on?: boolean
   return <button type="button" aria-pressed={on} aria-label={label} className={cx("chip", on && "chip-on", className)} onClick={onClick}>{children}</button>;
 }
 
-export function Stepper({ value, min, max, onChange, label, suffix }: { value: number; min: number; max: number; onChange: (n: number) => void; label: string; suffix?: string }) {
+export function Stepper({ value, min, max, onChange, label, suffix, step = 1 }: { value: number; min: number; max: number; onChange: (n: number) => void; label: string; suffix?: string; step?: number }) {
   return (
     <div className="inline-flex h-11 items-center rounded-full border border-line-strong/60 bg-card" role="group" aria-label={label}>
-      <button className="grid h-11 w-11 place-items-center rounded-full disabled:opacity-30" disabled={value <= min} onClick={() => onChange(value - 1)} aria-label="Меньше"><Minus size={18} /></button>
+      <button className="grid h-11 w-11 place-items-center rounded-full disabled:opacity-30" disabled={value <= min} onClick={() => onChange(Math.max(min, value - step))} aria-label="Меньше"><Minus size={18} /></button>
       <span className="min-w-[2.75rem] text-center text-small font-semibold tabular-nums" aria-live="polite">{value}{suffix ? " " + suffix : ""}</span>
-      <button className="grid h-11 w-11 place-items-center rounded-full disabled:opacity-30" disabled={value >= max} onClick={() => onChange(value + 1)} aria-label="Больше"><Plus size={18} /></button>
+      <button className="grid h-11 w-11 place-items-center rounded-full disabled:opacity-30" disabled={value >= max} onClick={() => onChange(Math.min(max, value + step))} aria-label="Больше"><Plus size={18} /></button>
     </div>
   );
 }

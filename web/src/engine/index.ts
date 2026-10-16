@@ -85,6 +85,8 @@ export const relaxOptions = (c: Conditions, p: Preferences): ChatOption[] => cor
 /** Taste profile → per-recipe score bonus used by rankRecipes. */
 export const setTasteScorer = (fn: (r: Recipe) => number): void => core.LS(fn);
 export const tasteScorer = (t: Taste, now?: number): ((r: Recipe) => number) => svc.Em(t, now);
+/** One tap after cooking: «Понравилось» comes up more often, «Так себе» less (taste.liked / taste.disliked). */
+export const rateDish = (t: Taste, recipeId: string, liked: boolean): Taste => svc.zA(t, recipeId, liked ? 5 : 2);
 export const updateTaste = (t: Taste, recipeId: string, signal: "liked" | "cooked" | "too_hard" | "not_now" | "dislike", now?: number): Taste =>
   svc.B0(t, recipeId, signal, now);
 /** Cleans a typed or spoken message ("скока", "чё-нить", filler words) before parsing. */

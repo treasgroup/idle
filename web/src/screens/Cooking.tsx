@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
-  MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, Volume2, X,
+  MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, ThumbsDown, ThumbsUp, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
-  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, updateTaste, useHandsFree,
+  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, rateDish, useHandsFree,
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -650,13 +650,6 @@ function scrollToReviews() {
   setTimeout(tick, 200);
 }
 
-const RATED: Record<number, string> = {
-  1: "Понял — в следующий раз предложу что-нибудь другое.",
-  2: "Понял — в следующий раз предложу что-нибудь другое.",
-  3: "Спасибо, учту.",
-  4: "Отлично! Буду чаще предлагать похожее.",
-  5: "Отлично! Буду чаще предлагать похожее.",
-};
 
 /** After the last step: a rating, what to do next, and (once) the evening reminder. */
 function Done({ onClose }: { onClose: () => void }) {
@@ -666,8 +659,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const reminders = useReminders();
   const c = s.cooking!;
   const r = c.recipe;
-  const [stars, setStars] = useState(0);
-  const [hover, setHover] = useState(0);
+  const [rated, setRated] = useState<"yes" | "meh" | null>(null);
   const [sheet, setSheet] = useState<"menu" | "left" | "note" | null>(null);
   const askRemind = !profile.remindAsked && !s.reminders.daily && reminders.supported;
   const fav = isFavorite(r.id);
@@ -677,10 +669,10 @@ function Done({ onClose }: { onClose: () => void }) {
   useEffect(() => () => { if (ending.current) update((st) => (st.cooking?.done ? { ...st, cooking: null } : st)); }, [update]);
   const end = () => { ending.current = true; };
   const close = () => { end(); onClose(); };
-  const rate = (n: number) => {
+  const rate = (v: "yes" | "meh") => {
     cue("tap");
-    setStars(n);
-    update((st) => ({ ...st, taste: updateTaste(st.taste, r.id, n >= 4 ? "liked" : n === 3 ? "cooked" : "too_hard") }));
+    setRated(v);
+    update((st) => ({ ...st, taste: rateDish(st.taste, r.id, v === "yes") }));
   };
   useEffect(() => { cue("done"); }, []);
   const reviews = () => { end(); replace(routeHash({ tab: "home", recipe: r.id })); scrollToReviews(); };
@@ -700,19 +692,21 @@ function Done({ onClose }: { onClose: () => void }) {
           <p className="mt-1 text-body text-ink-soft">Приятного аппетита. Как получилось?</p>
         </div>
 
+        {/* One tap, no stars: it only tells the picker to offer this more often or less. */}
         <section className="mt-6 text-center" aria-label="Оценка">
-          <div role="radiogroup" aria-label="Оценка блюда" className="flex justify-center gap-1" onMouseLeave={() => setHover(0)}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button key={n} role="radio" aria-checked={stars === n} aria-label={n + " из 5"} onClick={() => rate(n)} onMouseEnter={() => setHover(n)}
-                className="grid h-12 w-12 place-items-center rounded-full transition-transform duration-150 active:scale-90">
-                <Star size={36} strokeWidth={1.5} className={cx("transition-colors duration-150", (hover || stars) >= n ? "fill-warn text-warn" : "text-line-strong")} aria-hidden />
+          <div role="radiogroup" aria-label="Как получилось" className="grid grid-cols-2 gap-2">
+            {([["yes", "Понравилось", ThumbsUp], ["meh", "Так себе", ThumbsDown]] as const).map(([v, label, Icon]) => (
+              <button key={v} role="radio" aria-checked={rated === v} onClick={() => rate(v)}
+                className={cx("flex h-14 items-center justify-center gap-2 rounded-card border text-body font-medium transition-colors active:scale-[.98]",
+                  rated === v ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-card text-ink hover:border-line-strong")}>
+                <Icon size={20} aria-hidden />{label}
               </button>
             ))}
           </div>
-          {stars > 0 && (
+          {rated && (
             <div className="anim-rise mt-3">
-              <p className="text-body-sm text-ink-soft" role="status">{RATED[stars]}</p>
-              <button className="btn-soft mt-3" onClick={reviews}><Camera size={18} aria-hidden />Фото или отзыв</button>
+              <p className="text-body-sm text-ink-soft" role="status">{rated === "yes" ? "Запомню — буду предлагать чаще." : "Понял — в следующий раз предложу что-нибудь другое."}</p>
+              <button className="btn-ghost mt-1" onClick={reviews}><Camera size={18} aria-hidden />Оставить отзыв для других</button>
             </div>
           )}
         </section>

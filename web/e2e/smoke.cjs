@@ -14,7 +14,7 @@ const step = (name) => console.log("  ✓ " + name);
 async function walk(size, mobile) {
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});
   const ctx = await browser.newContext({ viewport: size, isMobile: mobile, hasTouch: mobile, locale: "ru-RU" });
-  await ctx.route(/api\/index\.php\?r=(event|session|account\.|push\.|feedback|poll\.create|reviews\.save|error)/, (r) => r.fulfill({ status: 200, body: "{}", contentType: "application/json" }));
+  await ctx.route(/api\/index\.php\?r=(event|session|account\.|push\.|feedback|poll\.create|reviews\.save|error|taps)/, (r) => r.fulfill({ status: 200, body: "{}", contentType: "application/json" }));
   const page = await ctx.newPage();
   page.on("pageerror", (e) => problems.push((mobile ? "phone" : "desktop") + ": " + e.message));
   const go = async (hash) => { await page.evaluate((h) => { location.hash = h; }, hash); await page.waitForTimeout(700); };

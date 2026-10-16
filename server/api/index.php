@@ -132,6 +132,7 @@ try {
     elseif ($route === 'poll.vote' && $method === 'POST') poll_vote(read_json_body(1000));
     // ---------- Delivery partners for the shopping list ----------
     elseif ($route === 'error' && $method === 'POST') client_error(read_json_body(6000));
+    elseif ($route === 'taps' && $method === 'POST') client_taps(read_json_body(8000));
     elseif ($route === 'admin.insights' && $method === 'GET') { require_admin(); admin_insights((int)($_GET['days'] ?? 30)); }
     elseif ($route === 'barcode' && $method === 'POST') { require_same_origin(); barcode_lookup((string)(read_json_body(500)['code'] ?? '')); }
     elseif ($route === 'partners' && $method === 'GET') partners_route();

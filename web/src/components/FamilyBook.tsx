@@ -1,5 +1,6 @@
 // «Семейная книга»: the family's own recipes — typed in or read from a photo of a notebook page — kept with the
 // person's other things and sent to children and grandchildren as a link that opens straight into their book.
+import { gramsHint } from "../app/kitchenMath";
 import { useRef, useState } from "react";
 import { Camera, Clock, PenLine, Printer, Send, Trash2, Users } from "lucide-react";
 import { canShare, copyText, plural, type MyRecipe } from "../engine";
@@ -140,7 +141,7 @@ function MyRecipeView({ r, onClose, onEdit }: { r: MyRecipe; onClose: () => void
     toast("Рецепт удалён", { label: "Отменить", run: () => update((st) => saveRecipe(st, keep)) });
   };
   return (
-    <Layer title={r.title} onClose={onClose} label={r.title}
+    <Layer title={r.title} onClose={onClose} label={r.title} private
       actions={<button className="icon-btn" onClick={onEdit} aria-label="Изменить"><PenLine size={20} /></button>}>
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-[calc(env(safe-area-inset-top)+4.5rem)] sm:px-6">
         <p className="text-small text-ink-soft">Семейная книга{r.from ? " · " + r.from : ""}</p>
@@ -154,7 +155,7 @@ function MyRecipeView({ r, onClose, onEdit }: { r: MyRecipe; onClose: () => void
         {ing.length > 0 && (
           <section className="mt-6">
             <h2 className="text-h2">Продукты</h2>
-            <ul className="card mt-3 divide-y divide-line px-4">{ing.map((l, i) => <li key={i} className="py-3 text-body">{l}</li>)}</ul>
+            <ul className="card mt-3 divide-y divide-line px-4">{ing.map((l, i) => { const g = gramsHint(l); return <li key={i} className="py-3 text-body">{l}{g && <span className="ml-2 whitespace-nowrap text-body-sm text-ink-soft">{g}</span>}</li>; })}</ul>
           </section>
         )}
         {steps.length > 0 && (

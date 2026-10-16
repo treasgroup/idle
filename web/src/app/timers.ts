@@ -208,6 +208,9 @@ export function migrateOldTimer(old: { title: string; recipeId: string; end: num
 
 /** «Таймер на 10 мин» in a kitchen answer: the first number of minutes, if any. */
 export function minutesIn(text: string): number | null {
+  // «1 ч 30 мин», «2 ч» — hours count too.
+  const h = text.match(/(\d+)\s*(?:час(?:а|ов)?|ч(?![а-яё]))(?!\s*\.?\s*л)(?:\s*(\d+)\s*мин)?/i);
+  if (h) { const n = Number(h[1]) * 60 + Number(h[2] ?? 0); return n > 0 && n <= 360 ? n : null; }
   const m = text.match(/(\d+)(?:\s*[–-]\s*(\d+))?\s*мин/);
   if (!m) return null;
   const n = Number(m[2] ?? m[1]);
