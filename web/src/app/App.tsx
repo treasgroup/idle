@@ -38,7 +38,7 @@ const Learn = lazyScreen(() => loadExtras().then((m) => ({ default: m.Learn })))
 const Onboarding = lazyScreen(() => loadExtras().then((m) => ({ default: m.Onboarding })));
 const PollSheet = lazyScreen(() => loadExtras().then((m) => ({ default: m.PollSheet })));
 const IncomingRecipe = lazyScreen(() => import("../components/FamilyBook").then((m) => ({ default: m.IncomingRecipe })));
-import { Boundary, ChefAvatar, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
+import { Boundary, Logo, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
 import { useUpdateCheck } from "./updates";
 
 const NAV: { tab: Tab; label: string; icon: LucideIcon; simple?: boolean }[] = [
@@ -259,7 +259,7 @@ function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
           </button>
         ) : (
           <button className="-ml-1 flex items-center gap-2.5 rounded-full pr-2" onClick={() => go("home")} aria-label="На главную">
-            <ChefAvatar size={30} />
+            <Logo size={30} />
             <span className="text-title">Что приготовить?</span>
           </button>
         )}
@@ -289,7 +289,7 @@ function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const nav = useNav();
   return (
     <nav className="pt-safe fixed inset-y-0 left-0 z-30 hidden w-20 flex-col items-center gap-1 border-r border-line bg-paper pb-4 pt-4 sm:flex lg:hidden" aria-label="Разделы">
-      <button className="mb-3" onClick={() => go("home")} aria-label="На главную"><ChefAvatar size={40} /></button>
+      <button className="mb-3" onClick={() => go("home")} aria-label="На главную"><Logo size={40} /></button>
       {nav.map(({ tab, label, icon }) => {
         const on = route.tab === tab;
         return (
@@ -318,7 +318,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-4 pt-5 lg:flex" aria-label="Меню сайта">
       <button className="flex items-center gap-2.5 rounded-input px-2 py-1 text-left" onClick={() => go("home")}>
-        <ChefAvatar size={32} />
+        <Logo size={32} />
         <span className="text-title leading-tight">Что приготовить?</span>
       </button>
       <nav className="mt-6 grid gap-0.5" aria-label="Разделы">

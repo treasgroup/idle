@@ -53,6 +53,11 @@ export function ChefAvatar({ size = 32 }: { size?: number; mood?: Mood }) {
   );
 }
 
+/** The site's logo (fork and knife) — next to «Что приготовить?» in the header and menus. */
+export function Logo({ size = 32 }: { size?: number }) {
+  return <img src="./favicon.svg" alt="" aria-hidden width={size} height={size} draggable={false} className="shrink-0" />;
+}
+
 /**
  * A full-height layer over the app (recipe, cooking, documents, school). On desktop it sits next to the
  * sidebar like a page. `transparentUntil`: the header stays clear over a hero image until this many px are scrolled.
