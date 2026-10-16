@@ -4,7 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Snowflake, Refrigerator, Leaf, Sprout, Baby, Clock, Flame, Gauge, ShoppingBasket,
-  Timer, BellRing, Lightbulb, Users, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X } from "lucide-react";
+  Timer, BellRing, Lightbulb, Users, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon } from "lucide-react";
 import {
   LABELS, clampServings, displayName, formatMinutes, ingredient, ingredientMatches, isLenten, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide, yieldText,
@@ -24,6 +24,7 @@ import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause,
 import { RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { AskSheet, accusative, askStarters, type AskRequest } from "../components/AskSheet";
+import { shareRecipeCard } from "../app/shareCard";
 import { ServeBySheet } from "../components/ServeBy";
 import { ShareOptions } from "../components/ShareOptions";
 import { TimerStrip } from "../components/TimerStrip";
@@ -186,6 +187,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const [have, setHave] = useState<string[]>(() => haveIds(s));
   const [menuOpen, setMenuOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [making, setMaking] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
   const [askReq, setAskReq] = useState<AskRequest | null>(null);
   const root = useRef<HTMLDivElement>(null);
@@ -476,6 +478,22 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
       <ServeBySheet open={serveOpen} onClose={() => setServeOpen(false)} title={base.title} recipeId={base.id} minutes={recipe.totalMinutes} onCook={cook} />
       {menuOpen && <AddToMenuSheet recipeId={base.id} servings={servings} onClose={() => setMenuOpen(false)} />}
       <Sheet open={shareOpen} title="Поделиться рецептом" onClose={() => setShareOpen(false)}>
+        <button className="mb-3 flex w-full items-center gap-3 rounded-card border border-line bg-card p-3 text-left hover:border-line-strong disabled:opacity-60" disabled={making}
+          onClick={async () => {
+            setMaking(true);
+            const r = await shareRecipeCard(base, recipePageUrl(base.id));
+            setMaking(false);
+            if (r === "saved") toast("Картинка сохранена — отправьте её из галереи или загрузок");
+            else if (r === "failed") toast("Не получилось нарисовать картинку — отправьте ссылку");
+            else setShareOpen(false);
+          }}>
+          <RecipeImage recipe={base} className="h-14 w-14 shrink-0" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-body-sm font-medium">{making ? "Рисую картинку…" : "Картинкой"}</span>
+            <span className="block text-caption text-ink-soft">Фото, название и время — удобно переслать в ВК, Одноклассники, мессенджер</span>
+          </span>
+          <ImageIcon size={20} className="shrink-0 text-ink-soft" aria-hidden />
+        </button>
         <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)}
           onDone={(copied) => { setShareOpen(false); if (copied !== undefined) toast(copied ? "Ссылка скопирована" : "Ссылка готова"); }}
           onPrint={() => printPage(base.title + " — на " + servings + " " + plural(servings, "порцию", "порции", "порций"), [

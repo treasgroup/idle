@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
-import { useMemo, useState } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2 } from "lucide-react";
+import { useMemo, useState, type ReactNode } from "react";
+import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -21,6 +21,7 @@ import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
 import { ProfileButton } from "../app/App";
 import { LESSONS } from "./learn-data";
 import type { Pwa } from "./Profile";
+import { FeastSheet } from "../components/Feast";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -67,10 +68,13 @@ function useToday(pick: Recipe | null, meal: string): Recipe | null {
   return pick;
 }
 
+const FESTIVE = ["newyear", "easter", "maslenitsa"];
+
 export function Home({ pwa }: { pwa?: Pwa }) {
   const { profile } = useStore();
   const { openRecipe } = useActions();
   const [decide, setDecide] = useState(false);
+  const [feast, setFeast] = useState(false);
   const all = useSuitable();
   const meal = mealNow();
   const today = useToday(dayPick(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast")), meal);
@@ -120,7 +124,9 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 
       <Now />
       <Rescue />
-      {season && seasonal.length >= 4 && <Shelf title={season.title} hint={season.hint} list={seasonal} />}
+      {season && seasonal.length >= 4 && <Shelf title={season.title} hint={season.hint} list={seasonal}
+        extra={FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />Собрать праздничный стол</button> : undefined} />}
+      <FeastSheet open={feast} onClose={() => setFeast(false)} />
       {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} hint="До 30 минут" list={quick} all={() => openRecipesView("time:30")} />}
       <Shelf title="Супы" list={soups} all={() => openRecipesView("dish:soup")} />
       {(profile.kids || profile.goals.includes("family")) && kids.length >= 4 && <Shelf title="Детям нравится" list={kids} all={() => openRecipesView("filter:kids")} />}
@@ -178,7 +184,7 @@ function RepeatCard() {
 }
 
 /** A collection that scrolls sideways, like a shelf in a streaming app. */
-function Shelf({ title, hint, list, all }: { title: string; hint?: string; list: Recipe[]; all?: () => void }) {
+function Shelf({ title, hint, list, all, extra }: { title: string; hint?: string; list: Recipe[]; all?: () => void; extra?: ReactNode }) {
   const { openRecipe } = useActions();
   if (!list.length) return null;
   return (
@@ -187,6 +193,7 @@ function Shelf({ title, hint, list, all }: { title: string; hint?: string; list:
       <ScrollRow label={title}>
         {list.map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className="w-[168px] shrink-0 snap-start sm:w-[200px]" />)}
       </ScrollRow>
+      {extra}
     </Section>
   );
 }

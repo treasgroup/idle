@@ -1,1 +1,0 @@
-import{r as s}from"./app-4ZptqBeV.js";const r="cook-hints-seen",o=()=>{try{return JSON.parse(localStorage.getItem(r)||"[]")}catch{return[]}};function l(t){const[n,c]=s.useState(()=>!o().includes(t)),a=s.useCallback(()=>{c(!1);try{const e=o();e.includes(t)||localStorage.setItem(r,JSON.stringify([...e,t]))}catch{}},[t]);return[n,a]}export{l as u};

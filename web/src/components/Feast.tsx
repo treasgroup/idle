@@ -1,0 +1,161 @@
+// «Праздничный стол»: three short steps — how many guests and when to serve, the dishes (one tap to swap), and the
+// result: one shopping list for everybody and a plan of when to start each dish so all is ready on time.
+import { useMemo, useState } from "react";
+import { BellRing, ChevronLeft, PartyPopper, RefreshCw, ShoppingCart, X } from "lucide-react";
+import {
+  CATALOG_SECTIONS, addToShopping, clampServings, courseOf, formatMinutes, freshConditions, ingredientsToBuy, plural, rankRecipes, recipes,
+  type Recipe,
+} from "../engine";
+import { useStore } from "../app/store";
+import { useActions, haveIds } from "../app/actions";
+import { startTimer } from "../app/timers";
+import { cue } from "../app/feedback";
+import { RecipeImage } from "./RecipeCard";
+import { Chip, Sheet, Stepper } from "./ui";
+
+const SLOTS: { key: string; label: string; courses: string[] }[] = [
+  { key: "salad1", label: "Салат", courses: ["salad"] },
+  { key: "salad2", label: "Ещё салат", courses: ["salad"] },
+  { key: "snack", label: "Закуска", courses: ["snack"] },
+  { key: "main", label: "Горячее", courses: ["main"] },
+  { key: "dessert", label: "Сладкое", courses: ["dessert", "baking"] },
+];
+const hhmm = (d: Date) => d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+
+export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { s, update, toast } = useStore();
+  const { openRecipe } = useActions();
+  const [step, setStep] = useState(0);
+  const [guests, setGuests] = useState(6);
+  const [hour, setHour] = useState(() => Math.min(20, Math.max(new Date().getHours() + 3, 15)));
+  const [pick, setPick] = useState<Record<string, number>>({});
+  const [off, setOff] = useState<string[]>([]);
+
+  // Candidates per slot: dishes for guests first, then any suitable ones.
+  const pools = useMemo(() => {
+    if (!open) return {} as Record<string, Recipe[]>;
+    const c = { ...freshConditions({ servings: 4, appliances: s.preferences.appliances, vegetarian: s.preferences.vegetarian }), occasion: "guests" as const };
+    const ranked = rankRecipes(recipes(), c, s.preferences, 500).map((m) => m.recipe);
+    const forGuests = CATALOG_SECTIONS.find((x) => x.key === "guests")?.test ?? (() => false);
+    const out: Record<string, Recipe[]> = {};
+    for (const sl of SLOTS) {
+      // Not for a festive table: memorial and fasting-day dishes.
+      const fit = ranked.filter((r) => sl.courses.includes(courseOf(r)) && !/кутья|кутью|канун/i.test(r.title));
+      out[sl.key] = [...fit.filter(forGuests), ...fit.filter((r) => !forGuests(r))];
+    }
+    // The two salads differ.
+    out.salad2 = out.salad2.slice(1).concat(out.salad2.slice(0, 1));
+    return out;
+  }, [open, s.preferences]);
+  const dishes = SLOTS.filter((sl) => !off.includes(sl.key) && pools[sl.key]?.length)
+    .map((sl) => ({ slot: sl, r: pools[sl.key][(pick[sl.key] ?? 0) % pools[sl.key].length] }));
+
+  const serve = new Date(); serve.setHours(hour, 0, 0, 0);
+  const plan = dishes.map((d) => ({ ...d, start: new Date(serve.getTime() - d.r.totalMinutes * 60e3) }))
+    .sort((a, b) => a.start.getTime() - b.start.getTime());
+  const first = plan[0]?.start;
+  const close = () => { setStep(0); onClose(); };
+
+  const toShopping = () => {
+    const have = haveIds(s);
+    update((st) => {
+      let list = st.shopping;
+      for (const { r } of dishes) {
+        const per = clampServings(r, guests);
+        // A dish whose recipe does not go up to the number of guests is bought twice (or more).
+        for (let k = 0; k < Math.ceil(guests / per); k++) {
+          const items = ingredientsToBuy(r, per, have).filter((i) => !i.optional);
+          list = addToShopping(list, items, r.title);
+        }
+      }
+      return { ...st, shopping: list };
+    });
+    cue("success");
+    toast("Продукты на всех — в списке покупок");
+  };
+  const remind = () => {
+    if (!first) return;
+    const wait = Math.round((first.getTime() - Date.now()) / 1000);
+    if (wait < 60) return toast("Пора начинать — первое блюдо уже сейчас");
+    startTimer({ dish: "Праздничный стол", label: "Пора начинать: «" + plan[0].r.title + "»", seconds: wait });
+    toast("Напомню в " + hhmm(first) + ". Не закрывайте сайт — сигнал прозвучит здесь.");
+  };
+
+  return (
+    <Sheet open={open} title={["Праздничный стол", "Что подать", "План готов"][step]} onClose={close} tall
+      footer={step < 2
+        ? <div className="flex gap-2">
+            {step > 0 && <button className="btn-outline" onClick={() => setStep(step - 1)}><ChevronLeft size={18} />Назад</button>}
+            <button className="btn-primary flex-1" disabled={step === 1 && !dishes.length} onClick={() => setStep(step + 1)}>Дальше</button>
+          </div>
+        : <div className="grid gap-2 sm:grid-cols-2">
+            <button className="btn-primary" onClick={toShopping}><ShoppingCart size={18} />Всё в список покупок</button>
+            <button className="btn-outline" onClick={remind}><BellRing size={18} />Напомнить начать в {first ? hhmm(first) : "—"}</button>
+          </div>}>
+      {step === 0 && (
+        <div>
+          <p className="flex items-center gap-2 text-body-sm text-ink-soft"><PartyPopper size={18} aria-hidden />Соберу стол на всех: салаты, закуску, горячее и сладкое.</p>
+          <div className="mt-5 flex items-center justify-between gap-3 rounded-card border border-line bg-card p-4">
+            <span className="text-body-sm font-medium">Сколько человек</span>
+            <Stepper value={guests} min={2} max={24} onChange={setGuests} label="Гостей" />
+          </div>
+          <p className="label mb-2 mt-5">К какому времени подать</p>
+          <div className="flex flex-wrap gap-2">
+            {[14, 15, 16, 17, 18, 19, 20].map((h) => <Chip key={h} on={hour === h} onClick={() => setHour(h)}>{h}:00</Chip>)}
+          </div>
+        </div>
+      )}
+      {step === 1 && (
+        <ul className="grid gap-2">
+          {SLOTS.filter((sl) => pools[sl.key]?.length).map((sl) => {
+            const on = !off.includes(sl.key);
+            const r = pools[sl.key][(pick[sl.key] ?? 0) % pools[sl.key].length];
+            return (
+              <li key={sl.key} className={on ? "flex items-center gap-3 rounded-card border border-line bg-card p-2" : "flex items-center gap-3 rounded-card border border-dashed border-line p-2 opacity-60"}>
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <RecipeImage recipe={r} className="h-14 w-14 shrink-0" />
+                  <span className="min-w-0">
+                    <span className="block text-caption text-ink-soft">{sl.label} · {formatMinutes(r.totalMinutes)}</span>
+                    <span className="line-clamp-2 block text-body-sm font-medium leading-snug">{r.title}</span>
+                  </span>
+                </div>
+                {on && <button className="icon-btn shrink-0 text-ink-soft" onClick={() => setPick((p) => ({ ...p, [sl.key]: (p[sl.key] ?? 0) + 1 }))} aria-label={"Другое блюдо: " + sl.label}><RefreshCw size={18} /></button>}
+                <button className="icon-btn shrink-0 text-ink-soft" onClick={() => setOff((o) => (on ? [...o, sl.key] : o.filter((x) => x !== sl.key)))} aria-label={on ? "Убрать: " + sl.label : "Вернуть: " + sl.label}>
+                  {on ? <X size={18} /> : <RefreshCw size={18} />}
+                </button>
+              </li>
+            );
+          })}
+          <li className="px-1 pt-1 text-caption text-ink-faint">↻ — другое блюдо, × — не нужно.</li>
+        </ul>
+      )}
+      {step === 2 && (
+        <div>
+          <p className="text-body-sm text-ink-soft">{guests} {plural(guests, "человек", "человека", "человек")} · подать в {hour}:00. Начинайте с того, что готовится дольше:</p>
+          <ol className="mt-4 grid gap-2">
+            {plan.map(({ slot, r, start }) => {
+              const early = start.getTime() < Date.now() || r.totalMinutes > 240;
+              return (
+                <li key={slot.key}>
+                  {/* Opens the recipe; the plan stays as it is when the sheet is opened again. */}
+                  <button className="flex w-full items-center gap-3 rounded-input bg-sunken px-3 py-2.5 text-left hover:bg-line/60" onClick={() => { onClose(); openRecipe(r); }}>
+                    <span className="w-16 shrink-0 text-body font-medium tabular-nums">{early ? "Заранее" : hhmm(start)}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-body-sm">{r.title}</span>
+                      <span className="block text-caption text-ink-soft">{slot.label} · {formatMinutes(r.totalMinutes)}{clampServings(r, guests) < guests ? " · приготовьте ×" + Math.ceil(guests / clampServings(r, guests)) : ""}</span>
+                    </span>
+                  </button>
+                </li>
+              );
+            })}
+            <li className="flex items-center gap-3 rounded-input border border-brand/30 bg-brand-soft px-3 py-2.5">
+              <span className="w-16 shrink-0 text-body font-medium tabular-nums">{hour}:00</span>
+              <span className="text-body-sm font-medium">Всё на столе — приятного аппетита!</span>
+            </li>
+          </ol>
+          <p className="mt-3 text-caption text-ink-faint">«Заранее» — то, что готовится долго или настаивается: лучше сделать накануне.</p>
+        </div>
+      )}
+    </Sheet>
+  );
+}

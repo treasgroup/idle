@@ -1,7 +1,7 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
+  CalendarDays, ChevronDown, PartyPopper, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus,
 } from "lucide-react";
 import {
   MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
@@ -17,6 +17,7 @@ import { RecipeImage, RecipeMeta } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
+import { FeastSheet } from "../components/Feast";
 
 /** The person's goals narrow the dishes a menu is made of (passed to the engine only, never stored). */
 function goalFilter(p: Profile): ((r: Recipe) => boolean) | undefined {
@@ -38,6 +39,7 @@ export function Menu() {
   const { s, update, profile, setProfile, toast } = useStore();
   const { openRecipe } = useActions();
   const [settings, setSettings] = useState(false);
+  const [feast, setFeast] = useState(false);
   const [share, setShare] = useState(false);
   const [itemMenu, setItemMenu] = useState<{ date: string; index: number } | null>(null);
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
@@ -110,7 +112,9 @@ export function Menu() {
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {planChips.map((c) => <span key={c} className="inline-flex h-9 items-center rounded-full bg-sunken px-3 text-small text-ink-soft">{c}</span>)}
         <button className="inline-flex h-9 items-center gap-1.5 rounded-full px-2 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => setSettings(true)}><Settings2 size={16} aria-hidden />Настроить</button>
+        <button className="inline-flex h-9 items-center gap-1.5 rounded-full px-2 text-small text-ink-soft hover:bg-sunken" onClick={() => setFeast(true)}><PartyPopper size={16} aria-hidden />Праздничный стол</button>
       </div>
+      <FeastSheet open={feast} onClose={() => setFeast(false)} />
 
       {!filled ? (
         <div className="mt-6">
