@@ -56,7 +56,7 @@ export function ChefAvatar({ size = 32 }: { size?: number; mood?: Mood }) {
 /** The site's logo (fork and knife) cut to a circle — next to «Что приготовить?» in the header and menus.
  *  The app icons and the browser tab keep the rounded square. */
 export function Logo({ size = 32 }: { size?: number }) {
-  return <img src="./favicon.svg" alt="" aria-hidden width={size} height={size} draggable={false} className="shrink-0 rounded-full" />;
+  return <img src="./logo-round.svg" alt="" aria-hidden width={size} height={size} draggable={false} className="shrink-0" />;
 }
 
 /**
