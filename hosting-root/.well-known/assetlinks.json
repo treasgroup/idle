@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "su.treas.cook",
+      "sha256_cert_fingerprints": ["18:B8:83:67:82:62:AD:CB:F0:35:F3:E3:D6:59:DA:62:5C:91:7C:6D:D8:02:ED:84:4E:02:97:FB:1D:57:FE:47"]
+    }
+  }
+]
