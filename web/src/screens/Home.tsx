@@ -24,6 +24,7 @@ import type { Pwa } from "./Profile";
 import { FeastSheet } from "../components/Feast";
 import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 import { thawTomorrow } from "../app/reminders";
+import { BackupCard } from "../components/BackupCard";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -126,6 +127,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 
       <Now />
       <Rescue />
+      <BackupCard />
       {season && seasonal.length >= 4 && <Shelf title={season.title} list={seasonal}
         extra={FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />Собрать праздничный стол</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />

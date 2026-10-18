@@ -798,13 +798,28 @@ function nA() {
       (n.onsuccess = () => e(n.result));
   });
 }
-async function cO(e) {
+async function cO(e, v = "") {
   try {
     let t = await nA(),
       n = t.transaction("catalog", "readwrite");
-    n.objectStore("catalog").put({ at: Date.now(), body: e }, "last"),
+    n.objectStore("catalog").put({ at: Date.now(), body: e, v }, "last"),
       (n.oncomplete = () => t.close());
   } catch {}
+}
+// The saved copy with its version (null when there is none).
+async function uOv() {
+  try {
+    let e = await nA();
+    return await new Promise((t) => {
+      let n = e.transaction("catalog", "readonly"),
+        a = n.objectStore("catalog").get("last");
+      (a.onsuccess = () => t(a.result || null)),
+        (a.onerror = () => t(null)),
+        (n.oncomplete = () => e.close());
+    });
+  } catch {
+    return null;
+  }
 }
 async function uO() {
   try {
@@ -821,11 +836,28 @@ async function uO() {
   }
 }
 async function dO(e) {
+  // First the catalog's version (a few bytes): when the saved copy is the same, it is used as is — no 5 MB download
+  // on every start, which matters on a slow hosting and in the app.
+  let v = "";
+  try {
+    let r = await fetch(wt("catalog.version"), { signal: e });
+    if (r.ok) v = String((await r.json()).v || "");
+  } catch (x) {
+    if (e?.aborted) throw x;
+  }
+  if (v) {
+    let saved = await uOv();
+    if (saved && saved.v === v && saved.body)
+      try {
+        let a = aA(saved.body, "server");
+        if (a.source === "server") return a;
+      } catch {}
+  }
   let t = await fetch(wt("catalog"), { signal: e });
   if (!t.ok) throw new Error("сервер ответил " + t.status);
   let n = await t.json(),
     a = aA(n, "server");
-  return a.source === "server" && cO(n), a;
+  return a.source === "server" && cO(n, v), a;
 }
 function aA(e, t) {
   if (!Array.isArray(e.files) || !e.files.length)

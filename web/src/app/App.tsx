@@ -6,7 +6,7 @@ import {
   CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
-import { expiringSoon, recipeById, usePwa, type MyRecipe } from "../engine";
+import { expiringSoon, isNativeApp, recipeById, usePwa, type MyRecipe } from "../engine";
 import { useStore } from "./store";
 import { useActions } from "./actions";
 import { AssistantProvider } from "./assistant";
@@ -17,6 +17,7 @@ import { Recipes } from "../screens/Recipes";
 import { ScreenSkeleton } from "../components/Skeleton";
 import { lazyScreen, preload } from "./lazy";
 import { useWakeLock } from "./wakeLock";
+import { LINK_EVENT, takeLinks } from "./appLinks";
 import { preloadMascots } from "../components/Mascot";
 
 // Home and search come with the page; the rest loads when first opened (and quietly in the background).
@@ -68,9 +69,8 @@ function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRec
   useEffect(() => {
     // A shared recipe link needs the full catalog, not only the recipes built into the app.
     if (!ready || !loaded) return;
-    const q = new URLSearchParams(location.search);
-    const h = location.hash;
-    const clean = () => history.replaceState(null, "", location.pathname + routeHash({ tab: "home" }));
+    const run = (h: string, q: URLSearchParams) => {
+      const clean = () => history.replaceState(null, "", location.pathname + routeHash({ tab: "home" }));
     const poll = h.match(/^#poll=([0-9a-f]{32})$/), family = h.match(/^#family=([0-9a-f]{32})$/), login = h.match(/^#login=(\d{16})$/), doc = h.match(/^#(privacy|rules|terms|info)$/);
     const book = h.match(/^#book=([jz][A-Za-z0-9_-]{10,})$/);
     if (book) { clean(); void import("./myRecipes").then((m) => m.readLink(book[1])).then((r) => (r ? onBook(r) : toast("Ссылка на рецепт повреждена — попросите прислать её ещё раз"))); }
@@ -83,6 +83,13 @@ function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRec
     if (tab || recipe) history.replaceState(null, "", location.pathname + location.hash);
     if (tab === "shopping" || tab === "menu" || tab === "recipes" || tab === "pantry" || tab === "favorites" || tab === "chat") replace(routeHash({ tab: tab as Tab }));
     if (recipe) openRecipe(recipe);
+    };
+    run(location.hash, new URLSearchParams(location.search));
+    // In the app: a link tapped in a messenger opens here (see app/appLinks).
+    const later = () => { for (const l of takeLinks()) run(l.hash, l.query); };
+    later();
+    window.addEventListener(LINK_EVENT, later);
+    return () => window.removeEventListener(LINK_EVENT, later);
   }, [ready, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
@@ -107,7 +114,9 @@ export function App() {
 function Shell() {
   const { s, ready, profile, message, toast, clearToast } = useStore();
   const route = useRoute();
-  const pwa = usePwa(toast);
+  const web = usePwa(toast);
+  // In the Android app nothing offers to «install the app».
+  const pwa = isNativeApp() ? { ...web, installed: true, canInstall: false, ios: false } : web;
   const [poll, setPoll] = useState<string | null>(null);
   const [onboarding, setOnboarding] = useState(false);
   const keyboard = useKeyboardOpen();
@@ -156,6 +165,13 @@ function Shell() {
     if (route.tab === tab && !route.recipe) return window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     replace(routeHash({ tab }));
   };
+
+  // Android «Назад» with nothing open on top: from any section back to Главная; only there it leaves the app.
+  useEffect(() => {
+    const back = (e: Event) => { if (route.tab !== "home") { e.preventDefault(); go("home"); } };
+    window.addEventListener("cook-back", back);
+    return () => window.removeEventListener("cook-back", back);
+  });
 
   const screen = {
     home: <Home pwa={pwa} />, chat: <Chat />, recipes: <Recipes />, favorites: <Recipes mode="favorites" />, menu: <Menu />,

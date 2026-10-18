@@ -69,6 +69,12 @@ export function BarcodeScan({ onFound, onClose }: { onFound: (r: { id: string | 
       .catch(() => { setError("Нет доступа к камере. Разрешите его в настройках сайта или найдите продукт поиском."); setState("error"); });
     return () => { stop = true; window.clearTimeout(timer); stream?.getTracks().forEach((t) => t.stop()); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // «Назад» on Android (and Esc) closes the camera.
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => { if (e.key === "Escape") { e.stopImmediatePropagation(); onClose(); } };
+    document.addEventListener("keydown", key, true);
+    return () => document.removeEventListener("keydown", key, true);
+  }, [onClose]);
 
   return (
     <div className="anim-fade fixed inset-0 z-[60] flex flex-col bg-black text-white" role="dialog" aria-modal="true" aria-label="Сканировать штрихкод">

@@ -93,6 +93,11 @@ try {
         db()->prepare('INSERT OR IGNORE INTO feedback (session_id, id, recipe_id, value, created_at) VALUES (?, ?, ?, ?, ?)')->execute([$sid, $v['operationId'], $v['recipeId'], $v['value'], now_ms()]);
         send_json(['saved' => true]);
     }
+    elseif ($route === 'catalog.version' && $method === 'GET') {
+        // A few bytes instead of the whole catalog: the app keeps its copy while this stays the same.
+        header('Cache-Control: no-cache');
+        send_json(['v' => catalog_version()]);
+    }
     elseif ($route === 'catalog' && $method === 'GET') {
         // Files are passed through as written (so {} stays an object); the app validates every entry.
         $parts = [];

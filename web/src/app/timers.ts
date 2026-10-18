@@ -1,7 +1,7 @@
 // Kitchen timers shared by the whole app: started from a recipe step, the cooking screen or a chat answer
 // («Таймер на 10 мин»). Several can run at once; they live on the device (localStorage) and survive a reload.
 import { useEffect, useState } from "react";
-import { cancelNativeTimer, isNativeApp, scheduleNativeTimer } from "../engine";
+import { askNativeNotifications, cancelNativeTimer, isNativeApp, scheduleNativeTimer } from "../engine";
 import { audio as getAudio } from "./feedback";
 
 export interface CookTimer {
@@ -57,7 +57,9 @@ export function startTimer(o: { dish: string; recipeId?: string; step?: number |
   };
   const rest = current().filter((x) => !(o.recipeId && x.recipeId === o.recipeId && x.step === t.step && t.step != null));
   save([...rest, t]);
-  if ("Notification" in window && Notification.permission === "default") void Notification.requestPermission().catch(() => {});
+  // Asked at the moment it is needed: the first timer, so it can ring with the screen off.
+  if (isNativeApp()) void askNativeNotifications().catch(() => {});
+  else if ("Notification" in window && Notification.permission === "default") void Notification.requestPermission().catch(() => {});
   return t;
 }
 

@@ -79,7 +79,7 @@ export function ConditionBar() {
   if (c.minProtein) items.push({ label: "белка от " + c.minProtein + " г", relax: "protein" });
   if (c.occasion) items.push({ label: ({ kids: "детям", guests: "для гостей", date: "вдвоём" } as Record<string, string>)[c.occasion] ?? c.occasion, relax: "occasion" });
   if (!c.appliances.includes("oven") && s.preferences.appliances.includes("oven")) items.push({ label: "без духовки", relax: "appliances:all" });
-  if (c.available.length) items.push({ label: "есть: " + c.available.slice(0, 3).map((id) => shortName(id).toLowerCase()).join(", ") + (c.available.length > 3 ? "…" : ""), next: { ...c, available: [], strictPantry: false } });
+  if (c.available.length) items.push({ label: "есть: " + c.available.slice(0, 3).map((id) => (shortName(id) !== id ? shortName(id).toLowerCase() : conditionLabel(id))).join(", ") + (c.available.length > 3 ? "…" : ""), next: { ...c, available: [], strictPantry: false } });
   const servings = c.servings !== profile.eaters ? c.servings : null;
   // Only under a pick of recipes: after a kitchen question («сколько варить гречку») the old conditions are noise.
   const last = [...s.conversation].reverse().find((m) => m.role === "assistant");

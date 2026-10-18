@@ -1,7 +1,7 @@
 // «Где путаются» for the owner: taps on things that look tappable but are not (a picture, a heading, a short line),
 // and three quick taps on one spot (a button that seems not to answer). Only a short label of the thing and the
 // section are sent, in small batches; nothing typed by people, nothing inside [data-private].
-import { apiUrl } from "../engine";
+import { apiUrl, isNativeApp } from "../engine";
 
 type Tap = { kind: "dead" | "rage"; route: string; label: string };
 const ACTIVE = "button, a, input, select, textarea, label, summary, [role=button], [role=radio], [role=tab], [role=switch], [role=checkbox], [role=option], [role=link], [role=slider], [contenteditable]";
@@ -28,7 +28,8 @@ function flush() {
   if (!queue.length) return;
   const body = JSON.stringify({ taps: queue.splice(0, 20) });
   try {
-    if (!navigator.sendBeacon?.(apiUrl("taps"), new Blob([body], { type: "application/json" })))
+    // In the app requests go through its own fetch (it marks them as the app's); a beacon could not.
+    if (isNativeApp() || !navigator.sendBeacon?.(apiUrl("taps"), new Blob([body], { type: "application/json" })))
       void fetch(apiUrl("taps"), { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
   } catch { /* ignore */ }
 }

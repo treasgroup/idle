@@ -173,3 +173,15 @@ function photo_thumb(string $id): void {
     header('Content-Length: ' . filesize($file));
     readfile($file);
 }
+
+// ---------- What the catalog looks like now, in 16 letters ----------
+// Changes when a recipe file, a hidden or taught item, or a photo changes (card copies of photos do not count:
+// the app asks the server for any copy it does not know yet).
+function catalog_version(): string {
+    $parts = [];
+    foreach (glob(catalog_dir() . '/*.json') ?: [] as $p) $parts[] = basename($p) . ':' . filemtime($p) . ':' . filesize($p);
+    try { $parts[] = json_encode(setting('hidden', [])); $parts[] = json_encode(setting('taught', [])); } catch (Throwable $e) {}
+    $parts[] = json_encode(photo_versions());
+    $parts[] = json_encode(real_photos());
+    return substr(sha1(implode('|', $parts)), 0, 16);
+}

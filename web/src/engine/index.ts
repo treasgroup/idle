@@ -249,6 +249,8 @@ export const legalDoc = (key: LegalKey, info: LegalInfo): { key: string; title: 
 /** In the Android app the cooking timer is also scheduled as a system notification (works with the screen off). */
 export const scheduleNativeTimer = (end: number, title: string, body: string): Promise<boolean> => core.RC(end, title, body);
 export const cancelNativeTimer = (): void => core.NC();
+/** Asks the phone for notifications (once; later calls only report the answer). */
+export const askNativeNotifications = (): Promise<boolean> => core.yu(true);
 
 /** The store package that covers `amount` with the least left over, e.g. 2 × 400 г; null if not sold in packs. */
 export const packageFor = (ingredientId: string, amount: number, unit: string): { count: number; size: number; unit: string; word: string } | null =>
