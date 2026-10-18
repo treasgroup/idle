@@ -1,6 +1,7 @@
 // Text from a photo (a notebook page, a cookbook, a card) — recognised on the phone itself by Tesseract, free and
 // from the site's own server (ocr/). Loaded only when someone uses it: the first time ~5 MB, then from the cache.
 // Neat handwriting and print come out well; scrawl less so — the text is always shown for correcting.
+import { isNativeApp } from "../engine";
 
 /** The photo made smaller and plainer before recognition: faster, and better on phones. */
 async function prepare(file: Blob): Promise<HTMLCanvasElement> {
@@ -25,6 +26,8 @@ export async function recognize(file: Blob, progress: (share: number, what: stri
     workerPath: base + "worker.min.js",
     corePath: base,
     langPath: base + "lang",
+    // The Android build unpacks .gz files inside the app, so there the language file lies uncompressed.
+    gzip: !isNativeApp(),
     workerBlobURL: false,
     logger: (m) => {
       if (m.status === "recognizing text") progress(0.3 + m.progress * 0.7, "Читаю текст…");
