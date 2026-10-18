@@ -163,7 +163,7 @@ function seo_head(array $o): string {
         . "<meta property=\"og:title\" content=\"" . h($o['ogTitle'] ?? $o['title']) . "\">\n<meta property=\"og:description\" content=\"$d\">\n<meta property=\"og:url\" content=\"$url\">\n<meta property=\"og:image\" content=\"" . h($img) . "\">\n";
     if (!empty($o['imageW'])) $out .= '<meta property="og:image:width" content="' . (int)$o['imageW'] . "\">\n<meta property=\"og:image:height\" content=\"" . (int)$o['imageH'] . "\">\n";
     if (!empty($o['imageAlt'])) $out .= '<meta property="og:image:alt" content="' . h($o['imageAlt']) . "\">\n";
-    $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "logo-round.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
+    $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
     foreach (($o['ld'] ?? []) as $ld) $out .= "<script type=\"application/ld+json\">\n" . seo_json($ld) . "\n</script>\n";
     return $out . '<style>' . seo_css() . "</style>\n</head>\n<body>\n" . seo_header();
 }

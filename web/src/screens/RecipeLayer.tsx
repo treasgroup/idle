@@ -17,7 +17,6 @@ import { printPage } from "../app/print";
 import { useHint } from "../app/hints";
 import { PAN_CHOICES, area, panOf, panText, type Pan } from "../app/pan";
 import { stepTips } from "../app/stepTips";
-import { ChefSecret } from "../components/ChefSecret";
 import { goChat } from "../app/chatNav";
 import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
@@ -198,7 +197,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const side = sides.find((x) => x.id === sideId) ?? null;
   // One recipe with the side merged in, for cooking and the shopping list.
   const recipe = useMemo(() => (side ? withSide(base, side) : base), [base, side]);
-  const tips = useMemo(() => stepTips(recipe), [recipe]);
+  const tips = useMemo(() => stepTips(recipe, 2), [recipe]);
   // The same for questions, with its own version so nutrition is not mixed up with the dish alone.
   const askRecipe = useMemo(() => (side ? { ...recipe, version: base.version + "+" + side.id } : base), [recipe, base, side]);
   const nutrition = nutritionOf(base).perServing;
@@ -270,7 +269,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const anchors = ANCHORS.filter((a) => a.id !== "recipe-reviews" || online || !!reviews.data);
 
   return (
-    <Layer title={base.title} onClose={onClose} width="max-w-none" transparentUntil={header.until} label={base.title} actions={
+    <Layer title={base.title} onClose={onClose} width="max-w-none" transparentUntil={header.until} label={base.title} still actions={
       <>
         <button className="icon-btn" onClick={() => setShareOpen(true)} aria-label="Поделиться"><Share2 size={20} /></button>
         <button className="icon-btn" onClick={() => toggleFavorite(base)} aria-label={fav ? "Убрать из сохранённого" : "Сохранить"} aria-pressed={fav}>
@@ -363,16 +362,21 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
               <Section id="recipe-steps" className={UNDER_HEADER} title="Шаги"
                 action={<span className="text-small text-ink-soft">{recipe.steps.length} {plural(recipe.steps.length, "шаг", "шага", "шагов")} · {formatMinutes(recipe.totalMinutes)}</span>}>
                 <TimerStrip only={base.id} onJump={(t) => goStep(t.step)} className="mb-4" />
-                <ol className="space-y-6">
+                {/* One column, one rhythm: a big number, the text, and under it at most a quiet tip and the timer. */}
+                <ol className="card divide-y divide-line overflow-hidden">
                   {recipe.steps.map((st, n) => {
                     const part = splitSide(st.text);
                     return (
-                      <li key={n} id={"recipe-step-" + n} className={cx("flex gap-3", UNDER_HEADER)}>
-                        <span aria-hidden className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-soft text-small font-semibold tabular-nums text-brand-ink">{n + 1}</span>
-                        <div className="min-w-0 flex-1 pt-0.5">
+                      <li key={n} id={"recipe-step-" + n} className={cx("flex gap-4 px-4 py-5 sm:px-5", UNDER_HEADER)}>
+                        <span aria-hidden className="w-6 shrink-0 text-h2 leading-7 tabular-nums text-brand">{n + 1}</span>
+                        <div className="min-w-0 max-w-[62ch] flex-1">
                           {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
-                          <p className="text-body">{part.text}</p>
-                          {tips[n] && <ChefSecret text={tips[n]!} className="mt-3" />}
+                          <p className="text-body leading-7 text-ink">{part.text}</p>
+                          {tips[n] && (
+                            <p className="mt-2.5 flex gap-2 text-body-sm text-ink-soft">
+                              <Lightbulb size={16} className="mt-[3px] shrink-0 text-herb" aria-hidden /><span><span className="font-semibold text-herb">Совет: </span>{tips[n]}</span>
+                            </p>
+                          )}
                           {!!st.timerSeconds && <TimerChip recipe={base} step={n} text={st.text} seconds={st.timerSeconds} />}
                         </div>
                       </li>

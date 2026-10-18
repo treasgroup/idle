@@ -5,7 +5,11 @@ if (typeof document !== "undefined") document.addEventListener("pointerdown", (e
 
 type Doc = Document & { startViewTransition?: (cb: () => Promise<void> | void) => { finished: Promise<void>; ready: Promise<void> } };
 
+/** Off for now: the owner found the photo flight distracting; a recipe simply opens. Set to true to bring it back. */
+const ENABLED = false;
+
 export function withPhotoTransition(recipeId: string, change: () => void): void {
+  if (!ENABLED) return change();
   const d = document as Doc;
   // Not from a recipe page already open (two photos with one name would cancel the effect anyway).
   if (!d.startViewTransition || matchMedia("(prefers-reduced-motion: reduce)").matches || document.querySelector('[data-photo-hero="1"]')) return change();

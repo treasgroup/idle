@@ -63,13 +63,15 @@ export function Logo({ size = 32 }: { size?: number }) {
  * A full-height layer over the app (recipe, cooking, documents, school). On desktop it sits next to the
  * sidebar like a page. `transparentUntil`: the header stays clear over a hero image until this many px are scrolled.
  */
-export function Layer({ title, onClose, children, actions, width = "max-w-3xl", transparentUntil, closeIcon = "back", label, full, private: own }: {
+export function Layer({ title, onClose, children, actions, width = "max-w-3xl", transparentUntil, closeIcon = "back", label, full, private: own, still }: {
   title?: ReactNode; onClose: () => void; children: ReactNode; actions?: ReactNode; width?: string; transparentUntil?: number;
   closeIcon?: "back" | "close"; label?: string;
   /** Over the whole window, the site menu included (cooking: nothing else on screen). */
   full?: boolean;
   /** The person's own content (family recipes): never described in «Где путаются». */
   private?: boolean;
+  /** Opens at once, without the fade (the recipe page). */
+  still?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const scroller = useRef<HTMLDivElement>(null);
@@ -87,7 +89,7 @@ export function Layer({ title, onClose, children, actions, width = "max-w-3xl", 
   }, [transparentUntil]);
   return (
     <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label ?? (typeof title === "string" ? title : undefined)} data-private={own || undefined}
-      className={cx("anim-fade fixed inset-0 z-40 flex flex-col bg-paper outline-none", !full && "lg:left-64")}>
+      className={cx(!still && "anim-fade", "fixed inset-0 z-40 flex flex-col bg-paper outline-none", !full && "lg:left-64")}>
       <div className={cx("pt-safe absolute inset-x-0 top-0 z-20 transition-colors duration-150", solid ? "border-b border-line bg-paper" : "bg-transparent")}>
         <div className={cx("mx-auto flex h-14 items-center gap-1 px-2", width)}>
           {/* A labelled control: «Назад» or «Закрыть», easy to find for anyone. */}
