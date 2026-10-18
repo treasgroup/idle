@@ -8,6 +8,7 @@ import {
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
+import { HEALTH, withoutHealth } from "../app/topic";
 import { chipLabel, tidyReply, MOOD_LABEL } from "../app/chatText";
 import { RecipeFeatured, RecipeRow } from "./RecipeCard";
 import { ChefAvatar, Chip, Sheet, cx } from "./ui";
@@ -72,10 +73,12 @@ export function ConditionBar() {
   const items: { label: string; relax?: string; next?: Conditions }[] = [];
   if (c.maxMinutes) items.push({ label: "до " + c.maxMinutes + " мин", relax: "time" });
   for (const d of c.desired) items.push({ label: conditionLabel(d), relax: "desired:" + d });
-  for (const e of c.excluded) if (!s.preferences.excluded.includes(e)) items.push({ label: "без: " + conditionLabel(e), relax: "unexclude:" + e });
+  const rule = c.health ? HEALTH[c.health] : null;
+  if (rule) items.push({ label: rule.label, next: withoutHealth(c, s.preferences.excluded) });
+  for (const e of c.excluded) if (!s.preferences.excluded.includes(e) && !rule?.exclude.includes(e)) items.push({ label: "без: " + conditionLabel(e), relax: "unexclude:" + e });
   if (c.mood) items.push({ label: (MOOD_LABEL[c.mood] ?? LABELS[c.mood] ?? c.mood).toLowerCase(), relax: "mood" });
   if (c.strictPantry) items.push({ label: "только из того, что дома", relax: "strict" });
-  if (c.maxKcal) items.push({ label: "до " + c.maxKcal + " ккал", relax: "kcal" });
+  if (c.maxKcal && c.maxKcal !== rule?.maxKcal) items.push({ label: "до " + c.maxKcal + " ккал", relax: "kcal" });
   if (c.minProtein) items.push({ label: "белка от " + c.minProtein + " г", relax: "protein" });
   if (c.occasion) items.push({ label: ({ kids: "детям", guests: "для гостей", date: "вдвоём" } as Record<string, string>)[c.occasion] ?? c.occasion, relax: "occasion" });
   if (!c.appliances.includes("oven") && s.preferences.appliances.includes("oven")) items.push({ label: "без духовки", relax: "appliances:all" });

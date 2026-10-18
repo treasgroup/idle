@@ -4,7 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Clock, Flame,
-  Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon } from "lucide-react";
+  Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon, Users, Soup } from "lucide-react";
 import {
   LABELS, basics, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide, yieldText,
@@ -25,6 +25,7 @@ import { AddToMenuSheet } from "../components/AddToMenu";
 import { AskSheet, accusative, type AskRequest } from "../components/AskSheet";
 import { shareRecipeCard } from "../app/shareCard";
 import { rememberRecipe } from "../app/lastSeen";
+import { likedShare, useRecipeStat } from "../app/recipeStats";
 import { ServeBySheet } from "../components/ServeBy";
 import { ShareOptions } from "../components/ShareOptions";
 import { TimerStrip } from "../components/TimerStrip";
@@ -184,6 +185,9 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const [askOpen, setAskOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [askReq, setAskReq] = useState<AskRequest | null>(null);
+  const [sideOpen, setSideOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(() => !!s.notes[base.id]);
+  const stat = useRecipeStat(base.id);
   const root = useRef<HTMLDivElement>(null);
   const h1 = useRef<HTMLHeadingElement>(null);
   const body = useRef<HTMLDivElement>(null);
@@ -256,14 +260,26 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
     base.freezerDays ? "можно заморозить" : "",
   ].filter(Boolean).join(", ").replace(/^м/, "М") + (base.storageDays || base.freezerDays ? "." : "");
   // Гарнир: before the products on phones, above the steps next to the products column on wide screens.
+  // Folded into one line until wanted: most people cook the dish as it is.
   const sidePicker = sides.length > 0 && (
-    <Section title="Гарнир">
-      <p className="-mt-2 mb-3 text-small text-ink-soft">{side ? "Добавил продукты и шаги гарнира — приготовите всё вместе." : "Подскажу, что подать к блюду, и добавлю продукты и шаги."}</p>
-      <div className="scroller fade-x -mx-4 !gap-2 px-4 sm:mx-0 sm:flex-wrap sm:px-0 sm:[mask-image:none]">
-        <Chip on={!sideId} onClick={() => pickSide(null)}>Без гарнира</Chip>
-        {sides.map((x) => <Chip key={x.id} on={sideId === x.id} onClick={() => pickSide(x.id)}>{x.title}</Chip>)}
-      </div>
-    </Section>
+    <section className="mt-6" aria-label="Гарнир">
+      {!side && !sideOpen ? (
+        <button className="flex min-h-[52px] w-full items-center gap-3 rounded-input border border-line bg-card px-4 text-left text-body-sm hover:border-line-strong" onClick={() => setSideOpen(true)} aria-expanded={false}>
+          <Soup size={18} className="shrink-0 text-ink-soft" aria-hidden />
+          <span className="min-w-0 flex-1"><span className="font-medium">Добавить гарнир</span><span className="block truncate text-caption text-ink-soft">{sides.slice(0, 3).map((x) => x.title.toLowerCase()).join(", ")}…</span></span>
+          <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+        </button>
+      ) : (
+        <>
+          <h2 className="text-h2">Гарнир</h2>
+          <p className="mb-3 mt-1 text-small text-ink-soft">{side ? "Добавил продукты и шаги гарнира — приготовите всё вместе." : "Выберите — добавлю продукты и шаги."}</p>
+          <div className="scroller fade-x -mx-4 !gap-2 px-4 sm:mx-0 sm:flex-wrap sm:px-0 sm:[mask-image:none]">
+            <Chip on={!sideId} onClick={() => { pickSide(null); setSideOpen(false); }}>Без гарнира</Chip>
+            {sides.map((x) => <Chip key={x.id} on={sideId === x.id} onClick={() => pickSide(x.id)}>{x.title}</Chip>)}
+          </div>
+        </>
+      )}
+    </section>
   );
   const sum = reviews.data?.summary;
   const anchors = ANCHORS.filter((a) => a.id !== "recipe-reviews" || online || !!reviews.data);
@@ -286,14 +302,20 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
             <RecipeImage recipe={base} eager hero className="aspect-[4/3] w-full sm:aspect-[3/2]" rounded="rounded-none sm:rounded-card" />
             <div className="px-4 pt-5 sm:px-0 sm:pt-6 lg:pt-1">
               <h1 ref={h1} className="text-h1 xl:text-display">{base.title}</h1>
-              {(!!sum?.count || cookedTimes > 0) && (
+              {/* One quiet line: stars from reviews, how many people cooked it (and liked it), and your own count. */}
+              {(!!sum?.count || cookedTimes > 0 || !!stat) && (
                 <div className="mt-2 flex flex-wrap items-center gap-x-3 text-small text-ink-soft">
                   {!!sum?.count && (
                     <button className="-mx-1 -my-1.5 inline-flex h-11 items-center gap-1.5 rounded-full px-1 hover:text-ink" onClick={() => go("recipe-reviews")}>
                       <Stars value={sum.avg} size={14} /><span className="font-semibold text-ink">{sum.avg.toFixed(1).replace(".", ",")}</span><span>· {reviewsWord(sum.count)}</span>
                     </button>
                   )}
-                  {cookedTimes > 0 && <span className="inline-flex h-8 items-center gap-1.5"><Check size={16} className="text-herb" aria-hidden />Готовили {cookedTimes} {plural(cookedTimes, "раз", "раза", "раз")}</span>}
+                  {stat && (
+                    <span className="inline-flex min-h-8 items-center gap-1.5">
+                      <Users size={16} aria-hidden />Готовили {stat.cooked} {plural(stat.cooked, "раз", "раза", "раз")}{likedShare(stat) ? " · " + likedShare(stat) : ""}
+                    </span>
+                  )}
+                  {cookedTimes > 0 && <span className="inline-flex min-h-8 items-center gap-1.5"><Check size={16} className="text-herb" aria-hidden />{stat ? (cookedTimes > 1 ? "Вы — " + cookedTimes + " " + plural(cookedTimes, "раз", "раза", "раз") : "И вы тоже") : "Вы готовили " + cookedTimes + " " + plural(cookedTimes, "раз", "раза", "раз")}</span>}
                 </div>
               )}
               {base.summary && <p className="mt-3 text-body text-ink-soft">{base.summary}</p>}
@@ -383,22 +405,29 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                     );
                   })}
                 </ol>
-                <button className="mt-5 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60" onClick={() => setServeOpen(true)}>
-                  <Clock size={18} className="shrink-0" aria-hidden />
-                  <span className="flex-1">Нужно успеть к определённому часу? Подскажу, когда начинать</span>
-                  <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
-                </button>
+                {/* The helpers people use now and then: one row of small buttons instead of a line each. */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button className="chip h-11" onClick={() => setServeOpen(true)}><Clock size={18} className="text-ink-soft" aria-hidden />Успеть к часу</button>
+                  {!noteOpen && <button className="chip h-11" onClick={() => setNoteOpen(true)}><PenLine size={18} className="text-ink-soft" aria-hidden />Заметка для себя</button>}
+                </div>
               </Section>
 
               {(base.tips.length > 0 || keeps) && (
-                <Section title="Советы">
-                  <ul className="card space-y-3 p-4">
-                    {[...(keeps ? [keeps] : []), ...base.tips].map((t) => <li key={t} className="flex gap-3 text-body-sm"><Lightbulb size={20} className="mt-px shrink-0 text-ink-soft" aria-hidden />{t}</li>)}
+                // Folded: the tips that matter at a step are already under that step.
+                <details className="group mt-8 rounded-card border border-line bg-card">
+                  <summary className="flex min-h-[56px] cursor-pointer list-none items-center gap-3 px-4 text-body [&::-webkit-details-marker]:hidden">
+                    <Lightbulb size={20} className="shrink-0 text-ink-soft" aria-hidden />
+                    <span className="flex-1 font-semibold">{keeps ? "Советы и хранение" : "Советы"}</span>
+                    <span className="text-small text-ink-soft">{base.tips.length + (keeps ? 1 : 0)}</span>
+                    <ChevronRight size={18} className="shrink-0 text-ink-faint transition-transform group-open:rotate-90" aria-hidden />
+                  </summary>
+                  <ul className="space-y-3 px-4 pb-4">
+                    {[...(keeps ? [keeps] : []), ...base.tips].map((t) => <li key={t} className="flex gap-3 text-body-sm"><span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-line-strong" />{t}</li>)}
                   </ul>
-                </Section>
+                </details>
               )}
 
-              <Note id={base.id} />
+              {noteOpen && <Note id={base.id} />}
 
               <Reviews recipe={base} state={reviews} id="recipe-reviews" className={UNDER_HEADER} />
             </div>
@@ -681,13 +710,7 @@ function Note({ id }: { id: string }) {
     return () => window.clearTimeout(t);
   }, [text]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { if (latest.current.text.trim() !== latest.current.saved) save(latest.current.text); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // Closed until wanted: a quiet line instead of an empty box on every recipe.
-  const [open, setOpen] = useState(!!saved);
-  if (!open) return (
-    <button id="recipe-note" className="mt-8 flex min-h-[48px] w-full items-center gap-2 rounded-input px-1 text-left text-body-sm text-ink-soft hover:bg-sunken/60" onClick={() => setOpen(true)}>
-      <PenLine size={18} aria-hidden />Заметка для себя
-    </button>
-  );
+  // Shown once wanted (the «Заметка для себя» button under the steps) or when there is one.
   return (
     <Section title="Моя заметка" id="recipe-note" className={UNDER_HEADER}>
       <textarea className="input min-h-[96px]" aria-label="Моя заметка к рецепту" placeholder="Например: соли меньше, добавить чеснок" value={text} maxLength={500}

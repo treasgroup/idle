@@ -22,7 +22,7 @@ export function seasonalCollection(now = new Date()): Collection | null {
   if (toEaster >= 49 && toEaster <= 55) return { key: "maslenitsa", title: "Масленица", hint: "Блины, оладьи и всё к ним", test: title(/блин|олад|сырник|панкейк/i) };
   if (toEaster >= 1 && toEaster <= 48) return { key: "lent", title: "Великий пост", hint: "Постные блюда на каждый день", test: (r) => isLenten(r) && ["main", "soup", "salad"].includes(courseOf(r)) };
   if (toEaster >= -7 && toEaster <= 0) return { key: "easter", title: "К Пасхе", hint: "Выпечка и праздничный стол", test: (r) => ["baking", "dessert"].includes(courseOf(r)) || title(/кулич|пасх|творож/i)(r) };
-  if ((m === 12 && d >= 10) || (m === 1 && d <= 10)) return { key: "newyear", title: "К Новому году", hint: "Салаты, горячее и закуски к столу", test: (r) => r.occasions?.includes("guests") || title(/оливье|шуб|холодец|салат|запеч/i)(r) };
+  if (m === 12 || (m === 1 && d <= 8)) return { key: "newyear", title: "К Новому году", hint: "Салаты, горячее и закуски к столу", test: (r) => !!r.occasions?.includes("new-year") || title(/оливье|шуб|холодец|заливн/i)(r) };
   if (m >= 6 && m <= 8) return { key: "summer", title: "Летнее", hint: "Окрошка, холодные супы и салаты", test: (r) => title(/окрошк|холодник|гаспачо|свекольник|салат|огур|кабач/i)(r) };
   if (m >= 9 && m <= 11) return { key: "autumn", title: "Осеннее", hint: "Тыква, грибы и яблоки", test: title(/тыкв|гриб|шампиньон|яблок|шарлотк/i) };
   if (m <= 2 || m === 12) return { key: "winter", title: "Согревающее", hint: "Супы, рагу и всё горячее", test: (r) => courseOf(r) === "soup" || title(/рагу|жарк|туш/i)(r) };

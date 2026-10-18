@@ -23,12 +23,24 @@ const SLOTS: { key: string; label: string; courses: string[] }[] = [
 ];
 const hhmm = (d: Date) => d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 
+// December: the table for the night of the 31st — the classic dishes first, a choice of how the table should be,
+// and a plan that says what to make the day before.
+const STYLES = [
+  { key: "classic", label: "Классика", hint: "оливье, шуба, горячее" },
+  { key: "nomayo", label: "Без майонеза", hint: "полегче" },
+  { key: "simple", label: "Попроще", hint: "до 2 часов на блюдо" },
+] as const;
+type Style = (typeof STYLES)[number]["key"];
+const isNewYear = (d = new Date()) => d.getMonth() === 11;
+
 export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { s, update, toast } = useStore();
   const { openRecipe } = useActions();
+  const ny = isNewYear();
   const [step, setStep] = useState(0);
   const [guests, setGuests] = useState(6);
-  const [hour, setHour] = useState(() => Math.min(20, Math.max(new Date().getHours() + 3, 15)));
+  const [hour, setHour] = useState(() => (ny ? 21 : Math.min(20, Math.max(new Date().getHours() + 3, 15))));
+  const [style, setStyle] = useState<Style>("classic");
   const [pick, setPick] = useState<Record<string, number>>({});
   const [off, setOff] = useState<string[]>([]);
 
@@ -39,19 +51,26 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
     const ranked = rankRecipes(recipes(), c, s.preferences, 500).map((m) => m.recipe);
     const forGuests = CATALOG_SECTIONS.find((x) => x.key === "guests")?.test ?? (() => false);
     const out: Record<string, Recipe[]> = {};
+    const mayo = (r: Recipe) => r.ingredients.some((i) => i.id === "mayonnaise");
     for (const sl of SLOTS) {
       // Not for a festive table: memorial and fasting-day dishes.
-      const fit = ranked.filter((r) => sl.courses.includes(courseOf(r)) && !/кутья|кутью|канун/i.test(r.title));
-      out[sl.key] = [...fit.filter(forGuests), ...fit.filter((r) => !forGuests(r))];
+      let fit = ranked.filter((r) => sl.courses.includes(courseOf(r)) && !/кутья|кутью|канун/i.test(r.title));
+      if (ny && style === "nomayo") fit = fit.filter((r) => !mayo(r));
+      if (ny && style === "simple") { const easy = fit.filter((r) => r.totalMinutes <= 120 && r.difficulty !== "hard"); if (easy.length) fit = easy; }
+      const newYear = (r: Recipe) => !!r.occasions?.includes("new-year");
+      out[sl.key] = ny
+        ? [...fit.filter(newYear), ...fit.filter((r) => !newYear(r) && forGuests(r)), ...fit.filter((r) => !newYear(r) && !forGuests(r))]
+        : [...fit.filter(forGuests), ...fit.filter((r) => !forGuests(r))];
     }
     // The two salads differ.
     out.salad2 = out.salad2.slice(1).concat(out.salad2.slice(0, 1));
     return out;
-  }, [open, s.preferences]);
+  }, [open, s.preferences, ny, style]);
   const dishes = SLOTS.filter((sl) => !off.includes(sl.key) && pools[sl.key]?.length)
     .map((sl) => ({ slot: sl, r: pools[sl.key][(pick[sl.key] ?? 0) % pools[sl.key].length] }));
 
-  const serve = new Date(); serve.setHours(hour, 0, 0, 0);
+  const serve = ny ? new Date(new Date().getFullYear(), 11, 31, hour) : new Date(); if (!ny) serve.setHours(hour, 0, 0, 0);
+  const onTheDay = !ny || new Date().getDate() === 31;
   const plan = dishes.map((d) => ({ ...d, start: new Date(serve.getTime() - d.r.totalMinutes * 60e3) }))
     .sort((a, b) => a.start.getTime() - b.start.getTime());
   const first = plan[0]?.start;
@@ -83,7 +102,7 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
   };
 
   return (
-    <Sheet open={open} title={["Праздничный стол", "Что подать", "План готов"][step]} onClose={close} tall
+    <Sheet open={open} title={[ny ? "Новогодний стол" : "Праздничный стол", "Что подать", "План готов"][step]} onClose={close} tall
       footer={step < 2
         ? <div className="flex gap-2">
             {step > 0 && <button className="btn-outline" onClick={() => setStep(step - 1)}><ChevronLeft size={18} />Назад</button>}
@@ -91,21 +110,34 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
           </div>
         : <div className="grid gap-2 sm:grid-cols-2">
             <button className="btn-primary" onClick={toShopping}><ShoppingCart size={18} />Всё в список покупок</button>
-            <button className="btn-outline" onClick={remind}><BellRing size={18} />Напомнить начать в {first ? hhmm(first) : "—"}</button>
+            {onTheDay && <button className="btn-outline" onClick={remind}><BellRing size={18} />Напомнить начать в {first ? hhmm(first) : "—"}</button>}
           </div>}>
       {step === 0 && (
         <div>
           <div className="flex items-center gap-4">
             <Mascot size={104} mood="feast" className="shrink-0" />
-            <p className="text-body-sm text-ink-soft">Соберу стол на всех: салаты, закуску, горячее и сладкое.</p>
+            <p className="text-body-sm text-ink-soft">{ny ? "Соберу стол на новогоднюю ночь: салаты, закуску, горячее и сладкое — и скажу, что сделать накануне." : "Соберу стол на всех: салаты, закуску, горячее и сладкое."}</p>
           </div>
+          {ny && (
+            <>
+              <p className="label mb-2 mt-5">Какой стол</p>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {STYLES.map((x) => (
+                  <button key={x.key} aria-pressed={style === x.key} onClick={() => { setStyle(x.key); setPick({}); }}
+                    className={style === x.key ? "rounded-card border border-brand bg-brand-soft px-4 py-2.5 text-left" : "rounded-card border border-line bg-card px-4 py-2.5 text-left hover:border-line-strong"}>
+                    <span className="block text-body-sm font-semibold">{x.label}</span><span className="block text-caption text-ink-soft">{x.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
           <div className="mt-5 flex items-center justify-between gap-3 rounded-card border border-line bg-card p-4">
             <span className="text-body-sm font-medium">Сколько человек</span>
             <Stepper value={guests} min={2} max={24} onChange={setGuests} label="Гостей" />
           </div>
           <p className="label mb-2 mt-5">К какому времени подать</p>
           <div className="flex flex-wrap gap-2">
-            {[14, 15, 16, 17, 18, 19, 20].map((h) => <Chip key={h} on={hour === h} onClick={() => setHour(h)}>{h}:00</Chip>)}
+            {(ny ? [18, 19, 20, 21, 22, 23] : [14, 15, 16, 17, 18, 19, 20]).map((h) => <Chip key={h} on={hour === h} onClick={() => setHour(h)}>{h}:00</Chip>)}
           </div>
         </div>
       )}
@@ -135,15 +167,16 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
       )}
       {step === 2 && (
         <div>
-          <p className="text-body-sm text-ink-soft">{guests} {plural(guests, "человек", "человека", "человек")} · подать в {hour}:00. Начинайте с того, что готовится дольше:</p>
+          <p className="text-body-sm text-ink-soft">{guests} {plural(guests, "человек", "человека", "человек")} · подать {ny ? "31 декабря " : ""}в {hour}:00. Начинайте с того, что готовится дольше:</p>
           <ol className="mt-4 grid gap-2">
             {plan.map(({ slot, r, start }) => {
-              const early = start.getTime() < Date.now() || r.totalMinutes > 240;
+              // In December the plan is for the 31st: long dishes (холодец, торт, буженина) — on the 30th.
+              const early = ny ? r.totalMinutes > 240 : start.getTime() < Date.now() || r.totalMinutes > 240;
               return (
                 <li key={slot.key}>
                   {/* Opens the recipe; the plan stays as it is when the sheet is opened again. */}
                   <button className="flex w-full items-center gap-3 rounded-input bg-sunken px-3 py-2.5 text-left hover:bg-line/60" onClick={() => { onClose(); openRecipe(r); }}>
-                    <span className="w-16 shrink-0 text-body font-medium tabular-nums">{early ? "Заранее" : hhmm(start)}</span>
+                    <span className="w-16 shrink-0 text-body font-medium tabular-nums">{early ? (ny ? "30-го" : "Заранее") : hhmm(start)}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body-sm">{r.title}</span>
                       <span className="block text-caption text-ink-soft">{slot.label} · {formatMinutes(r.totalMinutes)}{clampServings(r, guests) < guests ? " · приготовьте ×" + Math.ceil(guests / clampServings(r, guests)) : ""}</span>
@@ -157,7 +190,7 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
               <span className="text-body-sm font-medium">Всё на столе — приятного аппетита!</span>
             </li>
           </ol>
-          <p className="mt-3 text-caption text-ink-faint">«Заранее» — то, что готовится долго или настаивается: лучше сделать накануне.</p>
+          <p className="mt-3 text-caption text-ink-faint">{ny ? "«30-го» — то, что готовится долго или должно настояться: торт, холодец, буженина. Салаты лучше заправить за час-два до стола." : "«Заранее» — то, что готовится долго или настаивается: лучше сделать накануне."}</p>
         </div>
       )}
     </Sheet>

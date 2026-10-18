@@ -1,0 +1,6 @@
+# treas.su — портфолио и сервис «Что приготовить?» (/cook/)
+User-agent: *
+Disallow: /cook/admin/
+Allow: /
+
+Sitemap: https://treas.su/cook/sitemap.xml

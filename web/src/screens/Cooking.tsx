@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
-  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, rateDish, useHandsFree,
+  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, rateDish, track, useHandsFree,
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -671,6 +671,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const close = () => { end(); onClose(); };
   const rate = (v: "yes" | "meh") => {
     cue("tap");
+    if (rated !== v) track({ type: "rate", recipeId: r.id, count: v === "yes" ? 1 : 0 });
     setRated(v);
     update((st) => ({ ...st, taste: rateDish(st.taste, r.id, v === "yes") }));
   };
@@ -703,12 +704,13 @@ function Done({ onClose }: { onClose: () => void }) {
               </button>
             ))}
           </div>
-          {rated && (
+          {rated === "yes" && (
             <div className="anim-rise mt-3">
-              <p className="text-body-sm text-ink-soft" role="status">{rated === "yes" ? "Запомню — буду предлагать чаще." : "Понял — в следующий раз предложу что-нибудь другое."}</p>
+              <p className="text-body-sm text-ink-soft" role="status">Запомню — буду предлагать чаще.</p>
               <button className="btn-ghost mt-1" onClick={reviews}><Camera size={18} aria-hidden />Оставить отзыв для других</button>
             </div>
           )}
+          {rated === "meh" && <Trouble recipe={r} />}
         </section>
 
         {/* Three things worth doing now; the rest is one quiet line. */}
@@ -744,6 +746,36 @@ function Done({ onClose }: { onClose: () => void }) {
       {sheet === "left" && <LeftoverSheet recipe={r} servings={c.servings} onClose={() => setSheet(null)} />}
       {sheet === "note" && <NoteSheet id={r.id} onClose={() => setSheet(null)} />}
     </Layer>
+  );
+}
+
+const TROUBLES = ["Непонятный шаг", "Пригорело или не пропеклось", "Не хватило времени", "Не понравился вкус", "Слишком сложно", "Другое"];
+const AT_STEP = new Set(TROUBLES.slice(0, 3));
+
+/** After «Так себе»: what went wrong and, if it was a step, which one — so the owner knows what to rewrite. */
+function Trouble({ recipe }: { recipe: Recipe }) {
+  const [reason, setReason] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
+  const send = (why: string, step: number) => { track({ type: "trouble", recipeId: recipe.id, text: why, count: step }); setSent(true); };
+  const pick = (why: string) => { cue("tap"); setReason(why); if (!AT_STEP.has(why)) send(why, 0); };
+  if (sent) return <p className="anim-rise mt-3 text-body-sm text-ink-soft" role="status">Спасибо! Поправлю рецепт, а вам в следующий раз предложу что-нибудь другое.</p>;
+  return (
+    <div className="anim-rise mt-4 text-left">
+      {!reason ? (
+        <>
+          <p className="text-body-sm font-semibold">Что не получилось?</p>
+          <div className="mt-2 flex flex-wrap gap-2">{TROUBLES.map((t) => <Chip key={t} onClick={() => pick(t)}>{t}</Chip>)}</div>
+        </>
+      ) : (
+        <>
+          <p className="text-body-sm font-semibold">На каком шаге?</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {recipe.steps.map((_, n) => <Chip key={n} onClick={() => send(reason, n + 1)} label={"Шаг " + (n + 1)}>{n + 1}</Chip>)}
+            <Chip onClick={() => send(reason, 0)}>Не помню</Chip>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 

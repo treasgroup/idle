@@ -1,7 +1,7 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic,
+  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -15,6 +15,7 @@ import { ShareOptions } from "../components/ShareOptions";
 import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
+import { WriteUs } from "../components/WriteUs";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
 const APPLIANCES = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"];
@@ -37,6 +38,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs">(null);
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
+  const [writeUs, setWriteUs] = useState(false);
   const prefs = s.preferences;
   const bookCount = new Set(s.book.map((b) => b.recipeId)).size;
   const nonzero = ([["Приготовлено", bookCount], ["Сохранено", s.favorites.length], ["Дома", s.fridge.length]] as const).filter(([, v]) => v > 0);
@@ -146,7 +148,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
             </div>
           </Section>
 
-          <div className="card mt-8 overflow-hidden">
+          <div className="card mt-8 divide-y divide-line overflow-hidden">
+            <Row icon={<MessageSquareHeart size={18} />} title="Написать нам" hint="Что улучшить или что мешает" onClick={() => setWriteUs(true)} />
             <Row icon={<Shield size={18} />} title="Документы и мои данные" hint="Политика, правила, удаление данных" onClick={() => setSheet("docs")} />
           </div>
         </div>
@@ -191,6 +194,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       </Sheet>
 
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
+      <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
       <Sheet open={sheet === "docs"} title="Документы и мои данные" onClose={close}>
         <div className="grid gap-1">
           {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (

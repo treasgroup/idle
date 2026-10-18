@@ -4,13 +4,14 @@
 import { measureAnswer, roastAnswer } from "./kitchenMath";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
+  DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, loadIntentModel, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
   relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
 } from "../engine";
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
 import { archiveChat, markChatActive, takeChat } from "./chats";
 import { plainWords } from "./colloquial";
+import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
 
 /** «курица и картошка»: a dish named after the products («Курица с картошкой») goes before one that only contains them. */
 function namedFirst(list: Match[], c: Conditions): Match[] {
@@ -20,6 +21,10 @@ function namedFirst(list: Match[], c: Conditions): Match[] {
   const head = list.slice(0, 10).map((m, i) => ({ m, i, n: hits(m) })).sort((a, b) => b.n - a.n || a.i - b.i).map((x) => x.m);
   return [...head, ...list.slice(10)];
 }
+
+// Products that can be left out of a dish without spoiling it: «без лука» keeps the dish, just without it.
+const SOFT: Record<string, string> = { onion: "лука", "red-onion": "лука", "green-onion": "лука", garlic: "чеснока", dill: "укропа", parsley: "петрушки", cilantro: "кинзы", "black-pepper": "перца" };
+const SOFT_ONE: Record<string, string> = { onion: "лук", "red-onion": "лук", "green-onion": "лук", garlic: "чеснок", dill: "укроп", parsley: "петрушку", cilantro: "кинзу", "black-pepper": "перец" };
 
 const lastShown = (conv: ChatMessage[]) => [...conv].reverse().find((m) => m.role === "assistant" && !!m.results?.length) ?? null;
 
@@ -115,6 +120,8 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     markChatActive();
   }, [update]);
 
+  const found = useCallback((c: Conditions, limit = 5) => rankRecipes(recipes(), withGoals(c), stateRef.current.preferences, limit), [withGoals]);
+
   const ask = useCallback(async (raw: string, opts: AskOptions = {}) => {
     const text = raw.trim();
     if (!text) return;
@@ -124,10 +131,15 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     const ac = new AbortController();
     abort.current = ac;
     setBusy(true);
-    const st = opts.fresh ? { ...stateRef.current, conversation: [], conditions: base() }
-      : opts.reset ? { ...stateRef.current, conditions: { ...base(), servings: stateRef.current.conditions.servings } } : stateRef.current;
+    // A new request is not a refinement of the last one: what was said for the previous dish is dropped
+    // («хочу сладкое», then «нет духовки, есть фарш»). «А без лука», «побыстрее» keep it.
+    const reset = opts.reset || (!opts.fresh && isNewTopic(text) && hasTopic(stateRef.current.conditions, base()));
+    const health = healthOf(text);
+    let st = opts.fresh ? { ...stateRef.current, conversation: [], conditions: base() }
+      : reset ? { ...stateRef.current, conditions: { ...base(), servings: stateRef.current.conditions.servings } } : stateRef.current;
+    if (health) st = { ...st, conditions: withHealth(st.conditions, health) };
     const started = Date.now();
-    push([{ role: "user", text: opts.shown || text }], opts.fresh || opts.reset ? st.conditions : undefined, !!opts.fresh);
+    push([{ role: "user", text: opts.shown || text }], opts.fresh || reset || health ? st.conditions : undefined, !!opts.fresh);
     // Kitchen arithmetic is answered here at once: grams in a glass, how long to roast by weight.
     const local = measureAnswer(text) ?? roastAnswer(text);
     if (local) { push([{ role: "assistant", text: local }]); setBusy(false); return; }
@@ -159,6 +171,8 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       }
       if (id !== turn.current) return;
       const cleaned = cleanMessage(plainWords(text));
+      if (!patch) await loadIntentModel().catch(() => null); // usually loaded already; on a quick first question, a moment
+      if (id !== turn.current) return;
       const local = parseMessage(cleaned, st.conditions);
       const isLocal = !patch;
       if (!patch) { patch = local; reply = local.reply; }
@@ -177,6 +191,19 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         guess: isLocal ? classifyIntent(cleaned) : null, focus: focusRecipe,
         focusServings: f && f.after === shown ? f.servings : st.cooking?.servings, voice: !!opts.voice,
       });
+      // Health words: the note first; when the rest of the message gave nothing to search by, the picks for it.
+      if (health) {
+        const c = { ...out.conditions, health };
+        const results = out.results.length && out.kind !== "unclear" ? out.results : found(c);
+        Object.assign(out, { kind: "found", text: HEALTH[health].reply, results, conditions: c, options: undefined });
+      } else if (st.conditions.health) out.conditions = { ...out.conditions, health: st.conditions.health };
+      // «есть фарш» → «а без лука»: nearly every dish with mince has onion, and the picker would fall back to
+      // anything (a milkshake). Onion, garlic and herbs can simply be left out — offer those dishes and say so.
+      const soft = ((patch?.excludedAdd as string[] | undefined) ?? []).filter((x) => x in SOFT);
+      if (soft.length && out.conditions.available.length && out.results.length && out.results.every((m) => !m.available.length)) {
+        const alt = found({ ...out.conditions, excluded: out.conditions.excluded.filter((x) => !soft.includes(x)) }).filter((m) => m.available.length);
+        if (alt.length) Object.assign(out, { kind: "found", results: alt, text: "Таких блюд совсем без " + SOFT[soft[0]] + " у меня нет — вот где " + SOFT_ONE[soft[0]] + " можно просто не класть:" });
+      }
       if (out.kind !== "talk")
         track({ type: "query", text, count: out.kind === "unclear" ? -1 : out.kind === "near" ? 0 : out.results.length, source: opts.source ?? (opts.voice ? "voice" : "chat") });
       // A short pause so the answer does not flash in before the question has settled on screen.
@@ -192,9 +219,8 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       clearTimeout(timer);
       if (id === turn.current) setBusy(false);
     }
-  }, [online, server.aiReady, ensureSession, push, toast, base, newChat, withGoals]);
+  }, [online, server.aiReady, ensureSession, push, toast, base, newChat, withGoals, found]);
 
-  const found = useCallback((c: Conditions, limit = 5) => rankRecipes(recipes(), withGoals(c), stateRef.current.preferences, limit), [withGoals]);
 
   const choose = useCallback((o: ChatOption) => {
     if (o.open) return openRef.current(o.open);

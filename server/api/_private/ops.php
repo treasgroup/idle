@@ -124,6 +124,9 @@ function admin_insights(int $days): void {
         'errors' => $all('SELECT day, message, place, version, agent, n, last FROM client_errors WHERE day >= ? ORDER BY last DESC LIMIT 60', [$from]),
         'taps' => (function () use ($all, $from) { taps_schema(); return $all('SELECT route, kind, label, SUM(n) AS n, MAX(last) AS last FROM ux_taps WHERE day >= ? GROUP BY route, kind, label ORDER BY n DESC, last DESC LIMIT 40', [$from]); })(),
         'backups' => backups_list(),
+        'messages' => admin_messages_list(),
+        'troubles' => admin_troubles($from),
+        'ratings' => admin_ratings($from),
     ]);
 }
 

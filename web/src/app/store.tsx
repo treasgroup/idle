@@ -92,7 +92,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     const onLate = () => setCatalog((c) => ({ ...c, version: Date.now(), source: "server", problem: undefined, count: recipes().length }));
     window.addEventListener(CATALOG_EVENT, onLate);
     fetch(apiUrl("status")).then((r) => r.json()).then((j) => setServer({ aiReady: !!j.aiReady, voiceReady: !!j.voiceReady, telegram: j.bots?.telegram ?? null, alice: j.bots?.alice ?? null })).catch(() => {});
-    void loadIntentModel();
+    // The model that helps Шеф understand free text is not needed for the first screen: fetched when the page is idle
+    // (and Шеф waits for it if asked before that).
+    const later = () => void loadIntentModel();
+    const idle = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback;
+    const kick = () => (idle ? idle(later, { timeout: 6000 }) : window.setTimeout(later, 3000));
+    if (document.readyState === "complete") kick(); else window.addEventListener("load", kick, { once: true });
     track({ type: "visit", source: deviceSource() });
     const net = () => setOnline(navigator.onLine);
     window.addEventListener("online", net);

@@ -17,6 +17,7 @@ import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
 import { DecideSheet } from "../components/Decide";
 import { RecipeImage, RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
+import { photoFirst } from "../app/photoFirst";
 import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
 import { ProfileButton } from "../app/App";
 import { LESSONS } from "./learn-data";
@@ -25,6 +26,7 @@ import { FeastSheet } from "../components/Feast";
 import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 import { thawTomorrow } from "../app/reminders";
 import { BackupCard } from "../components/BackupCard";
+import { Bone } from "../components/Skeleton";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -58,8 +60,9 @@ function dayPick<T>(list: T[], salt = 0): T | null {
 }
 
 /** «Рецепт дня» stays the same all day (per meal), even when the saved data or the catalog changes the list. */
-function useToday(pick: Recipe | null, meal: string): Recipe | null {
+function useToday(pick: Recipe | null, meal: string, ready: boolean): Recipe | null {
   const key = "cook-today-" + dateKey(new Date()) + "-" + meal;
+  if (!ready) return pick;
   let kept: string | null = null;
   try { kept = localStorage.getItem(key); } catch { /* private mode */ }
   const was = kept ? recipeById(kept) : null;
@@ -74,20 +77,20 @@ function useToday(pick: Recipe | null, meal: string): Recipe | null {
 const FESTIVE = ["newyear", "easter", "maslenitsa"];
 
 export function Home({ pwa }: { pwa?: Pwa }) {
-  const { profile } = useStore();
+  const { profile, catalog } = useStore();
   const { openRecipe } = useActions();
   const [decide, setDecide] = useState(false);
   const [feast, setFeast] = useState(false);
   const all = useSuitable();
   const meal = mealNow();
-  const today = useToday(dayPick(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast")), meal);
+  const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0);
   const season = seasonalCollection();
 
   if (profile.simple) return <SimpleHome today={today} />;
 
-  const quick = all.filter((r) => r.totalMinutes <= 30 && r.id !== today?.id).slice(0, 10);
-  const kids = all.filter((r) => r.kids === true && r.id !== today?.id).slice(0, 10);
-  const seasonal = season ? recipes().filter(season.test).slice(0, 10) : [];
+  const quick = photoFirst(all.filter((r) => r.totalMinutes <= 30 && r.id !== today?.id)).slice(0, 10);
+  const kids = photoFirst(all.filter((r) => r.kids === true && r.id !== today?.id)).slice(0, 10);
+  const seasonal = season ? photoFirst(recipes().filter(season.test)).slice(0, 10) : [];
 
   return (
     <div className="pb-4">
@@ -101,7 +104,8 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 
       <ContinueCard />
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-        {today && <TodayCard r={today} onOpen={() => openRecipe(today)} />}
+        {/* The first second of a first visit: the day's dish is chosen from the full list, not the small built-in one. */}
+        {!catalog.version ? <Bone className="h-[340px] rounded-card lg:h-auto lg:min-h-[260px]" /> : today && <TodayCard r={today} onOpen={() => openRecipe(today)} />}
         {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
         <div className="grid content-start gap-3 lg:flex lg:flex-col lg:[&>*]:flex-1">
           <RepeatCard />
@@ -129,7 +133,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <Rescue />
       <BackupCard />
       {season && seasonal.length >= 4 && <Shelf title={season.title} list={seasonal}
-        extra={FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />Собрать праздничный стол</button> : undefined} />}
+        extra={FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{season.key === "newyear" && new Date().getMonth() === 11 ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} list={quick} all={() => openRecipesView("time:30")} />}
       {(profile.kids || profile.goals.includes("family")) && kids.length >= 4 && <Shelf title="Детям нравится" list={kids} all={() => openRecipesView("filter:kids")} />}

@@ -5,6 +5,7 @@ import {
   CATALOG_SECTIONS, freshConditions, isLenten, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, reviewsApi, searchRecipes,
   type Recipe,
 } from "../engine";
+import { photoFirst } from "../app/photoFirst";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
@@ -300,7 +301,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
                     <ArrowUpRight size={20} className="shrink-0 text-brand" aria-hidden />
                   </button>
                 )}
-                {list.slice(0, sections && !browseAll ? 10 : limit).map((r) => tiles
+                {(sections && !browseAll ? photoFirst(list).slice(0, 10) : list.slice(0, limit)).map((r) => tiles
                   ? <RecipeTile key={r.id} recipe={r} note={tileNote(r)} onOpen={() => openRecipe(r)} />
                   : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} rating={ratings[r.id]} note={note(r)} onOpen={() => openRecipe(r)} />)}
               </div>

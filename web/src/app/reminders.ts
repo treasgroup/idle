@@ -2,7 +2,7 @@
 // worker asks the server what to show, and the server answers from the plan this device sent (menu, expiring food).
 // In the Android app the same reminders are scheduled as local notifications.
 import { useCallback, useEffect } from "react";
-import { apiUrl, dateKey, displayName, expiringSoon, ingredient, isNativeApp, recipeById, shortName, type EngineState } from "../engine";
+import { apiUrl, dateKey, displayName, expiringSoon, formatMinutes, ingredient, isNativeApp, recipeById, recipes, shortName, type EngineState } from "../engine";
 import * as core from "../engine/core.js";
 import { useStore } from "./store";
 
@@ -11,6 +11,19 @@ const GENERIC = [
   "Скажите, что есть дома, — подберу блюдо за минуту.",
   "Загляните: для вас есть идея на сегодня.",
 ];
+
+/** A concrete idea for the evening instead of a general «загляните»: one dinner dish for the day, the same all day. */
+export function dinnerIdea(s: EngineState, day: Date): string | null {
+  const ex = s.preferences.excluded;
+  const pool = recipes().filter((r) => (r.meals ? r.meals.includes("dinner") : r.course === "main" || r.course === "soup")
+    && r.totalMinutes <= 60 && r.difficulty !== "hard"
+    && !r.allergens.some((a) => ex.includes(a)) && !r.ingredients.some((i) => !i.optional && ex.includes(i.id))
+    && (!s.preferences.vegetarian || r.tags.includes("vegetarian")));
+  if (!pool.length) return null;
+  const n = day.getFullYear() * 400 + day.getMonth() * 31 + day.getDate();
+  const r = pool[(n * 7919) % pool.length];
+  return "Идея на ужин: «" + r.title + "», " + formatMinutes(r.totalMinutes) + ". Не то — Шеф подберёт другое.";
+}
 
 const FROZEN = ["meat", "poultry", "fish", "seafood"];
 /** «Завтра по плану котлеты»: the meat or fish of tomorrow's dish, which often waits in the freezer. */
@@ -45,7 +58,7 @@ export function reminderPlan(s: EngineState, now = new Date()): { date: string; 
         ? "Сегодня по плану: «" + titles[0] + "»" + (titles.length > 1 ? " и ещё " + (titles.length - 1) : "") + ". Рецепт и продукты — в одно касание."
         : soon.length
           ? "Пора использовать: " + soon.slice(0, 2).join(" и ") + ". Загляните — подскажу, что приготовить."
-          : thaw ? "" : GENERIC[day.getDate() % 3]).concat(thawText).trim().slice(0, 200),
+          : thaw ? "" : dinnerIdea(s, day) ?? GENERIC[day.getDate() % 3]).concat(thawText).trim().slice(0, 200),
     });
   }
   return out;

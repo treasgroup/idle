@@ -1,4 +1,4 @@
-// «Как идут дела»: the funnel, return of visitors, «Не то» from Шеф's answers, errors from phones, where people get lost, database copies.
+// «Как идут дела»: messages from people, the funnel, return of visitors, «Не то» from Шеф's answers, errors from phones, where people get lost, database copies.
 (function () {
   var out = document.getElementById("out");
   var days = document.getElementById("days");
@@ -7,8 +7,23 @@
   function when(ms) { return new Date(ms).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
   function size(b) { return b > 1048576 ? (b / 1048576).toFixed(1) + " МБ" : Math.round(b / 1024) + " КБ"; }
 
+  var KINDS = { idea: "Идея", problem: "Что-то не так", like: "Нравится", other: "Другое" };
+  function recipeLink(id) { return '<a href="../recipe/' + encodeURIComponent(id) + '" target="_blank" rel="noopener">' + esc(id) + "</a>"; }
+
   function render(d) {
     var top = d.funnel[0].n || 0, h = "";
+    var msgs = d.messages || [], fresh = msgs.filter(function (m) { return !+m.seen; }).length;
+    h += '<h2 id="messages">Сообщения от людей' + (fresh ? ' <span style="color:var(--brand)">· новых ' + fresh + "</span>" : "") + '</h2><div class="card">';
+    if (!msgs.length) h += '<p class="empty">Пока никто не написал. Кнопка «Написать нам» — в профиле.</p>';
+    msgs.forEach(function (m) {
+      h += '<div class="row" style="align-items:flex-start' + (+m.seen ? ";opacity:.7" : "") + '"><div style="flex:1"><div style="white-space:pre-wrap">' + esc(m.text) + "</div>"
+        + '<div class="muted">' + esc(KINDS[m.kind] || "Другое") + " · " + (m.place === "app" ? "приложение" : "сайт") + " · " + when(+m.ts)
+        + (m.contact ? " · ответить: <b>" + esc(m.contact) + "</b>" : "") + "</div></div>"
+        + '<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">'
+        + (+m.seen ? "" : '<button data-msg="' + m.id + '" data-act="seen">Прочитано</button>')
+        + '<button data-msg="' + m.id + '" data-act="delete">Удалить</button></span></div>';
+    });
+    h += "</div>";
     h += '<h2>Путь человека</h2><div class="card">';
     d.funnel.forEach(function (f, i) {
       var w = top ? Math.max(2, Math.round((f.n / top) * 100)) : 0;
@@ -26,6 +41,20 @@
     if (!d.wrong.length) h += '<p class="empty">Пока никто не нажимал «Не то».</p>';
     d.wrong.forEach(function (w) { h += '<div class="row"><span style="flex:1">' + esc(w.text) + '</span><span class="num">' + w.n + "</span></div>"; });
     h += '<p class="muted">Эти запросы стоит научить во вкладке «Запросы» → «Научить» или добавить под них рецепты.</p></div>';
+
+    var TR = d.troubles || [];
+    h += '<h2>Где не получилось</h2><div class="card">';
+    if (!TR.length) h += '<p class="empty">Пока никто не отметил, что блюдо не получилось.</p>';
+    TR.forEach(function (t) {
+      h += '<div class="row"><div style="flex:1"><div>' + recipeLink(t.id) + (+t.step ? " · шаг " + (+t.step) : "") + '</div><div class="muted">' + esc(t.reason || "") + '</div></div><span class="num">×' + t.n + "</span></div>";
+    });
+    h += '<p class="muted">Если один рецепт и шаг повторяются — этот шаг стоит переписать понятнее или поправить время.</p></div>';
+
+    var RT = d.ratings || [];
+    h += '<h2>Оценки «Так себе»</h2><div class="card">';
+    if (!RT.length) h += '<p class="empty">Пока всем всё понравилось.</p>';
+    RT.forEach(function (r) { h += '<div class="row"><span style="flex:1">' + recipeLink(r.id) + '</span><span class="muted">понравилось ' + (+r.liked) + '</span><span class="num">так себе ' + (+r.disliked) + "</span></div>"; });
+    h += "</div>";
 
     h += '<h2>Ошибки на телефонах</h2><div class="card">';
     if (!d.errors.length) h += '<p class="empty">Ошибок нет — всё работает.</p>';
@@ -63,6 +92,16 @@
       })
       .catch(function () { out.innerHTML = '<div class="card">Нет связи с сервером. Обновите страницу.</div>'; });
   }
+  out.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("button[data-msg]");
+    if (!b) return;
+    if (b.getAttribute("data-act") === "delete" && !confirm("Удалить это сообщение?")) return;
+    b.disabled = true;
+    fetch("../api/index.php?r=admin.message", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: +b.getAttribute("data-msg"), action: b.getAttribute("data-act") }) })
+      .then(function (r) { if (!r.ok) throw new Error(); load(); })
+      .catch(function () { b.disabled = false; alert("Не получилось. Обновите страницу и попробуйте ещё раз."); });
+  });
   days.addEventListener("change", load);
   load();
 })();

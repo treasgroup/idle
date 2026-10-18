@@ -803,7 +803,11 @@ async function cO(e, v = "") {
     let t = await nA(),
       n = t.transaction("catalog", "readwrite");
     n.objectStore("catalog").put({ at: Date.now(), body: e, v }, "last"),
-      (n.oncomplete = () => t.close());
+      (n.oncomplete = () => {
+        t.close();
+        // boot.js starts the catalog download together with the page only while there is no saved copy.
+        try { localStorage.setItem("cook-catalog-saved", "1"); } catch {}
+      });
   } catch {}
 }
 // The saved copy with its version (null when there is none).
@@ -908,7 +912,36 @@ async function tA(e) {
     } catch {}
   return { built: Kb, source: "bundled", problem: e };
 }
+// A later visit: the saved copy is shown at once and the server is asked in the background whether it changed;
+// a newer catalog replaces it a moment later (the "cook-catalog" event). No waiting for the network at start.
+async function bmSaved() {
+  let saved = await uOv();
+  if (!saved || !saved.body || !saved.v) return null;
+  let a;
+  try {
+    a = aA(saved.body, "server");
+  } catch {
+    return null;
+  }
+  if (a.source !== "server") return null;
+  (async () => {
+    try {
+      let r = await fetch(wt("catalog.version"));
+      if (!r.ok) return;
+      let v = String((await r.json()).v || "");
+      if (!v || v === saved.v) return;
+      let t = await fetch(wt("catalog"));
+      if (!t.ok) return;
+      let n = await t.json(),
+        b = aA(n, "server");
+      if (b.source === "server") cO(n, v), window.dispatchEvent(new Event(ym));
+    } catch {}
+  })();
+  return a;
+}
 async function bm(e = 5e3, t = !1) {
+  let quick = await bmSaved();
+  if (quick) return quick;
   let n = new AbortController(),
     a = dO(t ? void 0 : n.signal),
     i = 0,

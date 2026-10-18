@@ -80,6 +80,8 @@ export interface Conditions {
   maxKcal?: number | null;
   minProtein?: number | null;
   occasion?: "kids" | "guests" | "date" | null;
+  /** A health rule from app/topic.ts («при диабете»): its products are in `excluded`; shown as one chip. */
+  health?: "diabetes" | "pressure" | "stomach" | "cholesterol" | null;
 }
 
 export interface Preferences { excluded: string[]; appliances: string[]; vegetarian: boolean; basics?: string[] }

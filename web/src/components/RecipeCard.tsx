@@ -10,11 +10,15 @@ export function RecipeImage({ recipe, className, rounded = "rounded-img", eager,
   // data-photo: the card's picture that flows into the recipe page; hero: the page's own picture (see app/transition).
   const vt = hero ? { "data-photo-hero": "1", style: { viewTransitionName: "recipe-photo" } } : { "data-photo": recipe.id };
   // Cards take the smaller copy; the recipe page and the few big pictures the full photo.
+  const { catalog } = useStore();
   const src = hero || full ? photoUrl(recipe.id) : photoSmallUrl(recipe.id);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  // Until the server's list of photos is known (the first second or two of a first visit) the address of a photo is
+  // not final: loading it now would fetch the same picture twice. A quiet placeholder for that moment.
+  if (!catalog.version) return <div aria-hidden {...vt} className={cx("skeleton", rounded, className)} />;
   if (src && !failed)
-    return <img {...vt} src={src} alt="" loading={eager ? "eager" : "lazy"} decoding="async" onError={() => setFailed(true)} onLoad={() => setLoaded(true)}
+    return <img {...vt} src={src} alt="" loading={eager ? "eager" : "lazy"} fetchPriority={eager ? "high" : undefined} decoding="async" onError={() => setFailed(true)} onLoad={() => setLoaded(true)}
       className={cx("object-cover", loaded ? "img-in bg-sunken" : "skeleton", rounded, className)} />;
   const [a, b] = dishTint(recipe);
   const v = dishVariant(recipe);
