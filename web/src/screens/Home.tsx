@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -79,6 +79,7 @@ const FESTIVE = ["newyear", "easter", "maslenitsa"];
 export function Home({ pwa }: { pwa?: Pwa }) {
   const { profile, catalog } = useStore();
   const { openRecipe } = useActions();
+  const a = useAssistant();
   const [decide, setDecide] = useState(false);
   const [feast, setFeast] = useState(false);
   const all = useSuitable();
@@ -133,7 +134,8 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <Rescue />
       <BackupCard />
       {season && seasonal.length >= 4 && <Shelf title={season.title} list={seasonal}
-        extra={FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{season.key === "newyear" && new Date().getMonth() === 11 ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
+        extra={season.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
+          : FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{season.key === "newyear" && new Date().getMonth() === 11 ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} list={quick} all={() => openRecipesView("time:30")} />}
       {(profile.kids || profile.goals.includes("family")) && kids.length >= 4 && <Shelf title="Детям нравится" list={kids} all={() => openRecipesView("filter:kids")} />}

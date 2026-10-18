@@ -16,14 +16,15 @@ import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
 import { WriteUs } from "../components/WriteUs";
+import { useMyMessages } from "../app/myMessages";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
 const APPLIANCES = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave"];
 
-function Row({ icon, title, hint, onClick }: { icon: JSX.Element; title: string; hint?: string; onClick: () => void }) {
+function Row({ icon, title, hint, onClick, dot }: { icon: JSX.Element; title: string; hint?: string; onClick: () => void; dot?: boolean }) {
   return (
     <button className="flex min-h-[60px] w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-sunken/60" onClick={onClick}>
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{icon}</span>
+      <span className="relative grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{icon}{dot && <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-card bg-brand" />}</span>
       <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">{title}</span>{hint && <span className="block truncate text-caption text-ink-soft">{hint}</span>}</span>
       <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
     </button>
@@ -39,6 +40,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
   const [writeUs, setWriteUs] = useState(false);
+  const mine = useMyMessages();
   const prefs = s.preferences;
   const bookCount = new Set(s.book.map((b) => b.recipeId)).size;
   const nonzero = ([["Приготовлено", bookCount], ["Сохранено", s.favorites.length], ["Дома", s.fridge.length]] as const).filter(([, v]) => v > 0);
@@ -149,7 +151,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
           </Section>
 
           <div className="card mt-8 divide-y divide-line overflow-hidden">
-            <Row icon={<MessageSquareHeart size={18} />} title="Написать нам" hint="Что улучшить или что мешает" onClick={() => setWriteUs(true)} />
+            <Row icon={<MessageSquareHeart size={18} />} title="Написать нам" hint={mine.unread ? "Пришёл ответ на ваше сообщение" : "Что улучшить или что мешает"} dot={mine.unread > 0} onClick={() => setWriteUs(true)} />
             <Row icon={<Shield size={18} />} title="Документы и мои данные" hint="Политика, правила, удаление данных" onClick={() => setSheet("docs")} />
           </div>
         </div>

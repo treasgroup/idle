@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
-  MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, ThumbsDown, ThumbsUp, Volume2, X,
+  MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
-  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, rateDish, track, useHandsFree,
+  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, rateDish, track, isNativeApp, useHandsFree,
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -669,9 +669,11 @@ function Done({ onClose }: { onClose: () => void }) {
   useEffect(() => () => { if (ending.current) update((st) => (st.cooking?.done ? { ...st, cooking: null } : st)); }, [update]);
   const end = () => { ending.current = true; };
   const close = () => { end(); onClose(); };
+  const [askStore, setAskStore] = useState(false);
   const rate = (v: "yes" | "meh") => {
     cue("tap");
     if (rated !== v) track({ type: "rate", recipeId: r.id, count: v === "yes" ? 1 : 0 });
+    if (v === "yes" && rated !== "yes") setAskStore(storeAskDue());
     setRated(v);
     update((st) => ({ ...st, taste: rateDish(st.taste, r.id, v === "yes") }));
   };
@@ -707,7 +709,8 @@ function Done({ onClose }: { onClose: () => void }) {
           {rated === "yes" && (
             <div className="anim-rise mt-3">
               <p className="text-body-sm text-ink-soft" role="status">Запомню — буду предлагать чаще.</p>
-              <button className="btn-ghost mt-1" onClick={reviews}><Camera size={18} aria-hidden />Оставить отзыв для других</button>
+              {askStore ? <StoreAsk onDone={() => setAskStore(false)} />
+                : <button className="btn-ghost mt-1" onClick={reviews}><Camera size={18} aria-hidden />Оставить отзыв для других</button>}
             </div>
           )}
           {rated === "meh" && <Trouble recipe={r} />}
@@ -746,6 +749,31 @@ function Done({ onClose }: { onClose: () => void }) {
       {sheet === "left" && <LeftoverSheet recipe={r} servings={c.servings} onClose={() => setSheet(null)} />}
       {sheet === "note" && <NoteSheet id={r.id} onClose={() => setSheet(null)} />}
     </Layer>
+  );
+}
+
+// In the Android app, after the third «Понравилось»: one quiet request to rate the app in RuStore, asked once.
+const RUSTORE = "https://apps.rustore.ru/app/su.treas.cook";
+function storeAskDue(): boolean {
+  if (!isNativeApp()) return false;
+  try {
+    if (localStorage.getItem("cook-store-asked")) return false;
+    const n = Number(localStorage.getItem("cook-likes") || 0) + 1;
+    localStorage.setItem("cook-likes", String(n));
+    return n >= 3;
+  } catch { return false; }
+}
+function StoreAsk({ onDone }: { onDone: () => void }) {
+  const done = () => { try { localStorage.setItem("cook-store-asked", "1"); } catch { /* ignore */ } onDone(); };
+  return (
+    <div className="anim-rise mx-auto mt-3 max-w-sm rounded-card border border-line bg-card p-4 text-center">
+      <p className="text-body-sm font-semibold">Нравится приложение?</p>
+      <p className="mt-1 text-body-sm text-ink-soft">Оцените его в RuStore — так его найдут другие. Это займёт полминуты.</p>
+      <div className="mt-3 flex justify-center gap-2">
+        <a className="btn-primary" href={RUSTORE} target="_blank" rel="noopener" onClick={done}><Star size={18} aria-hidden />Оценить</a>
+        <button className="btn-ghost" onClick={done}>Не сейчас</button>
+      </div>
+    </div>
   );
 }
 

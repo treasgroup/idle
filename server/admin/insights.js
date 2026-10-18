@@ -16,13 +16,22 @@
     h += '<h2 id="messages">Сообщения от людей' + (fresh ? ' <span style="color:var(--brand)">· новых ' + fresh + "</span>" : "") + '</h2><div class="card">';
     if (!msgs.length) h += '<p class="empty">Пока никто не написал. Кнопка «Написать нам» — в профиле.</p>';
     msgs.forEach(function (m) {
-      h += '<div class="row" style="align-items:flex-start' + (+m.seen ? ";opacity:.7" : "") + '"><div style="flex:1"><div style="white-space:pre-wrap">' + esc(m.text) + "</div>"
+      var answer = m.reply
+        ? '<div class="reply"><b>Ваш ответ</b> · ' + when(+m.reply_at) + '<div style="white-space:pre-wrap">' + esc(m.reply) + "</div></div>"
+        : "";
+      var form = +m.can_reply
+        ? '<div class="reply-form" id="rf' + m.id + '" hidden><textarea rows="3" placeholder="Ответ увидят в профиле, в «Написать нам»">' + esc(m.reply || "") + "</textarea>"
+          + '<button data-msg="' + m.id + '" data-act="reply">Отправить ответ</button></div>'
+        : "";
+      h += '<div class="row" style="align-items:flex-start' + (+m.seen && !answer ? ";opacity:.75" : "") + '"><div style="flex:1"><div style="white-space:pre-wrap">' + esc(m.text) + "</div>"
         + '<div class="muted">' + esc(KINDS[m.kind] || "Другое") + " · " + (m.place === "app" ? "приложение" : "сайт") + " · " + when(+m.ts)
-        + (m.contact ? " · ответить: <b>" + esc(m.contact) + "</b>" : "") + "</div></div>"
+        + (m.contact ? " · контакт: <b>" + esc(m.contact) + "</b>" : "") + "</div>" + answer + form + "</div>"
         + '<span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">'
+        + (+m.can_reply ? '<button data-msg="' + m.id + '" data-act="open">' + (m.reply ? "Изменить ответ" : "Ответить") + "</button>" : "")
         + (+m.seen ? "" : '<button data-msg="' + m.id + '" data-act="seen">Прочитано</button>')
         + '<button data-msg="' + m.id + '" data-act="delete">Удалить</button></span></div>';
     });
+    h += '<p class="muted">Ответ приходит человеку в профиль — в «Написать нам» (на том же телефоне или компьютере, откуда он писал).</p>';
     h += "</div>";
     h += '<h2>Путь человека</h2><div class="card">';
     d.funnel.forEach(function (f, i) {
@@ -45,8 +54,10 @@
     var TR = d.troubles || [];
     h += '<h2>Где не получилось</h2><div class="card">';
     if (!TR.length) h += '<p class="empty">Пока никто не отметил, что блюдо не получилось.</p>';
-    TR.forEach(function (t) {
-      h += '<div class="row"><div style="flex:1"><div>' + recipeLink(t.id) + (+t.step ? " · шаг " + (+t.step) : "") + '</div><div class="muted">' + esc(t.reason || "") + '</div></div><span class="num">×' + t.n + "</span></div>";
+    TR.forEach(function (t, k) {
+      h += '<div class="row" style="align-items:flex-start"><div style="flex:1"><div>' + recipeLink(t.id) + (+t.step ? " · шаг " + (+t.step) : "") + '</div><div class="muted">' + esc(t.reason || "") + "</div>"
+        + '<div class="reply-form" id="fx' + k + '" hidden></div></div>'
+        + '<span style="display:flex;gap:6px;align-items:center"><button data-fix="' + k + '" data-id="' + esc(t.id) + '" data-step="' + (+t.step) + '">' + (+t.step ? "Исправить шаг" : "Открыть шаги") + '</button><span class="num">×' + t.n + "</span></span></div>";
     });
     h += '<p class="muted">Если один рецепт и шаг повторяются — этот шаг стоит переписать понятнее или поправить время.</p></div>';
 
@@ -92,13 +103,44 @@
       })
       .catch(function () { out.innerHTML = '<div class="card">Нет связи с сервером. Обновите страницу.</div>'; });
   }
+  // «Исправить шаг»: the step's text from the catalog file, edited here; the file is copied to _backups first.
+  function stepEditor(box, id, steps, n) {
+    var h = '<label class="muted">Шаг <select>' + steps.map(function (_, i) { return '<option value="' + (i + 1) + '"' + (i + 1 === n ? " selected" : "") + ">" + (i + 1) + "</option>"; }).join("") + "</select></label>"
+      + "<textarea rows=\"5\"></textarea><button>Сохранить шаг</button>";
+    box.innerHTML = h;
+    var sel = box.querySelector("select"), ta = box.querySelector("textarea"), save = box.querySelector("button");
+    var fill = function () { ta.value = steps[+sel.value - 1] || ""; };
+    sel.addEventListener("change", fill); fill();
+    save.addEventListener("click", function () {
+      save.disabled = true;
+      fetch("../api/index.php?r=admin.recipe.step", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id, step: +sel.value, text: ta.value }) })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || "Не сохранилось"); steps[+sel.value - 1] = ta.value; save.disabled = false; save.textContent = "Сохранено ✓ — люди увидят при следующем открытии"; }); })
+        .catch(function (err) { save.disabled = false; alert(err.message); });
+    });
+  }
   out.addEventListener("click", function (e) {
+    var fx = e.target.closest && e.target.closest("button[data-fix]");
+    if (fx) {
+      var box = document.getElementById("fx" + fx.getAttribute("data-fix"));
+      if (!box.hidden) { box.hidden = true; return; }
+      fx.disabled = true;
+      fetch("../api/index.php?r=admin.recipe&id=" + encodeURIComponent(fx.getAttribute("data-id")), { credentials: "same-origin" })
+        .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || "Рецепт не найден"); return j; }); })
+        .then(function (j) { fx.disabled = false; box.hidden = false; stepEditor(box, fx.getAttribute("data-id"), j.steps, +fx.getAttribute("data-step") || 1); })
+        .catch(function (err) { fx.disabled = false; alert(err.message); });
+      return;
+    }
     var b = e.target.closest && e.target.closest("button[data-msg]");
     if (!b) return;
-    if (b.getAttribute("data-act") === "delete" && !confirm("Удалить это сообщение?")) return;
+    var id = +b.getAttribute("data-msg"), act = b.getAttribute("data-act");
+    if (act === "open") { var f = document.getElementById("rf" + id); f.hidden = !f.hidden; if (!f.hidden) f.querySelector("textarea").focus(); return; }
+    if (act === "delete" && !confirm("Удалить это сообщение?")) return;
+    var body = { id: id, action: act };
+    if (act === "reply") { body.reply = document.querySelector("#rf" + id + " textarea").value.trim(); if (!body.reply && !confirm("Убрать ответ?")) return; }
     b.disabled = true;
     fetch("../api/index.php?r=admin.message", { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: +b.getAttribute("data-msg"), action: b.getAttribute("data-act") }) })
+      body: JSON.stringify(body) })
       .then(function (r) { if (!r.ok) throw new Error(); load(); })
       .catch(function () { b.disabled = false; alert("Не получилось. Обновите страницу и попробуйте ещё раз."); });
   });

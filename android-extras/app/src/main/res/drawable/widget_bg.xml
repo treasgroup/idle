@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Without a photo (first start, no internet) the widget is the app's brand colour. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#B7432F" />
+    <corners android:radius="24dp" />
+</shape>

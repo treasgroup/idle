@@ -88,3 +88,13 @@ public void onStart() {
 - Ссылка на рецепт, присланная в мессенджере, открывает приложение сразу на этом рецепте.
 - Таймер при погашенном экране звонит системным уведомлением.
 - «Заказать с доставкой», Telegram, документы открываются в браузере телефона.
+
+## 6. Виджет «Рецепт дня» (с версии 2.0.2)
+
+Файлы — в папке `android-extras/` этого репозитория (их кладут поверх проекта приложения):
+`TodayWidget.java`, `res/layout/widget_today.xml`, `res/xml/widget_today_info.xml`, `res/drawable/widget_bg.xml`,
+`res/drawable/widget_shade.xml`, `res/values/widget_strings.xml` и `<receiver android:name=".TodayWidget">` в `AndroidManifest.xml`.
+
+Виджет раз в 3 часа спрашивает `https://treas.su/cook/api/index.php?r=today` (блюдо дня с фото — одно для всех,
+новое каждый день) и хранит последнее, поэтому без интернета показывает вчерашнее. Нажатие открывает рецепт в приложении
+по обычной ссылке `https://treas.su/cook/recipe/<id>`.

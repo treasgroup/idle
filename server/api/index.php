@@ -13,7 +13,7 @@ require __DIR__ . '/_private/barcode.php';
 require __DIR__ . '/_private/ops.php';
 require __DIR__ . '/_private/community.php';
 
-const VERSION = '0.35.0';
+const VERSION = '0.36.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
 try { config(); } catch (Throwable $e) {}
 $route = isset($_GET['r']) ? (string)$_GET['r'] : '';
@@ -114,8 +114,12 @@ try {
         echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . '}';
     }
     elseif ($route === 'message.send' && $method === 'POST') message_send(read_json_body(8000));
+    elseif ($route === 'today' && $method === 'GET') { $t = recipe_of_day(); send_json($t ?? ['error' => 'Нет рецепта'], $t ? 200 : 404); }
+    elseif ($route === 'message.replies' && $method === 'POST') message_replies(read_json_body(8000));
     elseif ($route === 'recipe.stats' && $method === 'GET') send_json(['stats' => (object)recipe_stats()]); // recounted at most hourly
     elseif ($route === 'admin.message' && $method === 'POST') { require_admin(true); admin_message_action(read_json_body(2000)); }
+    elseif ($route === 'admin.recipe' && $method === 'GET') { require_admin(); admin_recipe_get((string)($_GET['id'] ?? '')); }
+    elseif ($route === 'admin.recipe.step' && $method === 'POST') { require_admin(true); admin_recipe_step(read_json_body(8000)); }
     elseif ($route === 'thumb' && $method === 'GET') {
         photo_thumb((string)($_GET['id'] ?? ''));
     }

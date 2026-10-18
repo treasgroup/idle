@@ -28,6 +28,11 @@
     select, button { font: inherit; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); }
     .top { display:flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .empty { color: var(--soft); padding: 8px 0; }
+    .reply { margin-top: 8px; padding: 8px 12px; border-radius: 12px; background: #eef5ee; font-size: 15px; }
+    .reply-form { margin-top: 8px; display: grid; gap: 8px; }
+    .reply-form[hidden] { display: none; }
+    .reply-form textarea { font: inherit; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); width: 100%; }
+    .reply-form button { justify-self: start; background: var(--brand); color: #fff; border-color: var(--brand); }
   </style>
 </head>
 <body>

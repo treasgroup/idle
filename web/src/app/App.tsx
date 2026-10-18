@@ -43,6 +43,7 @@ const PollSheet = lazyScreen(() => loadExtras().then((m) => ({ default: m.PollSh
 const IncomingRecipe = lazyScreen(() => import("../components/FamilyBook").then((m) => ({ default: m.IncomingRecipe })));
 import { Boundary, Logo, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
 import { useUpdateCheck } from "./updates";
+import { checkReplies } from "./myMessages";
 
 const NAV: { tab: Tab; label: string; icon: LucideIcon; simple?: boolean }[] = [
   { tab: "home", label: "Главная", icon: House, simple: true },
@@ -119,6 +120,14 @@ function Shell() {
   const pwa = isNativeApp() ? { ...web, installed: true, canInstall: false, ios: false } : web;
   const [poll, setPoll] = useState<string | null>(null);
   const [onboarding, setOnboarding] = useState(false);
+  // The owner answered a message sent from «Написать нам»: said once, softly, a few seconds after the start.
+  useEffect(() => {
+    if (!ready) return;
+    const t = window.setTimeout(() => void checkReplies().then((n) => {
+      if (n) toast((n > 1 ? "Пришли ответы на ваши сообщения" : "Пришёл ответ на ваше сообщение") + " — Профиль → «Написать нам»");
+    }), 6000);
+    return () => window.clearTimeout(t);
+  }, [ready, toast]);
   // Opened by a link (a recipe sent in a messenger): the recipe, not the welcome screens.
   useEffect(() => {
     const off = () => setOnboarding(false);
