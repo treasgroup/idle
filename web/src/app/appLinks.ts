@@ -5,6 +5,9 @@ import { routeHash, replace, TABS, type Tab } from "./router";
 export const LINK_EVENT = "cook-link";
 type Link = { hash: string; query: URLSearchParams };
 let pending: Link[] = [];
+let opened = false;
+/** The app was opened by a link this time (no welcome screens over it). */
+export const openedByLink = (): boolean => opened;
 
 export function takeLinks(): Link[] { const l = pending; pending = []; return l; }
 
@@ -16,7 +19,7 @@ export function toLink(raw: string): Link | null {
   const q = new URLSearchParams(u.search);
   const m = path.match(/^recipe\/([a-z0-9-]+)\/?$/);
   if (m) q.set("recipe", m[1]);
-  if (u.hash.startsWith("#/")) { location.hash = u.hash; return null; }
+  if (u.hash.startsWith("#/")) { opened = true; location.hash = u.hash; return null; }
   return { hash: u.hash, query: q };
 }
 
@@ -27,6 +30,7 @@ export function watchAppLinks(): void {
   const push = (url?: string) => {
     const l = url ? toLink(url) : null;
     if (!l) return;
+    opened = true;
     pending.push(l);
     window.dispatchEvent(new Event(LINK_EVENT));
   };

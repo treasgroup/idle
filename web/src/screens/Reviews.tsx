@@ -36,7 +36,8 @@ export function useReviews(recipeId: string) {
     const id = ++turn.current;
     setError("");
     reviewsApi.list(recipeId, sort)
-      .then((d) => { if (id === turn.current) setData(d); })
+      // A strange answer (an old server, a proxy page) is treated as «could not load», never as a crash of the recipe.
+      .then((d) => { if (id !== turn.current) return; if (d && Array.isArray(d.reviews)) setData(d); else setError("Не удалось загрузить отзывы."); })
       .catch((e) => { if (id === turn.current) setError(e instanceof Error && e.message ? e.message : "Не удалось загрузить отзывы."); });
   }, [recipeId, sort, online]);
   useEffect(load, [load]);
@@ -44,7 +45,7 @@ export function useReviews(recipeId: string) {
     if (!data || more) return;
     setMore(true);
     reviewsApi.list(recipeId, sort, data.reviews.length)
-      .then((d) => setData((x) => (x ? { ...d, reviews: [...x.reviews, ...d.reviews.filter((r) => !x.reviews.some((y) => y.id === r.id))] } : d)))
+      .then((d) => { if (d && Array.isArray(d.reviews)) setData((x) => (x ? { ...d, reviews: [...x.reviews, ...d.reviews.filter((r) => !x.reviews.some((y) => y.id === r.id))] } : d)); })
       .catch(() => {})
       .finally(() => setMore(false));
   }, [data, more, recipeId, sort]);

@@ -17,7 +17,7 @@ import { Recipes } from "../screens/Recipes";
 import { ScreenSkeleton } from "../components/Skeleton";
 import { lazyScreen, preload } from "./lazy";
 import { useWakeLock } from "./wakeLock";
-import { LINK_EVENT, takeLinks } from "./appLinks";
+import { LINK_EVENT, openedByLink, takeLinks } from "./appLinks";
 import { preloadMascots } from "../components/Mascot";
 
 // Home and search come with the page; the rest loads when first opened (and quietly in the background).
@@ -119,6 +119,12 @@ function Shell() {
   const pwa = isNativeApp() ? { ...web, installed: true, canInstall: false, ios: false } : web;
   const [poll, setPoll] = useState<string | null>(null);
   const [onboarding, setOnboarding] = useState(false);
+  // Opened by a link (a recipe sent in a messenger): the recipe, not the welcome screens.
+  useEffect(() => {
+    const off = () => setOnboarding(false);
+    window.addEventListener(LINK_EVENT, off);
+    return () => window.removeEventListener(LINK_EVENT, off);
+  }, []);
   const keyboard = useKeyboardOpen();
   const bottom = useRef<HTMLDivElement>(null);
   const [incoming, setIncoming] = useState<Partial<MyRecipe> | null>(null);
@@ -130,7 +136,7 @@ function Shell() {
   useUpdateCheck(toast);
   useEffect(() => {
     if (!ready) return;
-    if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=") && !location.hash.startsWith("#book=")) setOnboarding(true);
+    if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=") && !location.hash.startsWith("#book=") && !openedByLink()) setOnboarding(true);
     const c = s.cooking;
     migrateOldTimer([
       ...(c ? [{ title: c.recipe.title, recipeId: c.recipe.id, end: c.timerEnd, step: c.timerStep }] : []),
