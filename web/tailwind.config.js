@@ -46,7 +46,7 @@ export default {
         e1: "0 1px 2px rgb(33 29 26 / .05)",
         e2: "0 8px 28px rgb(33 29 26 / .12), 0 2px 6px rgb(33 29 26 / .06)",
       },
-      maxWidth: { chat: "760px" },
+      maxWidth: { chat: "760px", "chat-wide": "920px" },
       transitionTimingFunction: { out: "cubic-bezier(.2,.8,.2,1)" },
     },
   },

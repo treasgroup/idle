@@ -55,7 +55,10 @@ function vk_call(string $method, array $params, string $token): array {
 // ---------- VK ID: «Подключить через ВКонтакте» ----------
 function vk_b64url(string $bin): string { return rtrim(strtr(base64_encode($bin), '+/', '-_'), '='); }
 function vk_redirect_uri(): string {
-    return seo_origin() . rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/cook/api/index.php'))), '/') . '/index.php?r=vk.callback';
+    // The API does not load seo.php, so the site's address is worked out here.
+    $host = (string)($_SERVER['HTTP_HOST'] ?? 'treas.su');
+    if (!preg_match('/^[a-z0-9.-]+(:\d{1,5})?$/i', $host)) $host = 'treas.su';
+    return (is_https() ? 'https://' : 'http://') . strtolower($host) . rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/cook/api/index.php'))), '/') . '/index.php?r=vk.callback';
 }
 /** POST to VK ID (the key exchange); the answer or a clear error. */
 function vk_id_post(array $params): array {

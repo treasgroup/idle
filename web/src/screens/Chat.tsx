@@ -84,7 +84,7 @@ export function Chat() {
   return (
     <div className="flex min-h-[100dvh] flex-col">
       <header className={cx("pt-safe sticky top-0 z-30 border-b bg-paper/95 backdrop-blur transition-colors", scrolled ? "border-line" : "border-transparent")}>
-        <div className="mx-auto flex h-14 max-w-chat items-center gap-1 px-2 sm:px-4">
+        <div className="mx-auto flex h-14 max-w-chat xl:max-w-chat-wide items-center gap-1 px-2 sm:px-4">
           <span className="flex flex-1 items-center gap-2.5 pl-2">
             <ChefAvatar size={36} />
             <span className="leading-tight">
@@ -96,10 +96,10 @@ export function Chat() {
           {chats.length > 0 && <button className="inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => setHistory(true)}><History size={18} aria-hidden />История</button>}
           {has && <button className="inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => { a.newChat(); setFocusKey((k) => k + 1); }}><SquarePen size={18} aria-hidden />Новый</button>}
         </div>
-        <div className="mx-auto max-w-chat px-4"><TimerStrip className="pb-2" /></div>
+        <div className="mx-auto max-w-chat xl:max-w-chat-wide px-4"><TimerStrip className="pb-2" /></div>
       </header>
 
-      <div className="mx-auto w-full max-w-chat flex-1 px-4" style={{ paddingBottom: "calc(var(--dock) + var(--nav-h) + 24px)" }}>
+      <div className="mx-auto w-full max-w-chat xl:max-w-chat-wide flex-1 px-4" style={{ paddingBottom: "calc(var(--dock) + var(--nav-h) + 24px)" }}>
         {has ? (
           <div className="space-y-5 pt-4" aria-live="polite" aria-relevant="additions">
             {msgs.map((m, i) => {
@@ -129,7 +129,7 @@ export function Chat() {
 
       {/* Wide screens: no line above the input — the conversation fades out under it, as in today's messengers. */}
       <div ref={dock} className="fixed inset-x-0 z-30 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64 lg:border-t-0 lg:bg-transparent lg:bg-gradient-to-t lg:from-paper lg:from-70% lg:to-paper/0 lg:pt-6 lg:backdrop-blur-none" style={{ bottom: "var(--nav-h)" }}>
-        <div className="mx-auto max-w-chat px-4 pb-3 pt-2">
+        <div className="mx-auto max-w-chat xl:max-w-chat-wide px-4 pb-3 pt-2">
           <Composer variant="dock" busy={a.busy} focusKey={focusKey} onSend={(t, o) => send(t, o)}
             placeholder={has ? undefined : "Например: курица и картошка"} />
         </div>
@@ -179,7 +179,7 @@ function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSu
     <div className="anim-rise space-y-4 pb-6 pt-4">
       <div className="flex justify-center pt-2"><Mascot size={128} mood="happy" /></div>
       <p className="mx-auto w-fit rounded-full bg-sunken px-3 py-1 text-caption text-ink-soft">Сегодня</p>
-      <p className="max-w-[85%] rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-3 text-body">
+      <p className="max-w-[85%] xl:max-w-[640px] rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-3 text-body">
         Здравствуйте! Я Шеф — помогу выбрать, что приготовить. Скажите, что есть дома или чего хочется. Можно голосом — кнопка с микрофоном внизу.
       </p>
       <div className="flex flex-wrap gap-2">

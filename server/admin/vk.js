@@ -7,7 +7,7 @@
   function when(ms) { return new Date(ms).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }); }
   function api(route, body) {
     return fetch("../api/index.php?r=" + route, body ? { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : { credentials: "same-origin" })
-      .then(function (r) { return r.json().then(function (j) { if (!r.ok) throw new Error(j.error || "Сервер не ответил"); return j; }); });
+      .then(function (r) { return r.json().catch(function () { return { error: "Сервер ответил ошибкой " + r.status + "." }; }).then(function (j) { if (!r.ok) throw new Error(j.error || "Сервер не ответил"); return j; }); });
   }
   function render(s) {
     var last = s.last
@@ -70,5 +70,6 @@
         .catch(function (e) { alert(e.message); api("admin.vk").then(render); });
     };
   }
-  api("admin.vk").then(render).catch(function (e) { box.innerHTML = '<p class="muted">' + esc(e.message === "Сервер не ответил" ? e.message : "Войдите в админ-панель, чтобы настроить.") + "</p>"; });
+  // The server's own words: «Войдите в админ-панель» only when that is really the reason.
+  api("admin.vk").then(render).catch(function (e) { box.innerHTML = '<p class="muted">' + esc(e.message || "Сервер не ответил") + "</p>"; });
 })();

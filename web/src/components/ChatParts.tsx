@@ -25,7 +25,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
   if (m.role === "user")
     return (
       <article className="anim-rise flex justify-end" aria-label="Вы" data-private>
-        <p className="max-w-[85%] whitespace-pre-line rounded-[20px] rounded-br-md bg-brand-soft px-4 py-2.5 text-body text-ink">{m.text}</p>
+        <p className="max-w-[85%] xl:max-w-[640px] whitespace-pre-line rounded-[20px] rounded-br-md bg-brand-soft px-4 py-2.5 text-body text-ink">{m.text}</p>
       </article>
     );
   // `reason` falls back to the dish summary; only a real "why it fits" gets the green tick.
@@ -38,7 +38,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
   return (
     <article className="anim-rise" aria-label="Шеф">
       <div className="min-w-0 space-y-3">
-        <p className="w-fit max-w-[85%] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{tidyReply(m.text)}</p>
+        <p className="w-fit max-w-[85%] xl:max-w-[640px] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{tidyReply(m.text)}</p>
         {results[0]?.recipe && (
           <RecipeFeatured recipe={results[0].recipe} note={results[0].why || undefined} onOpen={() => open(results[0].id)}
             onMenu={() => setMenuFor(results[0].id)} onSave={() => toggleFavorite(results[0].recipe!)} saved={isFavorite(results[0].id)} />
