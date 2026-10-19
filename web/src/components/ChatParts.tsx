@@ -111,12 +111,10 @@ export function ConditionsButton() {
   const shown = !!cond;
   useEffect(() => { if (!shown) setOpen(false); }, [shown]);
   if (!cond) return null;
-  const n = cond.items.length + (cond.servings ? 1 : 0);
   return (
     <>
-      <button className="relative inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => setOpen(true)} aria-label={"Условия подбора: " + n}>
+      <button className="inline-flex h-10 min-w-10 items-center justify-center gap-1.5 rounded-full bg-sunken px-2.5 text-small font-medium hover:bg-line sm:px-3" onClick={() => setOpen(true)} aria-label="Условия подбора">
         <SlidersHorizontal size={18} aria-hidden /><span className="hidden sm:inline">Условия</span>
-        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-ink/10 px-1 text-caption font-semibold" aria-hidden>{n}</span>
       </button>
       {/* Outside the header: its blurred background would hold the sheet inside it. */}
       {createPortal(<Sheet open={open} title="Что я учитываю" onClose={() => setOpen(false)}
