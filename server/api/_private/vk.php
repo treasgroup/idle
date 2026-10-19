@@ -2,10 +2,9 @@
 // «Рецепт дня» on the owner's VK community wall: once a day, after the hour the owner chose, the same dish as the
 // widget's, with a link to the recipe (VK shows the link with its photo and title). Without cron: started after the
 // app's first request of the day. The access key is set in the admin panel and never sent back to the browser.
-// A community key cannot post on the wall (VK answers «код 27»), and the keys of the new VK ID sign-in («vk2.a.…») are
-// for signing in only (VK answers «код 1051»). Posting needs the key of the person who runs the community, from VK's
-// own sign-in page (oauth.vk.com) for VK's app «VK Admin»: the owner opens the link from the admin panel, allows
-// access and pastes the address VK shows (the key is in it). With «offline» it does not run out.
+// Only a person's key may post on a wall, and VK no longer gives one to sites: a community key answers «код 27», the
+// new VK ID sign-in «код 1051», VK's own apps are blocked for this. So the admin panel's main way is the week's posts
+// to put in the community as delayed posts by hand (admin_vk_week); automatic posting stays for a key VK accepts.
 declare(strict_types=1);
 
 const VK_API = 'https://api.vk.com/method/';
@@ -22,10 +21,10 @@ function vk_settings(): array {
 /** What a VK error number means here, in plain words (VK's own text stays next to it). */
 function vk_hint(int $code): string {
     return [
-        5 => 'Ключ больше не действует (сменили пароль или отозвали доступ). Получите новый ключ по ссылке в админке.',
+        5 => 'Ключ больше не действует (сменили пароль или отозвали доступ).',
         15 => 'У этой страницы нет права публиковать в сообществе: нужен администратор или редактор.',
-        27 => 'Это ключ сообщества, а он не может публиковать на стене — так устроен ВКонтакте. Получите ключ администратора по ссылке в админке.',
-        1051 => 'Этот ключ ВКонтакте разрешает только вход на сайты, публиковать им нельзя. Получите ключ по ссылке в админке.',
+        27 => 'Это ключ сообщества, а он не может публиковать на стене — так устроен ВКонтакте. Ставьте посты отложенными записями — в админке они готовы на неделю.',
+        1051 => 'Этот ключ ВКонтакте разрешает только вход на сайты, публиковать им нельзя. Ставьте посты отложенными записями — в админке они готовы на неделю.',
         214 => 'Публикация на стене запрещена настройками сообщества.',
         220 => 'Слишком много публикаций за сутки.',
     ][$code] ?? '';
@@ -133,6 +132,18 @@ function admin_vk_save(array $b): void {
     if (isset($b['on'])) $s['on'] = (bool)$b['on'];
     set_setting('vk', $s);
     admin_vk_status();
+}
+/** The next seven days' posts, to be put in the community as delayed posts by hand (no key needed). */
+function admin_vk_week(): void {
+    $days = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
+    $out = [];
+    for ($i = 0; $i < 7; $i++) {
+        $ts = strtotime('+' . $i . ' day 12:00');
+        $t = recipe_of_day($ts);
+        if (!$t) continue;
+        $out[] = ['day' => date('Y-m-d', $ts), 'weekday' => $days[(int)date('w', $ts)], 'title' => $t['title'], 'photo' => $t['photo'], 'url' => $t['url'], 'text' => vk_post_text($t)];
+    }
+    send_json(['week' => $out]);
 }
 function admin_vk_post(): void {
     try { $id = vk_post_today(); send_json(['posted' => true, 'post' => $id]); }
