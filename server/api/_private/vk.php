@@ -2,31 +2,30 @@
 // «Рецепт дня» on the owner's VK community wall: once a day, after the hour the owner chose, the same dish as the
 // widget's, with a link to the recipe (VK shows the link with its photo and title). Without cron: started after the
 // app's first request of the day. The access key is set in the admin panel and never sent back to the browser.
-// A community key cannot post on the wall (VK answers «код 27»): posting needs the key of a person who runs the
-// community. It is got by «Подключить через ВКонтакте» (VK ID, OAuth 2.1 with PKCE): a short key and a long one that
-// renews it, so the connection keeps working without the owner doing anything.
+// A community key cannot post on the wall (VK answers «код 27»), and the keys of the new VK ID sign-in («vk2.a.…») are
+// for signing in only (VK answers «код 1051»). Posting needs the key of the person who runs the community, from VK's
+// own sign-in page (oauth.vk.com) for VK's app «VK Admin»: the owner opens the link from the admin panel, allows
+// access and pastes the address VK shows (the key is in it). With «offline» it does not run out.
 declare(strict_types=1);
 
 const VK_API = 'https://api.vk.com/method/';
 const VK_VERSION = '5.199';
 
-const VK_ID = 'https://id.vk.com/';
-
 function vk_settings(): array {
     $v = setting('vk', []);
     return ['token' => (string)($v['token'] ?? ''), 'group' => (int)($v['group'] ?? 0), 'groupName' => (string)($v['groupName'] ?? ''),
         'hour' => max(6, min(22, (int)($v['hour'] ?? 10))), 'on' => !empty($v['on']),
-        // Set when the key came from «Подключить через ВКонтакте»: how to renew it and whose it is.
-        'refresh' => (string)($v['refresh'] ?? ''), 'deviceId' => (string)($v['deviceId'] ?? ''), 'clientId' => (string)($v['clientId'] ?? ''),
-        'expiresAt' => (int)($v['expiresAt'] ?? 0), 'userName' => (string)($v['userName'] ?? '')];
+        // Whose key it is (a person's key; a community key has no name here).
+        'userName' => (string)($v['userName'] ?? '')];
 }
 
 /** What a VK error number means here, in plain words (VK's own text stays next to it). */
 function vk_hint(int $code): string {
     return [
-        5 => 'Ключ больше не действует. Подключите ВКонтакте заново.',
+        5 => 'Ключ больше не действует (сменили пароль или отозвали доступ). Получите новый ключ по ссылке в админке.',
         15 => 'У этой страницы нет права публиковать в сообществе: нужен администратор или редактор.',
-        27 => 'Ключ сообщества не может публиковать на стене — так устроен ВКонтакте. Нажмите «Подключить через ВКонтакте» и войдите как администратор сообщества.',
+        27 => 'Это ключ сообщества, а он не может публиковать на стене — так устроен ВКонтакте. Получите ключ администратора по ссылке в админке.',
+        1051 => 'Этот ключ ВКонтакте разрешает только вход на сайты, публиковать им нельзя. Получите ключ по ссылке в админке.',
         214 => 'Публикация на стене запрещена настройками сообщества.',
         220 => 'Слишком много публикаций за сутки.',
     ][$code] ?? '';
@@ -52,96 +51,8 @@ function vk_call(string $method, array $params, string $token): array {
     return is_array($j['response']) ? $j['response'] : ['value' => $j['response']];
 }
 
-// ---------- VK ID: «Подключить через ВКонтакте» ----------
-function vk_b64url(string $bin): string { return rtrim(strtr(base64_encode($bin), '+/', '-_'), '='); }
-function vk_redirect_uri(): string {
-    // The API does not load seo.php, so the site's address is worked out here.
-    $host = (string)($_SERVER['HTTP_HOST'] ?? 'treas.su');
-    if (!preg_match('/^[a-z0-9.-]+(:\d{1,5})?$/i', $host)) $host = 'treas.su';
-    return (is_https() ? 'https://' : 'http://') . strtolower($host) . rtrim(str_replace('\\', '/', dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/cook/api/index.php'))), '/') . '/vk-callback.php';
-}
-/** POST to VK ID (the key exchange); the answer or a clear error. */
-function vk_id_post(array $params): array {
-    if (!function_exists('curl_init')) throw new ApiError(503, 'provider', 'На хостинге нет расширения PHP curl.');
-    $ch = curl_init(VK_ID . 'oauth2/auth');
-    curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => http_build_query($params), CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CONNECTTIMEOUT => 8, CURLOPT_TIMEOUT => 20, CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded']]);
-    $body = curl_exec($ch);
-    $err = curl_error($ch);
-    curl_close($ch);
-    if ($body === false) throw new ApiError(504, 'vk', 'VK ID не ответил: ' . $err);
-    $j = json_decode((string)$body, true);
-    if (!is_array($j)) throw new ApiError(502, 'vk', 'VK ID ответил непонятно.');
-    if (isset($j['error']) || empty($j['access_token'])) throw new ApiError(400, 'vk', 'VK ID: ' . (string)($j['error_description'] ?? $j['error'] ?? 'нет ключа в ответе'));
-    return $j;
-}
-/** Keeps the keys VK ID gave (the short one, the one that renews it, the device they belong to). */
-function vk_store_tokens(array $s, array $j, string $deviceId): void {
-    $s['token'] = (string)$j['access_token'];
-    if (!empty($j['refresh_token'])) $s['refresh'] = (string)$j['refresh_token'];
-    if ($deviceId !== '') $s['deviceId'] = $deviceId;
-    $s['expiresAt'] = now_ms() + max(60, (int)($j['expires_in'] ?? 3600)) * 1000;
-    set_setting('vk', $s);
-}
-/** The key to post with: renewed first when it came from VK ID and is about to run out. */
-function vk_token(): string {
-    $s = vk_settings();
-    if ($s['refresh'] === '' || $s['expiresAt'] - 300000 > now_ms()) return $s['token'];
-    try {
-        $j = vk_id_post(['grant_type' => 'refresh_token', 'refresh_token' => $s['refresh'], 'client_id' => $s['clientId'],
-            'device_id' => $s['deviceId'], 'state' => bin2hex(random_bytes(16))]);
-    } catch (ApiError $e) {
-        throw new ApiError(400, 'vk', 'Подключение к ВКонтакте устарело — нажмите «Подключить через ВКонтакте» ещё раз. (' . $e->getMessage() . ')');
-    }
-    vk_store_tokens($s, $j, $s['deviceId']);
-    return (string)$j['access_token'];
-}
-/** Admin: the address of VK's sign-in page (the check words for the way back are kept here for 15 minutes). */
-function admin_vk_connect(array $b): void {
-    $client = trim((string)($b['clientId'] ?? ''));
-    if (!preg_match('/^\d{4,12}$/', $client)) throw new ApiError(400, 'validation', 'ID приложения — это число из настроек приложения VK ID.');
-    $verifier = vk_b64url(random_bytes(48));
-    $state = bin2hex(random_bytes(16));
-    set_setting('vk_pending', ['state' => $state, 'verifier' => $verifier, 'clientId' => $client, 'at' => now_ms()]);
-    $s = vk_settings(); $s['clientId'] = $client; set_setting('vk', $s);
-    send_json(['url' => VK_ID . 'authorize?' . http_build_query([
-        'response_type' => 'code', 'client_id' => $client, 'redirect_uri' => vk_redirect_uri(), 'state' => $state,
-        'code_challenge' => vk_b64url(hash('sha256', $verifier, true)), 'code_challenge_method' => 'S256', 'scope' => 'wall groups',
-    ], '', '&', PHP_QUERY_RFC3986), 'redirect' => vk_redirect_uri()]);
-}
-/** VK sends the owner back here after the sign-in. The admin cookie does not come along (it is SameSite=Strict), so
- *  the check word is what proves the way back belongs to the sign-in started from the admin panel. */
-function vk_callback(): void {
-    $page = function (bool $ok, string $text): void {
-        http_response_code($ok ? 200 : 400);
-        header('Content-Type: text/html; charset=utf-8');
-        header('Cache-Control: no-store');
-        header('Referrer-Policy: no-referrer');
-        echo '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ВКонтакте</title>'
-            . '<body style="font:18px/1.5 system-ui,sans-serif;max-width:520px;margin:48px auto;padding:0 16px;color:#2b211a;background:#fbf7f1">'
-            . '<h1 style="font-size:24px">' . ($ok ? 'ВКонтакте подключён' : 'Не получилось подключить') . '</h1><p>' . htmlspecialchars($text) . '</p>'
-            . '<p><a href="../admin/insights.html#vk-title" style="color:#c2562a">Вернуться в админ-панель</a></p></body>';
-    };
-    $p = setting('vk_pending', []);
-    $state = (string)($_GET['state'] ?? '');
-    if (!$p || $state === '' || !hash_equals((string)$p['state'], $state) || now_ms() - (int)$p['at'] > 15 * 60000) { $page(false, 'Ссылка устарела. Нажмите «Подключить через ВКонтакте» в админ-панели ещё раз.'); return; }
-    set_setting('vk_pending', null);
-    if (isset($_GET['error'])) { $page(false, 'ВКонтакте ответил: ' . mb_substr((string)($_GET['error_description'] ?? $_GET['error']), 0, 200)); return; }
-    $code = (string)($_GET['code'] ?? '');
-    $device = (string)($_GET['device_id'] ?? '');
-    if ($code === '' || strlen($code) > 2000 || strlen($device) > 400) { $page(false, 'ВКонтакте не прислал код.'); return; }
-    try {
-        $j = vk_id_post(['grant_type' => 'authorization_code', 'code' => $code, 'code_verifier' => (string)$p['verifier'], 'client_id' => (string)$p['clientId'],
-            'device_id' => $device, 'redirect_uri' => vk_redirect_uri(), 'state' => bin2hex(random_bytes(16))]);
-        $s = vk_settings();
-        $s['clientId'] = (string)$p['clientId'];
-        $name = '';
-        try { $u = vk_call('users.get', [], (string)$j['access_token']); $name = trim(($u[0]['first_name'] ?? '') . ' ' . ($u[0]['last_name'] ?? '')); } catch (Throwable $e) {}
-        $s['userName'] = $name;
-        vk_store_tokens($s, $j, $device);
-    } catch (Throwable $e) { $page(false, $e->getMessage()); return; }
-    $page(true, 'Публикации пойдут от имени сообщества' . ($name !== '' ? ' (вход: ' . $name . ')' : '') . '. Вернитесь в админ-панель и нажмите «Опубликовать сейчас», чтобы проверить.');
-}
+/** The key to post with. */
+function vk_token(): string { return vk_settings()['token']; }
 
 /** «https://vk.com/club123», «public123», «-123», «123» or a short name → the community's number and name. */
 function vk_resolve_group(string $input, string $token): array {
@@ -174,7 +85,7 @@ function seo_plural_vk(int $n, string $one, string $few, string $many): string {
 /** Posts today's dish; returns the post's number. */
 function vk_post_today(): int {
     $s = vk_settings();
-    if ($s['token'] === '' || !$s['group']) throw new ApiError(400, 'validation', 'Сначала подключите ВКонтакте и укажите сообщество.');
+    if ($s['token'] === '' || !$s['group']) throw new ApiError(400, 'validation', 'Сначала вставьте ключ и укажите сообщество.');
     $t = recipe_of_day();
     if (!$t) throw new ApiError(404, 'recipe', 'Нет рецепта дня: в каталоге нет блюд с фото.');
     $r = vk_call('wall.post', ['owner_id' => -$s['group'], 'from_group' => 1, 'message' => vk_post_text($t), 'attachments' => $t['url']], vk_token());
@@ -199,8 +110,7 @@ function vk_daily(): void {
 function admin_vk_status(): void {
     $s = vk_settings();
     send_json(['group' => $s['group'], 'groupName' => $s['groupName'], 'hour' => $s['hour'], 'on' => $s['on'],
-        'hasToken' => $s['token'] !== '', 'viaVkId' => $s['refresh'] !== '', 'userName' => $s['userName'], 'clientId' => $s['clientId'],
-        'redirect' => vk_redirect_uri(), 'last' => setting('vk_last', null)]);
+        'hasToken' => $s['token'] !== '', 'userName' => $s['userName'], 'last' => setting('vk_last', null)]);
 }
 function admin_vk_save(array $b): void {
     $s = vk_settings();
@@ -209,14 +119,14 @@ function admin_vk_save(array $b): void {
         // A whole address from the browser bar (…#access_token=…&expires_in=0…) is fine too.
         if (preg_match('/access_token=([A-Za-z0-9._\-]+)/', $token, $m)) $token = $m[1];
         if (!preg_match('/^[A-Za-z0-9._\-]{20,400}$/', $token)) throw new ApiError(400, 'validation', 'Ключ доступа выглядит неправильно — скопируйте его целиком.');
-        // A key pasted by hand is not renewed: the VK ID one is dropped.
-        $s['token'] = $token; $s['refresh'] = ''; $s['expiresAt'] = 0; $s['userName'] = '';
+        // Whose key: a person's key answers users.get with that person (a community key does not).
+        $name = '';
+        try { $u = vk_call('users.get', [], $token); $name = trim(($u[0]['first_name'] ?? '') . ' ' . ($u[0]['last_name'] ?? '')); } catch (Throwable $e) {}
+        $s['token'] = $token; $s['userName'] = $name;
     }
     if (isset($b['group']) && trim((string)$b['group']) !== '') {
-        if ($s['token'] === '') throw new ApiError(400, 'validation', 'Сначала подключите ВКонтакте.');
-        set_setting('vk', $s);
-        $g = vk_resolve_group((string)$b['group'], vk_token());
-        $s = vk_settings(); // the key may have just been renewed
+        if ($s['token'] === '') throw new ApiError(400, 'validation', 'Сначала вставьте ключ.');
+        $g = vk_resolve_group((string)$b['group'], $s['token']);
         $s['group'] = $g['id']; $s['groupName'] = $g['name'];
     }
     if (isset($b['hour'])) $s['hour'] = max(6, min(22, (int)$b['hour']));
