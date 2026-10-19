@@ -201,6 +201,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   return (
     <div className="pb-4">
       <h1 className="pt-2 text-h1 sm:pt-0">{mode === "favorites" ? "Избранное" : "Поиск"}</h1>
+      {mode === "favorites" && view === "saved" && saved.length > 0 && <p className="mt-1 text-body-sm text-ink-soft">Сохранённые рецепты открываются и без интернета — на даче и в магазине.</p>}
 
       <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_400px] lg:gap-4">
         {!bare && <form role="search" onSubmit={(e) => { e.preventDefault(); input.current?.blur(); }} className="relative">

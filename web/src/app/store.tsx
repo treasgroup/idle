@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { PERSONAL_EVENT, personalScorer } from "./personal";
 import { refreshWeather, weatherNow, weatherScore } from "./weather";
+import { useOfflinePhotos } from "./offline";
 import {
   CATALOG_EVENT, DEFAULT_STATE, type EngineState, apiUrl, clearState, initNativeBridge, isNativeApp, loadCatalog, loadIntentModel, loadState,
   recipes, saveState, setTasteScorer, tasteScorer, track, deviceSource, useAccountSync, type SyncApi,
@@ -140,6 +141,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => applyTheme(profile.theme), [profile.theme]);
 
   const sync = useAccountSync(s, ready, online, update);
+  // Photos of the plan, Избранное and the last cooked dishes kept ahead for use without internet (app/offline).
+  useOfflinePhotos(s, ready && catalog.version > 0);
   const wipe = useCallback(async () => {
     // Stop saving first, so the state is not written back after it is cleared.
     saveBroken.current = true;

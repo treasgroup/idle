@@ -23,6 +23,10 @@ function newTopic(text: string, base: Parameters<typeof parseMessage>[1]): boole
   return !!((p.moodChanged && p.mood) || (Array.isArray(p.desiredAdd) && p.desiredAdd.length));
 }
 
+// The empty chat: what can be asked, in turn, in the box itself (people who do not know what to write).
+const CHAT_HINTS = ["Например: курица и картошка", "Например: что-то быстрое на ужин", "Например: суп без мяса", "Например: есть фарш, нет духовки",
+  "Например: что приготовить ребёнку", "Например: сколько варить гречку"];
+
 export function Chat() {
   const { s, toast } = useStore();
   const a = useAssistant();
@@ -131,7 +135,7 @@ export function Chat() {
       <div ref={dock} className="fixed inset-x-0 z-30 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64 lg:border-t-0 lg:bg-transparent lg:bg-gradient-to-t lg:from-paper lg:from-70% lg:to-paper/0 lg:pt-6 lg:backdrop-blur-none" style={{ bottom: "var(--nav-h)" }}>
         <div className="mx-auto max-w-chat xl:max-w-chat-wide px-4 pb-3 pt-2">
           <Composer variant="dock" busy={a.busy} focusKey={focusKey} onSend={(t, o) => send(t, o)}
-            placeholder={has ? undefined : "Например: курица и картошка"} />
+            hints={has ? undefined : CHAT_HINTS} />
         </div>
       </div>
       <PantryPicker open={picker} onClose={() => setPicker(false)} />

@@ -13,6 +13,7 @@ import { goChat } from "../app/chatNav";
 import { goalConditions } from "../app/profile";
 import { seasonalCollection } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
+import { MonthCard } from "../components/MonthCard";
 import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
@@ -133,6 +134,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         </div>
       </div>
       {pwa && <InstallCard pwa={pwa} />}
+      <MonthCard />
 
       <Now />
       <Rescue />

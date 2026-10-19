@@ -8,7 +8,7 @@ import { cue } from "../app/feedback";
 
 const HERO_HINTS = ["Курица и картошка", "Мне грустно — хочу уютного", "Сколько варить яйца?", "Ужин без духовки на 4 человек", "Что приготовить из фарша?"];
 
-export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusKey }: {
+export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusKey, hints }: {
   variant: "hero" | "dock";
   onSend: (text: string, opts: { voice?: boolean }) => void;
   busy?: boolean;
@@ -16,6 +16,8 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
   placeholder?: string;
   /** Changing it moves the focus into the box (the "Спросить Шефа" pill). */
   focusKey?: number;
+  /** Examples shown in turn in the empty box (the chat before the first question). */
+  hints?: string[];
 }) {
   const { server, online, ensureSession, toast } = useStore();
   const [text, setText] = useState("");
@@ -33,12 +35,13 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
     was.current = voice.state;
   }, [voice.state]);
 
-  // Rotating examples in the big box, paused while typing or for people who prefer less motion.
+  // Rotating examples in the big box (and in the empty chat), paused while typing or for people who prefer less motion.
+  const examples = hints ?? (variant === "hero" ? HERO_HINTS : null);
   useEffect(() => {
-    if (variant !== "hero" || focused || text || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setHint((h) => (h + 1) % HERO_HINTS.length), 3500);
+    if (!examples || focused || text || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setHint((h) => (h + 1) % examples.length), 3500);
     return () => clearInterval(t);
-  }, [variant, focused, text]);
+  }, [examples, focused, text]);
 
   // Auto-grow up to 6 lines.
   useEffect(() => {
@@ -88,7 +91,7 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); send(); } }}
-        placeholder={placeholder ?? (hero ? HERO_HINTS[hint] : "Напишите или скажите…")}
+        placeholder={examples ? examples[hint % examples.length] : placeholder ?? "Напишите или скажите…"}
         aria-label="Спросите Шефа"
         {...{ enterkeyhint: "send" }}
         className={cx("min-h-[44px] flex-1 resize-none bg-transparent py-2.5 text-body text-ink outline-none placeholder:text-ink-faint", hero && "sm:text-title sm:font-normal")}
