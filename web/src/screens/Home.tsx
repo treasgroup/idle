@@ -12,6 +12,7 @@ import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { goalConditions } from "../app/profile";
 import { seasonalCollection } from "../app/seasonal";
+import { useWeather, weatherLine } from "../app/weather";
 import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
@@ -86,6 +87,8 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const meal = mealNow();
   const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0);
   const season = seasonalCollection();
+  // Only when «Погода за окном» is on in the profile.
+  const weather = weatherLine(useWeather());
 
   if (profile.simple) return <SimpleHome today={today} />;
 
@@ -99,6 +102,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         <div>
           <p className="text-body-sm text-ink-soft">{greeting()}!</p>
           <h1 className="mt-1 text-h1 sm:text-display">Что приготовим {MEAL_WORD[meal]}?</h1>
+          {weather && <p className="mt-1.5 text-body-sm text-ink-soft">{weather}</p>}
         </div>
         <ProfileButton className="-mr-1.5 lg:hidden" />
       </div>

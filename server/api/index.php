@@ -13,8 +13,9 @@ require __DIR__ . '/_private/barcode.php';
 require __DIR__ . '/_private/ops.php';
 require __DIR__ . '/_private/community.php';
 require __DIR__ . '/_private/vk.php';
+require __DIR__ . '/_private/weather.php';
 
-const VERSION = '0.38.0';
+const VERSION = '0.39.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
 try { config(); } catch (Throwable $e) {}
 $route = isset($_GET['r']) ? (string)$_GET['r'] : '';
@@ -115,6 +116,8 @@ try {
         echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . '}';
     }
     elseif ($route === 'message.send' && $method === 'POST') message_send(read_json_body(8000));
+    elseif ($route === 'weather' && $method === 'GET') weather_now();
+    elseif ($route === 'weather.city' && $method === 'GET') weather_city();
     elseif ($route === 'today' && $method === 'GET') { $t = recipe_of_day(); send_json($t ?? ['error' => 'Нет рецепта'], $t ? 200 : 404); }
     elseif ($route === 'message.replies' && $method === 'POST') message_replies(read_json_body(8000));
     elseif ($route === 'recipe.stats' && $method === 'GET') send_json(['stats' => (object)recipe_stats()]); // recounted at most hourly
@@ -122,6 +125,8 @@ try {
     elseif ($route === 'admin.vk' && $method === 'GET') { require_admin(); admin_vk_status(); }
     elseif ($route === 'admin.vk.save' && $method === 'POST') { require_admin(true); admin_vk_save(read_json_body(4000)); }
     elseif ($route === 'admin.vk.post' && $method === 'POST') { require_admin(true); admin_vk_post(); }
+    elseif ($route === 'admin.vk.connect' && $method === 'POST') { require_admin(true); admin_vk_connect(read_json_body(2000)); }
+    elseif ($route === 'vk.callback' && $method === 'GET') { vk_callback(); }
     elseif ($route === 'admin.recipe' && $method === 'GET') { require_admin(); admin_recipe_get((string)($_GET['id'] ?? '')); }
     elseif ($route === 'admin.recipe.step' && $method === 'POST') { require_admin(true); admin_recipe_step(read_json_body(8000)); }
     elseif ($route === 'thumb' && $method === 'GET') {

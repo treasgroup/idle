@@ -2,12 +2,13 @@
 // Every action with a dish is a signal (opened and read, closed at once, saved, cooked, rated); a dish is a set of
 // traits (the main product, the kind of dish, the cuisine, how long, in the oven…). The traits collect the signals,
 // fading over a month, so a new dish with liked traits comes up even if it was never opened.
-// On top of that: the moment (a weekday evening wants something quick) and variety (not what was cooked yesterday).
+// On top of that: the moment (a weekday evening wants something quick), habits by the day of the week (fish on
+// Thursdays, baking on Sundays — learnt from what was really cooked) and variety (not what was cooked yesterday).
 import { LABELS, courseOf, ingredient, recipeById, shortName, type BookEntry, type Recipe } from "../engine";
 
 export type Signal = "open" | "read" | "bounce" | "save" | "plan" | "cook" | "done" | "liked" | "meh" | "not_this";
 const WEIGHT: Record<Signal, number> = { open: 0.4, read: 0.8, bounce: -0.5, save: 2, plan: 1.5, cook: 1.5, done: 3, liked: 3, meh: -3, not_this: -0.6 };
-interface Sig { id: string; w: number; at: number; f: string[] }
+interface Sig { id: string; w: number; at: number; f: string[]; k?: Signal }
 interface Store { sigs: Sig[]; muted: string[] }
 
 const KEY = "cook-taste-v2";
@@ -62,7 +63,7 @@ export function signal(r: Recipe | undefined | null, kind: Signal): void {
   const s = load();
   const now = Date.now();
   if (s.sigs.some((x) => x.id === r.id && x.w === WEIGHT[kind] && now - x.at < 3600e3)) return;
-  s.sigs.push({ id: r.id, w: WEIGHT[kind], at: now, f: traits(r) });
+  s.sigs.push({ id: r.id, w: WEIGHT[kind], at: now, f: traits(r), k: kind });
   save(s);
 }
 
@@ -81,16 +82,73 @@ export function traitWeights(now = Date.now()): Map<string, number> {
 export const signalCount = (): number => load().sigs.length;
 
 /** «Что я про вас понял»: what comes up more often and what less, in words. */
-export function understood(): { likes: { key: string; label: string }[]; less: { key: string; label: string }[]; count: number } {
+export function understood(): { likes: { key: string; label: string }[]; less: { key: string; label: string }[]; habits: Habit[]; count: number } {
   const w = traitWeights();
   const named = [...w.entries()].map(([key, v]) => ({ key, v, label: traitLabel(key) })).filter((x): x is { key: string; v: number; label: string } => !!x.label);
   const seen = new Set<string>();
   const uniq = (list: typeof named) => list.filter((x) => (seen.has(x.label) ? false : (seen.add(x.label), true)));
   const likes = uniq(named.filter((x) => x.v > 0.6).sort((a, b) => b.v - a.v)).slice(0, 6);
   const less = uniq(named.filter((x) => x.v < -0.6).sort((a, b) => a.v - b.v)).slice(0, 4);
-  return { likes, less, count: load().sigs.length };
+  return { likes, less, habits: habits(), count: load().sigs.length };
 }
-/** «Это не так»: the trait no longer counts (and stays out until the profile is reset). */
+
+// ---------- Habits by the day of the week ----------
+export interface Habit { key: string; days: number[]; when: string; label: string; trait: string }
+const WHEN = ["по воскресеньям", "по понедельникам", "по вторникам", "по средам", "по четвергам", "по пятницам", "по субботам"];
+const GROUPS: { days: number[]; when: string }[] = [
+  ...WHEN.map((when, d) => ({ days: [d], when })),
+  { days: [1, 2, 3, 4, 5], when: "в будни" },
+  { days: [0, 6], when: "в выходные" },
+];
+// Traits a habit can be about (the main product alone is too narrow, «быстрые» on weekday evenings is known anyway).
+const HABIT_KINDS = new Set(["course", "grp", "cuisine", "tag", "time", "app"]);
+const MONDAY = 4 * DAY; // 1970-01-05 was a Monday: weeks are counted from it
+
+/**
+ * What is cooked on which days, from what was really cooked (started, finished, «понравилось») in the last half year:
+ * a day with at least three dishes in at least two different weeks, where a trait comes up in half of them and clearly
+ * more often than on other days. One habit per day at most; a single day wins over «в будни» / «в выходные».
+ */
+export function habits(now = Date.now()): Habit[] {
+  const s = load();
+  const muted = new Set(s.muted);
+  // One dish once a day: started and finished the same evening is one dinner.
+  const seen = new Set<string>();
+  const cooked: { day: number; week: number; f: string[] }[] = [];
+  for (const x of s.sigs) {
+    const strong = x.k ? x.k === "cook" || x.k === "done" || x.k === "liked" : x.w === WEIGHT.done;
+    if (!strong || now - x.at > 183 * DAY) continue;
+    const d = new Date(x.at);
+    const key = x.id + "|" + d.toDateString();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    cooked.push({ day: d.getDay(), week: Math.floor((x.at - d.getTimezoneOffset() * 60e3 - MONDAY) / (7 * DAY)), f: x.f.filter((f) => HABIT_KINDS.has(f.slice(0, f.indexOf(":")))) });
+  }
+  if (cooked.length < 5) return [];
+  const share = (list: typeof cooked, f: string) => list.filter((c) => c.f.includes(f)).length / list.length;
+  const out: Habit[] = [];
+  const taken = new Set<number>();
+  for (const g of GROUPS) {
+    if (g.days.some((d) => taken.has(d))) continue;
+    const mine = cooked.filter((c) => g.days.includes(c.day));
+    const rest = cooked.filter((c) => !g.days.includes(c.day));
+    if (mine.length < 3 || new Set(mine.map((c) => c.week)).size < 2 || rest.length < 2) continue;
+    let best: { f: string; lift: number } | null = null;
+    for (const f of new Set(mine.flatMap((c) => c.f))) {
+      const key = "habit:" + g.days.join("") + ":" + f;
+      if (muted.has(key) || muted.has(f) || !traitLabel(f)) continue;
+      const here = share(mine, f), there = share(rest, f);
+      if (here < 0.5 || here < there + 0.3 || here < there * 1.6) continue;
+      const lift = here - there;
+      if (!best || lift > best.lift) best = { f, lift };
+    }
+    if (!best) continue;
+    out.push({ key: "habit:" + g.days.join("") + ":" + best.f, days: g.days, when: g.when, label: traitLabel(best.f)!, trait: best.f });
+    for (const d of g.days) taken.add(d);
+  }
+  return out;
+}
+/** «Это не так»: the trait (or a day's habit, «habit:5:course:baking») no longer counts — until the profile is reset. */
 export function forgetTrait(key: string): void { const s = load(); if (!s.muted.includes(key)) s.muted.push(key); save(s); }
 export function resetTaste(): void { save({ sigs: [], muted: [] }); }
 
@@ -116,6 +174,8 @@ export function personalScorer(book: BookEntry[], now = new Date()): (r: Recipe)
   const recentIds = new Set(recent.map((b) => b.recipeId));
   // The main product of what was cooked in the last two days: «курица вчера» — today a little less курица.
   const recentMain = new Set(recent.filter((b) => now.getTime() - b.at < 2 * DAY).map((b) => recipeById(b.recipeId)?.mainIngredient).filter(Boolean));
+  // Today's habit («по пятницам — выпечка»): such dishes a little higher today.
+  const today = habits(now.getTime()).filter((h) => h.days.includes(now.getDay())).map((h) => h.trait);
   const cache = new Map<string, number>();
   return (r) => {
     const hit = cache.get(r.id);
@@ -128,6 +188,7 @@ export function personalScorer(book: BookEntry[], now = new Date()): (r: Recipe)
     }
     if (weekday && evening) score += r.totalMinutes <= 40 ? 0.6 : r.totalMinutes > 90 ? -0.8 : 0;
     else if (!weekday && (r.tags.includes("cozy") || courseOf(r) === "baking")) score += 0.3;
+    if (today.length) { const f = traits(r); if (today.some((t) => f.includes(t))) score += 0.7; }
     if (recentIds.has(r.id)) score -= 3;
     else if (r.mainIngredient && recentMain.has(r.mainIngredient)) score -= 0.5;
     score += jitter(r.id, day);

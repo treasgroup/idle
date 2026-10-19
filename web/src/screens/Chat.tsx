@@ -126,7 +126,8 @@ export function Chat() {
         )}
       </div>
 
-      <div ref={dock} className="fixed inset-x-0 z-30 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64" style={{ bottom: "var(--nav-h)" }}>
+      {/* Wide screens: no line above the input — the conversation fades out under it, as in today's messengers. */}
+      <div ref={dock} className="fixed inset-x-0 z-30 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64 lg:border-t-0 lg:bg-transparent lg:bg-gradient-to-t lg:from-paper lg:from-70% lg:to-paper/0 lg:pt-6 lg:backdrop-blur-none" style={{ bottom: "var(--nav-h)" }}>
         <div className="mx-auto max-w-chat px-4 pb-3 pt-2">
           <ConditionBar />
           <Composer variant="dock" busy={a.busy} focusKey={focusKey} onSend={(t, o) => send(t, o)}

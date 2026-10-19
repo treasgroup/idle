@@ -1,7 +1,7 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles,
+  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -17,6 +17,8 @@ import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
 import { WriteUs } from "../components/WriteUs";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
+import { WeatherSheet, degrees } from "../components/WeatherSheet";
+import { usePlace, useWeather } from "../app/weather";
 import { useMyMessages } from "../app/myMessages";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
@@ -43,6 +45,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [writeUs, setWriteUs] = useState(false);
   const [tasteOpen, setTasteOpen] = useState(false);
   const understoodNow = useUnderstood();
+  const [weatherOpen, setWeatherOpen] = useState(false);
+  const place = usePlace(), weather = useWeather();
   const mine = useMyMessages();
   const prefs = s.preferences;
   const bookCount = new Set(s.book.map((b) => b.recipeId)).size;
@@ -108,6 +112,9 @@ export function Profile({ pwa }: { pwa: Pwa }) {
               <Row icon={<Sparkles size={18} />} title="Что я про вас понял"
                 hint={understoodNow.likes.length ? "Чаще: " + understoodNow.likes.slice(0, 3).map((x) => x.label).join(", ") : "Пока присматриваюсь к вашим вкусам"}
                 onClick={() => setTasteOpen(true)} />
+              <Row icon={<CloudSun size={18} />} title="Погода за окном"
+                hint={place ? place.name + (weather ? " · " + degrees(weather.t) : "") + " — учитываю при подборе" : "Выключено. В холод — супы, в жару — лёгкое"}
+                onClick={() => setWeatherOpen(true)} />
               <Row icon={<Ban size={18} />} title="Ограничения" hint={excludedHint || "Ничего не исключено"} onClick={() => setSheet("limits")} />
               <Row icon={<Utensils size={18} />} title="Техника" hint={prefs.appliances.map((a) => (LABELS[a] ?? a).toLowerCase()).join(", ")} onClick={() => setSheet("kitchen")} />
             </div>
@@ -204,6 +211,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
       <TasteSheet open={tasteOpen} onClose={() => setTasteOpen(false)} />
+      <WeatherSheet open={weatherOpen} onClose={() => setWeatherOpen(false)} />
       <Sheet open={sheet === "docs"} title="Документы и мои данные" onClose={close}>
         <div className="grid gap-1">
           {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (

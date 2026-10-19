@@ -1,8 +1,10 @@
 // Ways to send a link or a text: the phone's share sheet, messengers, copy, print. Used by the recipe, План and Покупки.
 import { Link2, Printer, Send } from "lucide-react";
 import { SHARE_TARGETS, canShare, copyText, shareLink } from "../engine";
+import { useStore } from "../app/store";
 
 export function ShareOptions({ text, title, url, onDone, onPrint }: { text: string; title: string; url?: string; onDone: (copied?: boolean) => void; onPrint?: () => void }) {
+  const { toast } = useStore();
   return (
     <div className="grid gap-2">
       {canShare() && (
@@ -12,9 +14,15 @@ export function ShareOptions({ text, title, url, onDone, onPrint }: { text: stri
       )}
       <div className="grid grid-cols-2 gap-2">
         {SHARE_TARGETS.map((t) => (
-          <button key={t.id} className="btn-outline" onClick={async () => {
+          <button key={t.id} className="btn-outline" onClick={() => {
+            // ВКонтакте with a link: its own «Поделиться» window (to a friend or on the wall), with the link's picture.
+            if (t.id === "vk" && url) {
+              window.open("https://vk.com/share.php?url=" + encodeURIComponent(url) + "&title=" + encodeURIComponent(title), "_blank", "noopener");
+              return onDone();
+            }
             const l = shareLink(t.id, text);
-            if (l.copyFirst) await copyText(text);
+            // Copied in the same tap (a browser forgets the tap after a page opens), and said so.
+            if (l.copyFirst) { void copyText(text); toast("Текст скопирован — вставьте его в сообщение"); }
             window.open(l.url, "_blank", "noopener");
             onDone();
           }}>{t.label}{t.id === "whatsapp" && "*"}</button>

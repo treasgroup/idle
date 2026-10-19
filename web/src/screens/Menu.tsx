@@ -134,45 +134,44 @@ export function Menu() {
             <button className="btn-outline" onClick={() => (weeks.length ? setAgain(true) : make())}><RefreshCw size={18} />Составить заново</button>
           </div>
 
-          {/* The week as one calm list: a row per dish, the day written small above its name. */}
-          <ul className="card mt-6 divide-y divide-line overflow-hidden">
+          {/* The week in one column, a block per day: the day as a heading, its dishes in a card under it. */}
+          <div className="mt-6 grid gap-5">
             {days.map((d) => (
-              <li key={d.date} aria-label={dayLabel(d.date)}>
+              <section key={d.date} aria-label={dayLabel(d.date)}>
+                <h3 className={cx("mb-2 px-1 text-body font-semibold", d.date === today && "text-brand")}>{dayLabel(d.date)}</h3>
                 {d.items.length === 0 ? (
-                  <div className="px-3 py-3">
-                    <span className={cx("label block", d.date === today && "text-brand")}>{dayLabel(d.date)}</span>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
-                      <button className="btn-outline h-11" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={16} />Из рецептов</button>
-                    </div>
+                  <div className="card flex flex-wrap gap-2 p-3">
+                    <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
+                    <button className="btn-outline h-11" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={16} />Из рецептов</button>
                   </div>
-                ) : d.items.map((it, n) => {
-                  const r = recipeById(it.recipeId);
-                  if (!r) return null;
-                  const meal = (it.meal ?? "dinner") !== "dinner" ? MEAL_LABELS[it.meal!] : "";
-                  return (
-                    <div key={n} className={cx("flex items-center gap-2 py-2 pl-2 pr-1", n > 0 && "border-t border-line")}>
-                      <button className="flex min-w-0 flex-1 items-center gap-3 rounded-input text-left" onClick={() => openRecipe(r)}>
-                        <RecipeImage recipe={r} className="h-14 w-14 shrink-0" />
-                        <span className="min-w-0">
-                          <span className={cx("block text-caption", d.date === today ? "font-semibold text-brand" : "text-ink-soft")}>
-                            {n === 0 ? dayLabel(d.date) : ""}{meal ? (n === 0 ? " · " : "") + meal : ""}
-                          </span>
-                          <span className="line-clamp-2 text-body-sm font-semibold leading-snug">{r.title}</span>
-                          <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : formatMinutes(r.totalMinutes)}</span>
-                        </span>
-                      </button>
-                      {/* One clear button per dish: replace, remove and the day's actions are inside. */}
-                      {/* Phones: just the pencil (the row has no room for the word next to a long day and dish). */}
-                      <button className="inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-small text-ink-soft hover:bg-sunken" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Изменить: " + r.title}>
-                        <Pencil size={18} aria-hidden /><span className="hidden sm:inline">Изменить</span>
-                      </button>
-                    </div>
-                  );
-                })}
-              </li>
+                ) : (
+                  <div className={cx("card divide-y divide-line overflow-hidden", d.date === today && "border-brand/40")}>
+                    {d.items.map((it, n) => {
+                      const r = recipeById(it.recipeId);
+                      if (!r) return null;
+                      const meal = (it.meal ?? "dinner") !== "dinner" ? MEAL_LABELS[it.meal!] : "";
+                      return (
+                        <div key={n} className="flex items-center gap-2 py-2 pl-2 pr-1">
+                          <button className="flex min-w-0 flex-1 items-center gap-3 rounded-input text-left" onClick={() => openRecipe(r)}>
+                            <RecipeImage recipe={r} className="h-14 w-14 shrink-0" />
+                            <span className="min-w-0">
+                              {meal && <span className="block text-caption text-ink-soft">{meal}</span>}
+                              <span className="line-clamp-2 text-body-sm font-semibold leading-snug">{r.title}</span>
+                              <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : formatMinutes(r.totalMinutes)}</span>
+                            </span>
+                          </button>
+                          {/* One clear button per dish: replace, remove and the day's actions are inside. Phones: just the pencil. */}
+                          <button className="inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-small text-ink-soft hover:bg-sunken" onClick={() => setItemMenu({ date: d.date, index: n })} aria-label={"Изменить: " + r.title}>
+                            <Pencil size={18} aria-hidden /><span className="hidden sm:inline">Изменить</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
             ))}
-          </ul>
+          </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {days.some((d) => !d.items.length) && <button className="btn-ghost" onClick={fill}><Plus size={18} />Заполнить пустые дни</button>}
             {/* A week that went well: keep it and repeat it later from «Составить заново». */}

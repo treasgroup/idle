@@ -1,5 +1,5 @@
 // «Что я про вас понял»: what the service has learnt from what the person opens, cooks and rates — in words,
-// each with «это не так», and «начать заново». Everything here lives only on this device.
+// habits by the day of the week, each with «это не так», and «начать заново». Everything here lives only on this device.
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { forgetTrait, resetTaste, understood, PERSONAL_EVENT } from "../app/personal";
@@ -35,12 +35,14 @@ export function TasteSheet({ open, onClose }: { open: boolean; onClose: () => vo
     <Sheet open={open} title="Что я про вас понял" onClose={onClose}
       footer={u.count > 0 ? <button className="btn-ghost w-full" onClick={reset}>Начать заново</button> : undefined}>
       <p className="text-body-sm text-ink-soft">Учусь по тому, что вы открываете, готовите и оцениваете, — и подбираю похожее. Хранится только на этом телефоне.</p>
-      {u.likes.length === 0 && u.less.length === 0 ? (
+      {u.likes.length === 0 && u.less.length === 0 && u.habits.length === 0 ? (
         <p className="mt-4 rounded-input bg-sunken px-4 py-3 text-body-sm">Пока присматриваюсь. Открывайте рецепты, готовьте и нажимайте «Понравилось» — через несколько блюд здесь появится, что вы любите.</p>
       ) : (
         <>
           {u.likes.length > 0 && <><h3 className="mt-5 text-title">Чаще предлагаю</h3>{chips(u.likes, "border-herb/40 bg-herb-soft")}</>}
           {u.less.length > 0 && <><h3 className="mt-5 text-title">Реже предлагаю</h3>{chips(u.less, "border-line bg-card")}</>}
+          {u.habits.length > 0 && <><h3 className="mt-5 text-title">По дням недели</h3>
+            {chips(u.habits.map((h) => ({ key: h.key, label: h.when[0].toUpperCase() + h.when.slice(1) + " — " + h.label })), "border-line bg-card")}</>}
           <p className="mt-4 text-caption text-ink-soft">Нажмите на ✕, если это не так, — перестану это учитывать.</p>
         </>
       )}

@@ -2,6 +2,7 @@
 // the person's profile, the catalog and the server's capabilities.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { PERSONAL_EVENT, personalScorer } from "./personal";
+import { refreshWeather, weatherNow, weatherScore } from "./weather";
 import {
   CATALOG_EVENT, DEFAULT_STATE, type EngineState, apiUrl, clearState, initNativeBridge, isNativeApp, loadCatalog, loadIntentModel, loadState,
   recipes, saveState, setTasteScorer, tasteScorer, track, deviceSource, useAccountSync, type SyncApi,
@@ -122,10 +123,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   // The taste profile nudges the ranking of every list.
   // The engine's taste score plus what was learnt quietly on this device (app/personal), the moment and variety.
   const [learnt, setLearnt] = useState(0);
-  useEffect(() => { const on = () => setLearnt((n) => n + 1); window.addEventListener(PERSONAL_EVENT, on); return () => window.removeEventListener(PERSONAL_EVENT, on); }, []);
+  useEffect(() => { const on = () => setLearnt((n) => n + 1); window.addEventListener(PERSONAL_EVENT, on); void refreshWeather(); return () => window.removeEventListener(PERSONAL_EVENT, on); }, []);
   useEffect(() => {
-    const base = tasteScorer(s.taste), mine = personalScorer(s.book);
-    setTasteScorer((r) => base(r) + mine(r));
+    // The weather counts only when it is turned on in the profile (weatherNow is null otherwise).
+    const base = tasteScorer(s.taste), mine = personalScorer(s.book), w = weatherNow();
+    setTasteScorer((r) => base(r) + mine(r) + weatherScore(r, w));
   }, [s.taste, s.book, catalog.version, learnt]);
   // Text size: the profile's three steps; the synced «large text» flag from older versions counts as «large».
   const size = profile.textSize !== "m" ? profile.textSize : s.largeText || profile.simple ? "l" : "m";
