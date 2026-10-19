@@ -13,16 +13,35 @@
       .then(function (r) { return r.json().catch(function () { return { error: "Сервер ответил ошибкой " + r.status + "." }; }).then(function (j) { if (!r.ok) throw new Error(j.error || "Сервер не ответил"); return j; }); });
   }
   function copy(text, btn) {
-    var done = function () { var t = btn.textContent; btn.textContent = "Скопировано ✓"; setTimeout(function () { btn.textContent = t; }, 1600); };
+    var done = function () { var t = btn.textContent; btn.textContent = "Текст скопирован ✓"; setTimeout(function () { btn.textContent = t; }, 1600); };
     if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { prompt("Скопируйте текст:", text); });
     else prompt("Скопируйте текст:", text);
+  }
+
+  // The photo into the clipboard as a picture (Ctrl+V in the VK post attaches it); a download when the browser refuses.
+  function copyPhoto(d, btn) {
+    var label = btn.textContent;
+    var done = function (t) { btn.textContent = t; setTimeout(function () { btn.textContent = label; }, 1800); };
+    var download = function () { var a = document.createElement("a"); a.href = d.photoFull; a.download = d.id + ".jpg"; document.body.appendChild(a); a.click(); a.remove(); done("Скачано ✓"); };
+    if (!window.ClipboardItem || !navigator.clipboard || !navigator.clipboard.write) return download();
+    btn.textContent = "Копирую…";
+    // Browsers put only PNG pictures into the clipboard: the JPEG is redrawn as PNG, in full size.
+    var png = fetch(d.photoFull, { credentials: "same-origin" }).then(function (r) { if (!r.ok) throw new Error(); return r.blob(); })
+      .then(function (b) { return createImageBitmap(b); })
+      .then(function (img) {
+        var c = document.createElement("canvas"); c.width = img.width; c.height = img.height;
+        c.getContext("2d").drawImage(img, 0, 0);
+        return new Promise(function (ok, no) { c.toBlob(function (b) { b ? ok(b) : no(); }, "image/png"); });
+      });
+    navigator.clipboard.write([new ClipboardItem({ "image/png": png })]).then(function () { done("Фото скопировано ✓"); }, download);
   }
 
   function weekHtml(week) {
     if (!week.length) return '<p class="muted">Нет рецепта дня: в каталоге нет подходящих блюд с фото.</p>';
     return '<ol class="muted" style="font-size:14px;margin:0 0 12px;padding-left:20px">'
       + "<li>Откройте своё сообщество во ВКонтакте → «Что у вас нового?».</li>"
-      + "<li>Нажмите «Скопировать» у нужного дня и вставьте текст. ВКонтакте сам добавит фото и название из ссылки.</li>"
+      + "<li>Нажмите «Текст» у нужного дня и вставьте его в пост.</li>"
+      + "<li>Нажмите «Фото» и в том же посте нажмите Ctrl+V — фото прикрепится. (Если браузер не даст скопировать, фото скачается — прикрепите его кнопкой с фотоаппаратом.)</li>"
       + "<li>Нажмите на часы («Отложенная запись»), выберите этот день и время — например, 12:00 — и «Поставить в очередь».</li>"
       + "<li>Так все 7 дней — минут пять раз в неделю. Блюда те же, что в виджете приложения в этот день.</li>"
       + "</ol>"
@@ -31,7 +50,7 @@
           + '<img src="' + esc(d.photo) + '" alt="" width="64" height="64" style="border-radius:12px;object-fit:cover;flex:none">'
           + '<div style="flex:1;min-width:0"><b>' + (i === 0 ? "Сегодня" : esc(d.weekday[0].toUpperCase() + d.weekday.slice(1))) + ", " + esc(dayLabel(d.day)) + "</b>"
           + '<div class="muted" style="margin-top:2px">' + esc(d.title) + "</div></div>"
-          + '<button data-copy="' + i + '" style="flex:none">Скопировать</button></div>';
+          + '<div style="display:flex;gap:8px;flex:none;flex-wrap:wrap;justify-content:flex-end"><button data-copy="' + i + '">Текст</button><button data-photo="' + i + '">Фото</button></div></div>';
       }).join("");
   }
 
@@ -60,6 +79,7 @@
       + last
       + "</div></details>";
     Array.prototype.forEach.call(box.querySelectorAll("[data-copy]"), function (b) { b.onclick = function () { copy(week[+b.getAttribute("data-copy")].text, b); }; });
+    Array.prototype.forEach.call(box.querySelectorAll("[data-photo]"), function (b) { b.onclick = function () { copyPhoto(week[+b.getAttribute("data-photo")], b); }; });
     document.getElementById("vk-save").onclick = function () {
       var b = this; b.disabled = true;
       api("admin.vk.save", { group: document.getElementById("vk-group").value, token: document.getElementById("vk-token").value,

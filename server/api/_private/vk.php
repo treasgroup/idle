@@ -141,7 +141,7 @@ function admin_vk_week(): void {
         $ts = strtotime('+' . $i . ' day 12:00');
         $t = recipe_of_day($ts);
         if (!$t) continue;
-        $out[] = ['day' => date('Y-m-d', $ts), 'weekday' => $days[(int)date('w', $ts)], 'title' => $t['title'], 'photo' => $t['photo'], 'url' => $t['url'], 'text' => vk_post_text($t)];
+        $out[] = ['day' => date('Y-m-d', $ts), 'weekday' => $days[(int)date('w', $ts)], 'title' => $t['title'], 'photo' => $t['photo'], 'photoFull' => $t['photoFull'], 'id' => $t['id'], 'url' => $t['url'], 'text' => vk_post_text($t)];
     }
     send_json(['week' => $out]);
 }

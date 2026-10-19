@@ -172,5 +172,7 @@ function recipe_of_day(?int $ts = null): ?array {
     return ['id' => $id, 'title' => (string)$r['title'], 'minutes' => (int)($r['totalMinutes'] ?? 0), 'day' => date('Y-m-d', $ts),
         'summary' => (string)($r['summary'] ?? ''), 'servings' => (int)($r['servings'] ?? 0),
         'photo' => $base . (is_file(thumbs_dir() . '/' . $id . '-' . $v . '.jpg') ? 'photos/s/' . $id . '-' . $v . '.jpg' : 'api/index.php?r=thumb&id=' . rawurlencode($id) . '&v=' . $v),
+        // The photo itself, full size (for a post put by hand: the card copy is too small).
+        'photoFull' => $base . 'photos/' . rawurlencode($id) . '.jpg?v=' . $v,
         'url' => $base . 'recipe/' . $id];
 }
