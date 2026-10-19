@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Clock, Flame, Heart, CalendarPlus, Check } from "lucide-react";
+import { Clock, Flame, Heart, CalendarPlus, Check, Star } from "lucide-react";
 import { formatMinutes, nutritionOf, photoSmallUrl, photoUrl, type Recipe } from "../engine";
 import { dishEmoji, dishTint, dishVariant } from "./dishArt";
 import { useStore } from "../app/store";
+import { ratingLabel, useRatings } from "../app/ratings";
 import { cx } from "./ui";
 
 /** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
@@ -35,6 +36,18 @@ export function RecipeImage({ recipe, className, rounded = "rounded-img", eager,
 
 const DIFF: Record<string, string> = { easy: "просто", medium: "средне", hard: "сложно" };
 
+/** «★ 4,8» in a corner of a card's photo: small, but seen. Only for recipes with reviews. */
+export function RatingBadge({ id, className }: { id: string; className?: string }) {
+  const r = useRatings()[id];
+  if (!r || !r.count) return null;
+  return (
+    <span className={cx("absolute inline-flex items-center gap-1 rounded-full bg-card/95 px-2 py-0.5 text-caption font-semibold text-ink shadow-e1", className)}
+      aria-label={"Оценка " + ratingLabel(r) + " из 5"}>
+      <Star size={12} className="fill-warn text-warn" aria-hidden />{ratingLabel(r)}
+    </span>
+  );
+}
+
 /** "25 мин · 361 ккал · просто" */
 export function RecipeMeta({ recipe, size = "small", showDifficulty = true }: { recipe: Recipe; size?: "small" | "caption"; showDifficulty?: boolean }) {
   const kcal = nutritionOf(recipe).perServing.kcal;
@@ -58,6 +71,7 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
       <button className="relative block w-full text-left sm:w-[42%] sm:shrink-0" onClick={onOpen} aria-label={"Открыть рецепт: " + recipe.title}>
         <RecipeImage recipe={recipe} full className="aspect-video w-full sm:aspect-auto sm:h-full sm:min-h-[200px]" rounded="rounded-none" />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-2.5 py-1 text-micro font-semibold text-ink shadow-e1">Лучше всего подходит</span>
+        <RatingBadge id={recipe.id} className="right-3 top-3" />
       </button>
       <div className="p-4 sm:flex sm:flex-1 sm:flex-col sm:justify-center sm:p-5">
         <button className="block text-left" onClick={onOpen}>
@@ -107,6 +121,7 @@ export function RecipeTile({ recipe, note, onOpen, className }: { recipe: Recipe
     <button onClick={onOpen} className={cx("card relative flex flex-col overflow-hidden text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.99]", className)}>
       <RecipeImage recipe={recipe} className="aspect-[4/3] w-full" rounded="rounded-none" />
       {cooked && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-card/95 px-2 py-0.5 text-caption text-ink shadow-e1"><Check size={12} className="text-herb" aria-hidden />Вы готовили</span>}
+      <RatingBadge id={recipe.id} className="right-2 top-2" />
       <span className="flex flex-1 flex-col p-3">
         <span className="line-clamp-2 min-h-[3rem] text-title leading-snug">{recipe.title}</span>
         {/* Narrow tile: one short line, no icons (time first, calories quietly after it). */}

@@ -186,7 +186,8 @@ export interface ReviewList {
 }
 export const reviewsApi = {
   list: (recipeId: string, sort = "new", offset = 0): Promise<ReviewList> => svc.zm(recipeId, sort, offset),
-  ratings: (): Promise<Record<string, { avg: number; count: number }>> => svc.UA(),
+  // {recipeId: [average, count]} (see app/ratings, which reads it).
+  ratings: (): Promise<Record<string, unknown>> => svc.UA(),
   /** keep: photo URLs of the review to keep; files: new photos (compressed before upload). */
   save: (data: { recipeId: string; rating: number; text: string; author?: string; consent?: boolean; keep: string[]; files: File[] }) => svc.IA(data),
   remove: (id: number) => svc.LA(id),

@@ -165,16 +165,22 @@ function seo_head(array $o): string {
     if (!empty($o['imageAlt'])) $out .= '<meta property="og:image:alt" content="' . h($o['imageAlt']) . "\">\n";
     $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
     foreach (($o['ld'] ?? []) as $ld) $out .= "<script type=\"application/ld+json\">\n" . seo_json($ld) . "\n</script>\n";
-    return $out . '<style>' . seo_css() . "</style>\n</head>\n<body>\n" . seo_header();
+    return $out . '<style>' . seo_css() . "</style>\n</head>\n<body" . (!empty($o['bodyClass']) ? ' class="' . h($o['bodyClass']) . '"' : '') . ">\n" . seo_header();
 }
 function seo_header(): string {
     $p = h(seo_path());
-    return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"32\" height=\"32\"><span>" . h(SEO_SITE) . "</span></a><nav><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_combo_path('')) . "\">По продуктам</a><a class=\"pill\" href=\"$p\">Спросить Шефа</a></nav></div></header>\n<main class=\"wrap\">\n";
+    // Phones: the name and «Открыть приложение»; the other links are in the footer and the breadcrumbs.
+    return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"34\" height=\"34\"><span>" . h(SEO_SITE) . "</span></a>"
+        . "<nav aria-label=\"Разделы\"><a class=\"wide\" href=\"" . h(seo_list_path()) . "\">Рецепты</a><a class=\"wide\" href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a class=\"wide\" href=\"" . h(seo_combo_path('')) . "\">По продуктам</a>"
+        . "<a class=\"pill\" href=\"$p\">Открыть<span class=\"wide\"> приложение</span></a></nav></div></header>\n<main class=\"wrap\">\n";
 }
+/** Подборки' address (collections.php is not loaded on every page). */
+function seo_collection_path_safe(): string { return seo_path() . (seo_pretty() ? 'podborka/' : 'podborka.php'); }
 function seo_footer(): string {
     $p = h(seo_path());
-    return "</main>\n<footer class=\"wrap foot\"><p><a href=\"$p\">«" . h(SEO_SITE) . "»</a> — подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, без регистрации.</p>"
-        . "<p><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a> · <a href=\"" . h(seo_path() . (seo_pretty() ? 'podborka/' : 'podborka.php')) . "\">Подборки</a> · <a href=\"{$p}#info\">Откуда сведения</a> · <a href=\"{$p}#privacy\">Конфиденциальность</a></p></footer>\n</body>\n</html>\n";
+    return "</main>\n<footer class=\"foot\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"28\" height=\"28\" loading=\"lazy\"><span>" . h(SEO_SITE) . "</span></a>"
+        . "<p>Подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, бесплатно и без регистрации.</p>"
+        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
 }
 /** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
@@ -184,32 +190,55 @@ function seo_fonts(): string {
         ;
 }
 function seo_css(): string {
-    return ':root{--bg:#faf7f0;--card:#fff;--ink:#211d1a;--muted:#5c544d;--line:#e8e1d5;--accent:#b7432f;--accent-ink:#fff;--soft:#f8e7e0;color-scheme:only light}'
+    // The app's colours and font; cards and chips as in the app.
+    return ':root{--bg:#faf7f0;--card:#fff;--ink:#211d1a;--muted:#5c544d;--faint:#8a8178;--line:#ebe4d8;--accent:#b7432f;--accent-ink:#fff;--soft:#f8e7e0;--herb:#36703f;--sunken:#f3ede3;--warn:#b7791f;color-scheme:only light}'
         . seo_fonts()
-        . '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}'
-        . 'h1,h2,.brand{letter-spacing:-.015em;font-weight:600}'
-        . 'a{color:var(--accent)}img{max-width:100%;display:block}.wrap{max-width:860px;margin:0 auto;padding:0 16px}'
-        . '.top{background:var(--card);border-bottom:1px solid var(--line)}.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;flex-wrap:wrap}'
-        . '.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink);text-decoration:none}.top nav{display:flex;gap:14px;align-items:center;font-size:15px;white-space:nowrap}'
-        . '@media(max-width:560px){.top .wrap{padding-top:8px;padding-bottom:10px;gap:6px 12px}.top nav{width:100%;justify-content:space-between;gap:10px}}'
-        . '.pill{background:var(--accent);color:var(--accent-ink);padding:8px 16px;border-radius:999px;text-decoration:none;font-weight:600}'
-        . '.crumbs{font-size:14px;color:var(--muted);margin:18px 0 6px}.crumbs a{color:var(--muted)}h1{font-size:clamp(28px,5vw,40px);line-height:1.15;margin:6px 0 10px}main>h1:first-child{margin-top:22px}'
-        . '.lead{font-size:19px;color:var(--muted);margin:0 0 14px}.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}'
-        . '.meta li{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:15px}'
-        . 'figure{margin:0 0 18px}figure img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:20px;background:var(--soft)}@media(min-width:700px){figure img{aspect-ratio:16/10}}figcaption{font-size:13px;color:var(--muted);margin-top:6px}'
-        . '.cta{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin:0 0 26px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}'
-        . '.cta p{margin:0;font-size:15px;color:var(--muted);flex:1 1 260px}.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:700;padding:12px 20px;border-radius:14px}'
-        . 'h2{font-size:24px;margin:30px 0 10px}.note{color:var(--muted);font-size:15px;margin:-4px 0 10px}'
-        . '.ing{list-style:none;padding:0;margin:0;background:var(--card);border:1px solid var(--line);border-radius:18px}.ing li{display:flex;justify-content:space-between;gap:12px;padding:10px 16px;border-top:1px solid var(--line)}.ing li:first-child{border-top:0}.ing b{white-space:nowrap;font-weight:600}.ing small{color:var(--muted)}'
-        . '.steps{counter-reset:s;list-style:none;padding:0;margin:0}.steps li{counter-increment:s;position:relative;padding:0 0 16px 48px}.steps li:before{content:counter(s);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font-weight:700}'
-        . '.tips{background:var(--soft);border-radius:18px;padding:6px 18px}.tips p{margin:10px 0}.faq h3{font-size:17px;margin:16px 0 4px}.faq p{margin:0}'
-        . 'table{border-collapse:collapse;width:100%;max-width:460px;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}td,th{padding:8px 14px;border-top:1px solid var(--line);text-align:left}td.n{text-align:right;font-variant-numeric:tabular-nums}'
-        . '.review{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0 0 10px}.review p{margin:4px 0 0}.stars{color:#c98a12;letter-spacing:1px}'
-        . '.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:12px;list-style:none;padding:0;margin:0}.grid a{display:block;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;text-decoration:none;color:var(--ink);height:100%}'
-        . '.grid a:hover{border-color:var(--accent)}.grid small{display:block;color:var(--muted);font-size:14px}.grid b{display:block;overflow-wrap:break-word}@media(max-width:560px){.grid{gap:8px}.grid a{padding:10px 14px}.grid a:not(:has(img)){display:flex;justify-content:space-between;gap:12px;align-items:baseline}.grid a:not(:has(img)) small{white-space:nowrap}}.grid li{min-width:0}.grid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:10px;margin-bottom:8px;background:var(--soft)}'
-        . '.cats{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 16px;padding:0;list-style:none}.cats a{display:block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 14px;text-decoration:none;color:var(--ink)}.cats a.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}'
-        . '.more{margin:10px 0 0}.foot{color:var(--muted);font-size:14px;border-top:1px solid var(--line);margin-top:40px;padding-top:12px;padding-bottom:30px}'
-        . '@media print{.top,.cta,.foot,.related{display:none}body{background:#fff}}';
+        . '*{box-sizing:border-box}html{scroll-padding-top:80px}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility}'
+        . 'h1,h2,h3,.brand{letter-spacing:-.015em;font-weight:600}'
+        . 'a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}img{max-width:100%;display:block}.wrap{max-width:1120px;margin:0 auto;padding:0 20px}@media(max-width:560px){.wrap{padding:0 16px}}'
+        // Header: one line everywhere, white and calm.
+        . '.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}'
+        . '.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px}'
+        . '.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:18px;color:var(--ink);text-decoration:none;white-space:nowrap}'
+        . '.top nav{display:flex;gap:4px;align-items:center;font-size:15px;white-space:nowrap}.top nav a{color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:999px}.top nav a.wide:hover{background:var(--sunken)}'
+        . '.pill,.top nav a.pill{background:var(--accent);color:var(--accent-ink);padding:9px 18px;border-radius:999px;text-decoration:none;font-weight:600;margin-left:6px}'
+        . '@media(max-width:820px){.top nav a.wide,.pill .wide{display:none}.top .wrap{min-height:58px}.brand{font-size:17px}.pill,.top nav a.pill{padding:8px 14px;font-size:14px}}'
+        . '@media(max-width:360px){.brand span{display:none}}'
+        // Text.
+        . '.crumbs{font-size:14px;color:var(--muted);margin:20px 0 4px}.crumbs a{color:var(--muted);text-decoration:none}.crumbs a:hover{color:var(--accent)}'
+        . 'h1{font-size:clamp(28px,4.6vw,42px);line-height:1.12;margin:8px 0 12px}main>h1:first-child{margin-top:28px}'
+        . '.lead{font-size:18px;color:var(--muted);margin:0 0 16px;max-width:68ch}h2{font-size:clamp(22px,3vw,26px);margin:36px 0 12px;line-height:1.25}h2 a{color:inherit;text-decoration:none}h2 a:hover{color:var(--accent)}.note{color:var(--muted);font-size:15px;margin:-6px 0 12px}'
+        // Chips with the facts.
+        . '.meta{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:0;list-style:none}.meta li{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:15px}.meta svg{width:16px;height:16px;color:var(--muted);flex:none}'
+        . '.rating{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--muted);margin:0 0 10px}.rating b{color:var(--ink)}.stars{color:var(--warn);letter-spacing:1px}'
+        // The recipe: photo and facts side by side on wide screens; ingredients beside the steps.
+        . '.hero{display:grid;gap:20px;margin:6px 0 8px}@media(min-width:900px){.hero{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:center}.hero h1{margin-top:0}}'
+        . 'figure{margin:0}figure img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:24px;background:var(--soft)}figcaption{font-size:13px;color:var(--faint);margin-top:6px}'
+        . '.go{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}.go p{margin:0;font-size:14px;color:var(--muted);flex:1 1 220px}'
+        . '.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;padding:13px 22px;border-radius:999px;min-height:48px}.btn:hover{filter:brightness(1.06)}'
+        . '.cols{display:grid;gap:8px 40px}@media(min-width:900px){.cols{grid-template-columns:340px minmax(0,1fr)}.cols aside{position:sticky;top:88px;align-self:start}}'
+        . '.ing{list-style:none;padding:0;margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}.ing li{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid var(--line)}.ing li:first-child{border-top:0}.ing b{white-space:nowrap;font-weight:600}.ing small{color:var(--muted)}'
+        . '.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:10px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 60px;background:var(--card);border:1px solid var(--line);border-radius:18px}.steps li:before{content:counter(s);position:absolute;left:14px;top:12px;width:32px;height:32px;border-radius:50%;background:var(--soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:15px}'
+        . '.tips{background:var(--soft);border-radius:20px;padding:6px 18px}.tips p{margin:12px 0}'
+        . '.faq details{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:0 0 8px;padding:0 16px}.faq summary{cursor:pointer;font-weight:600;padding:13px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";color:var(--muted);font-weight:400;font-size:22px;line-height:1}.faq details[open] summary:after{content:"–"}.faq details p{margin:0 0 14px;color:var(--muted)}'
+        . 'table{border-collapse:separate;border-spacing:0;width:100%;max-width:460px;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}td,th{padding:9px 16px;border-top:1px solid var(--line);text-align:left}tr:first-child td{border-top:0}td.n{text-align:right;font-variant-numeric:tabular-nums}'
+        . '.review{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px 16px;margin:0 0 10px}.review p{margin:4px 0 0}'
+        // Cards: always a picture (the photo, or the kind of dish drawn), then the title and the facts.
+        . '.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;list-style:none;padding:0;margin:0}@media(min-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}}@media(min-width:1000px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}'
+        . '.grid li{min-width:0}.card{display:flex;flex-direction:column;height:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;text-decoration:none;color:var(--ink);transition:border-color .15s,transform .15s}.card:hover{border-color:#d9cdbb;transform:translateY(-1px)}'
+        . '.pic{position:relative;aspect-ratio:4/3;background:var(--sunken)}.pic img{width:100%;height:100%;object-fit:cover}.pic .art{position:absolute;inset:0;display:grid;place-items:center;font-size:46px;background:radial-gradient(120% 120% at 30% 15%,#fbeee6 0%,#f3e2d3 100%)}'
+        . '.pic .art:before{content:"";position:absolute;width:62%;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 4px 14px rgba(60,30,10,.1)}.pic .art span{position:relative}'
+        . '.pic .score{position:absolute;right:8px;top:8px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.95);border-radius:999px;padding:2px 9px;font-size:13px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}.pic .score i{color:var(--warn);font-style:normal}'
+        . '.card b{display:block;padding:10px 12px 0;font-weight:600;font-size:16px;line-height:1.3;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.card small{display:block;padding:4px 12px 12px;color:var(--muted);font-size:14px;margin-top:auto}'
+        . '@media(max-width:560px){.grid{gap:10px}.card b{font-size:15px;padding:8px 10px 0}.card small{padding:3px 10px 10px;font-size:13px}}'
+        . '.more{margin:14px 0 0}.more a{font-weight:600;text-decoration:none}'
+        // Chips to choose a section; «Спросить Шефа» as a quiet card.
+        . '.cats{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 18px;padding:0;list-style:none}.cats a{display:block;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 14px;text-decoration:none;color:var(--ink);font-size:15px}.cats a:hover{border-color:#d9cdbb}.cats a.on{background:var(--ink);color:#fff;border-color:var(--ink)}.cats small{color:var(--faint);font-size:13px;margin-left:4px}.cats a.on small{color:rgba(255,255,255,.7)}'
+        . '.cta{background:var(--soft);border-radius:22px;padding:18px 20px;margin:4px 0 24px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}.cta p{margin:0;font-size:16px;flex:1 1 260px}'
+        // Phones, recipe page: «Готовить по шагам» always at hand.
+        . '.dock{display:none}@media(max-width:899px){.go{display:none}.dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:10px;align-items:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.95);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line)}.dock .btn{flex:1}body.has-dock{padding-bottom:84px}}'
+        . '.foot{margin-top:56px;border-top:1px solid var(--line);background:var(--card);color:var(--muted);font-size:14px;padding:24px 0 36px}.foot p{margin:8px 0 12px;max-width:60ch}.foot nav{display:flex;flex-wrap:wrap;gap:6px 18px}.foot nav a{color:var(--muted);text-decoration:none}.foot nav a:hover{color:var(--accent)}'
+        . '@media print{.top,.cta,.foot,.related,.dock,.go{display:none}body{background:#fff}}';
 }
 
 // ---------- recipe.php ----------
@@ -284,45 +313,61 @@ function seo_recipe_page(string $id): void {
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: public, max-age=300');
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', max((int)$r['_mtime'], $photo['mtime'] ?? 0)) . ' GMT');
-    echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'ogTitle' => (string)$r['title'], 'description' => $desc, 'canonical' => $canonical, 'ogType' => 'article',
+    echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'ogTitle' => (string)$r['title'], 'description' => $desc, 'canonical' => $canonical, 'ogType' => 'article', 'bodyClass' => 'has-dock',
         'image' => $image, 'imageW' => $photo['w'] ?? null, 'imageH' => $photo['h'] ?? null, 'imageAlt' => $photo ? (string)$r['title'] : null,
         'ld' => array_merge([$ld, $crumbs], ($faqLd = seo_faq_ld(seo_recipe_faq($r, $kcal, $servings))) ? [$faqLd] : [])]);
 
     $app = h(seo_app_path($id));
+    $icon = [
+        'clock' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
+        'hand' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8"/></svg>',
+        'users' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+        'level' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20v-4M10 20v-8M16 20V8M22 20V4"/></svg>',
+        'flame' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+    ];
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_list_path()) . '">Рецепты</a> › <a href="' . h(seo_list_path($course)) . '">' . h(SEO_COURSES[$course][0]) . "</a></nav>\n";
-    echo '<article><h1>' . h($r['title']) . "</h1>\n";
+    $meta = [[$icon['clock'], 'Всего ' . seo_minutes((int)($r['totalMinutes'] ?? 0))]];
+    if (!empty($r['activeMinutes']) && (int)$r['activeMinutes'] < (int)$r['totalMinutes']) $meta[] = [$icon['hand'], 'у плиты ' . seo_minutes((int)$r['activeMinutes'])];
+    $meta[] = [$icon['users'], $servings . ' ' . seo_plural($servings, 'порция', 'порции', 'порций')];
+    if (isset(SEO_DIFFICULTY[$r['difficulty'] ?? ''])) $meta[] = [$icon['level'], SEO_DIFFICULTY[$r['difficulty']]];
+    if ($kcal) $meta[] = [$icon['flame'], $kcal['kcal'] . ' ккал на порцию'];
+    // Top: the photo and, beside it on a wide screen, the name, the mark, what the dish is, the facts and «Готовить по шагам».
+    echo '<article><div class="hero">';
+    if ($photo) echo '<figure><img src="' . h($photo['path']) . '" alt="' . h($r['title']) . '"' . ($photo['w'] ? ' width="' . (int)$photo['w'] . '" height="' . (int)$photo['h'] . '"' : '') . ' fetchpriority="high">' . ($photo['real'] ? '' : '<figcaption>Иллюстрация создана нейросетью по описанию рецепта и показывает примерную подачу.</figcaption>') . "</figure>\n";
+    echo '<div><h1>' . h($r['title']) . "</h1>\n";
+    if ($rev['summary']['count'] > 0) {
+        $avg = (float)$rev['summary']['avg'];
+        echo '<p class="rating"><span class="stars" aria-hidden="true">' . str_repeat('★', (int)round($avg)) . str_repeat('☆', 5 - (int)round($avg)) . '</span><b>' . h(str_replace('.', ',', (string)$avg)) . '</b> · <a href="#reviews">' . $rev['summary']['count'] . ' ' . seo_plural((int)$rev['summary']['count'], 'отзыв', 'отзыва', 'отзывов') . "</a></p>\n";
+    }
     if (!empty($r['summary'])) echo '<p class="lead">' . h($r['summary']) . "</p>\n";
-    $meta = ['Всего ' . seo_minutes((int)($r['totalMinutes'] ?? 0))];
-    if (!empty($r['activeMinutes']) && (int)$r['activeMinutes'] < (int)$r['totalMinutes']) $meta[] = 'у плиты ' . seo_minutes((int)$r['activeMinutes']);
-    $meta[] = $servings . ' ' . seo_plural($servings, 'порция', 'порции', 'порций');
-    if (isset(SEO_DIFFICULTY[$r['difficulty'] ?? ''])) $meta[] = SEO_DIFFICULTY[$r['difficulty']];
-    if ($kcal) $meta[] = $kcal['kcal'] . ' ккал на порцию';
-    if ($rev['summary']['count'] > 0) $meta[] = '★ ' . str_replace('.', ',', (string)$rev['summary']['avg']) . ' · ' . $rev['summary']['count'] . ' ' . seo_plural((int)$rev['summary']['count'], 'отзыв', 'отзыва', 'отзывов');
-    echo '<ul class="meta">' . implode('', array_map(function ($m) { return '<li>' . h($m) . '</li>'; }, $meta)) . "</ul>\n";
-    if ($photo) echo '<figure><img src="' . h($photo['path']) . '" alt="' . h($r['title']) . '"' . ($photo['w'] ? ' width="' . (int)$photo['w'] . '" height="' . (int)$photo['h'] . '"' : '') . '>' . ($photo['real'] ? '' : '<figcaption>Иллюстрация создана нейросетью по описанию рецепта и показывает примерную подачу.</figcaption>') . "</figure>\n";
-    echo '<div class="cta"><p>В приложении: пересчёт на любое число порций, таймеры на шагах, список покупок и готовка по шагам голосом.</p><a class="btn" href="' . $app . "\">Готовить по шагам</a></div>\n";
+    echo '<ul class="meta">' . implode('', array_map(function ($m) { return '<li>' . $m[0] . h($m[1]) . '</li>'; }, $meta)) . "</ul>\n";
+    echo '<div class="go"><a class="btn" href="' . $app . '">Готовить по шагам</a><p>Таймеры на шагах, пересчёт на любое число порций и список покупок — бесплатно.</p></div>';
+    echo "</div></div>\n";
 
-    echo '<h2>Ингредиенты</h2><p class="note">На ' . $servings . ' ' . seo_plural($servings, 'порцию', 'порции', 'порций') . "</p>\n<ul class=\"ing\">";
+    // Ingredients beside the steps on a wide screen (they stay in view while reading the steps).
+    echo '<div class="cols"><aside><h2>Ингредиенты</h2><p class="note">На ' . $servings . ' ' . seo_plural($servings, 'порцию', 'порции', 'порций') . "</p>\n<ul class=\"ing\">";
     foreach ($r['ingredients'] as $i) if (is_array($i)) echo '<li><span>' . h($i['name'] ?? '') . (!empty($i['optional']) ? ' <small>по желанию</small>' : '') . '</span><b>' . h(seo_amount($i['amount'] ?? 0) . ' ' . ($i['unit'] ?? '')) . '</b></li>';
-    echo "</ul>\n<h2>Как приготовить</h2>\n<ol class=\"steps\">";
+    echo "</ul></aside>\n<div><h2>Как приготовить</h2>\n<ol class=\"steps\">";
     $k = 0; foreach ($r['steps'] as $s) if (is_array($s)) { $k++; echo '<li id="step-' . $k . '">' . h($s['text'] ?? '') . '</li>'; }
     echo "</ol>\n";
     $tips = array_values(array_filter((array)($r['tips'] ?? []), 'is_string'));
     if ($tips) echo '<h2>Советы</h2><div class="tips">' . implode('', array_map(function ($t) { return '<p>' . h($t) . '</p>'; }, $tips)) . "</div>\n";
     if ($kcal) echo '<h2>Калорийность и БЖУ</h2><p class="note">На одну порцию' . ($kcal['complete'] ? '' : ', без продуктов, для которых нет данных') . '</p><table><tbody><tr><td>Калории</td><td class="n">' . $kcal['kcal'] . ' ккал</td></tr><tr><td>Белки</td><td class="n">' . $kcal['protein'] . ' г</td></tr><tr><td>Жиры</td><td class="n">' . $kcal['fat'] . ' г</td></tr><tr><td>Углеводы</td><td class="n">' . $kcal['carbs'] . " г</td></tr></tbody></table>\n";
-    // Частые вопросы: the answers are in the recipe already; shown here and marked up, so a search engine can show them.
+    // Частые вопросы: the answers are in the recipe already; folded here (the text is on the page, marked up for search engines).
     $faq = seo_recipe_faq($r, $kcal, $servings);
     if ($faq) {
         echo '<h2>Частые вопросы</h2><div class="faq">';
-        foreach ($faq as [$q, $a]) echo '<h3>' . h($q) . '</h3><p>' . h($a) . '</p>';
+        foreach ($faq as [$q, $a]) echo '<details><summary>' . h($q) . '</summary><p>' . h($a) . '</p></details>';
         echo "</div>\n";
     }
     if ($rev['list']) {
-        echo '<h2>Отзывы</h2>';
+        echo '<h2 id="reviews">Отзывы</h2>';
         foreach ($rev['list'] as $x) echo '<div class="review"><b>' . h($x['author']) . '</b> <span class="stars" aria-label="Оценка ' . (int)$x['rating'] . ' из 5">' . str_repeat('★', (int)$x['rating']) . str_repeat('☆', 5 - (int)$x['rating']) . '</span><p>' . nl2br(h($x['text'])) . '</p></div>';
         echo '<p><a href="' . $app . "\">Все отзывы и написать свой</a></p>\n";
     }
-    echo '<p class="note" style="margin-top:22px">Время, калорийность и сроки хранения ориентировочные. Доводите мясо, рыбу и яйца до готовности.</p></article>' . "\n";
+    echo '<p class="note" style="margin-top:24px">Время, калорийность и сроки хранения ориентировочные. Доводите мясо, рыбу и яйца до готовности.</p></div></div></article>' . "\n";
+    // Phones: the main action stays at hand while scrolling.
+    echo '<div class="dock"><a class="btn" href="' . $app . "\">Готовить по шагам</a></div>\n";
 
     // Other variants of the same dish first, then dishes of the same kind with the same main product, then the rest of the kind.
     $dish = (string)($r['dish'] ?? ''); $mainIng = (string)($r['mainIngredient'] ?? '');
@@ -333,14 +378,37 @@ function seo_recipe_page(string $id): void {
     $others = array_slice($others, 0, 8, true);
     if ($others) {
         echo '<section class="related"><h2>Похожие рецепты</h2><ul class="grid">';
-        foreach ($others as $x) echo seo_card($x, false);
+        foreach ($others as $x) echo seo_card($x);
         echo '</ul><p class="more"><a href="' . h(seo_list_path($course)) . '">Все ' . h(mb_strtolower(SEO_COURSES[$course][0], 'UTF-8')) . "</a></p></section>\n";
     }
     echo seo_footer();
 }
-function seo_card(array $x, bool $withPhoto): string {
-    $p = $withPhoto ? seo_photo($x['id']) : null;
-    return '<li><a href="' . h(seo_recipe_path($x['id'])) . '">' . ($p ? '<img src="' . h($p['path']) . '" alt="" loading="lazy" width="320" height="240">' : '') . '<b>' . h($x['title']) . '</b><small>' . h(seo_minutes((int)($x['totalMinutes'] ?? 0))) . '</small></a></li>';
+/** Emoji for a dish without a photo, by its kind. */
+const SEO_ART = ['soup' => '🍲', 'main' => '🍽️', 'side' => '🥔', 'salad' => '🥗', 'breakfast' => '🍳', 'baking' => '🥧', 'dessert' => '🍰', 'snack' => '🥪', 'sauce' => '🥣', 'drink' => '🥤'];
+/** All averages at once: [recipe id => [average, count]] (one query per page). */
+function seo_ratings(): array {
+    static $out = null;
+    if ($out !== null) return $out;
+    $out = [];
+    try { reviews_schema(); foreach (db()->query("SELECT recipe_id, AVG(rating) a, COUNT(*) n FROM reviews WHERE status = 'visible' GROUP BY recipe_id")->fetchAll() as $r) $out[(string)$r['recipe_id']] = [round((float)$r['a'], 1), (int)$r['n']]; } catch (Throwable $e) {}
+    return $out;
+}
+/** The card's small copy of the photo when it is ready (as on the app's cards), else the photo itself. */
+function seo_thumb(string $id): ?string {
+    $file = photos_dir() . '/' . $id . '.jpg';
+    if (!is_file($file)) return null;
+    $v = filemtime($file);
+    return seo_path() . (is_file(photos_dir() . '/s/' . $id . '-' . $v . '.jpg') ? 'photos/s/' . $id . '-' . $v . '.jpg' : 'photos/' . $id . '.jpg?v=' . $v);
+}
+function seo_card(array $x, bool $withPhoto = true): string {
+    $src = seo_thumb($x['id']);
+    $pic = $src ? '<img src="' . h($src) . '" alt="" loading="lazy" decoding="async" width="400" height="300">'
+        : '<span class="art" aria-hidden="true"><span>' . (SEO_ART[$x['_course'] ?? 'main'] ?? '🍽️') . '</span></span>';
+    $r = seo_ratings()[$x['id']] ?? null;
+    $score = $r ? '<span class="score" aria-label="Оценка ' . h(str_replace('.', ',', (string)$r[0])) . ' из 5"><i>★</i>' . h(str_replace('.', ',', (string)$r[0])) . '</span>' : '';
+    $kcal = seo_nutrition($x);
+    $facts = seo_minutes((int)($x['totalMinutes'] ?? 0)) . ($kcal ? ' · ' . $kcal['kcal'] . ' ккал' : '');
+    return '<li><a class="card" href="' . h(seo_recipe_path($x['id'])) . '"><span class="pic">' . $pic . $score . '</span><b>' . h($x['title']) . '</b><small>' . h($facts) . '</small></a></li>';
 }
 function seo_not_found(): void {
     http_response_code(404);
@@ -377,16 +445,21 @@ function seo_list_page(?string $course): void {
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
     if ($course) echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_list_path()) . "\">Рецепты</a></nav>\n";
     echo '<h1>' . h($course ? SEO_COURSES[$course][0] : 'Все рецепты') . '</h1><p class="lead">' . h($desc) . "</p>\n";
-    echo '<ul class="cats"><li><a href="' . h(seo_list_path()) . '"' . ($course ? '' : ' class="on"') . '>Все · ' . $count . '</a></li>';
-    foreach (SEO_COURSES as $c => $names) if (!empty($by[$c])) echo '<li><a href="' . h(seo_list_path($c)) . '"' . ($course === $c ? ' class="on"' : '') . '>' . h($names[0]) . ' · ' . count($by[$c]) . '</a></li>';
+    echo '<ul class="cats"><li><a href="' . h(seo_list_path()) . '"' . ($course ? '' : ' class="on"') . '>Все<small>' . $count . '</small></a></li>';
+    foreach (SEO_COURSES as $c => $names) if (!empty($by[$c])) echo '<li><a href="' . h(seo_list_path($c)) . '"' . ($course === $c ? ' class="on"' : '') . '>' . h($names[0]) . '<small>' . count($by[$c]) . '</small></a></li>';
     echo "</ul>\n";
-    echo '<div class="cta"><p>Не знаете, что выбрать? Спросите Шефа: назовите продукты, время или настроение — он подберёт рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
+    echo '<div class="cta"><p>Не знаете, что выбрать? Назовите продукты, время или настроение — Шеф подберёт рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
+    // Dishes with a photo first, then by name.
+    $photoFirst = function (array $list): array { usort($list, fn($a, $b) => (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0) ?: strcmp(mb_strtolower($a['title'], 'UTF-8'), mb_strtolower($b['title'], 'UTF-8'))); return $list; };
     foreach (SEO_COURSES as $c => $names) {
         if (empty($by[$c]) || ($course && $course !== $c)) continue;
-        if (!$course) echo '<h2>' . h($names[0]) . '</h2>';
+        // All recipes: eight of each kind and the way to the rest; a kind's page: every recipe of it.
+        $list = $photoFirst($by[$c]);
+        if (!$course) echo '<h2><a href="' . h(seo_list_path($c)) . '">' . h($names[0]) . '</a></h2>';
         echo '<ul class="grid">';
-        foreach ($by[$c] as $r) echo seo_card($r, (bool)$course);
+        foreach ($course ? $list : array_slice($list, 0, 8) as $r) echo seo_card($r);
         echo "</ul>\n";
+        if (!$course && count($list) > 8) echo '<p class="more"><a href="' . h(seo_list_path($c)) . '">Все ' . h(mb_strtolower($names[0], 'UTF-8')) . ' · ' . count($list) . " →</a></p>\n";
     }
     if (!$all) echo '<p>Рецепты скоро появятся.</p>';
     echo seo_footer();
@@ -447,7 +520,7 @@ function seo_ing_name(string $id): string {
     $ing = catalog_ingredients()[$id] ?? null;
     if (!$ing) return $id;
     foreach ((array)($ing['aliases'] ?? []) as $a) if (mb_strlen($a, 'UTF-8') <= 22 && !preg_match('/\d/', $a)) return mb_strtolower($a, 'UTF-8');
-    return mb_strtolower(preg_replace('/,.*$/u', '', (string)$ing['name']), 'UTF-8');
+    return mb_strtolower(preg_replace('/,.*$|\s+\d[\d.,]*\s*%?.*$/u', '', (string)$ing['name']), 'UTF-8');
 }
 function seo_ucfirst(string $s): string { return mb_strtoupper(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8'); }
 /** [ingredient id => [recipe ids]] for products worth a page. */
@@ -511,23 +584,38 @@ function seo_combo_page(string $a, ?string $b): void {
     arsort($with);
     if ($with) {
         echo '<h2>' . ($b ? 'А если есть ещё' : 'С чем ещё ' . h(seo_ing_name($a))) . '</h2><ul class="cats">';
-        foreach (array_slice($with, 0, 24, true) as $other => $k) echo '<li><a href="' . h($b ? seo_combo_path($other) : seo_combo_path($a, $other)) . '">' . h(seo_ing_name($other)) . ' · ' . $k . '</a></li>';
+        foreach (array_slice($with, 0, 24, true) as $other => $k) echo '<li><a href="' . h($b ? seo_combo_path($other) : seo_combo_path($a, $other)) . '">' . h(seo_ucfirst(seo_ing_name($other))) . '<small>' . $k . '</small></a></li>';
         echo "</ul>\n";
     }
     echo seo_footer();
 }
+// Seasonings, baking things and sauces: real products, but nobody starts a dinner from them. On the index page they
+// are only in «Все продукты», and not in «Популярные сочетания».
+const SEO_COMBO_MINOR = ['garlic', 'lemon-juice', 'vanilla-sugar', 'tomato-paste', 'parsley', 'dill', 'mayonnaise', 'paprika', 'green-onion', 'cilantro',
+    'cumin', 'canned-tomato', 'instant-yeast', 'soy-sauce', 'chili', 'coriander', 'breadcrumbs', 'ginger', 'cinnamon', 'baking-soda', 'baking-powder',
+    'potato-starch', 'rice-vinegar', 'egg-yolk', 'egg-white', 'prepared-mustard', 'dried-oregano', 'lime-juice', 'fresh-basil', 'ground-nutmeg',
+    'toasted-sesame-oil', 'dried-thyme', 'turmeric', 'garam-masala', 'sesame-seed', 'tomato-ketchup', 'dried-basil', 'fresh-mint', 'oyster-sauce',
+    'table-vinegar-9', 'cocoa-powder', 'raisins', 'walnut', 'honey', 'heavy-cream', 'red-onion', 'white-bread'];
 function seo_combo_list(): void {
     $idx = seo_combo_index();
     uasort($idx, fn($x, $y) => count($y) <=> count($x));
+    $main = array_filter($idx, fn($id) => !in_array($id, SEO_COMBO_MINOR, true), ARRAY_FILTER_USE_KEY);
     $title = 'Что приготовить из того, что есть дома — рецепты по продуктам';
     $desc = 'Выберите продукт, который есть дома, — покажем все рецепты с ним и удачные сочетания: картофель и фарш, курица и рис, яйца и сыр.';
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: public, max-age=600');
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => seo_abs(seo_combo_path(''))]);
     echo '<h1>Что приготовить из того, что есть дома</h1><p class="lead">' . h($desc) . "</p>\n";
-    echo '<ul class="cats">';
-    foreach ($idx as $id => $rs) echo '<li><a href="' . h(seo_combo_path($id)) . '">' . h(seo_ing_name($id)) . ' · ' . count($rs) . '</a></li>';
-    echo "</ul>\n<h2>Популярные сочетания</h2><ul class=\"cats\">";
-    foreach (seo_combo_pairs(60) as [$x, $y, $n]) echo '<li><a href="' . h(seo_combo_path($x, $y)) . '">' . h(seo_ing_name($x) . ' и ' . seo_ing_name($y)) . ' · ' . $n . '</a></li>';
-    echo "</ul>\n" . seo_footer();
+    echo '<div class="cta"><p>Дома несколько продуктов? Напишите или скажите их все сразу — Шеф подберёт блюдо и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
+    $chip = fn($id, $n) => '<li><a href="' . h(seo_combo_path($id)) . '">' . h(seo_ucfirst(seo_ing_name($id))) . '<small>' . $n . '</small></a></li>';
+    echo '<h2>Основные продукты</h2><ul class="cats">';
+    foreach (array_slice($main, 0, 40, true) as $id => $rs) echo $chip($id, count($rs));
+    echo "</ul>\n<h2>Удачные сочетания</h2><ul class=\"cats\">";
+    $pairs = array_filter(seo_combo_pairs(400), fn($x) => !in_array($x[0], SEO_COMBO_MINOR, true) && !in_array($x[1], SEO_COMBO_MINOR, true));
+    foreach (array_slice($pairs, 0, 36) as [$x, $y, $n]) echo '<li><a href="' . h(seo_combo_path($x, $y)) . '">' . h(seo_ucfirst(seo_ing_name($x)) . ' и ' . seo_ing_name($y)) . '<small>' . $n . '</small></a></li>';
+    echo "</ul>\n";
+    // Every product with a page, for those who look for something rarer (and for search engines).
+    echo '<details class="faq" style="margin-top:28px"><summary>Все продукты · ' . count($idx) . '</summary><ul class="cats" style="margin-top:4px">';
+    foreach ($idx as $id => $rs) echo $chip($id, count($rs));
+    echo "</ul></details>\n" . seo_footer();
 }

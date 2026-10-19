@@ -7,13 +7,21 @@ import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, loadIntentModel, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
-  formatMinutes, nutritionOf, relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
+  dishLabel, formatMinutes, matchesDish, nutritionOf, plural, relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
 } from "../engine";
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
 import { archiveChat, markChatActive, takeChat } from "./chats";
-import { plainWords } from "./colloquial";
+import { fixBySound, plainWords, soundBook } from "./colloquial";
 import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
+
+// The recipe titles by sound («хочопури» → «хачапури»), made again when the catalog changes.
+let sounds: { n: number; book: ReturnType<typeof soundBook> } | null = null;
+function titleSounds() {
+  const list = recipes();
+  if (!sounds || sounds.n !== list.length) sounds = { n: list.length, book: soundBook(list.map((r) => r.title), list.flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text)])) };
+  return sounds.book;
+}
 
 /** «курица и картошка»: a dish named after the products («Курица с картошкой») goes before one that only contains them. */
 function namedFirst(list: Match[], c: Conditions): Match[] {
@@ -202,7 +210,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         }
       }
       if (id !== turn.current) return;
-      const cleaned = cleanMessage(plainWords(text));
+      const cleaned = cleanMessage(fixBySound(plainWords(text), titleSounds()));
       if (!patch) await loadIntentModel().catch(() => null); // usually loaded already; on a quick first question, a moment
       if (id !== turn.current) return;
       const local = parseMessage(cleaned, st.conditions);
@@ -227,6 +235,24 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       // «хочу равиоли» with the goal «полегче»: the goal must not hide the dish asked for by name — once more without it.
       const goalsAdded = JSON.stringify(withGoals(st.conditions)) !== JSON.stringify(st.conditions);
       if (goalsAdded && out.conditions.desired.some((d) => d.startsWith("dish:"))) out = turnWith(st.conditions);
+      // «хочу сладкое», then «а хачапури есть?»: a dish asked for by name is a new request, even after «а …». When what
+      // was said for the previous dish (сладкое, суп, до 20 минут) leaves none of it, once more without that — keeping
+      // only what the person does not eat and the kitchen they have.
+      const asked = ((patch?.desiredAdd as string[] | undefined) ?? []).filter((d) => d.startsWith("dish:") && !st.conditions.desired.includes(d));
+      const hasAsked = (o: typeof out) => o.results.some((m) => asked.some((d) => matchesDish(m.recipe, d)));
+      if (asked.length && !reset && !opts.fresh && !hasAsked(out)) {
+        const clean: Conditions = { ...base(), servings: st.conditions.servings, excluded: st.conditions.excluded, appliances: st.conditions.appliances, health: st.conditions.health };
+        let again = turnWith(withGoals(clean));
+        if (!hasAsked(again)) again = turnWith(clean);
+        if (hasAsked(again)) out = again;
+      }
+      // Still none of it: the dish is in the catalog, but what the person does not eat (or the kitchen) rules it out — say
+      // so plainly instead of «не нашлось».
+      if (asked.length && !hasAsked(out) && out.kind !== "talk") {
+        const have = recipes().filter((r) => asked.some((d) => matchesDish(r, d))).length;
+        if (have) out.text = "«" + dishLabel(asked[0]) + "» у меня есть" + (have > 1 ? " (" + have + " " + plural(have, "вариант", "варианта", "вариантов") + ")" : "")
+          + ", но под ваши условия не подходит — их можно поменять в «Условиях» вверху." + (out.results.length ? " Вот что подходит:" : "");
+      }
       // Health words: the note first; when the rest of the message gave nothing to search by, the picks for it.
       if (health) {
         const c = { ...out.conditions, health };

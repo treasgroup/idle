@@ -1,8 +1,9 @@
 // «Рецепты»: search, saved dishes and «Моя книга», dish types and filters. Long or vague queries go to Шеф.
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { ArrowUpRight, BookOpen, Heart, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { useRatings } from "../app/ratings";
 import {
-  CATALOG_SECTIONS, freshConditions, isLenten, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, reviewsApi, searchRecipes,
+  CATALOG_SECTIONS, freshConditions, isLenten, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, searchRecipes,
   type Recipe,
 } from "../engine";
 import { photoFirst } from "../app/photoFirst";
@@ -92,7 +93,7 @@ function useMedia(query: string): boolean {
 
 /** «Поиск» (the whole catalog) and «Избранное» (saved and cooked) are one screen with two modes. */
 export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) {
-  const { s, catalog, online, profile } = useStore();
+  const { s, catalog, profile } = useStore();
   const { openRecipe, isFavorite } = useActions();
   const a = useAssistant();
   const tiles = useMedia("(min-width: 640px)");
@@ -106,7 +107,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   const [limit, setLimit] = useState(PAGE);
   // The first screen of Поиск: sections and ten popular dishes, the whole catalog one tap further.
   const [browseAll, setBrowseAll] = useState(false);
-  const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({});
+  const ratings = useRatings();
   const input = useRef<HTMLInputElement>(null);
 
   // The home screen's «Все» under «Сохранённое» opens this tab on the saved view.
@@ -117,7 +118,6 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     else if (v?.startsWith("filter:")) setF({ ...NONE, on: [v.slice(7)] });
     else if (v?.startsWith("time:")) setF({ ...NONE, time: Number(v.slice(5)) || null });
   }, []);
-  useEffect(() => { if (online) reviewsApi.ratings().then(setRatings).catch(() => {}); }, [online]);
   useEffect(() => { setLimit(PAGE); setBrowseAll(false); }, [query, dish, f, view]);
 
   // Default order: dishes for the current meal first, then the best rated, then the engine's own ranking.
@@ -170,12 +170,6 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     if (view === "book" && cooked.has(r.id))
       return "Готовили " + new Date(cooked.get(r.id)!).toLocaleDateString("ru-RU", { day: "numeric", month: "long" }) + (mine ? " · " + mine : "");
     return mine ? "Заметка: " + mine : undefined;
-  };
-  const tileNote = (r: Recipe) => {
-    const n = note(r);
-    if (n) return n;
-    const x = ratings[r.id];
-    return x && x.count ? "★ " + x.avg.toFixed(1).replace(".", ",") : undefined;
   };
 
   // An empty «Избранное» is just the explanation: no search or filters over nothing.
@@ -321,8 +315,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
                     <ArrowUpRight size={20} className="shrink-0 text-brand" aria-hidden />
                   </button>
                 )}
-                {(sections && !browseAll ? photoFirst(list).slice(0, 10) : list.slice(0, limit)).map((r) => tiles
-                  ? <RecipeTile key={r.id} recipe={r} note={tileNote(r)} onOpen={() => openRecipe(r)} />
+                {(sections && !browseAll ? photoFirst(list).slice(0, 12) : list.slice(0, limit)).map((r) => tiles
+                  ? <RecipeTile key={r.id} recipe={r} note={note(r)} onOpen={() => openRecipe(r)} />
                   : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} rating={ratings[r.id]} note={note(r)} onOpen={() => openRecipe(r)} />)}
               </div>
               {sections && !browseAll ? (

@@ -65,7 +65,7 @@ function seo_collection_page(string $key): void {
     header('Cache-Control: public, max-age=600');
     $nav = function () use ($list, $key) {
         $o = '<ul class="cats">';
-        foreach ($list as $k => $c) $o .= '<li><a href="' . h(seo_collection_path($k)) . '"' . ($k === $key ? ' class="on"' : '') . '>' . h($c['short']) . ' · ' . count($c['items']) . '</a></li>';
+        foreach ($list as $k => $c) $o .= '<li><a href="' . h(seo_collection_path($k)) . '"' . ($k === $key ? ' class="on"' : '') . '>' . h($c['short']) . '<small>' . count($c['items']) . '</small></a></li>';
         return $o . "</ul>\n";
     };
     if ($key === '') {
@@ -75,7 +75,9 @@ function seo_collection_page(string $key): void {
         echo '<h1>Подборки рецептов</h1><p class="lead">' . h($desc) . "</p>\n" . $nav();
         foreach ($list as $k => $c) {
             echo '<h2><a href="' . h(seo_collection_path($k)) . '">' . h($c['h1']) . '</a></h2><ul class="grid">';
-            foreach (array_slice($c['items'], 0, 4) as $r) echo seo_card($r, true);
+            $items = $c['items'];
+            usort($items, fn($a, $b) => (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0));
+            foreach (array_slice($items, 0, 4) as $r) echo seo_card($r);
             echo "</ul>\n";
         }
         echo seo_footer();
@@ -83,7 +85,7 @@ function seo_collection_page(string $key): void {
     }
     $c = $list[$key];
     $n = count($c['items']);
-    usort($c['items'], fn($a, $b) => (seo_photo($b['id']) ? 1 : 0) <=> (seo_photo($a['id']) ? 1 : 0) ?: strcmp($a['title'], $b['title']));
+    usort($c['items'], fn($a, $b) => (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0) ?: strcmp($a['title'], $b['title']));
     $title = $c['h1'] . ' — ' . $n . ' ' . seo_plural($n, 'рецепт', 'рецепта', 'рецептов');
     $desc = 'Домашние рецепты: ' . $c['what'] . '. Время, ингредиенты, шаги и калорийность — и подбор по продуктам, которые есть дома.';
     $ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => $c['h1'], 'numberOfItems' => $n,
@@ -91,7 +93,7 @@ function seo_collection_page(string $key): void {
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => seo_abs(seo_collection_path($key)), 'ld' => [$ld]]);
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_collection_path()) . "\">Подборки</a></nav>\n";
     echo '<h1>' . h($c['h1']) . '</h1><p class="lead">' . h($desc) . "</p>\n" . $nav();
-    echo '<div class="cta"><p>Соберите стол за минуту: Шеф подберёт блюда, посчитает продукты на всех и подскажет, когда что начинать.</p><a class="btn" href="' . h(seo_path()) . "\">Открыть «" . h(SEO_SITE) . "»</a></div>\n";
+    echo '<div class="cta"><p>Соберите стол за минуту: Шеф подберёт блюда, посчитает продукты на всех и подскажет, когда что начинать.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
     echo '<ul class="grid">';
     foreach ($c['items'] as $r) echo seo_card($r, true);
     echo "</ul>\n" . seo_footer();

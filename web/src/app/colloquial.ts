@@ -38,3 +38,46 @@ export function plainWords(text: string): string {
     return hit ? hit[1] : w;
   });
 }
+
+// ---------- Written as heard ----------
+// «хочопури», «пильмени», «чибуреки»: in Russian an unstressed «о» sounds like «а» and «е» like «и», so people write
+// what they hear. A word that is not in any recipe title but sounds exactly like one becomes that word.
+
+/** How a word sounds: unstressed vowels merged, soft and hard signs and doubled letters dropped, the last consonant voiceless. */
+export function soundOf(word: string): string {
+  const s = word.toLowerCase().replace(/ё/g, "е")
+    .replace(/[оa]/g, "а").replace(/[еэиы]/g, "и").replace(/я/g, "а").replace(/ю/g, "у").replace(/[ьъ]/g, "")
+    .replace(/(.)\1+/g, "$1");
+  const last: Record<string, string> = { б: "п", в: "ф", г: "к", д: "т", ж: "ш", з: "с" };
+  return s.slice(0, -1) + (last[s.slice(-1)] ?? s.slice(-1));
+}
+
+/**
+ * Words by how they sound, from recipe titles. `words` also holds every word of the recipes' texts: a real word is never
+ * «corrected» (обжарка stays обжарка). A sound shared by two different title words is left out.
+ */
+export function soundBook(titles: Iterable<string>, texts: Iterable<string> = []): { words: Set<string>; bySound: Map<string, string> } {
+  const split = (t: string) => t.toLowerCase().replace(/ё/g, "е").match(/[а-я]{5,}/g) ?? [];
+  const named = new Set<string>();
+  for (const t of titles) for (const w of split(t)) named.add(w);
+  const words = new Set(named);
+  for (const t of texts) for (const w of split(t)) words.add(w);
+  const bySound = new Map<string, string>();
+  const clash = new Set<string>();
+  for (const w of named) { const k = soundOf(w); if (bySound.has(k) && bySound.get(k) !== w) clash.add(k); else bySound.set(k, w); }
+  for (const k of clash) bySound.delete(k);
+  return { words, bySound };
+}
+
+/**
+ * «хочу хочопури» → «хочу хачапури». Only words of five letters and more that the recipes do not have, of the same length
+ * as the title word and different from it before the ending (another ending is not a mistake: «тесто», «теста»).
+ */
+export function fixBySound(text: string, book: { words: Set<string>; bySound: Map<string, string> }): string {
+  return text.replace(/[а-яё]{5,}/gi, (w) => {
+    const low = w.toLowerCase().replace(/ё/g, "е");
+    if (book.words.has(low)) return w;
+    const hit = book.bySound.get(soundOf(low));
+    return hit && hit.length === low.length && hit.slice(0, -2) !== low.slice(0, -2) ? hit : w;
+  });
+}

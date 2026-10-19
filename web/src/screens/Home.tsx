@@ -17,7 +17,7 @@ import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
 import { DecideSheet } from "../components/Decide";
-import { RecipeImage, RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
+import { RatingBadge, RecipeImage, RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { photoFirst } from "../app/photoFirst";
 import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
 import { ProfileButton } from "../app/App";
@@ -159,6 +159,7 @@ function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
       <button className="relative block w-full text-left lg:w-[46%] lg:shrink-0" onClick={onOpen} aria-label={"Рецепт дня: " + r.title}>
         <RecipeImage recipe={r} full className="aspect-[16/10] w-full lg:aspect-auto lg:h-full lg:min-h-[260px]" rounded="rounded-none" eager />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">Рецепт дня</span>
+        <RatingBadge id={r.id} className="right-3 top-3" />
       </button>
       <div className="p-4 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-6">
         <h2 className="text-h2 lg:text-h1">{r.title}</h2>
