@@ -1,6 +1,7 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { readdirSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { readFileSync, readdirSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const assets = fileURLToPath(new URL("../server/assets/", import.meta.url));
@@ -17,11 +18,22 @@ const cleanOldBundles = (): Plugin => ({
   },
 });
 
+// Files without a hash in the name (boot.js, intent-model.json): the hosting tells browsers to keep them for 45 days,
+// so they are asked for with their content's hash (?v=…) — a changed file is a new address.
+const fileHash = (name: string) => {
+  try { return createHash("sha1").update(readFileSync(fileURLToPath(new URL("../server/" + name, import.meta.url)))).digest("hex").slice(0, 8); } catch { return "0"; }
+};
+const versionedBoot = (): Plugin => ({
+  name: "versioned-boot",
+  transformIndexHtml: (html) => html.replace('src="./boot.js"', 'src="./boot.js?v=' + fileHash("boot.js") + '"'),
+});
+
 // The site lives in a subfolder (treas.su/cook/), so every path is relative.
 // The build goes straight into ../server — the folder that is uploaded to the hosting.
 export default defineConfig({
   base: "./",
-  plugins: [react(), cleanOldBundles()],
+  plugins: [react(), cleanOldBundles(), versionedBoot()],
+  define: { __INTENT_V__: JSON.stringify(fileHash("intent-model.json")) },
   build: {
     outDir: previewOut ?? "../server",
     emptyOutDir: false,

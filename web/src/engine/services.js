@@ -769,7 +769,8 @@ function oO(e, t) {
 }
 var hm = null,
   FC = null;
-function JC(e = "intent-model.json") {
+// eslint-disable-next-line no-undef
+function JC(e = "intent-model.json?v=" + (typeof __INTENT_V__ !== "undefined" ? __INTENT_V__ : "0")) {
   return (
     FC ??
       (FC = fetch(e)
