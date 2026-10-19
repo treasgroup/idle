@@ -94,7 +94,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const seasonal = season ? photoFirst(recipes().filter(season.test)).slice(0, 10) : [];
 
   return (
-    <div className="pb-4">
+    <div className="pb-4" data-list="home">
       <div className="flex items-start justify-between gap-3 pt-3 sm:pt-6">
         <div>
           <p className="text-body-sm text-ink-soft">{greeting()}!</p>
@@ -178,7 +178,7 @@ function ContinueCard() {
   const cookingIt = !!s.cooking && !s.cooking.done;
   if (!last || !r || cookedSince || cookingIt) return null;
   return (
-    <div className="mt-4 flex min-h-[60px] items-center gap-2 rounded-card border border-line bg-card p-2">
+    <div className="mt-4 flex min-h-[60px] items-center gap-2 rounded-card border border-line bg-card p-2" data-pick-skip>
       <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={() => { forgetRecipe(); openRecipe(r); }}>
         <RecipeImage recipe={r} className="h-11 w-11 shrink-0" rounded="rounded-input" />
         <span className="min-w-0 flex-1">

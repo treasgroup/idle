@@ -1,7 +1,7 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart,
+  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -16,6 +16,7 @@ import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
 import { WriteUs } from "../components/WriteUs";
+import { TasteSheet, useUnderstood } from "../components/TasteSheet";
 import { useMyMessages } from "../app/myMessages";
 
 const ALLERGENS = ["dairy", "eggs", "gluten", "nuts", "fish", "seafood", "soy", "mushrooms", "legumes", "spicy", "meat", "poultry"];
@@ -40,6 +41,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
   const [writeUs, setWriteUs] = useState(false);
+  const [tasteOpen, setTasteOpen] = useState(false);
+  const understoodNow = useUnderstood();
   const mine = useMyMessages();
   const prefs = s.preferences;
   const bookCount = new Set(s.book.map((b) => b.recipeId)).size;
@@ -102,6 +105,9 @@ export function Profile({ pwa }: { pwa: Pwa }) {
               <Row icon={<Target size={18} />} title="Для кого, цели и опыт"
                 hint={profile.eaters + " " + plural(profile.eaters, "человек", "человека", "человек") + " · " + profile.goals.map((g) => GOALS.find((x) => x.id === g)?.label).join(", ") + " · " + LEVELS.find((l) => l.id === profile.level)?.label}
                 onClick={() => setSheet("goals")} />
+              <Row icon={<Sparkles size={18} />} title="Что я про вас понял"
+                hint={understoodNow.likes.length ? "Чаще: " + understoodNow.likes.slice(0, 3).map((x) => x.label).join(", ") : "Пока присматриваюсь к вашим вкусам"}
+                onClick={() => setTasteOpen(true)} />
               <Row icon={<Ban size={18} />} title="Ограничения" hint={excludedHint || "Ничего не исключено"} onClick={() => setSheet("limits")} />
               <Row icon={<Utensils size={18} />} title="Техника" hint={prefs.appliances.map((a) => (LABELS[a] ?? a).toLowerCase()).join(", ")} onClick={() => setSheet("kitchen")} />
             </div>
@@ -197,6 +203,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
 
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
+      <TasteSheet open={tasteOpen} onClose={() => setTasteOpen(false)} />
       <Sheet open={sheet === "docs"} title="Документы и мои данные" onClose={close}>
         <div className="grid gap-1">
           {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (

@@ -1,8 +1,9 @@
 // The conversation with Шеф (#/chat): full screen on phones, a centred column next to the sidebar on desktop.
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SquarePen, Timer, MessageCircle, History, ThumbsDown, X } from "lucide-react";
-import { cleanMessage, parseMessage, track, type ChatOption } from "../engine";
+import { cleanMessage, parseMessage, recipeById, track, type ChatOption } from "../engine";
 import { useStore } from "../app/store";
+import { signal } from "../app/personal";
 import { useAssistant } from "../app/assistant";
 import { CONTINUES_TOPIC } from "../app/chatText";
 import { FOCUS_COMPOSER, takeFocusRequest } from "../app/chatNav";
@@ -105,9 +106,9 @@ export function Chat() {
               const prev = msgs[i - 1];
               const mins = m.role === "assistant" && !m.results?.length && prev?.role === "user" && /сколько|как долго|минут|варить|жарить|запекать|тушить/i.test(prev.text) ? minutesIn(m.text) : null;
               return (
-                <div key={i} ref={isLast ? last : undefined} className="scroll-mt-[72px]">
+                <div key={i} ref={isLast ? last : undefined} className="scroll-mt-[72px]" data-list={m.results?.length ? "chat" : undefined}>
                   <Message m={m} last={isLast && !a.busy} onOption={onOption} />
-                  {isLast && !a.busy && m.role === "assistant" && prev?.role === "user" && <WrongAnswer question={prev.text} />}
+                  {isLast && !a.busy && m.role === "assistant" && prev?.role === "user" && <WrongAnswer question={prev.text} shown={m.results?.map((x) => x.id) ?? []} />}
                   {mins && (
                     <div className="mt-2 sm:pl-10">
                       <button className="btn-soft h-10" onClick={() => { startTimer({ dish: "Таймер", label: prev!.text.replace(/^(сколько|как долго|сколько минут)\s+/i, "").replace(/[?!.]+$/, "").slice(0, 30), seconds: mins * 60 }); toast("Таймер на " + mins + " мин запущен"); }}>
@@ -155,12 +156,12 @@ export function Chat() {
 }
 
 /** «Не то»: one tap tells the owner which question Шеф answered badly (it shows up in the admin panel). */
-function WrongAnswer({ question }: { question: string }) {
+function WrongAnswer({ question, shown }: { question: string; shown: string[] }) {
   const [done, setDone] = useState(false);
   if (done) return <p className="mt-2 text-caption text-ink-soft sm:pl-1">Спасибо, передал — Шеф научится. Попробуйте сказать по-другому.</p>;
   return (
     <button className="mt-1.5 inline-flex h-9 items-center gap-1.5 rounded-full px-2 text-caption text-ink-faint hover:bg-sunken hover:text-ink-soft"
-      onClick={() => { track({ type: "wrong", text: question }); cue("tap"); setDone(true); }}>
+      onClick={() => { track({ type: "wrong", text: question }); for (const id of shown) signal(recipeById(id), "not_this"); cue("tap"); setDone(true); }}>
       <ThumbsDown size={14} aria-hidden />Не то
     </button>
   );

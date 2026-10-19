@@ -1,6 +1,7 @@
 // App state: the engine's state (kept on the device and synced through the anonymous account),
 // the person's profile, the catalog and the server's capabilities.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { PERSONAL_EVENT, personalScorer } from "./personal";
 import {
   CATALOG_EVENT, DEFAULT_STATE, type EngineState, apiUrl, clearState, initNativeBridge, isNativeApp, loadCatalog, loadIntentModel, loadState,
   recipes, saveState, setTasteScorer, tasteScorer, track, deviceSource, useAccountSync, type SyncApi,
@@ -119,7 +120,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [s, ready, toast]);
 
   // The taste profile nudges the ranking of every list.
-  useEffect(() => { setTasteScorer(tasteScorer(s.taste)); }, [s.taste, catalog.version]);
+  // The engine's taste score plus what was learnt quietly on this device (app/personal), the moment and variety.
+  const [learnt, setLearnt] = useState(0);
+  useEffect(() => { const on = () => setLearnt((n) => n + 1); window.addEventListener(PERSONAL_EVENT, on); return () => window.removeEventListener(PERSONAL_EVENT, on); }, []);
+  useEffect(() => {
+    const base = tasteScorer(s.taste), mine = personalScorer(s.book);
+    setTasteScorer((r) => base(r) + mine(r));
+  }, [s.taste, s.book, catalog.version, learnt]);
   // Text size: the profile's three steps; the synced «large text» flag from older versions counts as «large».
   const size = profile.textSize !== "m" ? profile.textSize : s.largeText || profile.simple ? "l" : "m";
   useEffect(() => {

@@ -1,0 +1,49 @@
+// «Что я про вас понял»: what the service has learnt from what the person opens, cooks and rates — in words,
+// each with «это не так», and «начать заново». Everything here lives only on this device.
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { forgetTrait, resetTaste, understood, PERSONAL_EVENT } from "../app/personal";
+import { useStore } from "../app/store";
+import { Sheet } from "./ui";
+
+export function useUnderstood() {
+  const [u, setU] = useState(understood);
+  useEffect(() => { const on = () => setU(understood()); window.addEventListener(PERSONAL_EVENT, on); return () => window.removeEventListener(PERSONAL_EVENT, on); }, []);
+  return u;
+}
+
+export function TasteSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { update, toast } = useStore();
+  const u = useUnderstood();
+  const reset = () => {
+    if (!confirm("Забыть всё, что я понял о ваших вкусах, и начать заново?")) return;
+    resetTaste();
+    update((st) => ({ ...st, taste: { liked: [], tooHard: [], disliked: [], notNow: [] } }));
+    toast("Начинаю заново — буду присматриваться");
+  };
+  const chips = (list: { key: string; label: string }[], tone: string) => (
+    <div className="mt-2 flex flex-wrap gap-2">
+      {list.map((x) => (
+        <button key={x.key} className={"inline-flex h-10 items-center gap-1.5 rounded-full border pl-3.5 pr-2.5 text-body-sm " + tone}
+          onClick={() => forgetTrait(x.key)} aria-label={"Это не так: " + x.label}>
+          {x.label}<X size={16} className="text-ink-faint" aria-hidden />
+        </button>
+      ))}
+    </div>
+  );
+  return (
+    <Sheet open={open} title="Что я про вас понял" onClose={onClose}
+      footer={u.count > 0 ? <button className="btn-ghost w-full" onClick={reset}>Начать заново</button> : undefined}>
+      <p className="text-body-sm text-ink-soft">Учусь по тому, что вы открываете, готовите и оцениваете, — и подбираю похожее. Хранится только на этом телефоне.</p>
+      {u.likes.length === 0 && u.less.length === 0 ? (
+        <p className="mt-4 rounded-input bg-sunken px-4 py-3 text-body-sm">Пока присматриваюсь. Открывайте рецепты, готовьте и нажимайте «Понравилось» — через несколько блюд здесь появится, что вы любите.</p>
+      ) : (
+        <>
+          {u.likes.length > 0 && <><h3 className="mt-5 text-title">Чаще предлагаю</h3>{chips(u.likes, "border-herb/40 bg-herb-soft")}</>}
+          {u.less.length > 0 && <><h3 className="mt-5 text-title">Реже предлагаю</h3>{chips(u.less, "border-line bg-card")}</>}
+          <p className="mt-4 text-caption text-ink-soft">Нажмите на ✕, если это не так, — перестану это учитывать.</p>
+        </>
+      )}
+    </Sheet>
+  );
+}

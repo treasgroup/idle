@@ -125,6 +125,9 @@ function admin_insights(int $days): void {
         'taps' => (function () use ($all, $from) { taps_schema(); return $all('SELECT route, kind, label, SUM(n) AS n, MAX(last) AS last FROM ux_taps WHERE day >= ? GROUP BY route, kind, label ORDER BY n DESC, last DESC LIMIT 40', [$from]); })(),
         'backups' => backups_list(),
         'messages' => admin_messages_list(),
+        // «С какой попытки»: where in its list the opened dish was (1 = the first suggestion).
+        'picks' => $all("SELECT source, COUNT(*) AS n, SUM(CASE WHEN value = 1 THEN 1 ELSE 0 END) AS first, SUM(CASE WHEN value <= 3 THEN 1 ELSE 0 END) AS top3, AVG(value) AS avg
+            FROM events WHERE type = 'pick' AND day >= ? AND value > 0 GROUP BY source ORDER BY n DESC", [$from]),
         'troubles' => admin_troubles($from),
         'ratings' => admin_ratings($from),
     ]);

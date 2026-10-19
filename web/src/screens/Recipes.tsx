@@ -309,7 +309,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
             )
           ) : (
             <>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5 xl:mt-0 min-[1440px]:grid-cols-4">
+              <div className="mt-3 grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5 xl:mt-0 min-[1440px]:grid-cols-4" data-list="search">
                 {handoff && (
                   <button type="button" onClick={() => ask(q.trim())}
                     className="flex min-h-[72px] items-center gap-3 rounded-card bg-brand-soft p-3 pr-4 text-left transition-transform duration-150 active:scale-[.99] sm:col-span-full">

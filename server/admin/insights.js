@@ -33,6 +33,16 @@
     });
     h += '<p class="muted">Ответ приходит человеку в профиль — в «Написать нам» (на том же телефоне или компьютере, откуда он писал).</p>';
     h += "</div>";
+    var PK = d.picks || [], SRC = { chat: "Шеф", home: "Главная", search: "Поиск" };
+    h += '<h2>С какой попытки находят блюдо</h2><div class="card">';
+    if (!PK.length) h += '<p class="empty">Данных пока нет: они появятся, когда люди начнут открывать рецепты из подборок.</p>';
+    PK.forEach(function (p) {
+      var n = +p.n || 0;
+      h += '<div class="row"><span class="label">' + esc(SRC[p.source] || p.source || "Другое") + '</span><span style="flex:1">открывают первое предложение — <b>' + pct(+p.first, n) + "</b>, одно из первых трёх — " + pct(+p.top3, n)
+        + '</span><span class="num muted">' + n + "</span></div>";
+    });
+    h += '<p class="muted">Чем больше доля «первого предложения», тем точнее подбор. Сравнивайте с прошлыми неделями — так видно, стало ли лучше.</p></div>';
+
     h += '<h2>Путь человека</h2><div class="card">';
     d.funnel.forEach(function (f, i) {
       var w = top ? Math.max(2, Math.round((f.n / top) * 100)) : 0;

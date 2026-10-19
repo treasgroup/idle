@@ -5,6 +5,8 @@ import {
   type EngineState, type Recipe,
 } from "../engine";
 import { useStore } from "./store";
+import { signal } from "./personal";
+import { takePick } from "./picks";
 import { openLayer, close, routeHash, parseRoute } from "./router";
 import { stopTimersFor } from "./timers";
 import { cue } from "./feedback";
@@ -29,6 +31,9 @@ export function useActions() {
     // Until the full catalog has arrived, the recipe page waits for it (a shared link to a newer recipe).
     if (!recipe && catalog.source === "server") return toast("Этот рецепт больше не в каталоге.");
     track({ type: "open", recipeId: id });
+    const pick = takePick(id);
+    if (pick) track({ type: "pick", recipeId: id, count: pick.pos, source: pick.list });
+    signal(recipe, "open");
     if (recipe) update((st) => ({ ...st, engaged: true, recent: [recipe, ...st.recent.filter((x) => x.id !== id)].slice(0, 20) }));
     const route = parseRoute(location.hash);
     withPhotoTransition(id, () => openLayer(routeHash({ tab: route.tab, recipe: id })));
@@ -44,7 +49,7 @@ export function useActions() {
   const toggleFavorite = useCallback((r: Recipe) => {
     const on = s.favorites.some((f) => f.id === r.id);
     cue(on ? "tap" : "success");
-    if (!on) track({ type: "favorite", recipeId: r.id });
+    if (!on) { track({ type: "favorite", recipeId: r.id }); signal(recipeById(r.id) ?? r, "save"); }
     update((st) => ({
       ...st,
       engaged: true,
@@ -69,6 +74,7 @@ export function useActions() {
   const startCooking = useCallback((r: Recipe, servings: number) => {
     const n = clampServings(r, servings);
     track({ type: "cook_start", recipeId: r.id });
+    signal(r, "cook");
     update((st) => ({
       ...st,
       engaged: true,
@@ -82,6 +88,7 @@ export function useActions() {
   /** The dish is done: into "Моя книга", taste profile, used-up perishables off the home list. */
   const finishCooking = useCallback((r: Recipe, fromMenu = false, markDone = true) => {
     track({ type: "cook_done", recipeId: r.id });
+    signal(r, "done");
     stopTimersFor(r.id);
     let removed = 0;
     update((st) => {

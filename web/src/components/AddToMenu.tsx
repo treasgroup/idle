@@ -1,6 +1,7 @@
 // "Add to menu": pick a day of the coming week for a recipe.
 import { clampServings, dateKey, dayLabel, recipeById, weekDays } from "../engine";
 import { useStore } from "../app/store";
+import { signal } from "../app/personal";
 import { Sheet } from "./ui";
 
 /** Choose a day of the week menu for a recipe. */
@@ -18,6 +19,7 @@ export function AddToMenuSheet({ recipeId, servings, onClose }: { recipeId: stri
       else menu.push({ date, items: [item] });
       return { ...st, menu: menu.filter((d) => d.date >= dateKey(new Date())).sort((x, y) => x.date.localeCompare(y.date)).slice(0, 31) };
     });
+    signal(recipe, "plan");
     toast("Добавлено в план: " + dayLabel(date).toLowerCase());
     onClose();
   };

@@ -11,6 +11,7 @@ import {
   type Recipe, type RecipeIngredient,
 } from "../engine";
 import { useStore } from "../app/store";
+import { signal } from "../app/personal";
 import { useActions, haveIds } from "../app/actions";
 import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
 import { printPage } from "../app/print";
@@ -170,6 +171,11 @@ interface Group { key: string; title: string | null; rows: RecipeIngredient[]; a
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const { s, profile, toast, online } = useStore();
   useEffect(() => rememberRecipe(base.id), [base.id]);
+  // How long the page was read: closed within seconds — not this; read for a while — interest.
+  useEffect(() => {
+    const opened = Date.now();
+    return () => { const t = Date.now() - opened; if (t < 5000) signal(base, "bounce"); else if (t > 25000) signal(base, "read"); };
+  }, [base]);
   const [haveHint, haveSeen] = useHint("recipe-have");
   const [serveOpen, setServeOpen] = useState(false);
   const [panOpen, setPanOpen] = useState(false);

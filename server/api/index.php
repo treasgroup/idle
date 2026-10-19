@@ -14,7 +14,7 @@ require __DIR__ . '/_private/ops.php';
 require __DIR__ . '/_private/community.php';
 require __DIR__ . '/_private/vk.php';
 
-const VERSION = '0.37.0';
+const VERSION = '0.38.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
 try { config(); } catch (Throwable $e) {}
 $route = isset($_GET['r']) ? (string)$_GET['r'] : '';

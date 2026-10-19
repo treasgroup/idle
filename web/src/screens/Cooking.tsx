@@ -11,6 +11,7 @@ import {
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
+import { signal } from "../app/personal";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
@@ -672,7 +673,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const [askStore, setAskStore] = useState(false);
   const rate = (v: "yes" | "meh") => {
     cue("tap");
-    if (rated !== v) track({ type: "rate", recipeId: r.id, count: v === "yes" ? 1 : 0 });
+    if (rated !== v) { track({ type: "rate", recipeId: r.id, count: v === "yes" ? 1 : 0 }); signal(r, v === "yes" ? "liked" : "meh"); }
     if (v === "yes" && rated !== "yes") setAskStore(storeAskDue());
     setRated(v);
     update((st) => ({ ...st, taste: rateDish(st.taste, r.id, v === "yes") }));
