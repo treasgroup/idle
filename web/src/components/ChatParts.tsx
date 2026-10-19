@@ -1,6 +1,7 @@
-// Pieces of the conversation with Шеф: messages, the condition bar, suggestion cards, mood tiles, the pantry picker.
-import { useMemo, useState } from "react";
-import { ArrowUpRight, X, Search, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator } from "lucide-react";
+// Pieces of the conversation with Шеф: messages, «Условия» (what Шеф takes into account), suggestion cards, mood tiles, the pantry picker.
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
+import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator } from "lucide-react";
 import {
   LABELS, addToFridge, conditionLabel, expiringSoon, freshConditions, ingredientOptions, pantryGroups, recipeById, searchIngredients, shortName,
   DEFAULT_CONDITIONS, type ChatMessage, type ChatOption, type Conditions,
@@ -65,10 +66,9 @@ export function Typing() {
   );
 }
 
-/** What Шеф is taking into account right now, each with a ✕ to drop it. */
-export function ConditionBar() {
+/** What Шеф is taking into account right now (null when there is nothing to show), each with a way to drop it. */
+function useConditionItems() {
   const { s, profile } = useStore();
-  const a = useAssistant();
   const c = s.conditions;
   const items: { label: string; relax?: string; next?: Conditions }[] = [];
   if (c.maxMinutes) items.push({ label: "до " + c.maxMinutes + " мин", relax: "time" });
@@ -95,20 +95,44 @@ export function ConditionBar() {
   const servings = c.servings !== profile.eaters ? c.servings : null;
   // Only under a pick of recipes: after a kitchen question («сколько варить гречку») the old conditions are noise.
   const last = [...s.conversation].reverse().find((m) => m.role === "assistant");
-  if (!last?.results?.length) return null;
-  if (!items.length && !servings) return null;
+  if (!last?.results?.length || (!items.length && !servings)) return null;
+  return { items, servings };
+}
+
+/**
+ * «Условия» in the chat's header: what Шеф is taking into account is not on the screen all the time (Шеф copes on its
+ * own, and the line only crowded the screen), but one tap away — each with a ✕, and «Сбросить всё».
+ */
+export function ConditionsButton() {
+  const a = useAssistant();
+  const { s } = useStore();
+  const [open, setOpen] = useState(false);
+  const cond = useConditionItems();
+  const shown = !!cond;
+  useEffect(() => { if (!shown) setOpen(false); }, [shown]);
+  if (!cond) return null;
+  const n = cond.items.length + (cond.servings ? 1 : 0);
   return (
-    <div className="scroller fade-x -mx-4 mb-2 px-4 sm:mx-0 sm:flex-wrap sm:px-0 sm:[mask-image:none]" aria-label="Учитываю">
-      <span className="self-center whitespace-nowrap text-caption text-ink-soft">Учитываю:</span>
-      {servings && <span className="inline-flex h-9 shrink-0 items-center rounded-full bg-sunken px-3 text-small">на {servings} порц.</span>}
-      {items.map((it) => (
-        <button key={it.label} className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full bg-sunken pl-3 pr-2 text-small hover:bg-line" aria-label={"Убрать: " + it.label}
-          onClick={() => (it.next ? a.adjust(it.next, "Убрать: " + it.label) : a.choose({ label: "Убрать: " + it.label, relax: it.relax }))}>
-          {it.label}<X size={14} aria-hidden />
-        </button>
-      ))}
-      {items.length > 1 && <button className="h-9 shrink-0 rounded-full px-2 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => a.adjust({ ...a.base(), servings: c.servings }, "Сбросить условия")}>Сбросить</button>}
-    </div>
+    <>
+      <button className="relative inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => setOpen(true)} aria-label={"Условия подбора: " + n}>
+        <SlidersHorizontal size={18} aria-hidden /><span className="hidden sm:inline">Условия</span>
+        <span className="grid h-5 min-w-5 place-items-center rounded-full bg-ink/10 px-1 text-caption font-semibold" aria-hidden>{n}</span>
+      </button>
+      {/* Outside the header: its blurred background would hold the sheet inside it. */}
+      {createPortal(<Sheet open={open} title="Что я учитываю" onClose={() => setOpen(false)}
+        footer={cond.items.length > 1 ? <button className="btn-ghost w-full" onClick={() => { setOpen(false); a.adjust({ ...a.base(), servings: s.conditions.servings }, "Сбросить условия"); }}>Сбросить всё</button> : undefined}>
+        <p className="text-body-sm text-ink-soft">По этим условиям подобраны блюда. Нажмите на условие, чтобы убрать его, — подберу заново.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {cond.servings && <span className="inline-flex h-10 items-center rounded-full bg-sunken px-3.5 text-body-sm">на {cond.servings} порц.</span>}
+          {cond.items.map((it) => (
+            <button key={it.label} className="inline-flex h-10 items-center gap-1.5 rounded-full border border-line bg-card pl-3.5 pr-2.5 text-body-sm hover:border-line-strong" aria-label={"Убрать: " + it.label}
+              onClick={() => { setOpen(false); if (it.next) a.adjust(it.next, "Убрать: " + it.label); else a.choose({ label: "Убрать: " + it.label, relax: it.relax }); }}>
+              {it.label}<X size={16} className="text-ink-faint" aria-hidden />
+            </button>
+          ))}
+        </div>
+      </Sheet>, document.body)}
+    </>
   );
 }
 

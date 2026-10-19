@@ -10,7 +10,7 @@ import { FOCUS_COMPOSER, takeFocusRequest } from "../app/chatNav";
 import { minutesIn, startTimer } from "../app/timers";
 import { Composer } from "../components/Composer";
 import { TimerStrip } from "../components/TimerStrip";
-import { ConditionBar, Message, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
+import { ConditionsButton, Message, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
 import { ChefAvatar, Chip, Sheet, cx, useScrolled } from "../components/ui";
 import { removeChat, useChats } from "../app/chats";
 import { Mascot } from "../components/Mascot";
@@ -92,6 +92,7 @@ export function Chat() {
               <span className="block text-caption text-ink-soft">{a.busy ? "подбирает…" : "ваш помощник"}</span>
             </span>
           </span>
+          <ConditionsButton />
           {chats.length > 0 && <button className="inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => setHistory(true)}><History size={18} aria-hidden />История</button>}
           {has && <button className="inline-flex h-10 items-center gap-1.5 rounded-full bg-sunken px-3 text-small font-medium hover:bg-line" onClick={() => { a.newChat(); setFocusKey((k) => k + 1); }}><SquarePen size={18} aria-hidden />Новый</button>}
         </div>
@@ -129,7 +130,6 @@ export function Chat() {
       {/* Wide screens: no line above the input — the conversation fades out under it, as in today's messengers. */}
       <div ref={dock} className="fixed inset-x-0 z-30 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64 lg:border-t-0 lg:bg-transparent lg:bg-gradient-to-t lg:from-paper lg:from-70% lg:to-paper/0 lg:pt-6 lg:backdrop-blur-none" style={{ bottom: "var(--nav-h)" }}>
         <div className="mx-auto max-w-chat px-4 pb-3 pt-2">
-          <ConditionBar />
           <Composer variant="dock" busy={a.busy} focusKey={focusKey} onSend={(t, o) => send(t, o)}
             placeholder={has ? undefined : "Например: курица и картошка"} />
         </div>
