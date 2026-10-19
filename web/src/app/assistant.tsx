@@ -3,10 +3,11 @@
 // The server AI is used only when it is configured; otherwise the local engine answers (the default).
 import { measureAnswer, roastAnswer } from "./kitchenMath";
 import { leftoverAnswer } from "./leftovers";
+import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, loadIntentModel, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
-  relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
+  formatMinutes, nutritionOf, relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
 } from "../engine";
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
@@ -26,6 +27,31 @@ function namedFirst(list: Match[], c: Conditions): Match[] {
 // Products that can be left out of a dish without spoiling it: «без лука» keeps the dish, just without it.
 const SOFT: Record<string, string> = { onion: "лука", "red-onion": "лука", "green-onion": "лука", garlic: "чеснока", dill: "укропа", parsley: "петрушки", cilantro: "кинзы", "black-pepper": "перца" };
 const SOFT_ONE: Record<string, string> = { onion: "лук", "red-onion": "лук", "green-onion": "лук", garlic: "чеснок", dill: "укроп", parsley: "петрушку", cilantro: "кинзу", "black-pepper": "перец" };
+
+// Memorial and fasting-eve dishes are offered only to those who ask for them.
+const MEMORIAL = /кутья|кутью|кути|канун|поминал/i;
+const kcalOf = (m: Match) => nutritionOf(m.recipe).perServing.kcal;
+const simpleScore = (m: Match) => (m.recipe.difficulty === "easy" ? 0 : m.recipe.difficulty === "medium" ? 2 : 4)
+  + (m.recipe.ingredients.length > 10 ? 2 : m.recipe.ingredients.length > 7 ? 1 : 0) + (m.recipe.totalMinutes > 60 ? 2 : m.recipe.totalMinutes > 40 ? 1 : 0);
+/**
+ * The last word on what is shown: no кутья unless asked; «проще» means simple to cook (easy, few products, quick);
+ * and without «сытное», «для гостей» or a holiday a dish of 2+ hours or 900+ kcal does not go first.
+ */
+function tidyResults(list: Match[], c: Conditions, text: string, simpler: boolean, found: (c: Conditions, limit?: number) => Match[]): Match[] {
+  const asked = MEMORIAL.test(text);
+  let out = asked ? list : list.filter((m) => !MEMORIAL.test(m.recipe.title));
+  if (simpler) {
+    const pool = found(c, 40).filter((m) => asked || !MEMORIAL.test(m.recipe.title));
+    if (pool.length) out = pool.map((m, i) => ({ m, i })).sort((a, b) => simpleScore(a.m) - simpleScore(b.m) || a.i - b.i).map((x) => x.m).slice(0, Math.max(5, out.length));
+  }
+  const festive = c.mood === "hearty" || c.occasion === "guests" || /сытн|праздн|гост|на стол|не спеша|выходн/i.test(text);
+  if (!festive) {
+    const heavy = (m: Match) => m.recipe.totalMinutes > 120 || kcalOf(m) > 900;
+    out = [...out.filter((m) => !heavy(m)), ...out.filter(heavy)];
+  }
+  if (!out.length && list.length) out = found(c, 20).filter((m) => !MEMORIAL.test(m.recipe.title));
+  return out.length ? out : list;
+}
 
 const lastShown = (conv: ChatMessage[]) => [...conv].reverse().find((m) => m.role === "assistant" && !!m.results?.length) ?? null;
 
@@ -78,6 +104,8 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
   // Profile goals (lighter, more protein, quick) apply to every search until the person removes one in this conversation.
   const relaxedGoals = useRef(new Set<string>());
   const withGoals = useCallback((c: Conditions): Conditions => {
+    // A dish asked for by name («хочу равиоли») is shown even when it is heavier or longer than the profile's goals.
+    if (c.desired.some((d) => d.startsWith("dish:"))) return c;
     const g = goalConditions(profileRef.current, c);
     const r = relaxedGoals.current;
     return { ...g, maxKcal: r.has("kcal") ? c.maxKcal : g.maxKcal, minProtein: r.has("protein") ? c.minProtein : g.minProtein, maxMinutes: r.has("time") ? c.maxMinutes : g.maxMinutes };
@@ -121,7 +149,8 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     markChatActive();
   }, [update]);
 
-  const found = useCallback((c: Conditions, limit = 5) => rankRecipes(recipes(), withGoals(c), stateRef.current.preferences, limit), [withGoals]);
+  const found = useCallback((c: Conditions, limit = 5) =>
+    rankRecipes(recipes(), withGoals(c), stateRef.current.preferences, limit + 3).filter((m) => !MEMORIAL.test(m.recipe.title)).slice(0, limit), [withGoals]);
 
   const ask = useCallback(async (raw: string, opts: AskOptions = {}) => {
     const text = raw.trim();
@@ -188,12 +217,16 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       const f = focus.current;
       const shown = lastShown(st.conversation);
       const focusRecipe = f && f.after === shown ? recipeById(f.id) ?? null : st.cooking && !st.cooking.done ? st.cooking.recipe : null;
-      const out = respond({
+      const turnWith = (conditions: Conditions) => respond({
         message: cleaned, patch, reply, local: isLocal,
-        conditions: withGoals(st.conditions), preferences: st.preferences, conversation: st.conversation,
+        conditions, preferences: st.preferences, conversation: st.conversation,
         guess: isLocal ? classifyIntent(cleaned) : null, focus: focusRecipe,
         focusServings: f && f.after === shown ? f.servings : st.cooking?.servings, voice: !!opts.voice,
       });
+      let out = turnWith(withGoals(st.conditions));
+      // «хочу равиоли» with the goal «полегче»: the goal must not hide the dish asked for by name — once more without it.
+      const goalsAdded = JSON.stringify(withGoals(st.conditions)) !== JSON.stringify(st.conditions);
+      if (goalsAdded && out.conditions.desired.some((d) => d.startsWith("dish:"))) out = turnWith(st.conditions);
       // Health words: the note first; when the rest of the message gave nothing to search by, the picks for it.
       if (health) {
         const c = { ...out.conditions, health };
@@ -207,6 +240,23 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         const alt = found({ ...out.conditions, excluded: out.conditions.excluded.filter((x) => !soft.includes(x)) }).filter((m) => m.available.length);
         if (alt.length) Object.assign(out, { kind: "found", results: alt, text: "Таких блюд совсем без " + SOFT[soft[0]] + " у меня нет — вот где " + SOFT_ONE[soft[0]] + " можно просто не класть:" });
       }
+      // Not understood: say so, and offer the closest things Шеф does understand.
+      if (out.kind === "unclear") {
+        const near = didYouMean(text);
+        if (near.length) Object.assign(out, { text: "Не до конца понял. Может, вы имели в виду:", options: near });
+      }
+      // The named dish goes past the profile's goals — said once, gently, under the answer.
+      const named = out.conditions.desired.some((d) => d.startsWith("dish:"));
+      const top = out.results[0]?.recipe;
+      if (named && top && out.kind !== "talk") {
+        const goals = profileRef.current.goals;
+        const kcal = nutritionOf(top).perServing.kcal;
+        const over = goals.includes("light") && kcal > 500 ? "сытнее вашей цели «полегче» — " + kcal + " ккал на порцию"
+          : goals.includes("quick") && top.totalMinutes > 30 ? "дольше, чем вы обычно готовите, — " + formatMinutes(top.totalMinutes)
+          : goals.includes("protein") && nutritionOf(top).perServing.protein < 25 ? "в нём меньше белка, чем в вашей цели" : "";
+        if (over) out.text = out.text.replace(/[:.]?\s*$/, "") + ". Учтите: это блюдо " + over + ".";
+      }
+      if (out.results.length) out.results = tidyResults(out.results, out.conditions, text, (patch?.mood as string | undefined) === "comfort", found);
       if (out.kind !== "talk")
         track({ type: "query", text, count: out.kind === "unclear" ? -1 : out.kind === "near" ? 0 : out.results.length, source: opts.source ?? (opts.voice ? "voice" : "chat") });
       // A short pause so the answer does not flash in before the question has settled on screen.

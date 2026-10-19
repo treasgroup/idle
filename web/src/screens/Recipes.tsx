@@ -150,6 +150,16 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   const filtered = active.length > 0 || !!dish;
   const reset = () => { setF(NONE); setDish(null); };
   const handoff = wantsChef(q.trim(), list.length, view === "all");
+  // Nothing found: dishes close to the words typed (each word on its own), else popular ones with a photo;
+  // with filters on — how many the query alone would find.
+  const near = useMemo(() => {
+    if (list.length || !(query || filtered)) return { list: [] as Recipe[], unfiltered: 0 };
+    const all = query ? searchRecipes(query) : [];
+    const words = query.split(/\s+/).filter((w) => w.length >= 4);
+    const loose = [...new Map(words.flatMap((w) => searchRecipes(w).slice(0, 6)).map((r) => [r.id, r])).values()];
+    const pick = (all.length ? all : loose.length ? loose : photoFirst(ranked)).slice(0, 4);
+    return { list: pick, unfiltered: filtered ? all.length : 0 };
+  }, [list.length, query, filtered, ranked]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ask = (text: string) => { void a.ask(text, { fresh: true }); goChat(); };
   // Without a query, Шеф gets the filters in words: «супы, до 30 мин, детям».
@@ -279,13 +289,23 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
                 Всё, что вы приготовите в режиме готовки, появится здесь — с датой и вашими заметками.
               </Empty>
             ) : (
-              <Empty icon={<SearchX size={48} strokeWidth={1.5} />} title="Ничего не нашлось"
-                actions={<>
-                  <button className="btn-primary" onClick={askFromFilters}><ChefAvatar size={24} />Спросить Шефа</button>
-                  {filtered && <button className="btn-outline" onClick={reset}>Сбросить фильтры</button>}
-                </>}>
-                {query ? "Шеф поймёт запрос своими словами и подберёт похожее." : "Уберите часть фильтров или спросите Шефа."}
-              </Empty>
+              <>
+                <Empty icon={<SearchX size={48} strokeWidth={1.5} />} title="Ничего не нашлось"
+                  actions={<>
+                    <button className="btn-primary" onClick={askFromFilters}><ChefAvatar size={24} />Спросить Шефа</button>
+                    {filtered && <button className="btn-outline" onClick={reset}>{near.unfiltered ? "Без фильтров — " + near.unfiltered + " " + recipesWord(near.unfiltered) : "Сбросить фильтры"}</button>}
+                  </>}>
+                  {query ? "Шеф поймёт запрос своими словами и подберёт похожее." : "Уберите часть фильтров или спросите Шефа."}
+                </Empty>
+                {near.list.length > 0 && (
+                  <section className="mt-2" aria-label="Может, подойдёт">
+                    <h2 className="mb-3 text-title">Может, подойдёт</h2>
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                      {near.list.map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} />)}
+                    </div>
+                  </section>
+                )}
+              </>
             )
           ) : (
             <>

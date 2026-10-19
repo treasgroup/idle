@@ -43,7 +43,7 @@ export function Learn({ onClose }: { onClose: () => void }) {
                 </button>
                 {expanded && (
                   <div className="border-t border-line px-4 pb-4 pt-3">
-                    <SchoolArt lesson={l.id} />
+                    <div className="mx-auto max-w-[420px]"><SchoolArt lesson={l.id} /></div>
                     <ul className="grid gap-2 text-body-sm">{l.points.map((p) => <li key={p} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-herb" aria-hidden />{p}</li>)}</ul>
                     <div className="mt-4 grid gap-2">{l.recipes.map((id) => { const r = recipeById(id); return r ? <RecipeRow key={id} recipe={r} note="Попробуйте на практике" onOpen={() => openRecipe(r)} /> : null; })}</div>
                     <button className={cx("mt-4 w-full", isDone ? "btn-ghost" : "btn-primary")} onClick={() => {
@@ -135,7 +135,7 @@ export function PollSheet({ token, onClose }: { token: string; onClose: () => vo
 
 const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Молочное"], ["gluten", "Глютен"], ["nuts", "Орехи"], ["mushrooms", "Грибы"], ["spicy", "Острое"]] as const;
 
-/** First visit: two short steps (how it looks, who eats what), then «Знакомьтесь — Шеф». Can be skipped. */
+/** First visit: two short steps (text size, who eats what), then «Знакомьтесь — Шеф». Can be skipped. */
 const LAST = 2;
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
@@ -144,7 +144,6 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const [step, setStep] = useState(0);
   const size = profile.textSize !== "m" ? profile.textSize : s.largeText ? "l" : "m";
   const setSize = (k: "m" | "l" | "xl") => { setProfile((p) => ({ ...p, textSize: k })); update((st) => ({ ...st, largeText: k !== "m" })); };
-  const setSimple = (v: boolean) => setProfile((p) => ({ ...p, simple: v }));
   const [eaters, setEaters] = useState(2);
   const [kids, setKids] = useState(false);
   const [excluded, setExcluded] = useState<string[]>(() => s.preferences.excluded);
@@ -164,40 +163,21 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   };
   const toggle = (list: string[], id: string) => (list.includes(id) ? list.filter((x) => x !== id) : [...list, id]);
 
-  const modes = [
-    { simple: true, title: "Простой", hint: "Крупно и только главное", tabs: ["Главная", "Шеф", "Избранное"] },
-    { simple: false, title: "Полный", hint: "Все возможности: поиск, покупки, план на неделю", tabs: ["Главная", "Поиск", "Шеф", "Избранное", "Покупки"] },
-  ];
   const steps = [
-    <div key="mode">
-      <h1 className="text-h1">Как вам удобнее?</h1>
-      <p className="mt-2 text-body-sm text-ink-soft">Можно поменять в любой момент в профиле.</p>
-      <div className="mt-6 grid gap-3" role="radiogroup" aria-label="Режим">
-        {modes.map((m) => {
-          const on = profile.simple === m.simple;
-          return (
-            <button key={m.title} role="radio" aria-checked={on} onClick={() => setSimple(m.simple)}
-              className={cx("rounded-card border p-4 text-left", on ? "border-brand bg-brand-soft" : "border-line bg-card")}>
-              <span className="flex items-center gap-3">
-                <span className={cx("grid h-6 w-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand" : "border-line-strong")}>{on && <span className="h-3 w-3 rounded-full bg-brand-fill" />}</span>
-                <span><span className="block text-title">{m.title}</span><span className="block text-small text-ink-soft">{m.hint}</span></span>
-              </span>
-              <span className="mt-3 flex gap-1 rounded-input bg-paper/80 p-1.5" aria-hidden>
-                {m.tabs.map((t) => <span key={t} className={cx("min-w-0 flex-auto truncate rounded-md px-1 py-1.5 text-center text-micro", t === "Шеф" ? "bg-brand-fill text-white" : "bg-sunken text-ink-soft", m.simple && "py-2.5 text-small")}>{t}</span>)}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      <p className="label mb-2 mt-6">Размер текста</p>
-      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Размер текста">
+    <div key="size">
+      {/* «Простой режим» is not offered here (it is in the profile): on the first screen people tap it and get less than they need. */}
+      <h1 className="text-h1">Какой размер текста удобнее?</h1>
+      <p className="mt-2 text-body-sm text-ink-soft">Выберите — весь сервис станет таким. Поменять можно в любой момент в профиле.</p>
+      <div className="mt-6 grid gap-2" role="radiogroup" aria-label="Размер текста">
         {(["m", "l", "xl"] as const).map((k, i) => (
           <button key={k} role="radio" aria-checked={size === k} onClick={() => setSize(k)}
-            className={cx("flex h-16 items-center justify-center rounded-input border", size === k ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-card")}>
-            <span style={{ fontSize: [16, 21, 26][i] + "px" }}>А</span>
+            className={cx("flex min-h-[64px] items-center gap-4 rounded-card border px-4 py-3 text-left", size === k ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-card")}>
+            <span className="w-10 shrink-0 text-center font-semibold leading-none" style={{ fontSize: [18, 24, 30][i] + "px" }} aria-hidden>А</span>
+            <span className="text-body">{["Обычный", "Крупный", "Очень крупный"][i]}</span>
           </button>
         ))}
       </div>
+      <p className="mt-5 rounded-input bg-sunken px-4 py-3 text-body text-ink">Так будет выглядеть рецепт: «Нарежьте картофель кубиками и залейте холодной водой».</p>
     </div>,
     <div key="who">
       <h1 className="text-h1">Для кого готовите?</h1>

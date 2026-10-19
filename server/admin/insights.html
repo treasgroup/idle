@@ -32,6 +32,10 @@
     .reply-form { margin-top: 8px; display: grid; gap: 8px; }
     .reply-form[hidden] { display: none; }
     .reply-form textarea { font: inherit; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); width: 100%; }
+    .vk-form { display: grid; gap: 10px; }
+    .vk-form input[type=text], .vk-form input[type=password] { font: inherit; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line); width: 100%; }
+    .vk-form .primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .vk-ok { color: var(--herb); } .vk-err { color: #a3311f; }
     .reply-form button { justify-self: start; background: var(--brand); color: #fff; border-color: var(--brand); }
   </style>
 </head>
@@ -46,7 +50,10 @@
       <label>За <select id="days"><option value="7">7 дней</option><option value="30" selected>30 дней</option><option value="90">90 дней</option></select></label>
     </div>
     <div id="out"><p class="muted">Загружаю…</p></div>
+    <h2 id="vk-title">ВКонтакте: рецепт дня</h2>
+    <div class="card" id="vk"><p class="muted">Загружаю…</p></div>
   </main>
   <script src="./insights.js"></script>
+  <script src="./vk.js"></script>
 </body>
 </html>

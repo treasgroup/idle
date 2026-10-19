@@ -75,7 +75,16 @@ export function ConditionBar() {
   for (const d of c.desired) items.push({ label: conditionLabel(d), relax: "desired:" + d });
   const rule = c.health ? HEALTH[c.health] : null;
   if (rule) items.push({ label: rule.label, next: withoutHealth(c, s.preferences.excluded) });
-  for (const e of c.excluded) if (!s.preferences.excluded.includes(e) && !rule?.exclude.includes(e)) items.push({ label: "без: " + conditionLabel(e), relax: "unexclude:" + e });
+  // «без лука» adds лук, красный лук and зелёный лук: one chip for the family (its shortest id), removing all of it.
+  const own = c.excluded.filter((e) => !s.preferences.excluded.includes(e) && !rule?.exclude.includes(e));
+  const head = (e: string) => own.filter((x) => x !== e && e.endsWith("-" + x)).sort((a, b) => a.length - b.length)[0] ?? e;
+  for (const e of own) {
+    if (head(e) !== e) continue;
+    const family = own.filter((x) => head(x) === e);
+    items.push(family.length > 1
+      ? { label: "без: " + conditionLabel(e), next: { ...c, excluded: c.excluded.filter((x) => !family.includes(x)) } }
+      : { label: "без: " + conditionLabel(e), relax: "unexclude:" + e });
+  }
   if (c.mood) items.push({ label: (MOOD_LABEL[c.mood] ?? LABELS[c.mood] ?? c.mood).toLowerCase(), relax: "mood" });
   if (c.strictPantry) items.push({ label: "только из того, что дома", relax: "strict" });
   if (c.maxKcal && c.maxKcal !== rule?.maxKcal) items.push({ label: "до " + c.maxKcal + " ккал", relax: "kcal" });

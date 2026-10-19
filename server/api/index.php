@@ -12,8 +12,9 @@ require __DIR__ . '/_private/partners.php';
 require __DIR__ . '/_private/barcode.php';
 require __DIR__ . '/_private/ops.php';
 require __DIR__ . '/_private/community.php';
+require __DIR__ . '/_private/vk.php';
 
-const VERSION = '0.36.0';
+const VERSION = '0.37.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
 try { config(); } catch (Throwable $e) {}
 $route = isset($_GET['r']) ? (string)$_GET['r'] : '';
@@ -23,7 +24,7 @@ try {
     if ($route === 'status' && $method === 'GET') {
         // Reminders without cron: after answering, a few due ones are sent (at most once a minute).
         // And once a day, a copy of the database (after the answer has gone, so nobody waits for it).
-        register_shutdown_function(function () { if (function_exists('fastcgi_finish_request')) fastcgi_finish_request(); push_opportunistic(); try { backup_daily(); } catch (Throwable $e) {} });
+        register_shutdown_function(function () { if (function_exists('fastcgi_finish_request')) fastcgi_finish_request(); push_opportunistic(); try { backup_daily(); } catch (Throwable $e) {} try { vk_daily(); } catch (Throwable $e) {} });
         $dbOk = true;
         try { db(); } catch (Throwable $e) { $dbOk = false; }
         // The bots people can also talk to (shown in the profile only when they are really set up).
@@ -118,6 +119,9 @@ try {
     elseif ($route === 'message.replies' && $method === 'POST') message_replies(read_json_body(8000));
     elseif ($route === 'recipe.stats' && $method === 'GET') send_json(['stats' => (object)recipe_stats()]); // recounted at most hourly
     elseif ($route === 'admin.message' && $method === 'POST') { require_admin(true); admin_message_action(read_json_body(2000)); }
+    elseif ($route === 'admin.vk' && $method === 'GET') { require_admin(); admin_vk_status(); }
+    elseif ($route === 'admin.vk.save' && $method === 'POST') { require_admin(true); admin_vk_save(read_json_body(4000)); }
+    elseif ($route === 'admin.vk.post' && $method === 'POST') { require_admin(true); admin_vk_post(); }
     elseif ($route === 'admin.recipe' && $method === 'GET') { require_admin(); admin_recipe_get((string)($_GET['id'] ?? '')); }
     elseif ($route === 'admin.recipe.step' && $method === 'POST') { require_admin(true); admin_recipe_step(read_json_body(8000)); }
     elseif ($route === 'thumb' && $method === 'GET') {

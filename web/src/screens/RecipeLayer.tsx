@@ -482,7 +482,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
           <RecipeImage recipe={base} className="h-14 w-14 shrink-0" />
           <span className="min-w-0 flex-1">
             <span className="block text-body-sm font-medium">{making ? "Рисую картинку…" : "Картинкой"}</span>
-            <span className="block text-caption text-ink-soft">Фото, название и время — удобно переслать в ВК, Одноклассники, мессенджер</span>
+            <span className="block text-caption text-ink-soft">Фото, название и время — для ВК, ОК и мессенджеров</span>
           </span>
           <ImageIcon size={20} className="shrink-0 text-ink-soft" aria-hidden />
         </button>

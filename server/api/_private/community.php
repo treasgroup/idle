@@ -168,6 +168,7 @@ function recipe_of_day(): ?array {
     $base = (is_https() ? 'https://' : 'http://') . strtolower(preg_match('/^[a-z0-9.-]+(:\d{1,5})?$/i', (string)($_SERVER['HTTP_HOST'] ?? '')) ? $_SERVER['HTTP_HOST'] : 'treas.su')
         . rtrim(str_replace('\\', '/', dirname(dirname((string)($_SERVER['SCRIPT_NAME'] ?? '/cook/api/index.php')))), '/') . '/';
     return ['id' => $id, 'title' => (string)$r['title'], 'minutes' => (int)($r['totalMinutes'] ?? 0), 'day' => date('Y-m-d'),
+        'summary' => (string)($r['summary'] ?? ''), 'servings' => (int)($r['servings'] ?? 0),
         'photo' => $base . (is_file(thumbs_dir() . '/' . $id . '-' . $v . '.jpg') ? 'photos/s/' . $id . '-' . $v . '.jpg' : 'api/index.php?r=thumb&id=' . rawurlencode($id) . '&v=' . $v),
         'url' => $base . 'recipe/' . $id];
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="widget_today_name">Рецепт дня</string>
+    <string name="widget_today_small_name">Рецепт дня (маленький)</string>
     <string name="widget_today_description">Блюдо дня с фото. Нажмите — откроется рецепт.</string>
 </resources>

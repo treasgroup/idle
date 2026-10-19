@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 2×2: a small square card. -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="110dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="2"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:updatePeriodMillis="10800000"
+    android:initialLayout="@layout/widget_today_small"
+    android:previewLayout="@layout/widget_today_small"
+    android:previewImage="@mipmap/ic_launcher"
+    android:description="@string/widget_today_description" />

@@ -32,17 +32,21 @@ public class TodayWidget extends AppWidgetProvider {
     private static final String SITE = "https://treas.su/cook/";
     private static final String PREFS = "today_widget";
 
+    /** The layout of this size: 4×2 here, 2×2 in TodayWidgetSmall. */
+    protected int layout() { return R.layout.widget_today; }
+
     @Override
     public void onUpdate(Context context, final AppWidgetManager manager, final int[] ids) {
         // Shown at once from what was saved; then the day's dish is fetched in the background.
-        draw(context, manager, ids);
+        draw(context, manager, ids, layout());
         final PendingResult async = goAsync();
         final Context app = context.getApplicationContext();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if (fetch(app)) draw(app, manager, ids);
+                    // A new dish: both sizes on the screen show it.
+                    if (fetch(app)) drawAll(app, manager);
                 } catch (Throwable ignored) {
                     // No internet or the site did not answer: the saved dish stays.
                 } finally {
@@ -112,16 +116,22 @@ public class TodayWidget extends AppWidgetProvider {
 
     private static File photoFile(Context context) { return new File(context.getFilesDir(), "today_widget.jpg"); }
 
-    private static void draw(Context context, AppWidgetManager manager, int[] ids) {
+    private static void drawAll(Context context, AppWidgetManager manager) {
+        draw(context, manager, manager.getAppWidgetIds(new ComponentName(context, TodayWidget.class)), R.layout.widget_today);
+        draw(context, manager, manager.getAppWidgetIds(new ComponentName(context, TodayWidgetSmall.class)), R.layout.widget_today_small);
+    }
+
+    private static void draw(Context context, AppWidgetManager manager, int[] ids, int layout) {
+        if (ids == null || ids.length == 0) return;
         SharedPreferences p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         String title = p.getString("title", "");
         int minutes = p.getInt("minutes", 0);
         String url = p.getString("url", SITE);
 
-        RemoteViews v = new RemoteViews(context.getPackageName(), R.layout.widget_today);
+        RemoteViews v = new RemoteViews(context.getPackageName(), layout);
         if (title.isEmpty()) {
             v.setTextViewText(R.id.widget_title, "Что приготовить сегодня?");
-            v.setTextViewText(R.id.widget_meta, "Нажмите — подберу блюдо");
+            v.setTextViewText(R.id.widget_meta, layout == R.layout.widget_today_small ? "Рецепт дня" : "Нажмите — подберу блюдо");
         } else {
             v.setTextViewText(R.id.widget_title, title);
             v.setTextViewText(R.id.widget_meta, "Рецепт дня" + (minutes > 0 ? " · " + time(minutes) : ""));
@@ -142,7 +152,6 @@ public class TodayWidget extends AppWidgetProvider {
         PendingIntent pi = PendingIntent.getActivity(context, 0, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         v.setOnClickPendingIntent(R.id.widget_root, pi);
 
-        if (ids == null) ids = manager.getAppWidgetIds(new ComponentName(context, TodayWidget.class));
         for (int id : ids) manager.updateAppWidget(id, v);
     }
 

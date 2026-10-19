@@ -79,12 +79,12 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       <div className="card mt-3 overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Type size={18} /></span>
-          <span className="flex-1 text-body-sm font-semibold">Размер текста</span>
+          <span className="min-w-0 flex-1 whitespace-nowrap text-body-sm font-semibold">Размер текста</span>
           <div role="radiogroup" aria-label="Размер текста" className="flex rounded-full bg-sunken p-1">
             {(["m", "l", "xl"] as const).map((k, i) => (
               <button key={k} role="radio" aria-checked={size === k} aria-label={["Обычный", "Крупный", "Очень крупный"][i]}
                 onClick={() => { setProfile((p) => ({ ...p, textSize: k })); update((st) => ({ ...st, largeText: k !== "m" })); }}
-                className={cx("grid h-10 w-11 place-items-center rounded-full", size === k ? "bg-card font-semibold shadow-e1" : "text-ink-soft")}
+                className={cx("grid h-10 w-10 place-items-center rounded-full min-[380px]:w-11", size === k ? "bg-card font-semibold shadow-e1" : "text-ink-soft")}
                 style={{ fontSize: ["0.875rem", "1.0625rem", "1.3125rem"][i] }}>А</button>
             ))}
           </div>

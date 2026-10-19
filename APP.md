@@ -92,7 +92,7 @@ public void onStart() {
 ## 6. Виджет «Рецепт дня» (с версии 2.0.2)
 
 Файлы — в папке `android-extras/` этого репозитория (их кладут поверх проекта приложения):
-`TodayWidget.java`, `res/layout/widget_today.xml`, `res/xml/widget_today_info.xml`, `res/drawable/widget_bg.xml`,
+`TodayWidget.java` и `TodayWidgetSmall.java` (2×2), `res/layout/widget_today*.xml`, `res/xml/widget_today*_info.xml`, `res/drawable/widget_bg.xml`,
 `res/drawable/widget_shade.xml`, `res/values/widget_strings.xml` и `<receiver android:name=".TodayWidget">` в `AndroidManifest.xml`.
 
 Виджет раз в 3 часа спрашивает `https://treas.su/cook/api/index.php?r=today` (блюдо дня с фото — одно для всех,
