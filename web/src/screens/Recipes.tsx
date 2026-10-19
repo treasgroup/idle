@@ -317,7 +317,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
                 )}
                 {(sections && !browseAll ? photoFirst(list).slice(0, 12) : list.slice(0, limit)).map((r) => tiles
                   ? <RecipeTile key={r.id} recipe={r} note={note(r)} onOpen={() => openRecipe(r)} />
-                  : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} rating={ratings[r.id]} note={note(r)} onOpen={() => openRecipe(r)} />)}
+                  : <RecipeRow key={r.id} recipe={r} favorite={isFavorite(r.id)} note={note(r)} onOpen={() => openRecipe(r)} />)}
               </div>
               {sections && !browseAll ? (
                 <div className="mt-6 flex justify-center">

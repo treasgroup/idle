@@ -3,7 +3,7 @@ import { Clock, Flame, Heart, CalendarPlus, Check, Star } from "lucide-react";
 import { formatMinutes, nutritionOf, photoSmallUrl, photoUrl, type Recipe } from "../engine";
 import { dishEmoji, dishTint, dishVariant } from "./dishArt";
 import { useStore } from "../app/store";
-import { ratingLabel, useRatings } from "../app/ratings";
+import { ratingLabel, useRatings, type Rating } from "../app/ratings";
 import { cx } from "./ui";
 
 /** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
@@ -49,13 +49,19 @@ export function RatingBadge({ id, className }: { id: string; className?: string 
 }
 
 /** "25 мин · 361 ккал · просто" */
-export function RecipeMeta({ recipe, size = "small", showDifficulty = true }: { recipe: Recipe; size?: "small" | "caption"; showDifficulty?: boolean }) {
+export function RecipeMeta({ recipe, size = "small", showDifficulty = true, rating }: { recipe: Recipe; size?: "small" | "caption"; showDifficulty?: boolean; rating?: Rating }) {
   const kcal = nutritionOf(recipe).perServing.kcal;
   const icon = size === "caption" ? 14 : 16;
   return (
     <div className={cx("flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-ink-soft", size === "caption" ? "text-caption" : "text-small")}>
       <span className="inline-flex items-center gap-1"><Clock size={icon} aria-hidden />{formatMinutes(recipe.totalMinutes)}</span>
       {kcal > 0 && <span className="inline-flex items-center gap-1"><Flame size={icon} aria-hidden />{kcal} ккал</span>}
+      {/* The mark after the calories (before «средне»): when a long time and many calories leave no room, it moves to the next line. */}
+      {rating && rating.count > 0 && (
+        <span className="inline-flex items-center gap-1 font-semibold text-ink" aria-label={"Оценка " + ratingLabel(rating) + " из 5"}>
+          <Star size={icon - 2} className="fill-warn text-warn" aria-hidden />{ratingLabel(rating)}
+        </span>
+      )}
       {showDifficulty && recipe.difficulty !== "easy" && <span>{DIFF[recipe.difficulty]}</span>}
     </div>
   );
@@ -92,7 +98,8 @@ export function RecipeFeatured({ recipe, note, onOpen, onMenu, onSave, saved }: 
 }
 
 /** A row: square photo left, title and facts right. */
-export function RecipeRow({ recipe, note, onOpen, favorite, rating }: { recipe: Recipe; note?: string; onOpen: () => void; favorite?: boolean; rating?: { avg: number; count: number } }) {
+export function RecipeRow({ recipe, note, onOpen, favorite }: { recipe: Recipe; note?: string; onOpen: () => void; favorite?: boolean }) {
+  const rating = useRatings()[recipe.id];
   return (
     <button onClick={onOpen} className="card flex min-h-[88px] w-full items-center gap-3 p-2 pr-3 text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.99]">
       <RecipeImage recipe={recipe} className="h-[72px] w-[72px] shrink-0" />
@@ -101,13 +108,8 @@ export function RecipeRow({ recipe, note, onOpen, favorite, rating }: { recipe: 
           <span className="line-clamp-2 text-title leading-snug">{recipe.title}</span>
           {favorite && <Heart size={14} className="mt-1.5 shrink-0 fill-brand text-brand" aria-label="В сохранённом" />}
         </span>
-        <span className="mt-0.5 block"><RecipeMeta recipe={recipe} size="caption" /></span>
-        {(note || (rating && rating.count > 0)) && (
-          <span className="mt-0.5 line-clamp-1 block text-caption text-ink-soft">
-            {rating && rating.count > 0 && <span className="mr-1.5 font-semibold text-warn">★ {rating.avg.toFixed(1).replace(".", ",")}</span>}
-            {note}
-          </span>
-        )}
+        <span className="mt-0.5 block"><RecipeMeta recipe={recipe} size="caption" rating={rating} /></span>
+        {note && <span className="mt-0.5 line-clamp-1 block text-caption text-ink-soft">{note}</span>}
       </span>
     </button>
   );
