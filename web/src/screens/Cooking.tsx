@@ -26,7 +26,6 @@ import { TimerRing, TimerStrip } from "../components/TimerStrip";
 import { StepTimer } from "../components/StepTimer";
 import { AskSheet } from "../components/AskSheet";
 import { homeAmount, mergeSame } from "../app/amounts";
-import { useHint } from "../app/hints";
 import { cue } from "../app/feedback";
 import { stepTips } from "../app/stepTips";
 import { ChefSecret } from "../components/ChefSecret";
@@ -184,7 +183,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", on);
   }, [dish, total, go]);
 
-  const [tapHint, tapSeen] = useHint("cook-tap", 3);
+  // The next step: one line until tapped, then the whole text (folded again on the next step).
+  const [nextOpen, setNextOpen] = useState(false);
+  useEffect(() => setNextOpen(false), [dish?.step]);
   // A horizontal swipe over the step changes it.
   const touch = useRef<{ x: number; y: number; t: number } | null>(null);
   const onTouchStart = (e: TouchEvent) => { const p = e.touches[0]; touch.current = { x: p.clientX, y: p.clientY, t: Date.now() }; };
@@ -201,7 +202,6 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
 
   const tapStep = (e: MouseEvent<HTMLElement>) => {
     if (!dish || window.getSelection()?.toString()) return;
-    tapSeen();
     const box = e.currentTarget.getBoundingClientRect();
     if (e.clientX - box.left < box.width * 0.3) { if (dish.step > 0) go(-1); }
     else if (dish.step < total - 1) go(1);
@@ -283,7 +283,6 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <div key={dish.key + dish.step} className="anim-rise">
             {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
             <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{cur.text}</p>
-            {tapHint && total > 1 && <p className="mt-2 text-caption text-ink-faint">Коснитесь текста справа — следующий шаг, слева — назад</p>}
             {uses.length > 0 && (
               <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
                 {uses.map((i) => (
@@ -311,13 +310,18 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           </div>
           {hint && <VoiceHint onClose={() => { setHint(false); markHintSeen(); }} />}
 
-          {next && (
-            // One quiet line: what comes next, without a second paragraph under the step.
-            <button onClick={() => go(1)} className="mt-8 flex min-h-11 w-full items-center gap-2 border-t border-line pt-4 text-left text-body-sm text-ink-soft">
+          {next && (nextOpen ? (
+            <button onClick={() => go(1)} className="mt-8 block w-full border-t border-line pt-4 text-left">
+              <span className="label">Следующий шаг</span>
+              <span className="mt-1 block text-body-sm text-ink-soft">{next.text}</span>
+            </button>
+          ) : (
+            // One quiet line: what comes next, without a second paragraph under the step; a tap shows it whole.
+            <button onClick={() => setNextOpen(true)} aria-expanded={false} className="mt-8 flex min-h-11 w-full items-center gap-2 border-t border-line pt-4 text-left text-body-sm text-ink-soft">
               <span className="shrink-0 font-semibold text-ink">Дальше:</span>
               <span className="min-w-0 flex-1 truncate">{next.text}</span>
             </button>
-          )}
+          ))}
         </div>
 
         <aside className="hidden lg:block" aria-label="Продукты, таймеры и второе блюдо">
