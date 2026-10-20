@@ -184,7 +184,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     return () => document.removeEventListener("keydown", on);
   }, [dish, total, go]);
 
-  const [tapHint, tapSeen] = useHint("cook-tap");
+  const [tapHint, tapSeen] = useHint("cook-tap", 3);
   // A horizontal swipe over the step changes it.
   const touch = useRef<{ x: number; y: number; t: number } | null>(null);
   const onTouchStart = (e: TouchEvent) => { const p = e.touches[0]; touch.current = { x: p.clientX, y: p.clientY, t: Date.now() }; };
@@ -312,9 +312,10 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           {hint && <VoiceHint onClose={() => { setHint(false); markHintSeen(); }} />}
 
           {next && (
-            <button onClick={() => go(1)} className="mt-8 block w-full border-t border-line pt-4 text-left">
-              <span className="label">Следующий шаг</span>
-              <span className="mt-1 line-clamp-2 block text-body-sm text-ink-soft">{next.text}</span>
+            // One quiet line: what comes next, without a second paragraph under the step.
+            <button onClick={() => go(1)} className="mt-8 flex min-h-11 w-full items-center gap-2 border-t border-line pt-4 text-left text-body-sm text-ink-soft">
+              <span className="shrink-0 font-semibold text-ink">Дальше:</span>
+              <span className="min-w-0 flex-1 truncate">{next.text}</span>
             </button>
           )}
         </div>

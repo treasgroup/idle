@@ -103,7 +103,8 @@ export function Menu() {
     } catch (e) { toast(e instanceof Error ? e.message : "Не удалось создать опрос."); }
   };
 
-  const planChips = [menuPlanSummary(plan), servings + " " + plural(servings, "человек", "человека", "человек")];
+  // Only the meal and how many people; the rest of the settings («в будни быстро», «на 2 дня») is behind «Настроить».
+  const planChips = [menuPlanSummary(plan).split(" · ")[0], servings + " " + plural(servings, "человек", "человека", "человек")];
 
   return (
     <div className="pt-4 sm:pt-6">

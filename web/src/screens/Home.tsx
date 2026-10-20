@@ -79,7 +79,7 @@ function useToday(pick: Recipe | null, meal: string, ready: boolean): Recipe | n
 const FESTIVE = ["newyear", "easter", "maslenitsa"];
 
 export function Home({ pwa }: { pwa?: Pwa }) {
-  const { profile, catalog } = useStore();
+  const { s, profile, catalog } = useStore();
   const { openRecipe } = useActions();
   const a = useAssistant();
   const [decide, setDecide] = useState(false);
@@ -92,6 +92,10 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const weather = weatherLine(useWeather());
 
   if (profile.simple) return <SimpleHome today={today} />;
+
+  // A dish planned for today takes the big card; «Рецепт дня» moves into «На сегодня» — the two swap places.
+  const planned = s.menu.find((d) => d.date === dateKey(new Date()))?.items.map((i) => recipeById(i.recipeId)).find((r): r is Recipe => !!r) ?? null;
+  const hero = planned ?? today;
 
   const quick = photoFirst(all.filter((r) => r.totalMinutes <= 30 && r.id !== today?.id)).slice(0, 10);
   const kids = photoFirst(all.filter((r) => r.kids === true && r.id !== today?.id)).slice(0, 10);
@@ -111,7 +115,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <ContinueCard />
       <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         {/* The first second of a first visit: the day's dish is chosen from the full list, not the small built-in one. */}
-        {!catalog.version ? <Bone className="h-[340px] rounded-card lg:h-auto lg:min-h-[260px]" /> : today && <TodayCard r={today} onOpen={() => openRecipe(today)} />}
+        {!catalog.version ? <Bone className="h-[340px] rounded-card lg:h-auto lg:min-h-[260px]" /> : hero && <TodayCard r={hero} badge={planned ? "По плану на сегодня" : "Рецепт дня"} onOpen={() => openRecipe(hero)} />}
         {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
         <div className="grid content-start gap-3 lg:flex lg:flex-col lg:[&>*]:flex-1">
           <RepeatCard />
@@ -136,7 +140,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       {pwa && <InstallCard pwa={pwa} />}
       <MonthCard />
 
-      <Now />
+      <Now skip={planned?.id} dayDish={planned && today?.id !== planned.id ? today : null} />
       <Rescue />
       <BackupCard />
       {season && seasonal.length >= 4 && <Shelf title={season.title} list={seasonal}
@@ -153,14 +157,14 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 }
 
 /** The recipe of the day: a big card with one action. */
-function TodayCard({ r, onOpen }: { r: Recipe; onOpen: () => void }) {
+function TodayCard({ r, badge, onOpen }: { r: Recipe; badge: string; onOpen: () => void }) {
   const { profile } = useStore();
   return (
     // Phones: photo on top. Wide screens: photo on the left, so the card is not a screen-high block.
     <article className="overflow-hidden rounded-card border border-line bg-card lg:flex">
-      <button className="relative block w-full text-left lg:w-[46%] lg:shrink-0" onClick={onOpen} aria-label={"Рецепт дня: " + r.title}>
+      <button className="relative block w-full text-left lg:w-[46%] lg:shrink-0" onClick={onOpen} aria-label={badge + ": " + r.title}>
         <RecipeImage recipe={r} full className="aspect-[16/10] w-full lg:aspect-auto lg:h-full lg:min-h-[260px]" rounded="rounded-none" eager />
-        <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">Рецепт дня</span>
+        <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">{badge}</span>
         <RatingBadge id={r.id} className="right-3 top-3" />
       </button>
       <div className="p-4 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-6">
@@ -273,11 +277,12 @@ function SimpleHome({ today }: { today: Recipe | null }) {
   );
 }
 
-function Now({ rail }: { rail?: boolean }) {
+function Now({ rail, skip, dayDish }: { rail?: boolean; skip?: string; dayDish?: Recipe | null }) {
   const { s, profile } = useStore();
   const { openRecipe } = useActions();
   const today = dateKey(new Date());
-  const menu = (s.menu.find((d) => d.date === today)?.items ?? []).map((i) => ({ i, r: recipeById(i.recipeId) })).filter((x): x is { i: typeof x.i; r: Recipe } => !!x.r);
+  // skip: the planned dish already shown in the big card above.
+  const menu = (s.menu.find((d) => d.date === today)?.items ?? []).map((i) => ({ i, r: recipeById(i.recipeId) })).filter((x): x is { i: typeof x.i; r: Recipe } => !!x.r && x.r.id !== skip);
   const toBuy = s.shopping.filter((i) => !i.checked).length;
   const cooking = s.cooking && !s.cooking.done ? s.cooking : null;
   const timers = useTimers().length;
@@ -296,10 +301,11 @@ function Now({ rail }: { rail?: boolean }) {
     </button>
   );
   // On phones and tablets the dish on the stove is in the bar above the nav.
-  if (!(cooking && rail) && !menu.length && !toBuy && !timers && !plan && !thaw) return null;
+  if (!(cooking && rail) && !menu.length && !toBuy && !timers && !plan && !thaw && !dayDish) return null;
   const rows = (
     <div className={cx("grid grid-cols-[minmax(0,1fr)] gap-2", rail && "gap-1")}>
       {timers > 0 && <TimerStrip flush={rail} />}
+      {dayDish && <RecipeRow recipe={dayDish} note="Рецепт дня" onOpen={() => openRecipe(dayDish)} />}
       {cooking && rail && (
         <button onClick={() => openLayer(routeHash({ cook: true }))} className="flex min-h-[56px] items-center gap-3 rounded-input bg-ink px-3 text-left text-paper">
           <Flame size={20} className="shrink-0 text-brand-soft" aria-hidden />

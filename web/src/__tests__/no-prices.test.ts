@@ -2,9 +2,11 @@
 // and prices differ). Regular expressions that parse a pasted receipt may still mention ₽ — those are skipped.
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { expect, it } from "vitest";
 
-const root = new URL("../", import.meta.url).pathname;
+// fileURLToPath, not .pathname: the folder is then right on Windows too.
+const root = fileURLToPath(new URL("../", import.meta.url));
 const files = (dir: string): string[] => readdirSync(dir).flatMap((f) => {
   const p = join(dir, f);
   return statSync(p).isDirectory() ? files(p) : /\.tsx?$/.test(f) ? [p] : [];

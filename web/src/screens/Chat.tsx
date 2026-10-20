@@ -10,7 +10,8 @@ import { FOCUS_COMPOSER, takeFocusRequest } from "../app/chatNav";
 import { minutesIn, startTimer } from "../app/timers";
 import { Composer } from "../components/Composer";
 import { TimerStrip } from "../components/TimerStrip";
-import { ConditionsButton, Message, PantryPicker, SuggestionCards, Typing, useSuggestions } from "../components/ChatParts";
+import { ConditionsButton, Message, PantryPicker, Typing } from "../components/ChatParts";
+import { useHint } from "../app/hints";
 import { ChefAvatar, Chip, Sheet, cx, useScrolled } from "../components/ui";
 import { removeChat, useChats } from "../app/chats";
 import { Mascot } from "../components/Mascot";
@@ -76,12 +77,6 @@ export function Chat() {
     void a.ask(text, { ...opts, reset });
   };
   const onOption = (o: ChatOption) => (o.action === "pantry" ? setPicker(true) : a.choose(o));
-  const suggestions = useSuggestions((t) => send(t), () => fromPantry());
-  const fromPantry = () => {
-    if (!s.fridge.length) return setPicker(true);
-    const ids = s.fridge.map((f) => f.id);
-    a.show("Из того, что дома", { ...a.base(), servings: s.conditions.servings, available: ids, strictPantry: ids.length >= 4 }, "Из того, что есть, можно приготовить:");
-  };
   const chats = useChats();
   const [history, setHistory] = useState(false);
 
@@ -127,7 +122,7 @@ export function Chat() {
             {a.busy && <Typing />}
           </div>
         ) : (
-          <EmptyChat suggestions={suggestions} send={send} />
+          <EmptyChat send={send} />
         )}
       </div>
 
@@ -172,9 +167,10 @@ function WrongAnswer({ question, shown }: { question: string; shown: string[] })
   );
 }
 
-/** An empty conversation looks like a messenger chat: Шеф says hello and offers ready answers to tap. */
-function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSuggestions>; send: (t: string, o?: { shown?: string; source?: string }) => void }) {
-  const fridge = useStore().s.fridge.length > 0;
+/** An empty conversation looks like a messenger chat: Шеф says hello and offers ready answers to tap.
+ * The full hello is for the first start; after that one short line — the person already knows who Шеф is. */
+function EmptyChat({ send }: { send: (t: string, o?: { shown?: string; source?: string }) => void }) {
+  const [hello] = useHint("chat-hello", 1);
   const quick = [
     ["Что-нибудь быстрое", "что-нибудь быстрое на ужин"], ["Из того, что есть", "что приготовить из того, что есть дома"],
     ["Хочу суп", "хочу суп"], ["Удиви меня", "удиви меня"],
@@ -184,13 +180,13 @@ function EmptyChat({ suggestions, send }: { suggestions: ReturnType<typeof useSu
       <div className="flex justify-center pt-2"><Mascot size={128} mood="happy" /></div>
       <p className="mx-auto w-fit rounded-full bg-sunken px-3 py-1 text-caption text-ink-soft">Сегодня</p>
       <p className="max-w-[85%] xl:max-w-[640px] rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-3 text-body">
-        Здравствуйте! Я Шеф — помогу выбрать, что приготовить. Скажите, что есть дома или чего хочется. Можно голосом — кнопка с микрофоном внизу.
+        {hello
+          ? "Здравствуйте! Я Шеф — помогу выбрать, что приготовить. Скажите, что есть дома или чего хочется. Можно голосом — кнопка с микрофоном внизу."
+          : "Что приготовим? Напишите или скажите."}
       </p>
       <div className="flex flex-wrap gap-2">
         {quick.map(([label, text]) => <Chip key={label} className="border-brand text-brand" onClick={() => send(text, { shown: label, source: "option" })}>{label}</Chip>)}
       </div>
-      <h2 className="label pt-4">Или выберите пример</h2>
-      <SuggestionCards items={fridge ? [suggestions[3], suggestions[0]] : [suggestions[0], suggestions[2]]} />
     </div>
   );
 }

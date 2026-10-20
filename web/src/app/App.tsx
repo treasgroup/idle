@@ -143,6 +143,8 @@ function Shell() {
   const anyTimer = useTimers().some((t) => !!t.end && !t.rang);
   useWakeLock((!!s.cooking && !s.cooking.done) || !!profile.parallel || anyTimer);
   useUpdateCheck(toast);
+  // A first visit: the welcome screens are fetched at once, not after the rest of the start.
+  useEffect(() => { if (!profile.setUp) void loadExtras(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!ready) return;
     if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=") && !location.hash.startsWith("#book=") && !openedByLink()) setOnboarding(true);
@@ -229,8 +231,11 @@ function Shell() {
       <Suspense fallback={route.doc ? <LayerSkeleton /> : null}>
         {route.doc && <DocLayer doc={route.doc} onClose={closeTop} />}
         {poll && <PollSheet token={poll} onClose={() => setPoll(null)} />}
-        {onboarding && <Onboarding onDone={() => setOnboarding(false)} />}
         {incoming && <IncomingRecipe data={incoming} onClose={() => setIncoming(null)} />}
+      </Suspense>
+      {/* Until the welcome screens are loaded, a blank page covers Главная: a tap there would land on them a moment later. */}
+      <Suspense fallback={<div className="fixed inset-0 z-50 bg-paper" aria-hidden />}>
+        {onboarding && <Onboarding onDone={() => setOnboarding(false)} />}
       </Suspense>
       <Toast message={message} onClose={clearToast} />
     </div>
