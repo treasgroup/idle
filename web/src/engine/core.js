@@ -2595,6 +2595,8 @@ function Vb(e) {
           continue;
         }
         let S = a.get(y.data.id);
+        // The same product described again in a later batch (same name and calories): nothing to report.
+        if (S && S.info?.name === y.data.name && S.info?.per100g?.kcal === y.data.per100g.kcal) continue;
         if (S) {
           t.push({
             file: u.name,
