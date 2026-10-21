@@ -18,7 +18,7 @@ import { goChat } from "../app/chatNav";
 import { useReminders } from "../app/reminders";
 import { replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, speak, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
-import { amountText } from "../app/nowaste";
+import { amountText, leftoversOf, rememberLeftovers } from "../app/nowaste";
 import { Chip, Layer, Sheet, Stepper, Toggle, cx, mmss } from "../components/ui";
 import { RecipeMini } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
@@ -220,7 +220,12 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const toggleVoice = () => {
     const on = !handsFree;
     setHandsFree(on);
-    if (on) { speak("Слушаю. Говорите: дальше, назад, повтори, таймер."); if (!hintSeen()) setHint(true); }
+    if (on) {
+      // Hands and eyes on the food: when you talk to the phone, it reads the steps back too.
+      if (!s.readAloud) update((st) => ({ ...st, readAloud: true }));
+      speak("Слушаю и читаю шаги вслух. Говорите: дальше, назад, повтори, таймер.");
+      if (!hintSeen()) setHint(true);
+    }
   };
   const toggleRead = () => {
     const on = !s.readAloud;
@@ -712,6 +717,22 @@ function Done({ onClose }: { onClose: () => void }) {
     update((st) => ({ ...st, taste: rateDish(st.taste, r.id, v === "yes") }));
   };
   useEffect(() => { cue("done"); }, []);
+  // «Шеф помнит, что осталось»: what is left in the packs goes to «Мои продукты» by itself — once per cooking,
+  // quietly, with «Отменить». «Что-то осталось?» below stays for corrections.
+  const [noted, setNoted] = useState<string[]>([]);
+  useEffect(() => {
+    const key = "cook-left-noted:" + r.id + ":" + c.startedAt;
+    try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch { /* private mode */ }
+    const left = leftoversOf(r, c.servings, s);
+    if (!left.length) return;
+    const before = s.fridge;
+    const ids = left.map((x) => x.id);
+    update((st) => ({ ...st, fridge: addToFridge(st.fridge, ids) }));
+    rememberLeftovers(ids, r.title);
+    setNoted(left.map((x) => x.name));
+    toast("Осталось: " + left.map((x) => x.name + " ~" + x.left).join(", ") + " — записал в «Мои продукты»",
+      { label: "Отменить", run: () => { update((st) => ({ ...st, fridge: before })); setNoted([]); } });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   const reviews = () => { end(); replace(routeHash({ tab: "home", recipe: r.id })); scrollToReviews(); };
   const book = () => {
     end();
@@ -752,7 +773,7 @@ function Done({ onClose }: { onClose: () => void }) {
 
         {/* Three things worth doing now; the rest is one quiet line. */}
         <ul className="card mt-8 divide-y divide-line overflow-hidden">
-          <li><DoneRow icon={<Refrigerator size={20} />} title="Что-то осталось?" hint="Запишу в «Мои продукты»" onClick={() => setSheet("left")} chevron /></li>
+          <li><DoneRow icon={<Refrigerator size={20} />} title={noted.length ? "Записал, что осталось" : "Что-то осталось?"} hint={noted.length ? noted.join(", ") + " — поправить" : "Запишу в «Мои продукты»"} onClick={() => setSheet("left")} chevron /></li>
           <li><DoneRow icon={<PenLine size={20} />} title={s.notes[r.id] ? "Ваша заметка" : "Заметка на следующий раз"} hint={s.notes[r.id] || "Например: соли меньше"} onClick={() => setSheet("note")} chevron /></li>
           <li><DoneRow icon={<MessageCircle size={20} />} title="Что приготовить завтра?" hint="Спросить Шефа" onClick={tomorrow} chevron /></li>
         </ul>

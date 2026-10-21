@@ -159,11 +159,14 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
       if (!done.length) return;
       save(current().map((t) => (done.some((d) => d.id === t.id) ? { ...t, rang: true, rangAt: now } : t)));
       const what = done.map((t) => (t.dish && t.dish !== "Таймер" ? "«" + t.dish + "»" + (t.label ? ", " + t.label : "") : t.label || "таймер")).join("; ");
-      toast("Время вышло: " + what);
+      // Said the way a person would say it: a step of the dinner timeline — what to do now; a cooking timer — what to check.
+      const said = done.map((t) => (/^(Ужин|Заготовки) к /.test(t.dish) ? "Пора: " + t.label.replace(/^([^:]+): /, "$1 — ")
+        : "Пора проверить: " + (t.label || (t.dish && t.dish !== "Таймер" ? t.dish : "таймер")))).join(". ");
+      toast(done.every((t) => /^(Ужин|Заготовки) к /.test(t.dish)) ? said : "Время вышло: " + what);
       beep();
       navigator.vibrate?.([300, 120, 300, 120, 300]);
       void notify("Таймер закончился", what);
-      if (readAloud) setTimeout(() => speak("Время вышло. " + what), 2600);
+      if (readAloud) setTimeout(() => speak(said), 2600);
     };
     tick();
     const t = setInterval(tick, 500);
