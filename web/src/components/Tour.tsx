@@ -72,18 +72,26 @@ export const tourWanted = (): boolean =>
 export function Tour({ onDone, last = "Дальше" }: { onDone: () => void; /** The last card's button. */ last?: string }) {
   const rail = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(0);
+  const aim = useRef<number | null>(null);
   // The card in view follows the scroll (a swipe), and «Дальше» scrolls to the next one.
   useEffect(() => {
     const el = rail.current;
     if (!el) return;
-    const on = () => setAt(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)));
+    // While «Дальше» scrolls to a card, the number waits for it (no flicker back mid-way).
+    const on = () => {
+      const p = Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+      if (aim.current != null) { if (p !== aim.current) return; aim.current = null; }
+      setAt(p);
+    };
+    const end = () => { aim.current = null; on(); };
     el.addEventListener("scroll", on, { passive: true });
-    el.addEventListener("scrollend", on);
-    return () => { el.removeEventListener("scroll", on); el.removeEventListener("scrollend", on); };
+    el.addEventListener("scrollend", end);
+    return () => { el.removeEventListener("scroll", on); el.removeEventListener("scrollend", end); };
   }, []);
   const go = (i: number) => {
     const el = rail.current;
     if (!el) return;
+    aim.current = i;
     el.scrollTo({ left: i * el.clientWidth, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     setAt(i);
   };

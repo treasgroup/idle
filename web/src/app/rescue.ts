@@ -300,3 +300,16 @@ export function troublesFor(r: Recipe): Trouble[] {
 /** Every answer once (for Школа готовки → «Спасение»). */
 export const ALL_TROUBLES: Trouble[] = [SALTY_SOUP, SALTY, BURNT, SMOKE, STICKS, ...SOUP, ...MEAT, ...FISH, UNDERCOOKED_RICE, UNDERCOOKED, MUSHY, WATERY,
   ...PASTA, ...MASH, ...BAKING, ...THICKEN, CREAM, ...PANCAKES, ...SYRNIKI, ...SALAD, ...OMELET, ...CASSEROLE, ...DUMPLINGS, ...ROAST_VEG, ...DRINK];
+
+/** Школа готовки → «Спасение»: the same answers, by kind of dish. */
+export const RESCUE_GROUPS: { title: string; items: Trouble[] }[] = [
+  { title: "Супы", items: [...SOUP, SALTY_SOUP] },
+  { title: "Крупы, паста, пюре", items: [UNDERCOOKED_RICE, UNDERCOOKED, MUSHY, WATERY, ...PASTA, ...MASH] },
+  { title: "Мясо и рыба", items: [...MEAT, ...FISH] },
+  { title: "Жарка", items: [STICKS, SMOKE, BURNT, SALTY] },
+  { title: "Выпечка, блины, сырники", items: [...BAKING, ...PANCAKES, ...SYRNIKI] },
+  { title: "Соусы, кремы, сливки", items: [...THICKEN, CREAM] },
+  { title: "Яйца, запеканки, вареники", items: [...OMELET, ...CASSEROLE, ...DUMPLINGS] },
+  { title: "Овощи и салаты", items: [...ROAST_VEG, ...SALAD] },
+  { title: "Напитки", items: DRINK },
+];

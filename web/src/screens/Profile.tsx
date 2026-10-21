@@ -83,7 +83,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         {!profile.simple && <Row icon={<Refrigerator size={18} />} title="Мои продукты" hint={s.fridge.length ? s.fridge.length + " " + plural(s.fridge.length, "продукт", "продукта", "продуктов") + " дома" : "Что есть дома — подскажу, что приготовить"} onClick={() => openLayer(routeHash({ tab: "pantry" }))} />}
         {profile.simple && <Row icon={<ShoppingCart size={18} />} title="Список покупок" hint={s.shopping.filter((i) => !i.checked).length ? "Купить: " + s.shopping.filter((i) => !i.checked).length : "Пока пуст"} onClick={() => openLayer(routeHash({ tab: "shopping" }))} />}
         <Row icon={<BookOpenCheck size={18} />} title="Я готовил(а)" hint={bookCount ? bookCount + " " + plural(bookCount, "блюдо", "блюда", "блюд") : "Здесь будет всё, что вы приготовили"} onClick={() => openRecipesView("book")} />
-        <Row icon={<GraduationCap size={18} />} title="Школа готовки" hint={profile.lessonsDone.length ? "Пройдено уроков: " + profile.lessonsDone.length : "14 коротких уроков для начинающих"} onClick={() => openLayer(routeHash({ tab: "learn" }))} />
+        <Row icon={<GraduationCap size={18} />} title="Школа готовки" hint={profile.lessonsDone.length ? "Пройдено уроков: " + profile.lessonsDone.length : "Короткие уроки: от ножа до духовки"} onClick={() => openLayer(routeHash({ tab: "learn" }))} />
       </div>
 
       <div className="card mt-3 overflow-hidden">

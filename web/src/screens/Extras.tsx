@@ -1,67 +1,131 @@
 // Smaller screens: the beginner course, legal documents, the family poll, first-run questions.
 import { useEffect, useState } from "react";
-import { Check, CircleCheck, ArrowUpRight, Search, Egg, Soup, CalendarDays } from "lucide-react";
-import { apiUrl, legalDoc, legalInfo, recipeById, type LegalInfo, type LegalKey } from "../engine";
+import { CircleCheck, ArrowUpRight, Search, Egg, Soup, CalendarDays, ChevronRight } from "lucide-react";
+import { apiUrl, legalDoc, legalInfo, plural, recipeById, type LegalInfo, type LegalKey } from "../engine";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { RecipeRow } from "../components/RecipeCard";
 import { KitchenTools } from "../components/KitchenTools";
 import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
-import { LESSONS } from "./learn-data";
-import { SchoolArt } from "../components/SchoolArt";
+import { BEGINNER, LESSONS, SECTIONS, type Lesson } from "./learn-data";
+import { LessonPlayer } from "../components/LessonPlayer";
+import { RESCUE_GROUPS } from "../app/rescue";
+import { cue } from "../app/feedback";
 import { Mascot } from "../components/Mascot";
 import { Tour, tourWanted } from "../components/Tour";
 import { PlaceHint } from "../components/PlaceHint";
 
-/** «Школа готовки»: short lessons, each with a skill and recipes to practise it. */
+/** «Школа готовки»: sections (Для новичка · Основы · Техники · Продукты · Спасение), «Продолжить» with the next
+ * lesson, and the lessons as short card decks (components/LessonPlayer). «Спасение» is the same help as in cooking. */
 export function Learn({ onClose }: { onClose: () => void }) {
   const { profile, setProfile } = useStore();
-  const { openRecipe } = useActions();
-  const [open, setOpen] = useState<string | null>(() => LESSONS.find((l) => !profile.lessonsDone.includes(l.id))?.id ?? null);
-  const done = profile.lessonsDone.length;
+  const done = new Set(profile.lessonsDone);
+  const byId = (id: string) => LESSONS.find((l) => l.id === id)!;
+  const order = [...BEGINNER, ...LESSONS.map((l) => l.id).filter((id) => !BEGINNER.includes(id))].map(byId);
+  const next = order.find((l) => !done.has(l.id)) ?? null;
+  const doneCount = LESSONS.filter((l) => done.has(l.id)).length;
+  const [tab, setTab] = useState<(typeof SECTIONS)[number]["id"]>(() => (BEGINNER.every((id) => done.has(id)) ? "basics" : "beginner"));
+  const [playing, setPlaying] = useState<Lesson | null>(null);
+  const list = tab === "beginner" ? BEGINNER.map(byId) : LESSONS.filter((l) => l.section === tab);
+  const finish = (l: Lesson) => {
+    if (!done.has(l.id)) { setProfile((p) => ({ ...p, lessonsDone: [...p.lessonsDone, l.id] })); cue("bought"); }
+    setPlaying(null);
+  };
+  const meta = (l: Lesson) => l.cards.length + " " + plural(l.cards.length, "карточка", "карточки", "карточек") + " · " + Math.max(1, Math.round((l.cards.length * 20 + l.quiz.length * 15) / 60)) + " мин";
+
   return (
     <Layer title="Школа готовки" onClose={onClose}>
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-2 sm:px-6">
         <h1 className="text-h1">Школа готовки</h1>
-        <p className="mt-1 text-body-sm text-ink-soft">{LESSONS.length} коротких уроков: навык и рецепт, чтобы сразу попробовать.</p>
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-sunken"><div className="h-full rounded-full bg-herb transition-all" style={{ width: (done / LESSONS.length) * 100 + "%" }} /></div>
-        <p className="mt-1.5 text-caption text-ink-soft">Пройдено {done} из {LESSONS.length}</p>
-        <PlaceHint id="learn" className="mt-4" text="Начните с первого урока — он уже открыт. В конце каждого урока — рецепт, чтобы сразу попробовать." />
-        <div className="mt-5 grid gap-2">
-          {LESSONS.map((l, n) => {
-            const isDone = profile.lessonsDone.includes(l.id);
-            const expanded = open === l.id;
-            return (
-              <section key={l.id} className="card overflow-hidden">
-                <button className="flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left" onClick={() => setOpen(expanded ? null : l.id)} aria-expanded={expanded}>
-                  {isDone
-                    ? <CircleCheck size={32} className="shrink-0 text-herb" aria-label="Пройден" />
-                    : <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-herb-soft text-small font-semibold text-herb">{n + 1}</span>}
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-body-sm font-semibold">{l.title}</span>
-                    <span className="block text-caption text-ink-soft">{isDone ? "Пройден · " : ""}{l.skill}</span>
-                  </span>
-                </button>
-                {expanded && (
-                  <div className="border-t border-line px-4 pb-4 pt-3">
-                    <div className="mx-auto max-w-[420px]"><SchoolArt lesson={l.id} /></div>
-                    <ul className="grid gap-2 text-body-sm">{l.points.map((p) => <li key={p} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-herb" aria-hidden />{p}</li>)}</ul>
-                    <div className="mt-4 grid gap-2">{l.recipes.map((id) => { const r = recipeById(id); return r ? <RecipeRow key={id} recipe={r} note="Попробуйте на практике" onOpen={() => openRecipe(r)} /> : null; })}</div>
-                    <button className={cx("mt-4 w-full", isDone ? "btn-ghost" : "btn-primary")} onClick={() => {
-                      setProfile((p) => ({ ...p, lessonsDone: isDone ? p.lessonsDone.filter((x) => x !== l.id) : [...p.lessonsDone, l.id] }));
-                      if (!isDone) setOpen(LESSONS[n + 1]?.id ?? null);
-                    }}>{isDone ? "Отметить как непройденный" : <><Check size={18} />Урок пройден</>}</button>
-                  </div>
-                )}
-              </section>
-            );
-          })}
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-sunken"><div className="h-full rounded-full bg-herb transition-all" style={{ width: (doneCount / LESSONS.length) * 100 + "%" }} /></div>
+        <p className="mt-1.5 text-caption text-ink-soft">Пройдено {doneCount} из {LESSONS.length}</p>
+        <PlaceHint id="learn" className="mt-4" text="Урок — несколько карточек: листайте пальцем, в конце — вопрос и рецепт, чтобы сразу попробовать." />
+
+        <div className="scroller -mx-4 mt-4 px-4" role="tablist" aria-label="Разделы школы">
+          {SECTIONS.map((x) => (
+            <button key={x.id} role="tab" aria-selected={tab === x.id} onClick={() => setTab(x.id)}
+              className={cx("chip h-10 shrink-0", tab === x.id && "border-brand-fill bg-brand-fill text-white hover:border-brand-fill")}>{x.label}</button>
+          ))}
         </div>
-        <KitchenTools />
+
+        {tab === "rescue" ? <RescueList /> : (
+          <>
+            {next && (tab === "beginner" ? BEGINNER.includes(next.id) : next.section === tab) && (
+              <button onClick={() => setPlaying(next)} className="card mt-4 flex w-full items-center gap-3 border-brand/40 p-4 text-left hover:border-brand">
+                <span className="min-w-0 flex-1">
+                  <span className="block text-caption font-semibold text-brand">{doneCount ? "Продолжить" : "Начать"}</span>
+                  <span className="mt-0.5 block text-title leading-snug">{next.title}</span>
+                  <span className="mt-0.5 block text-caption text-ink-soft">{meta(next)}</span>
+                </span>
+                <ChevronRight size={20} className="shrink-0 text-brand" aria-hidden />
+              </button>
+            )}
+            <div className="mt-4 grid gap-2">
+              {list.map((l, n) => {
+                const isDone = done.has(l.id);
+                return (
+                  <button key={l.id} onClick={() => setPlaying(l)} className="card flex min-h-[64px] w-full items-center gap-3 px-4 py-3 text-left hover:border-line-strong">
+                    {isDone
+                      ? <CircleCheck size={32} className="shrink-0 text-herb" aria-label="Пройден" />
+                      : <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-herb-soft text-small font-semibold text-herb">{n + 1}</span>}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-body-sm font-semibold">{l.title}</span>
+                      <span className="block text-caption text-ink-soft">{isDone ? "Пройден · " : ""}{meta(l)}</span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        )}
+        <div className="mt-10">
+          <KitchenTools />
+        </div>
       </div>
+      {playing && <LessonPlayer key={playing.id} lesson={playing} done={done.has(playing.id)} onFinish={() => finish(playing)} onClose={() => setPlaying(null)} />}
     </Layer>
+  );
+}
+
+/** «Спасение»: what to do when something went wrong — the answers from cooking's «Помощь», by kind of dish. */
+function RescueList() {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <div className="mt-4">
+      <p className="text-body-sm text-ink-soft">Что делать, если пошло не так. Во время готовки это же — под кнопкой «Помощь».</p>
+      <div className="mt-3 grid gap-3">
+        {RESCUE_GROUPS.map((g) => (
+          <section key={g.title} className="card overflow-hidden">
+            <h2 className="px-4 pb-1 pt-3 font-sans text-title">{g.title}</h2>
+            <ul className="divide-y divide-line">
+              {g.items.map((t) => {
+                const id = g.title + t.id;
+                const expanded = open === id;
+                return (
+                  <li key={id}>
+                    <button className="flex min-h-[48px] w-full items-center gap-3 px-4 text-left text-body-sm" onClick={() => setOpen(expanded ? null : id)} aria-expanded={expanded}>
+                      <span className="flex-1">{t.title}</span>
+                      <ChevronRight size={18} className={cx("shrink-0 text-ink-faint transition-transform", expanded && "rotate-90")} aria-hidden />
+                    </button>
+                    {expanded && (
+                      <ol className="space-y-2 px-4 pb-4">
+                        {t.steps.map((st, i) => (
+                          <li key={i} className="flex gap-3 text-body-sm">
+                            <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-warn-soft text-caption font-semibold" aria-hidden>{i + 1}</span>
+                            <span className="pt-0.5">{st}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </div>
   );
 }
 
