@@ -7,4 +7,5 @@ require __DIR__ . '/api/_private/accounts.php';
 require __DIR__ . '/api/_private/reviews.php';
 require __DIR__ . '/api/_private/seo.php';
 require __DIR__ . '/api/_private/collections.php';
+require __DIR__ . '/api/_private/school_seo.php';
 seo_run(function () { seo_sitemap(); });

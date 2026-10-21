@@ -26,6 +26,7 @@ import { TimerRing, TimerStrip } from "../components/TimerStrip";
 import { StepTimer } from "../components/StepTimer";
 import { AskSheet } from "../components/AskSheet";
 import { RescueSheet } from "../components/RescueSheet";
+import { useTerms } from "../components/Terms";
 import { homeAmount, mergeSame } from "../app/amounts";
 import { cue } from "../app/feedback";
 import { stepTips } from "../app/stepTips";
@@ -231,6 +232,8 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     setChecked((m) => ({ ...m, [recipeId]: (m[recipeId] ?? []).includes(key) ? m[recipeId].filter((k) => k !== key) : [...(m[recipeId] ?? []), key] }));
   const removeSecond = () => { if (second) setProfile((p) => ({ ...p, parallel: null })); setTab("main"); };
 
+  const terms = useTerms();
+
   if (!dish) {
     if (c?.done) return <Done onClose={onClose} />;
     return <NothingCooking onClose={onClose} />;
@@ -290,7 +293,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <p className="sr-only" aria-live="polite">Шаг {dish.step + 1} из {total}. {curText}</p>
           <div key={dish.key + dish.step} className="anim-rise">
             {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
-            <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{curText}</p>
+            <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{terms.render(curText)}</p>
             <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
@@ -392,6 +395,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
         <PickSecond main={c?.recipe ?? r} onClose={() => setSheet(null)}
           onPick={(x, n) => { setProfile((p) => ({ ...p, parallel: { recipeId: x.id, servings: n, step: 0, timerEnd: null } })); setSheet(null); }} />
       )}
+      {terms.sheet}
       <RescueSheet key={"rescue-" + r.id} open={sheet === "rescue"} recipe={r} onClose={() => setSheet(null)} onAsk={() => setSheet("ask")} />
       <AskSheet key={r.id} open={sheet === "ask"} onClose={() => setSheet(null)} recipe={r} servings={dish.servings} prefs={s.preferences}
         onServings={(n) => setServings(dish.key, n)} />

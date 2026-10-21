@@ -37,3 +37,12 @@ export function coverPrompt(key: string, title: string, hint: string, shape: Cov
   const scene = SCENES[key] ?? `One dish that says «${title}»${hint ? " (" + hint + ")" : ""} at a glance, served simply on a plate.`;
   return scene + " " + STYLE + " " + SHAPE[shape];
 }
+
+// Школа готовки: one flat illustration per lesson card, all in one style — the same set of colours as the app,
+// one clear action seen from above, nothing busy. Horizontal 3:2 (the card's picture). The scene is the card itself.
+const SCHOOL_STYLE = "Flat illustration, warm cream background #FAF7F0, soft terracotta accent #B7432F and herb green #36703F, simple shapes, no text, no letters, no numbers, top-down or three-quarter kitchen view, one clear action, gentle shadows, friendly and uncluttered. Horizontal 3:2.";
+
+/** The prompt for a lesson card's picture: what to show (the card, in Russian — modern image models read it) + the style. */
+export function schoolPrompt(lesson: string, title: string, text: string): string {
+  return "Illustration for a cooking lesson «" + lesson + "». Show this idea: «" + title + ". " + text + "» " + SCHOOL_STYLE;
+}

@@ -16,6 +16,7 @@ require __DIR__ . '/_private/vk.php';
 require __DIR__ . '/_private/weather.php';
 require __DIR__ . '/_private/catalog_heal.php';
 require __DIR__ . '/_private/home_collections.php';
+require __DIR__ . '/_private/school_images.php';
 require __DIR__ . '/_private/catalog_patch.php';
 
 const VERSION = '0.41.0';
@@ -126,6 +127,9 @@ try {
     elseif ($route === 'admin.collection.save' && $method === 'POST') { require_admin(true); admin_collection_save(read_json_body(40000)); }
     elseif ($route === 'admin.collection.cover' && $method === 'POST') { require_admin(true); admin_collection_cover(); }
     elseif ($route === 'admin.collection.cover.delete' && $method === 'POST') { require_admin(true); admin_collection_cover_delete(read_json_body(2000)); }
+    elseif ($route === 'school.images' && $method === 'GET') school_images_public();
+    elseif ($route === 'admin.school.image' && $method === 'POST') { require_admin(true); admin_school_image(); }
+    elseif ($route === 'admin.school.image.delete' && $method === 'POST') { require_admin(true); admin_school_image_delete(read_json_body(2000)); }
     elseif ($route === 'today' && $method === 'GET') { $t = recipe_of_day(); send_json($t ?? ['error' => 'Нет рецепта'], $t ? 200 : 404); }
     elseif ($route === 'message.replies' && $method === 'POST') message_replies(read_json_body(8000));
     elseif ($route === 'recipe.stats' && $method === 'GET') send_json(['stats' => (object)recipe_stats()]); // recounted at most hourly

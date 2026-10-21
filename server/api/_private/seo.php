@@ -171,7 +171,7 @@ function seo_header(): string {
     $p = h(seo_path());
     // Phones: the name and «Открыть приложение»; the other links are in the footer and the breadcrumbs.
     return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"34\" height=\"34\"><span>" . h(SEO_SITE) . "</span></a>"
-        . "<nav aria-label=\"Разделы\"><a class=\"wide\" href=\"" . h(seo_list_path()) . "\">Рецепты</a><a class=\"wide\" href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a class=\"wide\" href=\"" . h(seo_combo_path('')) . "\">По продуктам</a>"
+        . "<nav aria-label=\"Разделы\"><a class=\"wide\" href=\"" . h(seo_list_path()) . "\">Рецепты</a><a class=\"wide\" href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a class=\"wide\" href=\"" . h(seo_combo_path('')) . "\">По продуктам</a><a class=\"wide\" href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа</a>"
         . "<a class=\"pill\" href=\"$p\">Открыть<span class=\"wide\"> приложение</span></a></nav></div></header>\n<main class=\"wrap\">\n";
 }
 /** Подборки' address (collections.php is not loaded on every page). */
@@ -180,7 +180,7 @@ function seo_footer(): string {
     $p = h(seo_path());
     return "</main>\n<footer class=\"foot\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"28\" height=\"28\" loading=\"lazy\"><span>" . h(SEO_SITE) . "</span></a>"
         . "<p>Подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, бесплатно и без регистрации.</p>"
-        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
+        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
 }
 /** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
@@ -238,6 +238,11 @@ function seo_css(): string {
         // Phones, recipe page: «Готовить по шагам» always at hand.
         . '.dock{display:none}@media(max-width:899px){.go{display:none}.dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:30;gap:10px;align-items:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.95);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line)}.dock .btn{flex:1}body.has-dock{padding-bottom:84px}}'
         . '.foot{margin-top:56px;border-top:1px solid var(--line);background:var(--card);color:var(--muted);font-size:14px;padding:24px 0 36px}.foot p{margin:8px 0 12px;max-width:60ch}.foot nav{display:flex;flex-wrap:wrap;gap:6px 18px}.foot nav a{color:var(--muted);text-decoration:none}.foot nav a:hover{color:var(--accent)}'
+        // Школа готовки: lesson cards as a numbered list, lists of lessons, questions and answers (details).
+        . '.lesson{list-style:none;counter-reset:c;padding:0;margin:8px 0 8px;display:grid;gap:12px;max-width:68ch}.lesson li{counter-increment:c;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px}'
+        . '.lesson li img{width:100%;height:auto;border-radius:12px;margin:0 0 12px;display:block}.lesson h2{font-size:19px;margin:0 0 6px}.lesson h2:before{content:counter(c) ". ";color:var(--herb)}.lesson p{margin:0;color:var(--muted)}'
+        . '.links{list-style:none;padding:0;margin:0;display:grid;gap:8px;max-width:68ch}.links li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}.links a{font-weight:600;color:var(--ink);text-decoration:none}.links a:hover{color:var(--accent)}.links small{display:block;color:var(--muted);font-size:14px;margin-top:2px}'
+        . '.quiz{max-width:68ch}.quiz ol{margin:0 0 14px;padding-left:22px;color:var(--muted)}.quiz ol li{margin:0 0 6px}'
         . '@media print{.top,.cta,.foot,.related,.dock,.go{display:none}body{background:#fff}}';
 }
 
@@ -483,6 +488,7 @@ function seo_sitemap(): void {
         $url(seo_abs(seo_collection_path()), $newest);
         foreach (seo_collection_list() as $k => $_) $url(seo_abs(seo_collection_path($k)), $newest);
     }
+    if (function_exists('school_sitemap')) school_sitemap($url);
     $url(seo_abs(seo_combo_path('')), $newest);
     foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
     foreach (seo_combo_pairs() as [$a, $b]) $url(seo_abs(seo_combo_path($a, $b)), $newest);

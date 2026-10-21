@@ -8,16 +8,17 @@ import { Collections } from "./Collections";
 import { Improve } from "./Improve";
 import { Messages, Vk } from "./Legacy";
 import { NewRecipes } from "./NewRecipes";
+import { School } from "./School";
 import { CSS } from "./ui";
 
 /** The new pages; the other addresses are the old panel's. */
-const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#vk": Vk };
+const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": Vk };
 
 interface Section { label: string; tabs: [hash: string, label: string][] }
 const SECTIONS: Section[] = [
   { label: "Статистика", tabs: [["#stats", "Статистика"]] },
   { label: "Люди", tabs: [["#messages", "Сообщения"], ["#reviews", "Отзывы"]] },
-  { label: "Рецепты", tabs: [["#recipes", "Все рецепты"], ["#collections", "Подборки"], ["#new", "Новые рецепты"], ["#improve", "Доработка"], ["#files", "Файлы каталога"]] },
+  { label: "Рецепты", tabs: [["#recipes", "Все рецепты"], ["#collections", "Подборки"], ["#new", "Новые рецепты"], ["#improve", "Доработка"], ["#school", "Школа"], ["#files", "Файлы каталога"]] },
   { label: "Шеф", tabs: [["#teach", "Обучение Шефа"]] },
   { label: "Продвижение", tabs: [["#vk", "ВКонтакте"]] },
   { label: "Настройки", tabs: [["#server", "Настройки"]] },

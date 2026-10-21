@@ -34,6 +34,7 @@ import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../c
 import { Reviews, Stars, useReviews } from "./Reviews";
 import { timeLong, timeShort } from "../app/recipeTime";
 import { withAmounts } from "../app/stepAmounts";
+import { useTerms } from "../components/Terms";
 
 const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
 const ANCHORS = [
@@ -172,6 +173,7 @@ interface Group { key: string; title: string | null; rows: RecipeIngredient[]; a
 
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const { s, profile, toast, online } = useStore();
+  const terms = useTerms();
   useEffect(() => rememberRecipe(base.id), [base.id]);
   // How long the page was read: closed within seconds — not this; read for a while — interest.
   useEffect(() => {
@@ -400,7 +402,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                         <span aria-hidden className="w-6 shrink-0 text-h2 leading-7 tabular-nums text-brand">{n + 1}</span>
                         <div className="min-w-0 max-w-[62ch] flex-1">
                           {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
-                          <p className="text-body leading-7 text-ink">{withAmounts(part.text, lines)}</p>
+                          <p className="text-body leading-7 text-ink">{terms.render(withAmounts(part.text, lines))}</p>
                           {tips[n] && (
                             <p className="mt-2.5 flex gap-2 text-body-sm text-ink-soft">
                               <Lightbulb size={16} className="mt-[3px] shrink-0 text-herb" aria-hidden /><span><span className="font-semibold text-herb">Совет: </span>{tips[n]}</span>
@@ -478,6 +480,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
       }} />}
       <ServeBySheet open={serveOpen} onClose={() => setServeOpen(false)} title={base.title} recipeId={base.id} minutes={recipe.totalMinutes} onCook={cook} />
       {menuOpen && <AddToMenuSheet recipeId={base.id} servings={servings} onClose={() => setMenuOpen(false)} />}
+      {terms.sheet}
       <Sheet open={shareOpen} title="Поделиться рецептом" onClose={() => setShareOpen(false)}>
         <button className="mb-3 flex w-full items-center gap-3 rounded-card border border-line bg-card p-3 text-left hover:border-line-strong disabled:opacity-60" disabled={making}
           onClick={async () => {

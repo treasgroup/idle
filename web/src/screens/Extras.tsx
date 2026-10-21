@@ -27,10 +27,21 @@ export function Learn({ onClose }: { onClose: () => void }) {
   const doneCount = LESSONS.filter((l) => done.has(l.id)).length;
   const [tab, setTab] = useState<(typeof SECTIONS)[number]["id"]>(() => (BEGINNER.every((id) => done.has(id)) ? "basics" : "beginner"));
   const [playing, setPlaying] = useState<Lesson | null>(null);
+  // «#/learn/<lesson>»: a link from a kitchen word in a recipe step or from the lesson's page for search engines.
+  useEffect(() => {
+    const fromHash = () => { const id = location.hash.match(/^#\/learn\/([a-z-]+)/)?.[1]; const l = id && LESSONS.find((x) => x.id === id); if (l) setPlaying(l); };
+    fromHash();
+    window.addEventListener("hashchange", fromHash);
+    return () => window.removeEventListener("hashchange", fromHash);
+  }, []);
+  const close = () => {
+    setPlaying(null);
+    if (/^#\/learn\/./.test(location.hash)) history.replaceState(null, "", location.pathname + location.search + "#/learn");
+  };
   const list = tab === "beginner" ? BEGINNER.map(byId) : LESSONS.filter((l) => l.section === tab);
   const finish = (l: Lesson) => {
     if (!done.has(l.id)) { setProfile((p) => ({ ...p, lessonsDone: [...p.lessonsDone, l.id] })); cue("bought"); }
-    setPlaying(null);
+    close();
   };
   const meta = (l: Lesson) => l.cards.length + " " + plural(l.cards.length, "карточка", "карточки", "карточек") + " · " + Math.max(1, Math.round((l.cards.length * 20 + l.quiz.length * 15) / 60)) + " мин";
 
@@ -83,7 +94,7 @@ export function Learn({ onClose }: { onClose: () => void }) {
           <KitchenTools />
         </div>
       </div>
-      {playing && <LessonPlayer key={playing.id} lesson={playing} done={done.has(playing.id)} onFinish={() => finish(playing)} onClose={() => setPlaying(null)} />}
+      {playing && <LessonPlayer key={playing.id} lesson={playing} done={done.has(playing.id)} onFinish={() => finish(playing)} onClose={close} />}
     </Layer>
   );
 }

@@ -14,3 +14,6 @@ server/data/catalog/_backups/
 
 # Collection covers uploaded in the admin panel live on the hosting
 server/collections/
+
+# Pictures for Школа готовки cards, uploaded in the admin panel, live on the hosting
+server/school/

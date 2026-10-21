@@ -7,7 +7,7 @@ import {
   X, Hand, Flame, Timer, Eye, Droplet, Sparkles, Leaf, Coffee, Utensils, Check, Grid3x3, Layers, DoorOpen, Refrigerator, CalendarDays,
   Repeat2, CookingPot, Egg, Snowflake, Clock, Carrot, Fish, RotateCcw, Moon, Salad, Blend, ChefHat, CircleCheck, type LucideIcon,
 } from "lucide-react";
-import { recipeById, type Recipe } from "../engine";
+import { apiUrl, recipeById, type Recipe } from "../engine";
 import { useActions } from "../app/actions";
 import { cue } from "../app/feedback";
 import { SchoolArt } from "./SchoolArt";
@@ -22,6 +22,21 @@ const ICONS: Record<string, LucideIcon> = {
   moon: Moon, onion: Salad, tomato: Salad, blender: Blend, whisk: Blend, salt: Sparkles, pinch: Hand, board: Utensils, knife: Utensils,
 };
 
+// Pictures the owner uploaded for cards (admin «Школа»): asked once per app start; a card without one keeps its
+// drawn scheme or icon, and so does every card when offline.
+let pictures: Promise<Record<string, number>> | null = null;
+const site = () => apiUrl("today").replace(/api\/index\.php.*$/, "");
+function usePictures(): Record<string, number> {
+  const [p, setP] = useState<Record<string, number>>({});
+  useEffect(() => {
+    pictures ??= fetch(apiUrl("school.images")).then((r) => (r.ok ? r.json() : {})).then((j) => (j as { images?: Record<string, number> }).images ?? {}).catch(() => ({}));
+    let live = true;
+    void pictures.then((x) => { if (live) setP(x); });
+    return () => { live = false; };
+  }, []);
+  return p;
+}
+
 export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Lesson; done: boolean; onFinish: () => void; onClose: () => void }) {
   const { openRecipe } = useActions();
   const rail = useRef<HTMLDivElement>(null);
@@ -30,6 +45,7 @@ export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Less
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const pages = lesson.cards.length + lesson.quiz.length + 1;
   const recipes = lesson.recipes.map((id) => recipeById(id)).filter((r): r is Recipe => !!r);
+  const pics = usePictures();
 
   useEffect(() => {
     const el = rail.current;
@@ -79,7 +95,9 @@ export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Less
           const Icon = ICONS[c.icon ?? ""] ?? ChefHat;
           return (
             <section key={"c" + i} className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3" aria-hidden={i !== at}>
-              {c.art
+              {pics[lesson.id + "-" + i]
+                ? <img src={site() + "school/" + lesson.id + "-" + i + ".jpg?v=" + pics[lesson.id + "-" + i]} alt="" className="aspect-[3/2] w-full rounded-card bg-sunken object-cover" />
+                : c.art
                 ? <div className="rounded-card bg-sunken/60 p-3"><SchoolArt lesson={c.art} /></div>
                 : <div className="grid h-44 place-items-center rounded-card bg-herb-soft text-herb" aria-hidden><Icon size={72} strokeWidth={1.5} /></div>}
               <h1 className="mt-6 text-h1 leading-tight">{c.title}</h1>

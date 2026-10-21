@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && vite build -c vite.admin.config.ts && node scripts/copy-ocr.mjs",
+    "build": "tsc --noEmit && vite build && vite build -c vite.admin.config.ts && node scripts/copy-ocr.mjs && node scripts/school-json.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check:site": "node e2e/smoke.cjs",
