@@ -3311,6 +3311,18 @@ var ll = (e) => F.find((t) => t.id === e),
     ...new Set(e.ingredients.filter((t) => _O.has(t.id)).map((t) => t.id)),
   ],
   OO = { breakfast: 20, lunch: 40, dinner: 40 };
+// Cold soups — окрошка, холодник, свекольник, гаспачо — belong to the warm months (May to September).
+var COLD_SOUP = /окрошк|холодник|свекольник холодн|ботвин|гаспачо|таратор|холодн\S* суп/i;
+// Dishes most home cooks have never made: miso, tofu, fish sauce, curry pastes, tortillas… One a week at most —
+// a plan is familiar food first. «По-корейски» carrot and cucumbers are on every table, so the word alone does not count.
+var UNUSUAL_ING = new Set(["nori", "miso-paste", "tofu", "oyster-sauce", "fish-sauce", "rice-noodles", "tamarind-paste", "canned-coconut-milk", "star-anise", "rice-paper", "gochujang", "glass-noodles", "corn-tortilla", "wheat-tortilla", "canned-black-beans", "green-curry-paste", "massaman-curry-paste", "tom-yum-paste", "udon-noodles", "soba-noodles", "lime-juice", "garam-masala", "tahini", "sumac", "dark-soy-sauce", "quinoa", "matcha-powder", "curry-powder"]),
+  UNUSUAL_TITLE = /чапче|пад тай|том ям|рамен|фо бо|бибимбап|пибимпап|кимчи|ларб|терияки|карри|буррито|тако|кесадиль|гуакамоле|мисо|тайск|японск|вьетнам|индийск|мексикан|начос|фахитас|поке|суши|ролл/i;
+function inSeason(e, t) {
+  return !COLD_SOUP.test(e.title) || (t >= 4 && t <= 8);
+}
+function unusual(e) {
+  return UNUSUAL_TITLE.test(e.title) || e.ingredients.some((t) => !t.optional && UNUSUAL_ING.has(t.id));
+}
 function Mu(e, t, n, a = Date.now(), i = U0) {
   let s = a >>> 0 || 7,
     r = () => (
@@ -3323,8 +3335,10 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
     ),
     o = { ...rn(t), servings: n },
     // plan.only: the person's goals (budget, light, protein) narrow the dishes the menu is made of.
+    month = (e[0] ? Rm(e[0].date) : new Date()).getMonth(),
     l = Qe(i.only ? F.filter(i.only) : F, o, t, 1 / 0)
       .map((R) => R.recipe)
+      .filter((R) => inSeason(R, month))
       .map((R) => ({ r: R, k: r() }))
       .sort((R, T) => R.k - T.k)
       .map((R) => R.r),
@@ -3339,6 +3353,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
       )
       .filter((R) => !!R),
     w = new Set(S.map((R) => gn(R))),
+    odd = S.filter(unusual).length,
     v = new Set(S.map((R) => Us(R))),
     b = new Set(S.flatMap(Am)),
     g = y
@@ -3375,6 +3390,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
         Y = (W) => DO(W) && W.maxServings >= n * 2,
         G = (W) =>
           !w.has(gn(W)) &&
+          !(odd >= 1 && unusual(W)) &&
           !(M === "dinner" && Ru(W) && (g >= 2 || _)) &&
           x(W) !== N[M],
         Q = m[M],
@@ -3396,7 +3412,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
           Math.min(2, Am(W).filter((le) => b.has(le)).length),
         He = P[0];
       for (let W of P.slice(1)) vt(W) > vt(He) && (He = W);
-      w.add(gn(He)), v.add(Us(He));
+      w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++;
       for (let W of Am(He)) b.add(W);
       M === "dinner" && ((_ = Ru(He)), _ && g++), (N[M] = x(He));
       let ze = U && Y(He);

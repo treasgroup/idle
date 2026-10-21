@@ -76,6 +76,20 @@ describe("week menu", () => {
     expect(menu.filter((d) => d.items.length).length).toBe(7);
     expect(new Set(cooked).size).toBe(cooked.length);
   });
+  it("keeps cold soups to the warm months and unusual dishes to one a week", () => {
+    const s = structuredClone(DEFAULT_STATE);
+    const week = (from: string) => Array.from({ length: 7 }, (_, i) => ({ date: new Date(Date.parse(from) + i * 864e5).toISOString().slice(0, 10), items: [] }));
+    const titles = (m: { items: { recipeId: string }[] }[]) => m.flatMap((d) => d.items.map((i) => recipes().find((r) => r.id === i.recipeId)?.title ?? ""));
+    const odd = /чапче|пад тай|том ям|рамен|мисо|тайск|карри|тако|буррито|кесадиль|фо бо|удон|соба|тофу/i;
+    let summerCold = 0;
+    for (let seed = 1; seed <= 40; seed++) {
+      const october = titles(generateMenu(week("2026-10-19"), s.preferences, 2, seed, s.menuPlan));
+      expect(october.filter((t) => /окрошк|холодник|свекольник холодн|гаспачо/i.test(t))).toEqual([]);
+      expect(october.filter((t) => odd.test(t)).length).toBeLessThanOrEqual(1);
+      summerCold += titles(generateMenu(week("2026-07-13"), s.preferences, 2, seed, s.menuPlan)).filter((t) => /окрошк|холодник|свекольник холодн|гаспачо/i.test(t)).length;
+    }
+    expect(summerCold).toBeGreaterThan(0);
+  });
 });
 
 describe("receipt import", () => {
