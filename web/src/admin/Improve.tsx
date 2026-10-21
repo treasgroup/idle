@@ -20,18 +20,26 @@ function parseAnswer(text: string): Record<string, unknown> {
   try { return JSON.parse(text.slice(s, e + 1)); } catch { throw new Error("JSON в ответе с ошибкой. Попросите нейросеть: «Пришли только JSON, без пояснений»."); }
 }
 
-function stepsTask(list: RawRecipe[]): string {
-  return [
-    "Ты редактор кулинарных рецептов для сайта, по которому готовят с телефона, в том числе пожилые люди. Перепиши шаги рецептов ниже так, чтобы каждый шаг был коротким и понятным.",
-    "",
-    "Правила:",
-    "1. Один шаг — одно-два действия, не длиннее 250 знаков. Длинный шаг раздели на 2–3 шага.",
-    "2. Ничего не теряй: продукты, количества, время, огонь, признаки готовности должны остаться.",
+/** Steps the cook follows on a phone: few and whole. The catalog has ~6 per recipe, 10 at most; a first version of this
+ * prompt («one step — one or two actions») made the AI chop a pilaf into 25 two-word steps, so the rules now say:
+ * as few steps as possible, touch only the overlong ones, a new step only for a wait with its own timer. */
+const MAX_STEPS = 12;
+const chopped = (r: RawRecipe) => {
+  const n = r.steps.length;
+  const tiny = r.steps.filter((s) => s.text.length < 80 && !s.timerSeconds).length;
+  return n > MAX_STEPS || (n >= 8 && tiny / n >= 0.4);
+};
+
+const STEP_RULES = [
+  "2. Ничего не теряй: продукты, количества, время, огонь, признаки готовности должны остаться.",
     "3. Простые слова. Без кухонного термометра и «°C в центре» — пиши, что видно: «сок прозрачный», «без розового», «золотистая корочка». Температуру духовки оставь.",
     "4. Доли продуктов — только «половину», «треть», «четверть», «оставшееся». Не пиши «две пятых», «одну седьмую».",
     "5. Время цифрами: «варите 20 минут». Если на шаге есть ожидание, добавь timerSeconds — секунды основного ожидания этого шага.",
     "6. uses — id продуктов из «Состава», которые на этом шаге кладут, режут или добавляют. Каждый продукт должен встретиться хотя бы в одном шаге.",
-    "7. Не добавляй новых продуктов и действий, не меняй число порций. Всего шагов — не больше 25.",
+    "7. Не добавляй новых продуктов и действий, не меняй число порций.",
+];
+
+const listing = (list: RawRecipe[]) => [
     "",
     "Ответ — только JSON, без пояснений:",
     '{"id-рецепта": [{"text": "…", "timerSeconds": 600, "uses": ["id-продукта"]}, …], …}',
@@ -42,6 +50,30 @@ function stepsTask(list: RawRecipe[]): string {
       "Состав: " + r.ingredients.map((i) => i.id + " — " + i.name + ", " + i.amount + " " + i.unit).join("; "),
       "Шаги:", ...r.steps.map((s, n) => (n + 1) + ". " + s.text + (s.timerSeconds ? " [таймер " + Math.round(s.timerSeconds / 60) + " мин]" : "") + (s.uses?.length ? " {uses: " + s.uses.join(", ") + "}" : "")),
     ]),
+];
+
+function stepsTask(list: RawRecipe[]): string {
+  return [
+    "Ты редактор кулинарных рецептов для сайта, по которому готовят с телефона, в том числе пожилые люди. В рецептах ниже есть слишком длинные шаги. Поправь только их — шагов должно остаться как можно меньше.",
+    "",
+    "Правила:",
+    "1. Шаги короче 300 знаков не трогай. Длинный шаг сократи простыми словами или перенеси его конец в начало следующего шага. Делить на два — только если иначе никак; на три — никогда.",
+    "Новый отдельный шаг — только там, где есть своё ожидание с таймером (замочить на час, тушить 40 минут). Шаг в пару слов («Посолите.», «Перемешайте.») — нельзя: присоедини к соседнему.",
+    "Хороший шаг — законченный этап на 120–280 знаков. Шагов в итоге — не больше, чем было, плюс один-два, и не больше " + MAX_STEPS + ".",
+    ...STEP_RULES,
+    ...listing(list),
+  ].join("\n");
+}
+
+function mergeTask(list: RawRecipe[]): string {
+  return [
+    "Ты редактор кулинарных рецептов для сайта, по которому готовят с телефона, в том числе пожилые люди. Шаги рецептов ниже раздроблены на слишком мелкие кусочки — по ним неудобно готовить. Собери их обратно в цельные шаги.",
+    "",
+    "Правила:",
+    "1. Каждый шаг — законченный этап: подготовить продукты, обжарить, тушить, собрать и подать. 120–280 знаков. Шаг в пару слов присоедини к соседнему.",
+    "Отдельный шаг — только там, где своё ожидание с таймером (замочить на час, тушить 40 минут). Обычно получается 5–8 шагов, не больше " + MAX_STEPS + ".",
+    ...STEP_RULES,
+    ...listing(list),
   ].join("\n");
 }
 
@@ -119,12 +151,13 @@ function Batches({ count, size, at, setAt, task }: { count: number; size: number
 }
 
 function LongSteps({ all, onSaved }: { all: RawRecipe[]; onSaved: () => Promise<void> }) {
+  const [mode, setMode] = useState<"chopped" | "long">(() => (all.some(chopped) ? "chopped" : "long"));
   const [limit, setLimit] = useState(300);
   const [at, setAt] = useState(0);
   const [answer, setAnswer] = useState("");
   const [check, setCheck] = useState<{ ok: Record<string, RawStep[]>; rows: { r: RawRecipe; steps: RawStep[]; notes: string[] }[]; bad: string[] } | null>(null);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
-  const list = useMemo(() => all.filter((r) => r.steps.some((s) => s.text.length > limit)), [all, limit]);
+  const list = useMemo(() => all.filter((r) => (mode === "chopped" ? chopped(r) : !chopped(r) && r.steps.some((s) => s.text.length > limit))), [all, limit, mode]);
   const batch = list.slice(at * STEP_BATCH, (at + 1) * STEP_BATCH);
   useEffect(() => { if (at * STEP_BATCH >= list.length) setAt(Math.max(0, Math.ceil(list.length / STEP_BATCH) - 1)); }, [list.length, at]);
 
@@ -136,13 +169,17 @@ function LongSteps({ all, onSaved }: { all: RawRecipe[]; onSaved: () => Promise<
       for (const [id, v] of Object.entries(j)) {
         const r = all.find((x) => x.id === id);
         if (!r) { bad.push(id + ": такого рецепта нет"); continue; }
-        if (!Array.isArray(v) || v.length < 2 || v.length > 25) { bad.push(r.title + ": шагов должно быть от 2 до 25"); continue; }
+        if (!Array.isArray(v) || v.length < 2 || v.length > MAX_STEPS) { bad.push(r.title + ": шагов должно быть от 2 до " + MAX_STEPS + " — попросите нейросеть собрать мелкие шаги в цельные"); continue; }
+        if (mode === "long" && v.length > r.steps.length + 2) { bad.push(r.title + ": было " + r.steps.length + " шагов, стало " + v.length + " — слишком дробно, попросите нейросеть делить меньше"); continue; }
+        if (mode === "chopped" && v.length >= r.steps.length) { bad.push(r.title + ": шаги не собраны (было " + r.steps.length + ", стало " + v.length + ")"); continue; }
         const ids = new Set(r.ingredients.map((i) => i.id));
         const steps = (v as RawStep[]).map((s) => ({ text: String(s?.text ?? "").trim(), ...(s?.timerSeconds ? { timerSeconds: Math.round(Number(s.timerSeconds)) } : {}), uses: (s?.uses ?? []).filter((u) => ids.has(u)) }));
         if (steps.some((s) => s.text.length < 5 || s.text.length > 700)) { bad.push(r.title + ": пустой или слишком длинный шаг"); continue; }
         const notes: string[] = [];
         const long = steps.filter((s) => s.text.length > 300).length;
         if (long) notes.push(long + " шаг(а) всё ещё длиннее 300 знаков");
+        const tiny = steps.filter((s) => s.text.length < 60 && !s.timerSeconds).length;
+        if (tiny) notes.push(tiny + " шаг(а) в пару слов");
         const used = new Set(steps.flatMap((s) => s.uses));
         const lost = r.ingredients.filter((i) => !used.has(i.id) && !i.optional).map((i) => i.name);
         if (lost.length) notes.push("не отмечены в шагах: " + lost.slice(0, 4).join(", "));
@@ -165,15 +202,20 @@ function LongSteps({ all, onSaved }: { all: RawRecipe[]; onSaved: () => Promise<
     <div className="adm-card">
       <div className="cx-head">
         <div>
-          <h2 style={{ marginBottom: 2 }}>Длинные шаги</h2>
-          <p className="adm-muted" style={{ margin: 0 }}>Шаг-«простыня» тяжело читать на телефоне. Нейросеть делит его на 2–3 коротких, ничего не теряя.</p>
+          <h2 style={{ marginBottom: 2 }}>Шаги рецептов</h2>
+          <p className="adm-muted" style={{ margin: 0 }}>{mode === "chopped"
+            ? "Рецепты, раздробленные на мелкие шаги (больше " + MAX_STEPS + " или много шагов в пару слов). Нейросеть собирает их в цельные — обычно 5–8 шагов."
+            : "Шаг-«простыня» тяжело читать на телефоне. Нейросеть правит только длинные шаги: сокращает или переносит часть в соседний, шагов почти не прибавляется."}</p>
         </div>
         <div className="cx-pills" style={{ margin: 0 }}>
-          {[300, 250].map((n) => <button key={n} className={"cx-pill" + (limit === n ? " on" : "")} onClick={() => { setLimit(n); setAt(0); }}>длиннее {n} знаков</button>)}
+          <button className={"cx-pill" + (mode === "chopped" ? " on" : "")} onClick={() => { setMode("chopped"); setAt(0); setCheck(null); }}>Раздробленные · {all.filter(chopped).length}</button>
+          {[300, 250].map((n) => <button key={n} className={"cx-pill" + (mode === "long" && limit === n ? " on" : "")} onClick={() => { setMode("long"); setLimit(n); setAt(0); setCheck(null); }}>длиннее {n} знаков</button>)}
         </div>
       </div>
-      <p style={{ margin: "12px 0 0", fontSize: 15 }}>{list.length ? <>Осталось <b>{list.length}</b> рецептов с длинными шагами — {Math.ceil(list.length / STEP_BATCH)} пачек по {STEP_BATCH}.</> : "Длинных шагов нет 🎉"}</p>
-      <Batches count={list.length} size={STEP_BATCH} at={at} setAt={setAt} task={() => stepsTask(batch)} />
+      <p style={{ margin: "12px 0 0", fontSize: 15 }}>{list.length
+        ? <>Осталось <b>{list.length}</b> {mode === "chopped" ? "раздробленных рецептов" : "рецептов с длинными шагами"} — {Math.ceil(list.length / STEP_BATCH)} пачек по {STEP_BATCH}.</>
+        : mode === "chopped" ? "Раздробленных рецептов нет 🎉" : "Длинных шагов нет 🎉"}</p>
+      <Batches count={list.length} size={STEP_BATCH} at={at} setAt={setAt} task={() => (mode === "chopped" ? mergeTask(batch) : stepsTask(batch))} />
       {list.length > 0 && <Answer answer={answer} setAnswer={setAnswer} verify={verify} />}
       {check && (
         <div className="cx-section">
