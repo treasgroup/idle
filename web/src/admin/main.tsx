@@ -4,6 +4,7 @@
 import { createRoot, type Root } from "react-dom/client";
 import type { ComponentType } from "react";
 import { Collections } from "./Collections";
+import { Improve } from "./Improve";
 import { Messages, Vk } from "./Legacy";
 import { CSS } from "./ui";
 
@@ -12,6 +13,7 @@ interface Tab { hash: string; label: string; after: string; page: ComponentType 
 const TABS: Tab[] = [
   { hash: "#messages", label: "Сообщения", after: "#stats", page: Messages },
   { hash: "#collections", label: "Подборки", after: "#recipes", page: Collections },
+  { hash: "#improve", label: "Доработка", after: "#collections", page: Improve },
   { hash: "#vk", label: "ВКонтакте", after: "#teach", page: Vk },
 ];
 
