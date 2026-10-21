@@ -38,8 +38,8 @@ const PLACES: { re: RegExp; short?: RegExp; answer: (s: EngineState) => NavAnswe
     },
   },
   {
-    re: /покупк|список продуктов|корзин/,
-    short: /^(?:мой |наш )?(?:список )?покупк\p{L}*$/u,
+    re: /покуп(?:к|ок)|список продуктов|корзин/, // «покупки», «покупкам» and «список покупок»
+    short: /^(?:мой |наш )?(?:список )?покуп(?:к\p{L}*|ок)$/u,
     answer: (s) => {
       const n = s.shopping.filter((i) => !i.checked).length;
       return { text: n ? "В списке покупок " + n + " " + plural(n, "продукт", "продукта", "продуктов") + "." : "Список покупок пока пустой.", go: { label: "Открыть покупки", to: "#/shopping", icon: "cart" } };

@@ -11,6 +11,8 @@ describe("Шеф as a navigator", () => {
     expect(ask("где мой план?")?.go?.to).toBe("#/menu");
     expect(ask("Открой покупки")?.go?.to).toBe("#/shopping");
     expect(ask("открой покупки")?.text).toContain("1 продукт");
+    expect(ask("где мой список покупок")?.go?.to).toBe("#/shopping");
+    expect(ask("список покупок")?.go?.to).toBe("#/shopping");
     expect(ask("покажи избранное")?.go?.to).toBe("#/favorites");
     expect(ask("мой план")?.go?.to).toBe("#/menu");
     expect(ask("составь план на неделю")?.go?.to).toBe("#/menu");

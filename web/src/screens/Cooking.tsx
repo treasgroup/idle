@@ -51,6 +51,12 @@ function timeWords(sec: number): string {
   return [m ? m + " " + plural(m, "минута", "минуты", "минут") : "", s ? s + " " + plural(s, "секунда", "секунды", "секунд") : ""].filter(Boolean).join(" ") || "0 секунд";
 }
 
+/** The step as shown, for the voice too: «одну двадцатую воды» is read as «55 мл воды». */
+function stepSaid(d: Dish, i: number): string {
+  const r = d.recipe;
+  return withAmounts(r.steps[i]?.text ?? "", r.ingredients.map((x) => scaleIngredient(x, r, d.servings)));
+}
+
 /** «Голубцы классические с мясом» → «голубцы», «Картофельное пюре» → «пюре». */
 function shortDish(title: string): string {
   const words = title.toLowerCase().split(/\s+/);
@@ -130,9 +136,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     const r = dish.recipe, i = dish.step;
     const mine = timers.filter((t) => t.recipeId === r.id && !t.rang);
     switch (cmd.type) {
-      case "next": if (i < r.steps.length - 1) { cue("page"); setStep(dish.key, i + 1); speak(r.steps[i + 1].text); } else speak("Это последний шаг."); break;
-      case "back": if (i > 0) { cue("page"); setStep(dish.key, i - 1); speak(r.steps[i - 1].text); } break;
-      case "repeat": speak(r.steps[i].text); break;
+      case "next": if (i < r.steps.length - 1) { cue("page"); setStep(dish.key, i + 1); speak(stepSaid(dish, i + 1)); } else speak("Это последний шаг."); break;
+      case "back": if (i > 0) { cue("page"); setStep(dish.key, i - 1); speak(stepSaid(dish, i - 1)); } break;
+      case "repeat": speak(stepSaid(dish, i)); break;
       case "timer": {
         const sec = cmd.seconds ?? r.steps[i].timerSeconds;
         if (sec) { startFor(dish, sec); speak("Таймер на " + timeWords(sec) + "."); } else speak("На сколько минут поставить таймер?");
@@ -162,7 +168,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const hf = useHandsFree(handsFree && cookingNow, onCommand, toast);
 
   // Read the step aloud when it changes.
-  useEffect(() => { if (s.readAloud && cookingNow && dish) speak(dish.recipe.steps[dish.step]?.text ?? ""); }, [dish?.key, dish?.step, s.readAloud]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (s.readAloud && cookingNow && dish) speak(stepSaid(dish, dish.step)); }, [dish?.key, dish?.step, s.readAloud]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { try { window.speechSynthesis?.cancel(); } catch { /* ignore */ } }, []);
 
   // A new step starts at the top of the screen.
@@ -230,7 +236,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const toggleRead = () => {
     const on = !s.readAloud;
     update((st) => ({ ...st, readAloud: on }));
-    if (on && dish) speak(dish.recipe.steps[dish.step]?.text ?? "");
+    if (on && dish) speak(stepSaid(dish, dish.step));
     else { try { window.speechSynthesis?.cancel(); } catch { /* ignore */ } }
   };
   const toggleChecked = (recipeId: string, key: string) =>

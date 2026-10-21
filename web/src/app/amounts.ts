@@ -10,7 +10,7 @@ export interface HomeAmount {
   /** «2 шт.», «150 г», «по вкусу». */
   text: string;
   toTaste: boolean;
-  /** The same in spoons or glasses, for kitchens without scales: «2 ст. л.», «1½ стакана». */
+  /** The same in spoons or glasses, for kitchens without scales: «2 ст. л.», «1,5 стакана». */
   hint?: string;
 }
 
@@ -35,16 +35,16 @@ const SPOONS: [RegExp, number | null, number, number | null][] = [
   [/^oat-flakes$/, null, 12, 90],
 ];
 
+// «½ ч. л.» alone reads well; «1½» puzzles people (the owner asked to avoid it), so with a whole part it is «1,5».
 const frac = (n: number) => {
   const whole = Math.floor(n + 1e-9), rest = n - whole;
-  const f = rest < 0.125 ? "" : rest < 0.375 ? "¼" : rest < 0.625 ? "½" : rest < 0.875 ? "¾" : "";
-  const w = rest >= 0.875 ? whole + 1 : whole;
-  return (w ? String(w) : "") + f || "0";
+  if (whole) return String(Math.round(n * 100) / 100).replace(".", ",");
+  return rest < 0.125 ? "0" : rest < 0.375 ? "¼" : rest < 0.625 ? "½" : rest < 0.875 ? "¾" : "1";
 };
 const roundTo = (n: number, step: number) => Math.round(n / step) * step;
 const glasses = (n: number) => frac(n) + " " + (n <= 1 && n !== 1 ? "стакана" : n === 1 ? "стакан" : n < 5 ? "стакана" : "стаканов");
 
-/** «2 ст. л.» / «1½ стакана» for flour, sugar, oil, milk, grains…; nothing when it would be a rough guess. */
+/** «2 ст. л.» / «1,5 стакана» for flour, sugar, oil, milk, grains…; nothing when it would be a rough guess. */
 export function spoonHint(id: string, amount: number, unit: string): string | undefined {
   if ((unit !== "г" && unit !== "мл") || amount <= 0 || id === "water") return undefined;
   const row = SPOONS.find(([re]) => re.test(id));

@@ -76,7 +76,7 @@ function Cup({ x, label, fill, water }: { x: number; label: string; fill: string
 function Grains() {
   return (
     <svg viewBox="0 0 320 156" className="w-full" role="img" aria-label="Сколько воды для круп">
-      <T x={78} y={20} size={13}>Рис 1 : 1½–2</T>
+      <T x={78} y={20} size={13}>Рис 1 : 1,5–2</T>
       <T x={242} y={20} size={13}>Гречка 1 : 2</T>
       <Cup x={20} label="рис" fill="#EDE6D6" water={0.8} />
       <T x={78} y={70} size={18}>+</T>

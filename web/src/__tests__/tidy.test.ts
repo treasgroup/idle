@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { tidyRecipe } from "../engine/tidy";
 import { hasWait, timeLong, timeShort } from "../app/recipeTime";
 import { withAmounts } from "../app/stepAmounts";
+import { spoonHint } from "../app/amounts";
 import type { Recipe } from "../engine";
 
 const base = (over: Partial<Recipe>): Recipe => ({
@@ -53,10 +54,34 @@ describe("time and amounts on screen", () => {
     expect(timeLong(r)).toBe("40 мин у плиты, потом ждать сутки");
     expect(timeShort(base({ totalMinutes: 35, activeMinutes: 25 }))).toBe("35 мин");
   });
-  it("adds the amount right after the product", () => {
+  it("puts the amount in place of the fraction", () => {
     const lines = [{ id: "vegetable-oil", name: "Растительное масло", amount: 50, unit: "г", optional: false }, { id: "water", name: "Питьевая вода", amount: 1200, unit: "мл", optional: false }, { id: "potato", name: "Картофель", amount: 600, unit: "г", optional: false }];
-    expect(withAmounts("Нагрейте две пятых растительного масла, выложите лук.", lines)).toBe("Нагрейте две пятых растительного масла (≈ 20 г, 1 ст. л.), выложите лук.");
-    expect(withAmounts("Отложите одну шестую питьевой воды для соуса.", lines)).toBe("Отложите одну шестую питьевой воды (≈ 200 мл) для соуса.");
+    expect(withAmounts("Нагрейте две пятых растительного масла, выложите лук.", lines)).toBe("Нагрейте 20 г растительного масла (1 ст. л.), выложите лук.");
+    expect(withAmounts("Отложите одну шестую питьевой воды для соуса.", lines)).toBe("Отложите 200 мл питьевой воды для соуса.");
     expect(withAmounts("Подлейте одну десятую картофельного отвара.", lines)).toBe("Подлейте одну десятую картофельного отвара.");
+  });
+  it("reads every kind of fraction the recipes use", () => {
+    const water = { id: "water", name: "Вода", amount: 1050, unit: "мл", optional: false };
+    const oil = { id: "vegetable-oil", name: "Растительное масло для теста и сковороды", amount: 30, unit: "г", optional: false };
+    const butter = { id: "butter", name: "Сливочное масло, включая смазывание формы", amount: 105, unit: "г", optional: false };
+    const salt = { id: "salt", name: "Соль", amount: 6, unit: "г", optional: false };
+    expect(withAmounts("Отложите примерно одну двадцатую воды для свёклы; мясо залейте остальной водой.", [water])).toBe("Отложите примерно 55 мл воды для свёклы; мясо залейте остальной водой.");
+    expect(withAmounts("Добавьте две трети масла и перемешайте.", [oil])).toBe("Добавьте 20 г масла (1 ст. л.) и перемешайте.");
+    expect(withAmounts("Стенки смажьте двадцать первой частью масла.", [butter])).toBe("Стенки смажьте 5 г масла.");
+    expect(withAmounts("Смешайте с двумя третями соли.", [salt])).toBe("Смешайте с 4 г соли (½ ч. л.).");
+    expect(withAmounts("Отделите одну шестнадцатую всей воды для теста, остальными пятнадцатью шестнадцатыми залейте мясо.", [{ ...water, amount: 3200 }]))
+      .toBe("Отделите 200 мл воды для теста, остальными 3 л воды залейте мясо.");
+    // Butter and oil both say «масла»: without «сливочного» or «растительного» it stays a fraction.
+    expect(withAmounts("Добавьте две трети масла.", [oil, butter])).toBe("Добавьте две трети масла.");
+    expect(withAmounts("Добавьте две трети растительного масла.", [oil, butter])).toBe("Добавьте 20 г растительного масла (1 ст. л.).");
+    // Not a product, and not fractions at all.
+    expect(withAmounts("Заполните форму тестом не выше двух третей высоты.", [water])).toBe("Заполните форму тестом не выше двух третей высоты.");
+    expect(withAmounts("Варите четверть часа, на пятой минуте посолите.", [water, salt])).toBe("Варите четверть часа, на пятой минуте посолите.");
+  });
+  it("writes one and a half as «1,5», never «1½»", () => {
+    expect(spoonHint("vegetable-oil", 25, "г")).toBe("1,5 ст. л.");
+    expect(spoonHint("milk", 375, "мл")).toBe("1,5 стакана");
+    expect(spoonHint("vegetable-oil", 8, "г")).toBe("1,5 ч. л.");
+    expect(spoonHint("vegetable-oil", 2.5, "г")).toBe("½ ч. л.");
   });
 });

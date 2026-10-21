@@ -105,7 +105,9 @@
   html.xl-text { font-size: 125%; }
   /* A grid without explicit columns is one column that never grows wider than the screen (long words, truncated text). */
   .grid { grid-template-columns: minmax(0, 1fr); }
-  body { @apply bg-paper font-sans text-body text-ink antialiased; overscroll-behavior-y: none; }
+  /* overflow-x: clip — one element wider than the phone (a long chip) must not make the whole page slide sideways
+     and push the bottom menu off the screen. Unlike hidden, clip keeps sticky headers working. */
+  body { @apply bg-paper font-sans text-body text-ink antialiased; overscroll-behavior-y: none; overflow-x: clip; }
   button { -webkit-tap-highlight-color: transparent; }
   /* Emphasis inside text is medium, never heavy bold. */
   b, strong { font-weight: 500; }
@@ -126,6 +128,8 @@
 
   .chip { @apply inline-flex h-10 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line bg-card px-3.5 text-body-sm text-ink transition-colors duration-150 hover:border-line-strong active:scale-[.98]; }
   .chip-on { @apply border-brand bg-brand-soft text-brand-ink hover:border-brand; }
+  /* Шеф's suggestions can be long («Сразу с курицей и картофелем и сметаной, до 70 мин»): they wrap to a second line. */
+  .chip-wrap { @apply h-auto min-h-10 max-w-full whitespace-normal rounded-[1.25rem] py-2 text-left; }
 
   .card { @apply rounded-card border border-line bg-card shadow-e1; }
   .input { @apply h-12 w-full rounded-input border border-line bg-card px-3.5 text-body text-ink placeholder:text-ink-faint focus:border-brand focus:ring-2 focus:ring-brand/20; }

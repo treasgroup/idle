@@ -37,7 +37,7 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
   const ring: CookTimer = t ?? { id: "idle", dish, step, label: "", end: null, pausedLeft: seconds, total: seconds };
   const start = () => { cue("wind"); startTimer({ dish, recipeId, step, label, seconds }); onStart?.(seconds); };
 
-  const status = rang ? "Время вышло" : paused ? "На паузе" : running ? "Осталось" : "Таймер на " + durationText(seconds);
+  const status = rang ? "Время вышло" : paused ? "На паузе" : running ? "Осталось" : "Таймер на " + durationText(seconds) + " · нажмите круг";
   const icon = "shrink-0 max-[359px]:hidden";
   const buttons = !t ? (
     <button className="btn-primary h-12 flex-1 sm:flex-none" onClick={start}><Play size={18} className="shrink-0" aria-hidden />Запустить</button>
@@ -60,14 +60,19 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
     <section aria-label="Таймер шага" className={cx("rounded-card border p-4 transition-colors duration-150 sm:p-5", rang ? "border-brand bg-brand-soft" : t ? "border-brand/30 bg-card shadow-e1" : "border-line bg-card shadow-e1", className)}>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-4">
         <div className="flex min-w-0 flex-1 items-center gap-4">
-          <span className="relative grid h-[72px] w-[72px] shrink-0 place-items-center">
+          {/* Before the start the circle itself is ▶: with very large text «Запустить» below can end up under the bottom bar. */}
+          {!t ? (
+            <button type="button" className="grid h-[72px] w-[72px] shrink-0 place-items-center rounded-full bg-brand-fill text-white transition-transform active:scale-[.96]" onClick={start} aria-label={"Запустить таймер на " + durationText(seconds)}>
+              <Play size={30} className="translate-x-0.5" aria-hidden />
+            </button>
+          ) : <span className="relative grid h-[72px] w-[72px] shrink-0 place-items-center">
             {rang
               ? <span className="grid h-[72px] w-[72px] place-items-center rounded-full bg-brand-fill text-white"><BellRing size={28} className="animate-pulse" aria-hidden /></span>
               : <>
                   <span className="absolute inset-0"><TimerRing t={ring} size={72} now={now} /></span>
                   {paused ? <Pause size={24} className="text-ink-soft" aria-hidden /> : <Timer size={26} className={running ? "text-brand" : "text-ink-soft"} aria-hidden />}
                 </>}
-          </span>
+          </span>}
           <span className="min-w-0">
             <span className={cx("block text-small", rang ? "font-semibold text-brand-ink" : "text-ink-soft")} aria-live="polite">{status}</span>
             <span className={cx("block whitespace-nowrap text-timer tabular-nums sm:text-[3rem]", !t && "text-ink-soft", paused && "text-ink-soft", rang && "text-brand-ink")}>

@@ -59,7 +59,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
           </div>
         )}
         {last && options.length > 0 && (
-          <div className="flex flex-wrap gap-2 pt-1">{options.map((o) => <Chip key={o.label} onClick={() => onOption(o)}>{o.label}</Chip>)}</div>
+          <div className="flex flex-wrap gap-2 pt-1">{options.map((o) => <Chip key={o.label} className="chip-wrap" onClick={() => onOption(o)}>{o.label}</Chip>)}</div>
         )}
       </div>
       {menuFor && <AddToMenuSheet recipeId={menuFor} onClose={() => setMenuFor(null)} />}
