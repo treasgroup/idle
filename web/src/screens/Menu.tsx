@@ -75,6 +75,8 @@ export function Menu() {
     else toast("План готов. Любое блюдо можно заменить.");
   };
   const fill = () => save(generateMenu(days, s.preferences, servings, Date.now(), enginePlan));
+  // The whole week empty in one tap; «Отменить» brings it back.
+  const clear = () => { withUndo("План очищен"); save([]); };
 
   const toShopping = () => {
     const prev = loadRows();
@@ -190,6 +192,7 @@ export function Menu() {
             {days.some((d) => !d.items.length) && <button className="btn-ghost" onClick={fill}><Plus size={18} />Заполнить пустые дни</button>}
             {/* A week that went well: keep it and repeat it later from «Составить заново». */}
             <button className="btn-ghost" onClick={() => { saveWeek(days); setWeeks(savedWeeks()); toast("Неделя сохранена — повторить можно в «Составить заново»"); }}><Bookmark size={18} />Сохранить эту неделю</button>
+            <button className="btn-ghost text-ink-soft" onClick={clear}><Trash2 size={18} />Очистить план</button>
           </div>
 
           {(shared.length > 0 || leftovers.length > 0) && (
