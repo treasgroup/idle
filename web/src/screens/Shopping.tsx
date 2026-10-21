@@ -1,6 +1,7 @@
 // «Покупки»: the list by shop aisle. A tap on the row marks it bought; bought items move into «Мои продукты» in one go.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PlaceHint } from "../components/PlaceHint";
+import { hintDone } from "../app/hints";
 import { Check, ChevronDown, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients, shoppingText,
@@ -22,7 +23,9 @@ const isPinch = (i: ShoppingItem) => (i.unit === "г" || i.unit === "мл") && i
 const products = (n: number) => n + " " + plural(n, "продукт", "продукта", "продуктов");
 
 export function Shopping() {
-  const { s, update, toast, online } = useStore();
+  const { s, update, toast, online, clearToast } = useStore();
+  // «Продукты на неделю — в списке покупок · Открыть» has done its job once the list is open: it must not cover it.
+  useEffect(() => clearToast(), [clearToast]);
   const [adding, setAdding] = useState(false);
   const [share, setShare] = useState(false);
   const [clear, setClear] = useState(false);
@@ -46,6 +49,7 @@ export function Shopping() {
     const item = s.shopping.find((x) => x.key === key);
     const last = !!item && !item.checked && s.shopping.filter((x) => !x.checked).length === 1;
     if (last) cue("bought"); else haptic();
+    hintDone("place-shopping"); // the hint explains exactly this tap
     set((l) => l.map((x) => (x.key === key ? { ...x, checked: !x.checked } : x)));
   };
   const withUndo = (text: string, fn: (l: ShoppingItem[]) => ShoppingItem[]) => {

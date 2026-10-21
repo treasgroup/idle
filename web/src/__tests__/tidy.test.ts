@@ -46,6 +46,16 @@ describe("tidyRecipe", () => {
   });
 });
 
+describe("lost spaces", () => {
+  it("puts back the space between a word and a number", () => {
+    const r = tidyRecipe(base({ steps: [{ text: "Обжарьте на слабом огне2 минуты, затем остудите10 минут.", uses: [] }] }));
+    expect(r.steps[0].text).toBe("Обжарьте на слабом огне 2 минуты, затем остудите 10 минут.");
+    expect(r.steps[0].timerSeconds).toBe(600); // the longest time in the step, as before
+    const oven = tidyRecipe(base({ steps: [{ text: "Выпекайте на противне30×40 см при200 °C20 минут.", uses: [] }] }));
+    expect(oven.steps[0].text).toBe("Выпекайте на противне 30×40 см при 200 °C 20 минут.");
+  });
+});
+
 describe("time and amounts on screen", () => {
   it("says the waiting apart from the work", () => {
     const r = base({ totalMinutes: 1500, activeMinutes: 40 });

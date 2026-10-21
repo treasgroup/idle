@@ -116,7 +116,11 @@ const FRIDGE = [
   [/≥\s*(\d)/g, "не меньше $1"],
 ] as const;
 
-function plain(text: string, r: Recipe): string {
+// «огне2 минуты», «при200 °C20 минут», «до3×4»: a lost space between a word and a number (321 in the catalog), put back.
+const spaced = (t: string): string => t.replace(/([а-яё])(?=[\d≤≥])/gi, "$1 ").replace(/(°\s?C)(?=\d)/g, "$1 ");
+
+function plain(raw: string, r: Recipe): string {
+  const text = spaced(raw);
   let said = "";
   let t = text.split(/(?<=[.!?])\s+/).map((s) => { const out = plainSentence(s, r, said); said += " " + s; return out; }).filter(Boolean).join(" ");
   for (const [re, to] of FRIDGE) t = t.replace(re, to);
@@ -147,7 +151,7 @@ const NOT_FOR_KIDS = /остр(?:ый|ая|ое|ые|ого|ом|ой)|чили|
 export function tidyRecipe(r: Recipe): Recipe {
   const steps = r.steps.map((s) => {
     const text = plain(s.text, r);
-    const timerSeconds = s.timerSeconds ?? timerOf(s.text) ?? undefined;
+    const timerSeconds = s.timerSeconds ?? timerOf(spaced(s.text)) ?? undefined;
     return { ...s, text, ...(timerSeconds ? { timerSeconds } : {}) };
   });
   const ingredients = r.ingredients.map((i): Line => { const a = absorbed(i); return a ? { ...i, absorbed: a } : i; });

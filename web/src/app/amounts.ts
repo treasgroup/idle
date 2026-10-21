@@ -1,6 +1,6 @@
 // Amounts the way people measure at home: eggs and garlic in pieces, a pinch of pepper «по вкусу»,
 // one row per product. The catalog keeps grams (for nutrition); this is only how they are shown.
-import { aisleOf, formatAmount, ingredient, packageHint, shoppingName, type RecipeIngredient } from "../engine";
+import { aisleOf, displayName, formatAmount, ingredient, packageHint, type RecipeIngredient } from "../engine";
 
 type Item = Pick<RecipeIngredient, "id" | "name" | "amount" | "unit">;
 
@@ -184,7 +184,8 @@ export function mergeSame<T extends RecipeIngredient>(list: T[]): T[] {
 /** A shopping row: the name, how much to take, and under it how much is really needed (when that differs). */
 export function shopLine(i: { ingredientId: string; name: string; amount: number; unit: string }): { name: string; text: string; need?: string } {
   const q = shopQuantity(i.ingredientId, i.amount, i.unit);
-  const name = q?.name ?? shoppingName(i.ingredientId, i.name);
+  // The same short name as on the recipe page: «Судак», not «Филе судака сырое без костей».
+  const name = q?.name ?? displayName(i.ingredientId, i.name);
   if (q) return { name, text: q.text, need: q.need };
   const pack = packageHint(i.ingredientId, i.amount, i.unit);
   return pack ? { name, text: pack, need: "нужно " + formatAmount(i.amount, i.unit) } : { name, text: formatAmount(i.amount, i.unit) };

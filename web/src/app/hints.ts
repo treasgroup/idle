@@ -9,6 +9,11 @@ const views = (): Record<string, number> => { try { return JSON.parse(localStora
 // Counted once per app start (a page load), not on every screen opened.
 const counted = new Set<string>();
 
+/** Marks a hint as done from elsewhere: the person just did what it explains. */
+export function hintDone(id: string): void {
+  try { const seen = read(); if (!seen.includes(id)) localStorage.setItem(KEY, JSON.stringify([...seen, id])); } catch { /* private mode */ }
+}
+
 export function useHint(id: string, visits?: number): [boolean, () => void] {
   const [show, setShow] = useState(() => !read().includes(id) && (visits == null || (views()[id] ?? 0) < visits));
   useEffect(() => {
