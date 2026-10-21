@@ -4,6 +4,7 @@
 // Ported as-is from the previous build of the site (minified names kept for now).
 // Readable names live in ./index.ts — import from there, not from this file.
 import { z as D } from "zod";
+import { tidyRecipe } from "./tidy";
 
 var bS = {
   batch: "01-base",
@@ -2791,7 +2792,8 @@ function Vb(e) {
         }
     }),
     {
-      recipes: [...i.values()].map((u) => u.recipe),
+      // tidy.ts: timers from the text, plain words instead of degrees, frying oil, «Детям» (files stay as they are).
+      recipes: [...i.values()].map((u) => tidyRecipe(u.recipe)),
       ingredients: [...a.values()].map((u) => u.info),
       errors: t,
       warnings: n,
@@ -3641,7 +3643,8 @@ function Yt(e) {
       i = !1;
       continue;
     }
-    for (let f of ["kcal", "protein", "fat", "carbs"]) a[f] += (l[f] * u) / 100;
+    // absorbed: oil for deep frying — only the part the food takes in (tidy.ts).
+    for (let f of ["kcal", "protein", "fat", "carbs"]) a[f] += (l[f] * u * (o.absorbed ?? 1)) / 100;
   }
   let s = Math.max(1, e.servings),
     r = {

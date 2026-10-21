@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
 import {
-  courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
+  courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -29,6 +29,7 @@ import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 import { thawTomorrow } from "../app/reminders";
 import { BackupCard } from "../components/BackupCard";
 import { Bone } from "../components/Skeleton";
+import { timeShort } from "../app/recipeTime";
 
 const greeting = () => {
   const h = new Date().getHours();
@@ -195,7 +196,7 @@ function TodayCard({ r, badge, onOpen }: { r: Recipe; badge: string; onOpen: () 
       <div className="p-4 lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:p-6">
         <h2 className="text-h2 lg:text-h1">{r.title}</h2>
         <p className="mt-1 flex flex-wrap items-center gap-x-2 text-body-sm text-ink-soft lg:mt-2">
-          <Clock size={16} aria-hidden />{formatMinutes(r.totalMinutes)}<span aria-hidden>·</span>{DIFF[r.difficulty]}<span aria-hidden>·</span>на {people(profile.eaters)}
+          <Clock size={16} aria-hidden />{timeShort(r)}<span aria-hidden>·</span>{DIFF[r.difficulty]}<span aria-hidden>·</span>на {people(profile.eaters)}
         </p>
         {r.summary && <p className="mt-3 hidden text-body-sm text-ink-soft lg:line-clamp-3">{r.summary}</p>}
         <button className="btn-primary btn-bar mt-4 w-full lg:mt-5" onClick={onOpen}>Открыть рецепт</button>
@@ -307,7 +308,7 @@ function SimpleHome({ today }: { today: Recipe | null }) {
             <RecipeImage recipe={r} className="aspect-[16/9] w-full" rounded="rounded-none" />
             <span className="block px-4 pb-4 pt-3">
               <span className="block text-h2">{r.title}</span>
-              <span className="block text-body text-ink-soft">{formatMinutes(r.totalMinutes)} · {DIFF[r.difficulty].toLowerCase()}</span>
+              <span className="block text-body text-ink-soft">{timeShort(r)} · {DIFF[r.difficulty].toLowerCase()}</span>
             </span>
           </button>
         ))}

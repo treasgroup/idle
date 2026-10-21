@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { BellRing, ChevronLeft, RefreshCw, ShoppingCart, X } from "lucide-react";
 import {
-  CATALOG_SECTIONS, addToShopping, clampServings, courseOf, formatMinutes, freshConditions, ingredientsToBuy, plural, rankRecipes, recipes,
+  CATALOG_SECTIONS, addToShopping, clampServings, courseOf, freshConditions, ingredientsToBuy, plural, rankRecipes, recipes,
   type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -13,6 +13,7 @@ import { cue } from "../app/feedback";
 import { RecipeImage } from "./RecipeCard";
 import { Chip, Sheet, Stepper } from "./ui";
 import { Mascot } from "./Mascot";
+import { timeShort } from "../app/recipeTime";
 
 const SLOTS: { key: string; label: string; courses: string[] }[] = [
   { key: "salad1", label: "Салат", courses: ["salad"] },
@@ -151,7 +152,7 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                   <RecipeImage recipe={r} className="h-14 w-14 shrink-0" />
                   <span className="min-w-0">
-                    <span className="block text-caption text-ink-soft">{sl.label} · {formatMinutes(r.totalMinutes)}</span>
+                    <span className="block text-caption text-ink-soft">{sl.label} · {timeShort(r)}</span>
                     <span className="line-clamp-2 block text-body-sm font-medium leading-snug">{r.title}</span>
                   </span>
                 </div>
@@ -179,7 +180,7 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
                     <span className="w-16 shrink-0 text-body font-medium tabular-nums">{early ? (ny ? "30-го" : "Заранее") : hhmm(start)}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body-sm">{r.title}</span>
-                      <span className="block text-caption text-ink-soft">{slot.label} · {formatMinutes(r.totalMinutes)}{clampServings(r, guests) < guests ? " · приготовьте ×" + Math.ceil(guests / clampServings(r, guests)) : ""}</span>
+                      <span className="block text-caption text-ink-soft">{slot.label} · {timeShort(r)}{clampServings(r, guests) < guests ? " · приготовьте ×" + Math.ceil(guests / clampServings(r, guests)) : ""}</span>
                     </span>
                   </button>
                 </li>

@@ -4,7 +4,7 @@ import {
   CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus, Repeat2, Bookmark, X,
 } from "lucide-react";
 import {
-  MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, formatMinutes, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
+  MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
   rankRecipes, recipeById, recipes, regenerateDay, removeMenuItem, replaceMenuItem, sharedPerishables, siteBase, weekDays,
   type MenuDay, type MenuPlan, type Recipe,
 } from "../engine";
@@ -19,6 +19,7 @@ import { RecipeImage } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
+import { timeShort } from "../app/recipeTime";
 
 /** The person's goals narrow the dishes a menu is made of (passed to the engine only, never stored). */
 function goalFilter(p: Profile): ((r: Recipe) => boolean) | undefined {
@@ -158,7 +159,7 @@ export function Menu() {
                             <span className="min-w-0">
                               {meal && <span className="block text-caption text-ink-soft">{meal}</span>}
                               <span className="line-clamp-2 text-body-sm font-semibold leading-snug">{r.title}</span>
-                              <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : formatMinutes(r.totalMinutes)}</span>
+                              <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : timeShort(r)}</span>
                             </span>
                           </button>
                           {/* One clear button per dish: replace, remove and the day's actions are inside. Phones: just the pencil. */}

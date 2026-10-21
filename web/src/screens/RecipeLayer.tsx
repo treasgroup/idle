@@ -32,6 +32,8 @@ import { ShareOptions } from "../components/ShareOptions";
 import { TimerStrip } from "../components/TimerStrip";
 import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { Reviews, Stars, useReviews } from "./Reviews";
+import { timeLong, timeShort } from "../app/recipeTime";
+import { withAmounts } from "../app/stepAmounts";
 
 const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
 const ANCHORS = [
@@ -226,6 +228,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
     const k = base.servings / side.servings;
     groups.push({ key: side.id, title: "Гарнир: " + side.title.toLowerCase(), rows: scale(side.ingredients.map((i) => ({ ...i, amount: Math.round(i.amount * k * 100) / 100 }))), added: true });
   }
+  // All products for the chosen servings: the steps' «две пятых масла» get their amount from these.
+  const lines = groups.flatMap((g) => g.rows);
   const hasIt = (id: string) => have.some((h) => ingredientMatches(id, h));
   const needed = [...new Set(recipe.ingredients.filter((i) => !i.optional && i.id !== "water").map((i) => i.id))];
   const owned = needed.filter(hasIt).length;
@@ -324,7 +328,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                 </button>
               )}
               <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-body text-ink-soft">
-                <Clock size={18} aria-hidden /><span className="text-ink">{formatMinutes(recipe.totalMinutes)}</span>
+                <Clock size={18} aria-hidden /><span className="text-ink">{timeLong(recipe)}</span>
                 <span aria-hidden>·</span>{DIFF[base.difficulty] ?? base.difficulty}
                 <span aria-hidden>·</span>на {servings} {plural(servings, "человека", "человека", "человек")}
                 {/* Calories: part of the facts line, not a row of their own; a tap shows the composition. */}
@@ -385,7 +389,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
               <AskCard ask={ask} />
 
               <Section id="recipe-steps" className={UNDER_HEADER} title="Шаги"
-                action={<span className="text-small text-ink-soft">{recipe.steps.length} {plural(recipe.steps.length, "шаг", "шага", "шагов")} · {formatMinutes(recipe.totalMinutes)}</span>}>
+                action={<span className="text-small text-ink-soft">{recipe.steps.length} {plural(recipe.steps.length, "шаг", "шага", "шагов")} · {timeShort(recipe)}</span>}>
                 <TimerStrip only={base.id} onJump={(t) => goStep(t.step)} className="mb-4" />
                 {/* One column, one rhythm: a big number, the text, and under it at most a quiet tip and the timer. */}
                 <ol className="card divide-y divide-line overflow-hidden">
@@ -396,7 +400,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                         <span aria-hidden className="w-6 shrink-0 text-h2 leading-7 tabular-nums text-brand">{n + 1}</span>
                         <div className="min-w-0 max-w-[62ch] flex-1">
                           {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
-                          <p className="text-body leading-7 text-ink">{part.text}</p>
+                          <p className="text-body leading-7 text-ink">{withAmounts(part.text, lines)}</p>
                           {tips[n] && (
                             <p className="mt-2.5 flex gap-2 text-body-sm text-ink-soft">
                               <Lightbulb size={16} className="mt-[3px] shrink-0 text-herb" aria-hidden /><span><span className="font-semibold text-herb">Совет: </span>{tips[n]}</span>
@@ -494,7 +498,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         <ShareOptions text={"«" + base.title + "» — рецепт: " + recipePageUrl(base.id)} title={base.title} url={recipePageUrl(base.id)}
           onDone={(copied) => { setShareOpen(false); if (copied !== undefined) toast(copied ? "Ссылка скопирована" : "Ссылка готова"); }}
           onPrint={() => printPage(base.title + " — на " + servings + " " + plural(servings, "порцию", "порции", "порций"), [
-            { title: "Как готовить · " + formatMinutes(base.totalMinutes), ordered: true, items: recipe.steps.map((st) => st.text) },
+            { title: "Как готовить · " + timeShort(base), ordered: true, items: recipe.steps.map((st) => st.text) },
             ...(base.tips.length ? [{ title: "Советы", items: base.tips }] : []),
           ], recipePageUrl(base.id),
           groups.map((g) => ({ title: g.title ?? "Продукты", items: g.rows.map((r) => displayName(r.id, r.name) + " — " + homeAmount(r) + (r.optional ? " (по желанию)" : "")) })))} />

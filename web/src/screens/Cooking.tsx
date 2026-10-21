@@ -29,6 +29,8 @@ import { homeAmount, mergeSame } from "../app/amounts";
 import { cue } from "../app/feedback";
 import { stepTips } from "../app/stepTips";
 import { ChefSecret } from "../components/ChefSecret";
+import { timeShort } from "../app/recipeTime";
+import { withAmounts } from "../app/stepAmounts";
 
 type Key = "main" | "second";
 /** A dish on the stove: the one from the recipe (main) or the one cooked alongside (second, kept in the profile). */
@@ -240,6 +242,10 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const running = timers.find((t) => t.recipeId === r.id && t.step === dish.step);
   const seconds = cur.timerSeconds ?? running?.total ?? 0;
   const next = r.steps[dish.step + 1];
+  // «две пятых масла» with the amount for the servings being cooked.
+  const lines = r.ingredients.map((i) => scaleIngredient(i, r, dish.servings));
+  const curText = withAmounts(cur.text, lines);
+  const nextText = next ? withAmounts(next.text, lines) : "";
   const both = live.length === 2 && !!c && !!second;
   const offset = both ? c.recipe.totalMinutes - second.totalMinutes : 0;
 
@@ -279,10 +285,10 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           )}
 
           <h1 className="sr-only">{r.title}</h1>
-          <p className="sr-only" aria-live="polite">Шаг {dish.step + 1} из {total}. {cur.text}</p>
+          <p className="sr-only" aria-live="polite">Шаг {dish.step + 1} из {total}. {curText}</p>
           <div key={dish.key + dish.step} className="anim-rise">
             {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
-            <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{cur.text}</p>
+            <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{curText}</p>
             {uses.length > 0 && (
               <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
                 {uses.map((i) => (
@@ -313,13 +319,13 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           {next && (nextOpen ? (
             <button onClick={() => go(1)} className="mt-8 block w-full border-t border-line pt-4 text-left">
               <span className="label">Следующий шаг</span>
-              <span className="mt-1 block text-body-sm text-ink-soft">{next.text}</span>
+              <span className="mt-1 block text-body-sm text-ink-soft">{nextText}</span>
             </button>
           ) : (
             // One quiet line: what comes next, without a second paragraph under the step; a tap shows it whole.
             <button onClick={() => setNextOpen(true)} aria-expanded={false} className="mt-8 flex min-h-11 w-full items-center gap-2 border-t border-line pt-4 text-left text-body-sm text-ink-soft">
               <span className="shrink-0 font-semibold text-ink">Дальше:</span>
-              <span className="min-w-0 flex-1 truncate">{next.text}</span>
+              <span className="min-w-0 flex-1 truncate">{nextText}</span>
             </button>
           ))}
         </div>
@@ -618,7 +624,7 @@ function PickSecond({ main, onClose, onPick }: { main: Recipe; onClose: () => vo
         <section key={g.title} className="mt-5" aria-label={g.title}>
           <h3 className="label px-1.5">{g.title}</h3>
           <div className="mt-1.5 grid gap-0.5">
-            {g.list.map((r) => <RecipeMini key={r.id} recipe={r} note={(g.note?.get(r.id) ? g.note.get(r.id) + " · " : "") + formatMinutes(r.totalMinutes)} onOpen={() => onPick(r, clampServings(r, servings))} />)}
+            {g.list.map((r) => <RecipeMini key={r.id} recipe={r} note={(g.note?.get(r.id) ? g.note.get(r.id) + " · " : "") + timeShort(r)} onOpen={() => onPick(r, clampServings(r, servings))} />)}
           </div>
         </section>
       ))}

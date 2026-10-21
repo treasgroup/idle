@@ -5,12 +5,13 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { X, Heart, List, Zap, Timer, Clock3, UtensilsCrossed, ChevronRight, Star } from "lucide-react";
-import { formatMinutes, type Recipe } from "../engine";
+import { type Recipe } from "../engine";
 import { useActions } from "../app/actions";
 import { signal } from "../app/personal";
 import { useRatings, ratingLabel } from "../app/ratings";
 import { RecipeImage, RecipeTile } from "./RecipeCard";
 import { Layer, cx } from "./ui";
+import { timeShort } from "../app/recipeTime";
 
 const ROUND = 8;
 const DIFF: Record<string, string> = { easy: "просто", medium: "средне", hard: "сложно" };
@@ -147,7 +148,7 @@ function Card({ r, next, onAnswer }: { r: Recipe; next?: Recipe; onAnswer: (want
           <RecipeImage recipe={r} full eager className="pointer-events-none h-full w-full" rounded="rounded-[24px]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-5 pb-5 pt-20 text-white">
             <h3 className="text-h2 leading-tight">{r.title}</h3>
-            <p className="mt-1.5 text-body opacity-90">{formatMinutes(r.totalMinutes)} · {DIFF[r.difficulty]}{rating ? <> · <Star size={15} className="-mt-0.5 inline fill-current" aria-hidden /> {ratingLabel(rating)}</> : null}</p>
+            <p className="mt-1.5 text-body opacity-90">{timeShort(r)} · {DIFF[r.difficulty]}{rating ? <> · <Star size={15} className="-mt-0.5 inline fill-current" aria-hidden /> {ratingLabel(rating)}</> : null}</p>
           </div>
           {dx !== 0 && <span className={cx("pointer-events-none absolute top-5 rounded-full px-4 py-1.5 text-body font-semibold text-white", dx > 0 ? "left-5 bg-brand-fill" : "right-5 bg-ink/70")}
             style={{ opacity: Math.min(1, Math.abs(dx) / 90) }}>{dx > 0 ? "Хочу" : "Не то"}</span>}
@@ -177,7 +178,7 @@ function Pick({ liked, onOpen, onMore, more }: { liked: Recipe[]; onOpen: (r: Re
               <li key={x.id}>
                 <button className="flex w-full items-center gap-3 rounded-card border border-line bg-card p-2.5 pr-3 text-left hover:border-line-strong" onClick={() => onOpen(x)}>
                   <RecipeImage recipe={x} className="h-[84px] w-[84px] shrink-0" rounded="rounded-input" />
-                  <span className="min-w-0 flex-1"><span className="block text-body font-semibold leading-snug">{x.title}</span><span className="mt-1 block text-small text-ink-soft">{formatMinutes(x.totalMinutes)} · {DIFF[x.difficulty]}</span></span>
+                  <span className="min-w-0 flex-1"><span className="block text-body font-semibold leading-snug">{x.title}</span><span className="mt-1 block text-small text-ink-soft">{timeShort(x)} · {DIFF[x.difficulty]}</span></span>
                   <ChevronRight size={20} className="shrink-0 text-ink-faint" aria-hidden />
                 </button>
               </li>

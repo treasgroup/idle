@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Clock, Flame, Heart, CalendarPlus, Check, Star } from "lucide-react";
-import { formatMinutes, nutritionOf, photoSmallUrl, photoUrl, type Recipe } from "../engine";
+import { nutritionOf, photoSmallUrl, photoUrl, type Recipe } from "../engine";
 import { dishEmoji, dishTint, dishVariant } from "./dishArt";
 import { useStore } from "../app/store";
 import { ratingLabel, useRatings, type Rating } from "../app/ratings";
 import { cx } from "./ui";
+import { timeShort } from "../app/recipeTime";
 
 /** The dish photo; without one, a drawn plate with the dish's emoji over a soft colour of its kind. */
 export function RecipeImage({ recipe, className, rounded = "rounded-img", eager, hero, full }: { recipe: Recipe; className?: string; rounded?: string; eager?: boolean; hero?: boolean; full?: boolean }) {
@@ -54,7 +55,7 @@ export function RecipeMeta({ recipe, size = "small", showDifficulty = true, rati
   const icon = size === "caption" ? 14 : 16;
   return (
     <div className={cx("flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-ink-soft", size === "caption" ? "text-caption" : "text-small")}>
-      <span className="inline-flex items-center gap-1"><Clock size={icon} aria-hidden />{formatMinutes(recipe.totalMinutes)}</span>
+      <span className="inline-flex items-center gap-1"><Clock size={icon} aria-hidden />{timeShort(recipe)}</span>
       {kcal > 0 && <span className="inline-flex items-center gap-1"><Flame size={icon} aria-hidden />{kcal} ккал</span>}
       {/* The mark after the calories (before «средне»): when a long time and many calories leave no room, it moves to the next line. */}
       {rating && rating.count > 0 && (
@@ -127,7 +128,7 @@ export function RecipeTile({ recipe, note, onOpen, className }: { recipe: Recipe
       <span className="flex flex-1 flex-col p-3">
         <span className="line-clamp-2 min-h-[3rem] text-title leading-snug">{recipe.title}</span>
         {/* Narrow tile: one short line, no icons (time first, calories quietly after it). */}
-        <span className="mt-1 truncate text-caption text-ink-soft">{formatMinutes(recipe.totalMinutes)}{nutritionOf(recipe).perServing.kcal > 0 && " · " + nutritionOf(recipe).perServing.kcal + " ккал"}</span>
+        <span className="mt-1 truncate text-caption text-ink-soft">{timeShort(recipe)}{nutritionOf(recipe).perServing.kcal > 0 && " · " + nutritionOf(recipe).perServing.kcal + " ккал"}</span>
         {note && <span className="mt-1 line-clamp-2 text-caption text-ink-soft">{note}</span>}
       </span>
     </button>
@@ -141,7 +142,7 @@ export function RecipeMini({ recipe, note, onOpen }: { recipe: Recipe; note?: st
       <RecipeImage recipe={recipe} className="h-12 w-12 shrink-0" rounded="rounded-input" />
       <span className="min-w-0 flex-1">
         <span className="block truncate text-body-sm font-semibold">{recipe.title}</span>
-        <span className="block truncate text-caption text-ink-soft">{note ?? formatMinutes(recipe.totalMinutes)}</span>
+        <span className="block truncate text-caption text-ink-soft">{note ?? timeShort(recipe)}</span>
       </span>
     </button>
   );

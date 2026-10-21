@@ -2,9 +2,10 @@
 // worker asks the server what to show, and the server answers from the plan this device sent (menu, expiring food).
 // In the Android app the same reminders are scheduled as local notifications.
 import { useCallback, useEffect } from "react";
-import { apiUrl, dateKey, displayName, expiringSoon, formatMinutes, ingredient, isNativeApp, recipeById, recipes, shortName, type EngineState } from "../engine";
+import { apiUrl, dateKey, displayName, expiringSoon, ingredient, isNativeApp, recipeById, recipes, shortName, type EngineState } from "../engine";
 import * as core from "../engine/core.js";
 import { useStore } from "./store";
+import { timeShort } from "./recipeTime";
 
 const GENERIC = [
   "Не знаете, что приготовить? Идея дня уже ждёт.",
@@ -22,7 +23,7 @@ export function dinnerIdea(s: EngineState, day: Date): string | null {
   if (!pool.length) return null;
   const n = day.getFullYear() * 400 + day.getMonth() * 31 + day.getDate();
   const r = pool[(n * 7919) % pool.length];
-  return "Идея на ужин: «" + r.title + "», " + formatMinutes(r.totalMinutes) + ". Не то — Шеф подберёт другое.";
+  return "Идея на ужин: «" + r.title + "», " + timeShort(r) + ". Не то — Шеф подберёт другое.";
 }
 
 const FROZEN = ["meat", "poultry", "fish", "seafood"];

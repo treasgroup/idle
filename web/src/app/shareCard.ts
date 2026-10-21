@@ -1,7 +1,8 @@
 // «Поделиться картинкой»: a ready picture of the recipe (photo or drawn plate, title, time, the site's address),
 // drawn in the browser. People forward pictures more readily than links — and the address on it brings them here.
-import { formatMinutes, nutritionOf, photoUrl, siteBase, track, type Recipe } from "../engine";
+import { nutritionOf, photoUrl, siteBase, track, type Recipe } from "../engine";
 import { dishEmoji, dishTint } from "../components/dishArt";
+import { timeShort } from "./recipeTime";
 
 const W = 1080, H = 1350;
 const DIFF: Record<string, string> = { easy: "просто", medium: "средне", hard: "сложно" };
@@ -61,7 +62,7 @@ export async function recipeCard(r: Recipe): Promise<Blob | null> {
   for (const l of lines(ctx, r.title, W - 128, 2)) { ctx.fillText(l, 64, y); y += 82; }
   const kcal = nutritionOf(r).perServing.kcal;
   ctx.fillStyle = "#5C544D"; ctx.font = font(400, 38);
-  ctx.fillText([formatMinutes(r.totalMinutes), DIFF[r.difficulty] ?? "", kcal ? kcal + " ккал" : ""].filter(Boolean).join("  ·  "), 64, y + 6);
+  ctx.fillText([timeShort(r), DIFF[r.difficulty] ?? "", kcal ? kcal + " ккал" : ""].filter(Boolean).join("  ·  "), 64, y + 6);
   if (r.summary) {
     ctx.fillStyle = "#5C544D"; ctx.font = font(400, 34);
     let yy = y + 72;

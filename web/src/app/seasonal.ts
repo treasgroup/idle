@@ -63,11 +63,14 @@ const MOVIE = /пицц|начос|крыл|гренк|чипс|попкорн|�
 const ROMANTIC = /лосос|форел|стейк|ризотто|паст[аы](?![а-яё])|креветк|утк|фондан|тирамису|панна|медальон/i;
 const SICK = /бульон|куриный суп|суп с курицей|кисел|морс|каш[аи]|овсян/i;
 const isWarmMonth = (now: Date) => { const m = now.getMonth() + 1; return m >= 5 && m <= 8; };
+// «Детям» is set on most of the catalog (716 of 1000): the shelf keeps to what children really eat with pleasure.
+const KID_FOOD = /сырник|блин|олад|панкейк|омлет|каш[аи]|запеканк|котлет|тефтел|фрикадел|наггетс|пюре|макарон|спагетти|лапш|вермишел|пельмен|вареник|ленив|пицц|бутерброд|гренк|тост|сосиск|кекс|маффин|печенье|пирожк|шарлотк|творож|йогурт|смузи|какао|кисел|морс|компот|драник|зраз|суп с фрикадельк|куриный суп/i;
+const NOT_KID_FOOD = /печен[ьи](?![еь])|сердеч|желуд|язык|почк|остр|по-корейски|кимчи/i;
 
 /** Themes for Главная, in order; `when` keeps some to their season. */
 export const THEMES: Theme[] = [
   { key: "romantic", emoji: "🕯️", title: "Романтический ужин", hint: "Ужин для двоих", test: (r) => occasion("date")(r) || (ROMANTIC.test(r.title) && course("main", "dessert")(r) && r.difficulty !== "hard") },
-  { key: "kids", emoji: "🧸", title: "Детям нравится", hint: "То, что едят с удовольствием", test: (r) => r.kids === true },
+  { key: "kids", emoji: "🧸", title: "Детям нравится", hint: "То, что едят с удовольствием", test: (r) => r.kids === true && r.difficulty !== "hard" && !r.tags.includes("spicy") && KID_FOOD.test(r.title) && !NOT_KID_FOOD.test(r.title) },
   { key: "guests", emoji: "🍽️", title: "Для гостей", hint: "Горячее, салаты и закуски к столу", test: (r) => occasion("guests")(r) && course("main", "salad", "snack", "baking")(r) },
   { key: "movie", emoji: "🎬", title: "Вечер кино", hint: "Закуски и то, что едят руками", test: (r) => MOVIE.test(r.title) || course("snack")(r) },
   { key: "sick", emoji: "🍵", title: "Когда приболел", hint: "Бульоны, супы и мягкая еда", when: (now) => !isWarmMonth(now), test: (r) => SICK.test(r.title) || (course("soup")(r) && r.mainIngredient === "chicken") },
