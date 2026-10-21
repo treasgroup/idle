@@ -168,7 +168,8 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   useEffect(() => { pane.current?.closest(".overflow-y-auto")?.scrollTo({ top: 0 }); }, [dish?.key, dish?.step]);
 
   const total = dish?.recipe.steps.length ?? 0;
-  const go = useCallback((delta: number) => { if (dish) { cue("page"); setStep(dish.key, dish.step + delta); } }, [dish, setStep]);
+  // A tap or swipe on the screen only buzzes; the page's sound is for voice commands (eyes on the stove).
+  const go = useCallback((delta: number) => { if (dish) { cue("tap"); setStep(dish.key, dish.step + delta); } }, [dish, setStep]);
 
   // ←/→ on a keyboard (not while typing or with a sheet open).
   useEffect(() => {

@@ -4,7 +4,7 @@ import { ArrowUp, Mic, Square } from "lucide-react";
 import { useVoiceInput } from "../engine";
 import { useStore } from "../app/store";
 import { cx } from "./ui";
-import { cue } from "../app/feedback";
+import { askedByVoice, cue } from "../app/feedback";
 
 const HERO_HINTS = ["Курица и картошка", "Мне грустно — хочу уютного", "Сколько варить яйца?", "Ужин без духовки на 4 человек", "Что приготовить из фарша?"];
 
@@ -24,7 +24,7 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
   const [hint, setHint] = useState(0);
   const [focused, setFocused] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
-  const voice = useVoiceInput((t) => onSend(t, { voice: true }), toast, ensureSession, server.voiceReady && online);
+  const voice = useVoiceInput((t) => { askedByVoice(true); onSend(t, { voice: true }); }, toast, ensureSession, server.voiceReady && online);
   const listening = voice.state === "recording" || voice.state === "transcribing";
 
   // A rising blip when the microphone starts listening, a falling one when it stops — like phone assistants.
@@ -69,6 +69,7 @@ export function Composer({ variant, onSend, busy, autoFocus, placeholder, focusK
     const t = text.trim();
     if (!t || busy) return;
     setText("");
+    askedByVoice(false);
     onSend(t, {});
   };
   const mic = () => {

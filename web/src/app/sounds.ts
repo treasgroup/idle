@@ -1,7 +1,7 @@
 // The kitchen's sounds, made by the browser itself (no sound files): each one is a thing heard in a real kitchen,
 // so it says what happened without looking — a desk bell when the dish is ready, a wind-up timer's ring, a page
-// turning to the next step, a pencil on the shopping list, a store scanner's beep. Quiet, short, never shrill.
-// Built from three simple pieces: struck tones (wood, bell), filtered noise (paper, pencil), and a pitch drop (water).
+// turning to the next step, a store scanner's beep. Only for moments with the eyes off the screen (app/feedback).
+// Built from three simple pieces: struck tones (wood, bell), filtered noise (paper), and a pitch drop (water).
 
 type A = AudioContext;
 
@@ -66,12 +66,6 @@ function beepTone(a: A, f: number, at: number, len: number, vol: number) {
 const tick = (a: A, at: number, vol: number) => { hiss(a, at, 0.02, vol * 3, 3200, 2600, 4, 0.1); strike(a, 1900, at, vol * 0.35, [1], [1], [0.025]); };
 
 export const SOUNDS = {
-  /** Saved to favourites, a recipe kept in the family book: two soft wooden notes up. */
-  save: (a: A) => { wood(a, 784, 0, 0.16); wood(a, 1175, 0.085, 0.13); },
-  /** Added to the shopping list: a pencil writes a line. */
-  list: (a: A) => { hiss(a, 0, 0.08, 0.32, 4200, 5200, 2.2); hiss(a, 0.1, 0.12, 0.28, 4600, 3800, 2.2); },
-  /** The last item on the list is bought: a light chord of wood, the bag is full. */
-  bought: (a: A) => { wood(a, 659, 0, 0.13); wood(a, 831, 0.07, 0.12); wood(a, 988, 0.14, 0.12); wood(a, 1319, 0.22, 0.1); },
   /** A timer starts: the dial is wound — a few quick ticks. */
   wind: (a: A) => { for (let k = 0; k < 6; k++) tick(a, k * 0.045, 0.16 - k * 0.012); },
   /** The next or previous step: a page of the recipe turns. */
@@ -85,11 +79,6 @@ export const SOUNDS = {
   stop: (a: A) => { wood(a, 1175, 0, 0.1); wood(a, 784, 0.07, 0.1); },
   /** A barcode is read: the store scanner's beep. */
   scan: (a: A) => beepTone(a, 1850, 0, 0.09, 0.05),
-  /** Something did not work: a low, muted knock twice — not a buzzer. */
-  error: (a: A) => { wood(a, 196, 0, 0.15); wood(a, 175, 0.13, 0.14); },
-  /** The deck: «Хочу» — a bubble pops up; «Не то» — the card swishes aside. */
-  like: (a: A) => { drop(a, 0, 0.08, 760); wood(a, 1568, 0.05, 0.05); },
-  skip: (a: A) => hiss(a, 0, 0.2, 0.18, 2600, 900, 0.8, 0.3),
   /** A timer has run out: a wind-up kitchen timer's bell, a hammer ringing it fast for a second, twice. */
   alarm: (a: A) => {
     for (const start of [0, 1.35]) for (let k = 0; k < 15; k++) bell(a, 2349, start + k * 0.066, 0.2, 0.35);

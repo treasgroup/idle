@@ -14,7 +14,7 @@ import { ConditionsButton, Message, PantryPicker, SuggestionCards, Typing, useSu
 import { ChefAvatar, Chip, Sheet, cx, useScrolled } from "../components/ui";
 import { removeChat, useChats } from "../app/chats";
 import { Mascot } from "../components/Mascot";
-import { cue } from "../app/feedback";
+import { askedByVoice, cue } from "../app/feedback";
 
 /** A message that names new food or a new mood, and does not continue the topic ("а без лука?"), starts over. */
 function newTopic(text: string, base: Parameters<typeof parseMessage>[1]): boolean {
@@ -64,10 +64,10 @@ export function Chat() {
     else window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
   }, [msgs.length, a.busy]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (has && lastRole === "assistant") last.current?.scrollIntoView({ block: "start" }); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-  // A soft «pop» when Шеф answers (not for the conversation that was already there).
+  // A bubble when Шеф answers a spoken question (not for the conversation that was already there).
   const heard = useRef(msgs.length);
   useEffect(() => {
-    if (msgs.length > heard.current && lastRole === "assistant") cue("message");
+    if (msgs.length > heard.current && lastRole === "assistant" && askedByVoice()) cue("message");
     heard.current = msgs.length;
   }, [msgs.length, lastRole]);
 
