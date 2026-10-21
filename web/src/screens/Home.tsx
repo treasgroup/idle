@@ -11,13 +11,13 @@ import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { goalConditions } from "../app/profile";
-import { seasonalCollection } from "../app/seasonal";
+import { MIN_DISHES, coverUrl, holidayCollection, seasonCollection, themesNow, type Collection } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
 import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
-import { DecideSheet } from "../components/Decide";
+import { Deck } from "../components/Deck";
 import { RatingBadge, RecipeImage, RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { photoFirst } from "../app/photoFirst";
 import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
@@ -53,6 +53,13 @@ function useSuitable() {
   }, [s.preferences, profile, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
+/** The whole catalog in the person's order (their «не ем» and taste), for the collections: filtered by each one's rule. */
+function useRanked() {
+  const { s, profile, catalog } = useStore();
+  return useMemo(() => rankRecipes(recipes(), { ...freshConditions({ servings: profile.eaters, appliances: s.preferences.appliances, vegetarian: s.preferences.vegetarian }), servings: profile.eaters }, s.preferences, 5000).map((m) => m.recipe),
+    [s.preferences, profile.eaters, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
 /** The same «recipe of the day» all day long, a new one tomorrow. */
 function dayPick<T>(list: T[], salt = 0): T | null {
   if (!list.length) return null;
@@ -82,12 +89,15 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const { s, profile, catalog } = useStore();
   const { openRecipe } = useActions();
   const a = useAssistant();
-  const [decide, setDecide] = useState(false);
   const [feast, setFeast] = useState(false);
+  // The deck: «Выбрать за меня» (with the time question), a collection (cards), or «Все» of a shelf (the list).
+  const [deck, setDeck] = useState<{ title: string; pool: Recipe[]; askTime?: boolean; list?: boolean } | null>(null);
   const all = useSuitable();
+  const ranked = useRanked();
   const meal = mealNow();
   const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0);
-  const season = seasonalCollection();
+  const holiday = holidayCollection();
+  const season = seasonCollection();
   // Only when «Погода за окном» is on in the profile.
   const weather = weatherLine(useWeather());
 
@@ -97,9 +107,9 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const planned = s.menu.find((d) => d.date === dateKey(new Date()))?.items.map((i) => recipeById(i.recipeId)).find((r): r is Recipe => !!r) ?? null;
   const hero = planned ?? today;
 
-  const quick = photoFirst(all.filter((r) => r.totalMinutes <= 30 && r.id !== today?.id)).slice(0, 10);
-  const kids = photoFirst(all.filter((r) => r.kids === true && r.id !== today?.id)).slice(0, 10);
-  const seasonal = season ? photoFirst(recipes().filter(season.test)).slice(0, 10) : [];
+  const holidayDishes = holiday ? photoFirst(ranked.filter(holiday.test)) : [];
+  const seasonDishes = photoFirst(ranked.filter(season.test));
+  const themes = themesNow().map((t) => ({ t, list: photoFirst(ranked.filter(t.test)) })).filter((x) => x.list.length >= MIN_DISHES);
 
   return (
     <div className="pb-4" data-list="home">
@@ -119,11 +129,11 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
         <div className="grid content-start gap-3 lg:flex lg:flex-col lg:[&>*]:flex-1">
           <RepeatCard />
-          <button onClick={() => setDecide(true)} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
+          <button onClick={() => setDeck({ title: "Выбрать за меня", pool: all, askTime: true })} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Shuffle size={20} /></span>
             <span className="min-w-0 flex-1">
               <span className="block text-body font-medium">Выбрать за меня</span>
-              <span className="block text-small text-ink-soft">Одно блюдо: не понравится — покажу другое</span>
+              <span className="block text-small text-ink-soft">Покажу блюда по одному — выберите, что нравится</span>
             </span>
             <ChevronRight size={20} className="shrink-0 text-ink-soft" aria-hidden />
           </button>
@@ -140,18 +150,26 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       {pwa && <InstallCard pwa={pwa} />}
       <MonthCard />
 
+      {/* The holiday shelf only while a holiday is near; the season's shelf always; then the themes as cards. */}
+      {holiday && holidayDishes.length >= 4 && <Shelf c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true })}
+        extra={holiday.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
+          : FESTIVE.includes(holiday.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{holiday.key === "newyear" ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
+      <FeastSheet open={feast} onClose={() => setFeast(false)} />
+      {seasonDishes.length >= 4 && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
+      {themes.length > 0 && (
+        <Section title="Подборки">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
+          </div>
+        </Section>
+      )}
+
       <Now skip={planned?.id} dayDish={planned && today?.id !== planned.id ? today : null} />
       <Rescue />
       <BackupCard />
-      {season && seasonal.length >= 4 && <Shelf title={season.title} list={seasonal}
-        extra={season.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
-          : FESTIVE.includes(season.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{season.key === "newyear" && new Date().getMonth() === 11 ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
-      <FeastSheet open={feast} onClose={() => setFeast(false)} />
-      {quick.length >= 4 && <Shelf title={"Быстро " + MEAL_WORD[meal]} list={quick} all={() => openRecipesView("time:30")} />}
-      {(profile.kids || profile.goals.includes("family")) && kids.length >= 4 && <Shelf title="Детям нравится" list={kids} all={() => openRecipesView("filter:kids")} />}
       <Saved />
       <CourseCard />
-      <DecideSheet open={decide} onClose={() => setDecide(false)} meal={meal} />
+      {deck && <Deck title={deck.title} pool={deck.pool} askTime={deck.askTime} startList={deck.list} onClose={() => setDeck(null)} />}
     </div>
   );
 }
@@ -227,17 +245,31 @@ function RepeatCard() {
   );
 }
 
-/** A collection that scrolls sideways, like a shelf in a streaming app. */
-function Shelf({ title, list, all, extra }: { title: string; list: Recipe[]; all?: () => void; extra?: ReactNode }) {
+/** A collection that scrolls sideways, like a shelf in a streaming app; «Все» opens all of it as a list. */
+function Shelf({ c, list, all, extra }: { c: Collection; list: Recipe[]; all: () => void; extra?: ReactNode }) {
   const { openRecipe } = useActions();
   if (!list.length) return null;
   return (
-    <Section title={title} action={all ? "Все" : undefined} onAction={all}>
-      <ScrollRow label={title}>
-        {list.map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className="w-[168px] shrink-0 snap-start sm:w-[200px]" />)}
+    <Section title={c.emoji + " " + c.title} action="Все" onAction={all}>
+      <p className="-mt-1 mb-3 text-small text-ink-soft">{c.hint}</p>
+      <ScrollRow label={c.title}>
+        {list.slice(0, 10).map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className="w-[168px] shrink-0 snap-start sm:w-[200px]" />)}
       </ScrollRow>
       {extra}
     </Section>
+  );
+}
+
+/** A theme as a card: its own drawn cover (made in the admin), or the best dish's photo until there is one. */
+function ThemeCard({ c, cover, onOpen }: { c: Collection; cover: Recipe; onOpen: () => void }) {
+  const [own, setOwn] = useState(true);
+  return (
+    <button onClick={onOpen} className="relative aspect-[4/5] overflow-hidden rounded-card text-left transition-transform active:scale-[.98]">
+      {own
+        ? <img src={coverUrl(c.key)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
+        : <RecipeImage recipe={cover} className="absolute inset-0 h-full w-full" rounded="rounded-none" />}
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white">{c.title}</span>
+    </button>
   );
 }
 

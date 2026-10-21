@@ -6,8 +6,10 @@
 // Thursdays, baking on Sundays — learnt from what was really cooked) and variety (not what was cooked yesterday).
 import { LABELS, courseOf, ingredient, recipeById, shortName, type BookEntry, type Recipe } from "../engine";
 
-export type Signal = "open" | "read" | "bounce" | "save" | "plan" | "cook" | "done" | "liked" | "meh" | "not_this";
-const WEIGHT: Record<Signal, number> = { open: 0.4, read: 0.8, bounce: -0.5, save: 2, plan: 1.5, cook: 1.5, done: 3, liked: 3, meh: -3, not_this: -0.6 };
+// deck_yes / deck_no: «Хочу» / «Не то» in the deck. «Не то» there means «not right now», not «I don't eat it»:
+// thirty times weaker than «Так себе» after cooking, so only a long run of the same swipes moves the taste.
+export type Signal = "open" | "read" | "bounce" | "save" | "plan" | "cook" | "done" | "liked" | "meh" | "not_this" | "deck_yes" | "deck_no";
+const WEIGHT: Record<Signal, number> = { open: 0.4, read: 0.8, bounce: -0.5, save: 2, plan: 1.5, cook: 1.5, done: 3, liked: 3, meh: -3, not_this: -0.6, deck_yes: 1, deck_no: -0.1 };
 interface Sig { id: string; w: number; at: number; f: string[]; k?: Signal }
 interface Store { sigs: Sig[]; muted: string[] }
 
