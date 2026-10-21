@@ -50,7 +50,16 @@ main.adm-main.cook-extra-on > :not(#cook-extra) { display: none !important; }
 .cx-toggle input { width: 18px; height: 18px; accent-color: #b7432f; }
 .cx-saved { font-size: 13px; color: #36703f; }
 .cx-err { font-size: 13px; color: #a3311f; }
-.adm-nav a .cx-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 99px; background: #b7432f; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
+/* The grouped menu: the old panel's own menu hidden, the sections in its place, the section's tabs under the header. */
+header.adm-header > nav.adm-nav:not(.cx-nav) { display: none !important; }
+nav.cx-sub { position: sticky; top: 61px; z-index: 19; background: rgba(255, 253, 248, .94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+nav.cx-sub[hidden] { display: none; }
+.cx-sub-in { max-width: 1180px; margin: 0 auto; padding: 0 28px; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.cx-sub-in a { display: inline-flex; align-items: center; white-space: nowrap; padding: 11px 12px; font-size: 14px; color: #5d6052; text-decoration: none; border-bottom: 2px solid transparent; }
+.cx-sub-in a:hover { color: #2f3328; }
+.cx-sub-in a.on { color: #a83e2b; border-bottom-color: #b7432f; font-weight: 600; }
+@media (max-width: 640px) { .cx-sub-in { padding: 0 12px; } }
+.adm-nav a .cx-count, .cx-sub-in a .cx-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 99px; background: #b7432f; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
 
 /* The older scripts' blocks (messages, statistics, VK, catalog restore) in the panel's look. */
 .ins { --brand: #b7432f; --herb: #36703f; --soft: #6f7062; --line: var(--border); }

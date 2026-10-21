@@ -1,6 +1,7 @@
-// New tabs in the old admin panel (a prebuilt bundle without its source): they are added to its top menu as
-// links like its own (#collections…), and while one is open its page is shown in the panel's main area
-// instead of the old one. The old tabs keep working as they were.
+// The admin panel's menu, grouped as in a marketplace seller's office: a few sections at the top, the section's
+// own tabs in a row under the header. New tools go inside a section, so the header does not grow.
+// The old panel (a prebuilt bundle without its source) keeps its pages and routes (#stats, #recipes…); its own menu
+// is hidden and this one drawn in its place. The new pages (#messages, #collections…) are shown in its main area.
 import { createRoot, type Root } from "react-dom/client";
 import type { ComponentType } from "react";
 import { Collections } from "./Collections";
@@ -8,77 +9,80 @@ import { Improve } from "./Improve";
 import { Messages, Vk } from "./Legacy";
 import { CSS } from "./ui";
 
-interface Tab { hash: string; label: string; after: string; page: ComponentType }
-// Where each goes in the menu: messages next to the statistics, collections next to the recipes, VK before the catalog.
-const TABS: Tab[] = [
-  { hash: "#messages", label: "Сообщения", after: "#stats", page: Messages },
-  { hash: "#collections", label: "Подборки", after: "#recipes", page: Collections },
-  { hash: "#improve", label: "Доработка", after: "#collections", page: Improve },
-  { hash: "#vk", label: "ВКонтакте", after: "#teach", page: Vk },
+/** The new pages; the other addresses are the old panel's. */
+const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#vk": Vk };
+
+interface Section { label: string; tabs: [hash: string, label: string][] }
+const SECTIONS: Section[] = [
+  { label: "Статистика", tabs: [["#stats", "Статистика"]] },
+  { label: "Люди", tabs: [["#messages", "Сообщения"], ["#reviews", "Отзывы"]] },
+  { label: "Рецепты", tabs: [["#recipes", "Все рецепты"], ["#collections", "Подборки"], ["#improve", "Доработка"], ["#files", "Файлы каталога"]] },
+  { label: "Шеф", tabs: [["#teach", "Обучение Шефа"]] },
+  { label: "Продвижение", tabs: [["#vk", "ВКонтакте"]] },
+  { label: "Настройки", tabs: [["#server", "Настройки"]] },
 ];
 
-/** New messages from people: a number on «Сообщения», counted once the panel is open (and after a reply). */
+const base = () => "#" + (location.hash.slice(1).split("/")[0] || "stats");
+const sectionOf = (h: string) => SECTIONS.find((s) => s.tabs.some(([t]) => t === h)) ?? SECTIONS[0];
+
+/** New messages from people: a number on «Люди» and «Сообщения», counted when the panel opens (and after a reply). */
 let counted = false;
+let unread = 0;
 function countMessages(): void {
   if (counted) return;
   counted = true;
   fetch("../api/index.php?r=admin.insights&days=90", { credentials: "same-origin" }).then((r) => (r.ok ? r.json() : null)).then((d: { messages?: { seen?: number | string }[] } | null) => {
-    const n = (d?.messages ?? []).filter((m) => !+(m.seen ?? 0)).length;
-    const a = document.querySelector('nav.adm-nav a[data-extra="#messages"]');
-    if (!a) return;
-    a.querySelector(".cx-count")?.remove();
-    if (n) { const b = document.createElement("span"); b.className = "cx-count"; b.textContent = String(n); a.append(b); }
+    unread = (d?.messages ?? []).filter((m) => !+(m.seen ?? 0)).length;
+    drawMenu(true);
   }).catch(() => { counted = false; });
+}
+
+const count = (n: number) => (n ? `<span class="cx-count">${n}</span>` : "");
+let drawn = "";
+
+/** The sections in the header and the current section's tabs under it; redrawn only when something changed. */
+function drawMenu(force = false): void {
+  const header = document.querySelector<HTMLElement>("header.adm-header");
+  const old = header?.querySelector<HTMLElement>("nav.adm-nav:not(.cx-nav)");
+  if (!header || !old) return;
+  const h = base();
+  const cur = sectionOf(h);
+  const key = h + "|" + unread;
+  let nav = header.querySelector<HTMLElement>("nav.cx-nav");
+  let sub = document.querySelector<HTMLElement>("nav.cx-sub");
+  if (!force && nav && sub && drawn === key) return;
+  drawn = key;
+  if (!nav) { nav = document.createElement("nav"); nav.className = "adm-nav cx-nav"; nav.setAttribute("aria-label", "Разделы"); old.after(nav); }
+  nav.innerHTML = SECTIONS.map((s) => `<a href="${s.tabs[0][0]}"${s === cur ? ' class="active" aria-current="page"' : ""}>${s.label}${s.label === "Люди" ? count(unread) : ""}</a>`).join("");
+  if (!sub) { sub = document.createElement("nav"); sub.className = "cx-sub"; sub.setAttribute("aria-label", "Вкладки раздела"); header.after(sub); }
+  sub.hidden = cur.tabs.length < 2;
+  sub.innerHTML = `<div class="cx-sub-in">${cur.tabs.map(([t, label]) => `<a href="${t}"${t === h ? ' class="on" aria-current="page"' : ""}>${label}${t === "#messages" ? count(unread) : ""}</a>`).join("")}</div>`;
 }
 
 let root: Root | null = null;
 let shown: string | null = null;
 let box: HTMLElement | null = null;
 
-const base = () => "#" + (location.hash.slice(1).split("/")[0] || "stats");
-
-function ensureTabs(): void {
-  const nav = document.querySelector("nav.adm-nav");
-  if (!nav) return;
-  for (const t of TABS) {
-    if (nav.querySelector(`a[data-extra="${t.hash}"]`)) continue;
-    const a = document.createElement("a");
-    a.href = t.hash; a.textContent = t.label; a.dataset.extra = t.hash;
-    const ref = nav.querySelector(`a[href="${t.after}"]`);
-    if (ref) ref.after(a); else nav.append(a);
-  }
-  countMessages();
-  sync();
-}
-
 function sync(): void {
-  const nav = document.querySelector("nav.adm-nav");
+  drawMenu();
   const main = document.querySelector<HTMLElement>("main.adm-main");
-  if (!nav || !main) return;
+  if (!main) return;
   const h = base();
-  const tab = TABS.find((t) => t.hash === h);
-  // The menu: the old panel shows «Статистика» for any address it does not know — the right link is marked here.
-  // Only what differs is touched: the observer below sees these changes too.
-  for (const a of Array.from(nav.querySelectorAll<HTMLAnchorElement>("a"))) {
-    const on = a.getAttribute("href") === h;
-    if (a.classList.contains("active") !== on) a.classList.toggle("active", on);
-    if (on && a.getAttribute("aria-current") !== "page") a.setAttribute("aria-current", "page");
-    if (!on && a.hasAttribute("aria-current")) a.removeAttribute("aria-current");
-  }
-  if (tab) {
+  const Page = PAGES[h];
+  if (Page) {
     if (!box || !main.contains(box)) { box = document.createElement("div"); box.id = "cook-extra"; main.prepend(box); root?.unmount(); root = createRoot(box); shown = null; }
     // classList.add of a class already there still counts as a change for the observer: checked first.
     if (!main.classList.contains("cook-extra-on")) main.classList.add("cook-extra-on");
-    if (shown !== tab.hash) { const Page = tab.page; root!.render(<Page />); shown = tab.hash; window.scrollTo(0, 0); }
+    if (shown !== h) { root!.render(<Page />); shown = h; window.scrollTo(0, 0); }
   } else if (shown) {
-    // Leaving «Сообщения» (read, answered): the number on the tab is counted again.
+    // Leaving «Сообщения» (read, answered): the number is counted again.
     if (shown === "#messages") { counted = false; countMessages(); }
     root?.unmount(); root = null; box?.remove(); box = null; shown = null;
     if (main.classList.contains("cook-extra-on")) main.classList.remove("cook-extra-on");
   }
 }
 
-// «Прочитано», «Ответить», «Удалить» in the messages: the number on the tab follows a moment later.
+// «Прочитано», «Ответить», «Удалить» in the messages: the number follows a moment later.
 document.addEventListener("click", (e) => {
   if ((e.target as Element | null)?.closest?.("#cook-extra #out button")) window.setTimeout(() => { counted = false; countMessages(); }, 900);
 });
@@ -87,10 +91,11 @@ const style = document.createElement("style");
 style.textContent = CSS;
 document.head.append(style);
 window.addEventListener("hashchange", sync);
-// The old panel draws its menu after logging in and redraws it (marking «Статистика» for an address it does not
-// know): the links are put back and the right one marked again each time.
+// The old panel draws its header after logging in (and again after logging out and in): the menu is put back.
 new MutationObserver(() => {
-  const nav = document.querySelector("nav.adm-nav");
-  if (nav && TABS.some((t) => !nav.querySelector(`a[data-extra="${t.hash}"]`))) ensureTabs(); else sync();
-}).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
-ensureTabs();
+  const header = document.querySelector("header.adm-header");
+  if (header && !header.querySelector("nav.cx-nav")) { drawn = ""; countMessages(); }
+  sync();
+}).observe(document.body, { childList: true, subtree: true });
+countMessages();
+sync();
