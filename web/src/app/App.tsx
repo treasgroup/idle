@@ -2,6 +2,7 @@
 // Five destinations: Главная · Поиск · Шеф · Избранное · Покупки (Шеф is the coloured one, level with the rest).
 // Simple mode keeps three: Главная · Шеф · Избранное. Everything else lives in Профиль.
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { DinnerLayer, useDinnerReminders } from "../components/DinnerPlan";
 import {
   CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
   type LucideIcon,
@@ -139,6 +140,7 @@ function Shell() {
   const [incoming, setIncoming] = useState<Partial<MyRecipe> | null>(null);
   useIncomingLinks(setPoll, setIncoming);
   useTimerAlarm(toast, s.readAloud);
+  useDinnerReminders();
   // The screen stays on while something is on the stove or a timer is counting.
   const anyTimer = useTimers().some((t) => !!t.end && !t.rang);
   useWakeLock((!!s.cooking && !s.cooking.done) || !!profile.parallel || anyTimer);
@@ -172,7 +174,7 @@ function Shell() {
 
   const closeRecipe = useCallback(() => close(routeHash({ tab: route.tab })), [route.tab]);
   const closeTop = useCallback(() => close(routeHash({ tab: "home" })), []);
-  const layer = !!(route.recipe || route.cook || route.doc || route.tab === "learn");
+  const layer = !!(route.recipe || route.cook || route.dinner || route.doc || route.tab === "learn");
   const chat = route.tab === "chat";
   const cookingNow = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
   // Tapping the current tab again scrolls it back to the top, as in phone apps.
@@ -226,6 +228,7 @@ function Shell() {
         <Suspense fallback={<LayerSkeleton />}>
           {route.recipe && <RecipeLayer id={route.recipe} onClose={closeRecipe} />}
           {route.cook && <CookingLayer onClose={closeTop} />}
+          {route.dinner && <DinnerLayer onClose={closeTop} />}
         </Suspense>
       </Boundary>
       <Suspense fallback={route.doc ? <LayerSkeleton /> : null}>

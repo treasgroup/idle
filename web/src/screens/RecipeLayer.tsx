@@ -27,7 +27,7 @@ import { AskSheet, accusative, type AskRequest } from "../components/AskSheet";
 import { shareRecipeCard } from "../app/shareCard";
 import { rememberRecipe } from "../app/lastSeen";
 import { likedShare, useRecipeStat } from "../app/recipeStats";
-import { ServeBySheet } from "../components/ServeBy";
+import { DinnerSetup } from "../components/DinnerPlan";
 import { ShareOptions } from "../components/ShareOptions";
 import { TimerStrip } from "../components/TimerStrip";
 import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../components/ui";
@@ -417,7 +417,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                 {/* The helpers people use now and then: one row of small buttons instead of a line each. */}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {sides.length > 0 && !side && !sideOpen && <button className="chip h-11" onClick={() => setSideOpen(true)}><Soup size={18} className="text-ink-soft" aria-hidden />Добавить гарнир</button>}
-                  <button className="chip h-11" onClick={() => setServeOpen(true)}><Clock size={18} className="text-ink-soft" aria-hidden />Успеть к часу</button>
+                  <button className="chip h-11" onClick={() => setServeOpen(true)}><Clock size={18} className="text-ink-soft" aria-hidden />Подать к сроку</button>
                   {!noteOpen && <button className="chip h-11" onClick={() => setNoteOpen(true)}><PenLine size={18} className="text-ink-soft" aria-hidden />Заметка для себя</button>}
                 </div>
                 {sidePicker}
@@ -478,7 +478,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         setPanOpen(false);
         toast("Под форму " + panText(p) + " — продукты на " + n + " " + plural(n, "порцию", "порции", "порций"));
       }} />}
-      <ServeBySheet open={serveOpen} onClose={() => setServeOpen(false)} title={base.title} recipeId={base.id} minutes={recipe.totalMinutes} onCook={cook} />
+      {serveOpen && <DinnerSetup open base={base} onClose={() => setServeOpen(false)} />}
       {menuOpen && <AddToMenuSheet recipeId={base.id} servings={servings} onClose={() => setMenuOpen(false)} />}
       {terms.sheet}
       <Sheet open={shareOpen} title="Поделиться рецептом" onClose={() => setShareOpen(false)}>

@@ -1,7 +1,7 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus, Repeat2, Bookmark, X,
+  CalendarDays, ChevronDown, Clock, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus, Repeat2, Bookmark, X,
 } from "lucide-react";
 import {
   MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
@@ -12,6 +12,7 @@ import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
 import { replace, routeHash } from "../app/router";
+import { DinnerSetup } from "../components/DinnerPlan";
 import { PlaceHint } from "../components/PlaceHint";
 import { downloadIcs, planIcs } from "../app/calendar";
 import { applyWeek, removeWeek, saveWeek, savedWeeks } from "../app/savedWeeks";
@@ -44,6 +45,10 @@ export function Menu() {
   const [settings, setSettings] = useState(false);
   const [share, setShare] = useState(false);
   const [itemMenu, setItemMenu] = useState<{ date: string; index: number } | null>(null);
+  // «Ужин к сроку» for a day with two or three dishes (components/DinnerPlan).
+  const [dinnerDay, setDinnerDay] = useState<string | null>(null);
+  const dinnerDishes = (date: string) => (days.find((x) => x.date === date)?.items ?? []).filter((it) => !it.leftover && (it.meal ?? "dinner") === "dinner")
+    .map((it) => recipeById(it.recipeId)).filter((r): r is NonNullable<typeof r> => !!r).sort((a, b) => b.totalMinutes - a.totalMinutes).slice(0, 3);
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
   const [noWaste, setNoWaste] = useState(false);
   const [again, setAgain] = useState(false);
@@ -171,6 +176,11 @@ export function Menu() {
                         </div>
                       );
                     })}
+                    {d.date >= today && dinnerDishes(d.date).length >= 2 && (
+                      <button className="flex min-h-[48px] w-full items-center gap-2 px-3 text-left text-body-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setDinnerDay(d.date)}>
+                        <Clock size={18} aria-hidden />Ужин к сроку — все блюда к одному времени
+                      </button>
+                    )}
                   </div>
                 )}
               </section>
@@ -260,6 +270,7 @@ export function Menu() {
           </>
         )}
       </Sheet>
+      {dinnerDay && (() => { const list = dinnerDishes(dinnerDay); return list.length >= 2 ? <DinnerSetup open base={list[0]} preset={list} onClose={() => setDinnerDay(null)} /> : null; })()}
     </div>
   );
 }

@@ -13,6 +13,8 @@ export interface Route {
   tab: Tab;
   recipe: string | null;
   cook: boolean;
+  /** «Ужин к сроку»: the timeline of several dishes (app/dinner). */
+  dinner?: boolean;
   doc: string | null;
 }
 
@@ -20,6 +22,7 @@ export function parseRoute(hash: string): Route {
   const parts = hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const route: Route = { tab: "home", recipe: null, cook: false, doc: null };
   if (parts[0] === "cook") return { ...route, cook: true };
+  if (parts[0] === "dinner") return { ...route, dinner: true };
   if (parts[0] === "doc" && parts[1]) return { ...route, doc: parts[1] };
   if (parts[0] && (TABS as string[]).includes(parts[0])) route.tab = parts[0] as Tab;
   const r = parts.indexOf("r");
@@ -29,6 +32,7 @@ export function parseRoute(hash: string): Route {
 
 export function routeHash(r: Partial<Route> & { tab?: Tab }): string {
   if (r.cook) return "#/cook";
+  if (r.dinner) return "#/dinner";
   if (r.doc) return "#/doc/" + r.doc;
   const tab = r.tab ?? "home";
   return "#/" + (tab === "home" ? "" : tab) + (r.recipe ? (tab === "home" ? "" : "/") + "r/" + encodeURIComponent(r.recipe) : "");
