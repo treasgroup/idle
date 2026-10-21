@@ -1,12 +1,15 @@
 // Pieces of the conversation with Шеф: messages, «Условия» (what Шеф takes into account), suggestion cards, mood tiles, the pantry picker.
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator } from "lucide-react";
+import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator, CalendarDays, ShoppingCart, Heart, GraduationCap, UserRound, Home, ChefHat, Type, Moon, Sun, VolumeX, Volume2, Check, type LucideIcon } from "lucide-react";
 import {
   LABELS, addToFridge, conditionLabel, expiringSoon, freshConditions, ingredientOptions, pantryGroups, recipeById, searchIngredients, shortName,
-  DEFAULT_CONDITIONS, type ChatMessage, type ChatOption, type Conditions,
+  DEFAULT_CONDITIONS, type ChatGo, type ChatMessage, type ChatOption, type Conditions,
 } from "../engine";
 import { useStore } from "../app/store";
+import { push as openLayer, replace } from "../app/router";
+import { cue } from "../app/feedback";
+import type { Profile } from "../app/profile";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { HEALTH, withoutHealth } from "../app/topic";
@@ -38,7 +41,14 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
   return (
     <article className="anim-rise" aria-label="Шеф">
       <div className="min-w-0 space-y-3">
-        <p className="w-fit max-w-[85%] xl:max-w-[640px] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{tidyReply(m.text)}</p>
+        {m.go
+          ? (
+            <div className="w-fit max-w-[85%] xl:max-w-[640px] rounded-[20px] rounded-bl-md border border-line bg-card px-4 pb-3 pt-2.5">
+              <p className="whitespace-pre-line text-body">{tidyReply(m.text)}</p>
+              <GoButton go={m.go} />
+            </div>
+          )
+          : <p className="w-fit max-w-[85%] xl:max-w-[640px] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{tidyReply(m.text)}</p>}
         {results[0]?.recipe && (
           <RecipeFeatured recipe={results[0].recipe} note={results[0].why || undefined} onOpen={() => open(results[0].id)}
             onMenu={() => setMenuFor(results[0].id)} onSave={() => toggleFavorite(results[0].recipe!)} saved={isFavorite(results[0].id)} />
@@ -54,6 +64,41 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
       </div>
       {menuFor && <AddToMenuSheet recipeId={menuFor} onClose={() => setMenuFor(null)} />}
     </article>
+  );
+}
+
+const GO_ICONS: Record<string, LucideIcon> = {
+  plan: CalendarDays, cart: ShoppingCart, fridge: Refrigerator, heart: Heart, school: GraduationCap, profile: UserRound, search: Search,
+  home: Home, cook: ChefHat, text: Type, moon: Moon, sun: Sun, mute: VolumeX, sound: Volume2,
+};
+
+/** Шеф's big button (app/navigator): opens a screen, or changes a setting — only on this tap, never by itself. */
+function GoButton({ go }: { go: ChatGo }) {
+  const { setProfile, toast } = useStore();
+  const [done, setDone] = useState(false);
+  const Icon = GO_ICONS[go.icon ?? ""] ?? ArrowUpRight;
+  const run = () => {
+    if (go.to.startsWith("set:")) {
+      const [, key, value] = go.to.split(":");
+      setProfile((p): Profile => {
+        if (key === "textSize" && (value === "m" || value === "l" || value === "xl")) return { ...p, textSize: value };
+        if (key === "theme" && (value === "light" || value === "dark")) return { ...p, theme: value };
+        if (key === "sounds") return { ...p, sounds: value === "on" };
+        if (key === "simple") return { ...p, simple: value === "on" };
+        return p;
+      });
+      setDone(true);
+      if (key === "sounds" && value === "on") setTimeout(() => cue("listen"), 50); else cue("tap");
+      toast("Готово. Вернуть можно в Профиле");
+      return;
+    }
+    cue("tap");
+    if (go.to === "#/cook") openLayer(go.to); else replace(go.to);
+  };
+  return (
+    <button className="btn-primary mt-3 flex h-12 w-full min-w-[220px] items-center justify-center gap-2" onClick={run} disabled={done}>
+      {done ? <><Check size={20} aria-hidden />Сделано</> : <><Icon size={20} aria-hidden />{go.label}</>}
+    </button>
   );
 }
 

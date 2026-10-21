@@ -24,8 +24,9 @@ function newTopic(text: string, base: Parameters<typeof parseMessage>[1]): boole
 }
 
 // The empty chat: what can be asked, in turn, in the box itself (people who do not know what to write).
-const CHAT_HINTS = ["Например: курица и картошка", "Например: что-то быстрое на ужин", "Например: суп без мяса", "Например: есть фарш, нет духовки",
-  "Например: что приготовить ребёнку", "Например: сколько варить гречку"];
+// One of them about the service itself: Шеф also knows where things are (app/navigator).
+const CHAT_HINTS = ["Например: курица и картошка", "Например: что-то быстрое на ужин", "Например: где мой план?", "Например: суп без мяса",
+  "Например: есть фарш, нет духовки", "Например: что приготовить ребёнку", "Например: сделай шрифт крупнее", "Например: сколько варить гречку"];
 
 export function Chat() {
   const { s, toast } = useStore();

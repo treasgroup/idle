@@ -3,6 +3,7 @@
 // The server AI is used only when it is configured; otherwise the local engine answers (the default).
 import { measureAnswer, roastAnswer } from "./kitchenMath";
 import { leftoverAnswer } from "./leftovers";
+import { navigatorAnswer } from "./navigator";
 import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
@@ -168,6 +169,14 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     abort.current?.abort();
     const ac = new AbortController();
     abort.current = ac;
+    // About the service itself («где мой план», «сделай шрифт крупнее»): one line and a button, nothing searched.
+    const nav = navigatorAnswer(text, stateRef.current, profileRef.current);
+    if (nav) {
+      push([{ role: "user", text: opts.shown || text }, { role: "assistant", text: nav.text, ...(nav.go ? { go: nav.go } : {}) }]);
+      track({ type: "query", text, count: 0, source: "nav" });
+      setBusy(false);
+      return;
+    }
     setBusy(true);
     // A new request is not a refinement of the last one: what was said for the previous dish is dropped
     // («хочу сладкое», then «нет духовки, есть фарш»). «А без лука», «побыстрее» keep it.

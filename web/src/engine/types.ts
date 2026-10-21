@@ -122,12 +122,15 @@ export interface Cooking {
 }
 
 export interface ChatOption { label: string; text?: string; relax?: string; open?: string; action?: "pantry" }
+/** A big button in Шеф's answer about the service (app/navigator): a screen ("#/menu") or a setting ("set:textSize:l"). */
+export interface ChatGo { label: string; to: string; icon?: string }
 export interface ChatMessage {
   role: "user" | "assistant";
   text: string;
   results?: { id: string; reason: string; note?: string }[];
   options?: ChatOption[];
   chips?: string[];
+  go?: ChatGo;
 }
 
 export interface Taste { liked: string[]; tooHard: string[]; disliked: string[]; notNow: { id: string; at: number }[] }
