@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { buildCatalog, recipes, useCatalog, type Recipe } from "../engine";
 import { HOLIDAYS, MIN_DISHES, SEASONS, THEMES, type Collection, type Custom, type Customs } from "../app/seasonal";
 import { get, photo, post, upload } from "./api";
-import { coverPrompt } from "./prompts";
+import { coverPrompt, type CoverShape } from "./prompts";
 import { BTN, BTN_OUTLINE, BTN_SM, INPUT } from "./ui";
 
 type Kind = "holiday" | "season" | "theme" | "own";
@@ -218,41 +218,58 @@ function Editor({ e, x, rule, final, all, photos, onSave, onDelete, onCustoms }:
 }
 
 function confirmDelete(title: string): boolean {
-  return window.confirm("Удалить подборку «" + title + "»? Её обложка тоже удалится.");
+  return window.confirm("Удалить подборку «" + title + "»? Её обложки тоже удалятся.");
 }
 
+/** Two covers: tall 4:5 for phones and wide 3:2 for computers. Without the wide one, computers cut the tall one. */
 function Cover({ e, x, first, photos, title, hint, onCustoms }: { e: Entry; x: Custom; first?: Recipe; photos: Record<string, number>; title: string; hint: string; onCustoms: (c: Customs) => void }) {
+  const fallback = first ? photo(first.id, photos) : null;
+  return (
+    <div className="cx-covers">
+      <CoverSlot e={e} shape="tall" version={x.cover} fallback={fallback} title={title} hint={hint} onCustoms={onCustoms} />
+      <CoverSlot e={e} shape="wide" version={x.coverWide} fallback={x.cover ? "../collections/" + e.c.key + ".jpg?v=" + x.cover : fallback} title={title} hint={hint} onCustoms={onCustoms} />
+    </div>
+  );
+}
+
+const SHAPES: Record<CoverShape, { label: string; none: string; cut: string }> = {
+  tall: { label: "Для телефона · вертикальная 4:5", none: "пока стоит фото первого блюда", cut: "Картинка сама обрежется до 4:5." },
+  wide: { label: "Для компьютера · горизонтальная 3:2", none: "пока обрезается вертикальная", cut: "Картинка сама обрежется до 3:2." },
+};
+
+function CoverSlot({ e, shape, version, fallback, title, hint, onCustoms }: { e: Entry; shape: CoverShape; version?: number; fallback: string | null; title: string; hint: string; onCustoms: (c: Customs) => void }) {
   const file = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
-  const prompt = coverPrompt(e.c.key, title, hint);
-  const own = x.cover ? "../collections/" + e.c.key + ".jpg?v=" + x.cover : null;
-  const fallback = first ? photo(first.id, photos) : null;
+  const prompt = coverPrompt(e.c.key, title, hint, shape);
+  const own = version ? "../collections/" + e.c.key + (shape === "wide" ? "-wide" : "") + ".jpg?v=" + version : null;
+  const s = SHAPES[shape];
   const send = async (f: File) => {
     setBusy(true); setMsg({});
     try {
-      const form = new FormData(); form.append("key", e.c.key); form.append("cover", f);
+      const form = new FormData(); form.append("key", e.c.key); form.append("shape", shape); form.append("cover", f);
       const j = await upload<{ collections: Customs }>("admin.collection.cover", form);
       onCustoms(j.collections ?? {}); setMsg({ ok: "Обложка загружена" });
     } catch (err) { setMsg({ err: (err as Error).message }); } finally { setBusy(false); if (file.current) file.current.value = ""; }
   };
   const drop = async () => {
-    try { const j = await post<{ collections: Customs }>("admin.collection.cover.delete", { key: e.c.key }); onCustoms(j.collections ?? {}); setMsg({ ok: "Обложка убрана" }); }
+    try { const j = await post<{ collections: Customs }>("admin.collection.cover.delete", { key: e.c.key, shape }); onCustoms(j.collections ?? {}); setMsg({ ok: "Обложка убрана" }); }
     catch (err) { setMsg({ err: (err as Error).message }); }
   };
+  const img = "cx-cover-img cx-cover-" + shape;
   return (
     <div className="cx-cover">
-      {own ? <img className="cx-cover-img" src={own} alt="" /> : fallback ? <img className="cx-cover-img" src={fallback} alt="" /> : <div className="cx-cover-img">{e.c.emoji}</div>}
+      {own ? <img className={img} src={own} alt="" /> : fallback ? <img className={img} src={fallback} alt="" /> : <div className={img}>{e.c.emoji}</div>}
       <div>
-        <span className="cx-label">{own ? "Обложка · ваша картинка" : "Обложка · пока стоит фото первого блюда"}</span>
+        <span className="cx-label">{s.label} · {own ? "ваша картинка" : s.none}</span>
         <textarea className="cx-prompt" readOnly value={prompt} onFocus={(ev) => ev.currentTarget.select()} />
         <div className="cx-row">
           <button className={BTN_OUTLINE} onClick={() => void navigator.clipboard.writeText(prompt).then(() => setMsg({ ok: "Промт скопирован" }), () => setMsg({ err: "Не получилось скопировать — выделите текст и нажмите Ctrl+C" }))}>Скопировать промт</button>
-          <button className={BTN} disabled={busy} onClick={() => file.current?.click()}>{busy ? "Загружаю…" : own ? "Заменить обложку" : "Загрузить обложку"}</button>
+          <button className={BTN} disabled={busy} onClick={() => file.current?.click()}>{busy ? "Загружаю…" : own ? "Заменить" : "Загрузить"}</button>
           {own && <button className={BTN_SM} onClick={() => void drop()}>Убрать</button>}
           <input ref={file} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(ev) => { const f = ev.target.files?.[0]; if (f) void send(f); }} />
         </div>
-        <p className="adm-muted" style={{ marginTop: 8, marginBottom: 0 }}>Подойдёт JPEG, PNG или WebP до 12 МБ. Картинка сама обрежется до 4:5.{msg.ok && <span className="cx-saved"> ✓ {msg.ok}</span>}{msg.err && <span className="cx-err"> {msg.err}</span>}</p>
+        <p className="adm-muted" style={{ marginTop: 8, marginBottom: 0 }}>JPEG, PNG или WebP до 12 МБ. {s.cut}{msg.ok && <span className="cx-saved"> ✓ {msg.ok}</span>}{msg.err && <span className="cx-err"> {msg.err}</span>}</p>
       </div>
     </div>
   );

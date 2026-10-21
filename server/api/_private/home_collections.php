@@ -1,9 +1,20 @@
 <?php
 // Подборки on Главная: the owner's changes over the rules built into the site (setting 'collections'):
 // shown or not, the title and the line under it, recipes added or taken out by hand, own new collections
-// (only hand-picked recipes), and a drawn cover — collections/<key>.jpg next to the site.
+// (only hand-picked recipes), and drawn covers next to the site: collections/<key>.jpg (tall 4:5, phones) and
+// collections/<key>-wide.jpg (wide 3:2, computers; without it computers cut the tall one).
 
 const COLLECTION_KEY = '/^[a-z0-9][a-z0-9-]{0,40}$/';
+/** Cover shapes: file suffix, aspect (width / height) and the saved size. */
+const COVER_SHAPES = ['tall' => ['', 4 / 5, 900, 1125], 'wide' => ['-wide', 3 / 2, 1500, 1000]];
+
+/** A collection's key; «-wide» at the end is kept for the wide cover's file name. */
+function collection_key($k): string {
+    $k = (string)$k;
+    if (!preg_match(COLLECTION_KEY, $k) || substr($k, -5) === '-wide') throw new ApiError(400, 'validation', 'Неверная подборка.');
+    return $k;
+}
+function cover_path(string $key, string $shape): string { return collections_dir() . '/' . $key . COVER_SHAPES[$shape][0] . '.jpg'; }
 
 function collections_dir(): string { return dirname(__DIR__, 2) . '/collections'; }
 function collections_custom(): array { $v = setting('collections', []); return is_array($v) ? $v : []; }
@@ -30,19 +41,19 @@ function collections_public(): void {
     foreach (collections_custom() as $k => $c) if (is_string($k) && preg_match(COLLECTION_KEY, $k) && is_array($c)) $out[$k] = collection_clean($c);
     foreach (glob(collections_dir() . '/*.jpg') ?: [] as $p) {
         $k = basename($p, '.jpg');
-        if (preg_match(COLLECTION_KEY, $k)) { $out[$k] = $out[$k] ?? []; $out[$k]['cover'] = filemtime($p); }
+        $field = substr($k, -5) === '-wide' ? 'coverWide' : 'cover';
+        if ($field === 'coverWide') $k = substr($k, 0, -5);
+        if (preg_match(COLLECTION_KEY, $k)) { $out[$k] = $out[$k] ?? []; $out[$k][$field] = filemtime($p); }
     }
     send_json(['collections' => (object)$out]);
 }
 
 function admin_collection_save(array $b): void {
-    $key = (string)($b['key'] ?? '');
-    if (!preg_match(COLLECTION_KEY, $key)) throw new ApiError(400, 'validation', 'Неверная подборка.');
+    $key = collection_key($b['key'] ?? '');
     $all = collections_custom();
     if (!empty($b['delete'])) {
         unset($all[$key]);
-        $p = collections_dir() . '/' . $key . '.jpg';
-        if (is_file($p)) @unlink($p);
+        foreach (array_keys(COVER_SHAPES) as $shape) if (is_file(cover_path($key, $shape))) @unlink(cover_path($key, $shape));
     } else {
         $c = collection_clean(is_array($b['collection'] ?? null) ? $b['collection'] : []);
         if (!empty($c['custom']) && empty($c['title'])) throw new ApiError(400, 'validation', 'Дайте подборке название.');
@@ -52,10 +63,12 @@ function admin_collection_save(array $b): void {
     collections_public();
 }
 
-/** The cover: JPEG, PNG or WebP from any image generator, cut to 4:5 and saved as a 900×1125 JPEG. */
+/** A cover: JPEG, PNG or WebP from any image generator, cut around the centre to its shape (tall 4:5 → 900×1125,
+ * wide 3:2 → 1500×1000) and saved as a JPEG. */
 function admin_collection_cover(): void {
-    $key = (string)($_POST['key'] ?? '');
-    if (!preg_match(COLLECTION_KEY, $key)) throw new ApiError(400, 'validation', 'Неверная подборка.');
+    $key = collection_key($_POST['key'] ?? '');
+    $shape = ($_POST['shape'] ?? 'tall') === 'wide' ? 'wide' : 'tall';
+    [, $ratio, $ow, $oh] = COVER_SHAPES[$shape];
     $f = $_FILES['cover'] ?? null;
     if (!$f || ($f['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) throw new ApiError(400, 'upload', 'Картинка не загрузилась. Попробуйте файл поменьше.');
     if ($f['size'] <= 0 || $f['size'] > 12 * 1024 * 1024) throw new ApiError(413, 'upload', 'Картинка должна быть до 12 МБ.');
@@ -65,28 +78,28 @@ function admin_collection_cover(): void {
         throw new ApiError(415, 'upload', 'Нужна картинка JPEG, PNG или WebP.');
     $src = @imagecreatefromstring((string)file_get_contents($f['tmp_name']));
     if (!$src) throw new ApiError(415, 'upload', 'Не получилось прочитать картинку.');
-    // Cut to 4:5 around the centre, then scale.
+    // Cut to the shape around the centre, then scale.
     [$w, $h] = [imagesx($src), imagesy($src)];
-    $cw = $w; $ch = (int)round($w * 5 / 4);
-    if ($ch > $h) { $ch = $h; $cw = (int)round($h * 4 / 5); }
-    $dst = imagecreatetruecolor(900, 1125);
-    imagecopyresampled($dst, $src, 0, 0, (int)(($w - $cw) / 2), (int)(($h - $ch) / 2), 900, 1125, $cw, $ch);
+    $cw = $w; $ch = (int)round($w / $ratio);
+    if ($ch > $h) { $ch = $h; $cw = (int)round($h * $ratio); }
+    $dst = imagecreatetruecolor($ow, $oh);
+    imagecopyresampled($dst, $src, 0, 0, (int)(($w - $cw) / 2), (int)(($h - $ch) / 2), $ow, $oh, $cw, $ch);
     imageinterlace($dst, true);
     $dir = collections_dir();
     if (!is_dir($dir) && !@mkdir($dir, 0755, true)) throw new ApiError(500, 'write', 'Нет папки collections. Создайте её рядом с папкой photos.');
     $tmp = $dir . '/.upload-' . bin2hex(random_bytes(4));
     $ok = imagejpeg($dst, $tmp, 86);
     imagedestroy($dst); imagedestroy($src);
-    if (!$ok || !@rename($tmp, $dir . '/' . $key . '.jpg')) { @unlink($tmp); throw new ApiError(500, 'write', 'Не удалось сохранить обложку. Проверьте права на папку collections.'); }
-    @chmod($dir . '/' . $key . '.jpg', 0644);
+    $to = cover_path($key, $shape);
+    if (!$ok || !@rename($tmp, $to)) { @unlink($tmp); throw new ApiError(500, 'write', 'Не удалось сохранить обложку. Проверьте права на папку collections.'); }
+    @chmod($to, 0644);
     clearstatcache();
     collections_public();
 }
 
 function admin_collection_cover_delete(array $b): void {
-    $key = (string)($b['key'] ?? '');
-    if (!preg_match(COLLECTION_KEY, $key)) throw new ApiError(400, 'validation', 'Неверная подборка.');
-    $p = collections_dir() . '/' . $key . '.jpg';
+    $key = collection_key($b['key'] ?? '');
+    $p = cover_path($key, ($b['shape'] ?? 'tall') === 'wide' ? 'wide' : 'tall');
     if (is_file($p) && !@unlink($p)) throw new ApiError(500, 'write', 'Не удалось удалить обложку.');
     collections_public();
 }

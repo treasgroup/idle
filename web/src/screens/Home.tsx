@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -18,7 +18,7 @@ import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
 import { Deck } from "../components/Deck";
-import { RatingBadge, RecipeImage, RecipeMini, RecipeRow, RecipeTile } from "../components/RecipeCard";
+import { RatingBadge, RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { photoFirst } from "../app/photoFirst";
 import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
 import { ProfileButton } from "../app/App";
@@ -157,6 +157,9 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       </div>
       {pwa && <InstallCard pwa={pwa} />}
       <MonthCard />
+      {/* Personal first: what is for today (and what must be used up), then the holiday, the season and the themes. */}
+      <Now skip={planned?.id} dayDish={planned && today?.id !== planned.id ? today : null} />
+      <Rescue />
 
       {/* The holiday shelf only while a holiday is near; the season's shelf always; then the themes as cards. */}
       {holiday && holidayDishes.length >= 4 && <Shelf c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true })}
@@ -166,14 +169,12 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       {season && seasonDishes.length >= 4 && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
       {themes.length > 0 && (
         <Section title="Подборки">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} drawn={custom[t.key]?.cover} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-4">
+            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} drawn={custom[t.key]?.cover} wide={custom[t.key]?.coverWide} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
           </div>
         </Section>
       )}
 
-      <Now skip={planned?.id} dayDish={planned && today?.id !== planned.id ? today : null} />
-      <Rescue />
       <BackupCard />
       <Saved />
       <CourseCard />
@@ -268,15 +269,22 @@ function Shelf({ c, list, all, extra }: { c: Collection; list: Recipe[]; all: ()
   );
 }
 
-/** A theme as a card: its own drawn cover (uploaded in the admin), or the best dish's photo until there is one. */
-function ThemeCard({ c, cover, drawn, onOpen }: { c: Collection; cover: Recipe; drawn?: number; onOpen: () => void }) {
+/** A theme as a card: its own drawn cover (uploaded in the admin), or the best dish's photo until there is one.
+ * Phones and tablets: tall 4:5 cards, two or three in a row. Computers: three wide 3:2 cards in a row — with the wide
+ * cover when there is one, otherwise the tall one cut to the middle. */
+function ThemeCard({ c, cover, drawn, wide, onOpen }: { c: Collection; cover: Recipe; drawn?: number; wide?: number; onOpen: () => void }) {
   const [own, setOwn] = useState(true);
   return (
-    <button onClick={onOpen} className="relative aspect-[4/5] overflow-hidden rounded-card text-left transition-transform active:scale-[.98]">
+    <button onClick={onOpen} className="relative aspect-[4/5] overflow-hidden rounded-card text-left transition-transform active:scale-[.98] lg:aspect-[3/2]">
       {drawn && own
-        ? <img src={coverUrl(c.key, drawn)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
+        ? (
+          <picture>
+            {wide && <source media="(min-width: 1024px)" srcSet={coverUrl(c.key, wide, true)} />}
+            <img src={coverUrl(c.key, drawn)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
+          </picture>
+        )
         : <RecipeImage recipe={cover} className="absolute inset-0 h-full w-full" rounded="rounded-none" />}
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white">{c.title}</span>
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white lg:px-5 lg:pb-4 lg:text-h3">{c.title}</span>
     </button>
   );
 }
@@ -317,62 +325,45 @@ function SimpleHome({ today }: { today: Recipe | null }) {
   );
 }
 
-function Now({ rail, skip, dayDish }: { rail?: boolean; skip?: string; dayDish?: Recipe | null }) {
+/** «На сегодня» as one shelf: the day's dish, what is planned, yesterday's to warm up, then the week plan and the
+ * shopping list as tiles of the same size. One row instead of a list of four — and it stays on one line on phones. */
+function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const { s, profile } = useStore();
   const { openRecipe } = useActions();
   const today = dateKey(new Date());
   // skip: the planned dish already shown in the big card above.
   const menu = (s.menu.find((d) => d.date === today)?.items ?? []).map((i) => ({ i, r: recipeById(i.recipeId) })).filter((x): x is { i: typeof x.i; r: Recipe } => !!x.r && x.r.id !== skip);
   const toBuy = s.shopping.filter((i) => !i.checked).length;
-  const cooking = s.cooking && !s.cooking.done ? s.cooking : null;
   const timers = useTimers().length;
   // In the afternoon: tomorrow's meat or fish may be in the freezer.
   const thaw = new Date().getHours() >= 15 ? thawTomorrow(s, new Date()) : null;
   // The week plan is not in the bottom bar: from here it is one tap away (or one tap to make it).
   const planned = s.menu.filter((d) => d.date >= today && d.items.length > 0).length;
-  const plan = !rail && !profile.simple && (
-    <button onClick={() => openLayer(routeHash({ tab: "menu" }))} className="flex min-h-[56px] items-center gap-3 rounded-input border border-line bg-card px-3 py-2 text-left hover:border-line-strong/60">
-      <CalendarDays size={20} className="shrink-0 text-ink-soft" aria-hidden />
-      <span className="min-w-0 flex-1">
-        <span className="block text-body-sm font-medium">{planned ? "План на неделю" : "Составить план на неделю"}</span>
-        <span className="block text-small text-ink-soft">{planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") + " — посмотреть или поменять" : "Ужины без повторов и сразу список покупок"}</span>
-      </span>
-      <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+  if (!menu.length && !toBuy && !timers && !thaw && !dayDish && profile.simple) return null;
+  const tile = "w-[168px] shrink-0 snap-start sm:w-[200px]";
+  const action = (icon: ReactNode, title: string, line: string, onClick: () => void) => (
+    <button onClick={onClick} className={cx("card flex flex-col items-start justify-between gap-3 p-4 text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.99]", tile)}>
+      <span className="grid h-11 w-11 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{icon}</span>
+      <span><span className="block text-title leading-snug">{title}</span><span className="mt-1 block text-caption text-ink-soft">{line}</span></span>
     </button>
   );
-  // On phones and tablets the dish on the stove is in the bar above the nav.
-  if (!(cooking && rail) && !menu.length && !toBuy && !timers && !plan && !thaw && !dayDish) return null;
-  const rows = (
-    <div className={cx("grid grid-cols-[minmax(0,1fr)] gap-2", rail && "gap-1")}>
-      {timers > 0 && <TimerStrip flush={rail} />}
-      {dayDish && <RecipeRow recipe={dayDish} note="Рецепт дня" onOpen={() => openRecipe(dayDish)} />}
-      {cooking && rail && (
-        <button onClick={() => openLayer(routeHash({ cook: true }))} className="flex min-h-[56px] items-center gap-3 rounded-input bg-ink px-3 text-left text-paper">
-          <Flame size={20} className="shrink-0 text-brand-soft" aria-hidden />
-          <span className="min-w-0 flex-1"><span className="block truncate text-body-sm font-semibold">{cooking.recipe.title}</span><span className="block text-caption opacity-80">Готовите · шаг {cooking.step + 1} из {cooking.recipe.steps.length}</span></span>
-          <span className="text-small font-semibold text-brand-soft">Вернуться</span>
-        </button>
-      )}
-      {menu.map(({ i, r }) => rail
-        ? <RecipeMini key={r.id + i.servings} recipe={r} note={i.leftover ? "Только разогреть" : "По плану · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />
-        : <RecipeRow key={r.id + i.servings} recipe={r} note={i.leftover ? "Приготовлено вчера — только разогреть" : "По плану на сегодня · " + i.servings + " порц."} onOpen={() => openRecipe(r)} />)}
+  return (
+    <Section title="На сегодня">
+      {timers > 0 && <TimerStrip className="mb-3" />}
       {thaw && (
-        <p className="flex items-start gap-3 rounded-input bg-sunken px-3 py-2.5 text-body-sm">
+        <p className="mb-3 flex items-start gap-3 rounded-input bg-sunken px-3 py-2.5 text-body-sm">
           <Snowflake size={20} className="mt-0.5 shrink-0 text-ink-soft" aria-hidden />
           <span>Завтра «{thaw.title}»: если {thaw.what} в морозилке — переложите сегодня в холодильник.</span>
         </p>
       )}
-      {plan}
-      {toBuy > 0 && (
-        <button onClick={() => replace(routeHash({ tab: "shopping" }))} className="flex min-h-[52px] items-center gap-3 rounded-input border border-line bg-card px-3 text-left hover:border-line-strong/60">
-          <ShoppingCart size={20} className="shrink-0 text-ink-soft" aria-hidden />
-          <span className="flex-1 text-body-sm">В покупках: <b>{toBuy}</b></span>
-          <ChevronRight size={18} className="text-ink-faint" aria-hidden />
-        </button>
-      )}
-    </div>
+      <ScrollRow label="На сегодня">
+        {dayDish && <RecipeTile recipe={dayDish} badge="Рецепт дня" onOpen={() => openRecipe(dayDish)} className={tile} />}
+        {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? "Приготовлено вчера" : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
+        {action(<CalendarDays size={22} />, planned ? "План на неделю" : "Составить план", planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") : "Ужины без повторов и список покупок", () => openLayer(routeHash({ tab: "menu" })))}
+        {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
+      </ScrollRow>
+    </Section>
   );
-  return <Section title="На сегодня">{rows}</Section>;
 }
 
 /** Perishables that run out today or tomorrow, and what to cook with them. */

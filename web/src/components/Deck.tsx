@@ -12,6 +12,7 @@ import { useRatings, ratingLabel } from "../app/ratings";
 import { RecipeImage, RecipeTile } from "./RecipeCard";
 import { Layer, cx } from "./ui";
 import { timeShort } from "../app/recipeTime";
+import { cue } from "../app/feedback";
 
 const ROUND = 8;
 const DIFF: Record<string, string> = { easy: "просто", medium: "средне", hard: "сложно" };
@@ -115,44 +116,93 @@ function TimeQuestion({ onPick }: { onPick: (max: number | null) => void }) {
   );
 }
 
-/** One card: drag it sideways (it follows the finger and tilts), or tap ✕ / ♥ under it; ← and → on a keyboard. */
+const FAR = 90; // px past which letting go answers
+const FLICK = 0.5; // px per ms: a quick throw answers even when short
+
+/** One card: drag it sideways (it follows the finger and tilts), or tap ✕ / ♥ under it; ← and → on a keyboard.
+ * The drag moves the card directly (no React render per finger move): smooth on modest phones too. The word on
+ * the side the card goes («Не то» left, «Хочу» right, as the buttons under it); a light tick when it is far enough. */
 function Card({ r, next, onAnswer }: { r: Recipe; next?: Recipe; onAnswer: (want: boolean) => void }) {
-  const [dx, setDx] = useState(0);
-  const [fly, setFly] = useState<0 | 1 | -1>(0);
-  const start = useRef<number | null>(null);
-  const ratings = useRatings();
-  const rating = ratings[r.id];
+  const card = useRef<HTMLDivElement>(null);
+  const behind = useRef<HTMLDivElement>(null);
+  const yes = useRef<HTMLSpanElement>(null);
+  const no = useRef<HTMLSpanElement>(null);
+  const drag = useRef<{ x0: number; dx: number; lx: number; lt: number; v: number; past: boolean; raf: number } | null>(null);
+  const done = useRef(false);
+  const rating = useRatings()[r.id];
+
+  const paint = (x: number, ease = false) => {
+    const c = card.current;
+    if (!c) return;
+    const t = ease ? "transform 220ms cubic-bezier(.2,.7,.3,1)" : "none";
+    c.style.transition = t;
+    c.style.transform = "translate3d(" + x + "px,0,0) rotate(" + x / 22 + "deg)";
+    const k = Math.min(1, Math.abs(x) / FAR);
+    if (yes.current) { yes.current.style.transition = ease ? "opacity 200ms" : "none"; yes.current.style.opacity = x > 0 ? String(k) : "0"; }
+    if (no.current) { no.current.style.transition = ease ? "opacity 200ms" : "none"; no.current.style.opacity = x < 0 ? String(k) : "0"; }
+    if (behind.current) { behind.current.style.transition = t; behind.current.style.transform = "translate3d(0," + 12 * (1 - k) + "px,0) scale(" + (0.95 + 0.05 * k) + ")"; }
+  };
   const go = (want: boolean) => {
-    if (fly) return;
+    if (done.current) return;
+    done.current = true;
+    cue(want ? "like" : "skip");
     if (reduced()) return onAnswer(want);
-    setFly(want ? 1 : -1);
-    window.setTimeout(() => onAnswer(want), 180);
+    paint((want ? 1 : -1) * (window.innerWidth + 160), true);
+    window.setTimeout(() => onAnswer(want), 200);
   };
   useEffect(() => {
     const on = (e: KeyboardEvent) => { if (e.key === "ArrowRight") go(true); if (e.key === "ArrowLeft") go(false); };
     window.addEventListener("keydown", on);
     return () => window.removeEventListener("keydown", on);
   });
-  const down = (e: PointerEvent<HTMLDivElement>) => { start.current = e.clientX; e.currentTarget.setPointerCapture(e.pointerId); };
-  const move = (e: PointerEvent<HTMLDivElement>) => { if (start.current !== null) setDx(e.clientX - start.current); };
-  const up = () => { if (start.current === null) return; start.current = null; if (Math.abs(dx) > 90) go(dx > 0); else setDx(0); };
-  const x = fly ? fly * 520 : dx;
+
+  const down = (e: PointerEvent<HTMLDivElement>) => {
+    if (done.current || (e.pointerType === "mouse" && e.button !== 0)) return;
+    drag.current = { x0: e.clientX, dx: 0, lx: e.clientX, lt: e.timeStamp, v: 0, past: false, raf: 0 };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const move = (e: PointerEvent<HTMLDivElement>) => {
+    const g = drag.current;
+    if (!g) return;
+    g.dx = e.clientX - g.x0;
+    const dt = e.timeStamp - g.lt;
+    if (dt > 0) { g.v = 0.6 * ((e.clientX - g.lx) / dt) + 0.4 * g.v; g.lx = e.clientX; g.lt = e.timeStamp; }
+    const past = Math.abs(g.dx) > FAR;
+    if (past && !g.past) cue("tap");
+    g.past = past;
+    // One paint per frame, however often the finger reports.
+    if (!g.raf) g.raf = requestAnimationFrame(() => { g.raf = 0; if (drag.current === g) paint(g.dx); });
+  };
+  const up = (e: PointerEvent<HTMLDivElement>) => {
+    const g = drag.current;
+    if (!g) return;
+    drag.current = null;
+    if (g.raf) cancelAnimationFrame(g.raf);
+    // A cancel is the phone taking the gesture over (a scroll): the card goes back, nothing is answered.
+    const thrown = Math.abs(g.v) > FLICK && Math.abs(g.dx) > 30 && Math.sign(g.v) === Math.sign(g.dx);
+    if (e.type === "pointerup" && (Math.abs(g.dx) > FAR || thrown)) go(g.dx > 0);
+    else paint(0, true);
+  };
 
   return (
     <>
       <div className="relative mt-4 aspect-[4/5] max-h-[58vh] w-full">
-        {next && <div className="absolute inset-0 translate-y-3 scale-95 overflow-hidden rounded-[24px] opacity-60" aria-hidden><RecipeImage recipe={next} full className="h-full w-full" rounded="rounded-[24px]" /></div>}
-        <div className={cx("absolute inset-0 touch-pan-y select-none overflow-hidden rounded-[24px] bg-card shadow-e2", start.current === null && "transition-transform duration-200")}
-          style={{ transform: `translateX(${x}px) rotate(${x / 22}deg)` }}
+        {next && (
+          <div ref={behind} className="absolute inset-0 overflow-hidden rounded-[24px] opacity-60" style={{ transform: "translate3d(0,12px,0) scale(.95)" }} aria-hidden>
+            <RecipeImage recipe={next} full className="h-full w-full" rounded="rounded-[24px]" />
+          </div>
+        )}
+        <div ref={card} className="absolute inset-0 touch-pan-y select-none overflow-hidden rounded-[24px] bg-card shadow-e2 will-change-transform"
           onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
           <RecipeImage recipe={r} full eager className="pointer-events-none h-full w-full" rounded="rounded-[24px]" />
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-5 pb-5 pt-20 text-white">
             <h3 className="text-h2 leading-tight">{r.title}</h3>
             <p className="mt-1.5 text-body opacity-90">{timeShort(r)} · {DIFF[r.difficulty]}{rating ? <> · <Star size={15} className="-mt-0.5 inline fill-current" aria-hidden /> {ratingLabel(rating)}</> : null}</p>
           </div>
-          {dx !== 0 && <span className={cx("pointer-events-none absolute top-5 rounded-full px-4 py-1.5 text-body font-semibold text-white", dx > 0 ? "left-5 bg-brand-fill" : "right-5 bg-ink/70")}
-            style={{ opacity: Math.min(1, Math.abs(dx) / 90) }}>{dx > 0 ? "Хочу" : "Не то"}</span>}
         </div>
+        {/* Above the card, so they stay in view while it moves. */}
+        <span ref={no} className="pointer-events-none absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-ink/75 px-4 py-1.5 text-body font-semibold text-white opacity-0" aria-hidden><X size={18} />Не то</span>
+        <span ref={yes} className="pointer-events-none absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-brand-fill px-4 py-1.5 text-body font-semibold text-white opacity-0" aria-hidden><Heart size={17} className="fill-current" />Хочу</span>
       </div>
       <div className="mt-5 flex items-start justify-center gap-10">
         <button className="flex flex-col items-center gap-1.5 text-small text-ink-soft" onClick={() => go(false)}>

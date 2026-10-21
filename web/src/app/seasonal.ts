@@ -87,14 +87,16 @@ export function themesNow(now = new Date()): Theme[] {
   return holidayCollection(now)?.key === "lent" ? [...list.filter((t) => t.key === "lenten"), ...list.filter((t) => t.key !== "lenten")] : list;
 }
 
-/** The cover drawn for a collection (collections/<key>.jpg on the site), with its version so a new one shows at once. */
-export const coverUrl = (key: string, v: number): string => apiUrl("today").replace(/api\/index\.php.*$/, "") + "collections/" + key + ".jpg?v=" + v;
+/** The cover drawn for a collection (collections/<key>.jpg on the site; <key>-wide.jpg for computers), with its version
+ * so a new one shows at once. */
+export const coverUrl = (key: string, v: number, wide = false): string =>
+  apiUrl("today").replace(/api\/index\.php.*$/, "") + "collections/" + key + (wide ? "-wide" : "") + ".jpg?v=" + v;
 
 // ---------- The owner's changes from the admin panel ----------
 
 /** Per collection: shown or not, its own title and line, recipes added or taken out by hand, the cover's version.
  * `custom`: a collection the owner made, only of hand-picked recipes. */
-export interface Custom { on?: boolean; title?: string; hint?: string; emoji?: string; add?: string[]; remove?: string[]; custom?: boolean; cover?: number }
+export interface Custom { on?: boolean; title?: string; hint?: string; emoji?: string; add?: string[]; remove?: string[]; custom?: boolean; cover?: number; coverWide?: number }
 export type Customs = Record<string, Custom>;
 
 const SAVED = "cook-collections";

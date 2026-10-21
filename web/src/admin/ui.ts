@@ -24,9 +24,12 @@ main.adm-main.cook-extra-on > :not(#cook-extra) { display: none !important; }
 .cx-fields { display: grid; grid-template-columns: 1fr 1fr 90px; gap: 12px; margin-top: 16px; }
 @media (max-width: 640px) { .cx-fields { grid-template-columns: 1fr; } }
 .cx-fields label, .cx-label { display: block; font-size: 13px; font-weight: 600; color: #6f7062; margin-bottom: 5px; }
-.cx-cover { display: grid; grid-template-columns: 150px 1fr; gap: 18px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+.cx-covers { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); display: grid; gap: 22px; }
+.cx-cover { display: grid; grid-template-columns: 210px 1fr; gap: 18px; align-items: start; }
 @media (max-width: 640px) { .cx-cover { grid-template-columns: 1fr; } }
-.cx-cover-img { width: 150px; aspect-ratio: 4/5; border-radius: 16px; object-fit: cover; background: #f0ece0; display: grid; place-items: center; font-size: 42px; }
+.cx-cover-img { border-radius: 16px; object-fit: cover; background: #f0ece0; display: grid; place-items: center; font-size: 42px; }
+.cx-cover-tall { width: 150px; aspect-ratio: 4/5; }
+.cx-cover-wide { width: 210px; aspect-ratio: 3/2; }
 .cx-prompt { width: 100%; min-height: 96px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font: 13px/1.45 ui-monospace, Menlo, monospace; background: #f7f3ea; resize: vertical; }
 .cx-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 10px; }
 .cx-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }

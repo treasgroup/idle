@@ -3,7 +3,7 @@
 // profile turns them off; the timer's alarm stays on regardless — it matters at the stove.
 import { loadProfile } from "./profile";
 
-export type Cue = "tap" | "step" | "success" | "done" | "listen" | "stop" | "message" | "error";
+export type Cue = "tap" | "step" | "success" | "done" | "listen" | "stop" | "message" | "error" | "like" | "skip";
 
 let ctx: AudioContext | null = null;
 export function audio(): AudioContext | null {
@@ -35,10 +35,13 @@ const SOUND: Record<Cue, ((a: AudioContext) => void) | null> = {
   stop: (a) => note(a, 760, 0, 0.12, 0.08, 480),
   message: (a) => note(a, 880, 0, 0.07, 0.07, 700),
   error: (a) => { note(a, 300, 0, 0.12, 0.09, 260, "triangle"); note(a, 260, 0.14, 0.16, 0.09, 220, "triangle"); },
+  // The deck: a bright little «pop» up for «Хочу», a soft swish down for «Не то».
+  like: (a) => { note(a, 740, 0, 0.07, 0.07, 1100); note(a, 1180, 0.05, 0.09, 0.05); },
+  skip: (a) => note(a, 520, 0, 0.09, 0.045, 300, "triangle"),
 };
 
 const BUZZ: Record<Cue, number | number[]> = {
-  tap: 10, step: 15, success: [15, 50, 25], done: [30, 70, 30, 70, 80], listen: 25, stop: 15, message: 0, error: [40, 60, 40],
+  tap: 10, step: 15, success: [15, 50, 25], done: [30, 70, 30, 70, 80], listen: 25, stop: 15, message: 0, error: [40, 60, 40], like: [12, 40, 18], skip: 10,
 };
 
 export function soundsOn(): boolean { return loadProfile().sounds; }

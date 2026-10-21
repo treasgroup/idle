@@ -1,7 +1,13 @@
 // Cover prompts for the image generator. One subject that says the theme at a glance, big, on a calm background:
 // a whole table of small things comes out busy, with artefacts, and the theme gets lost on a small card.
 // The same style for every collection, so the cards look like one set. English: image models follow it best.
-const STYLE = "Close-up food photography: the main subject is large and fills most of the frame, shot from a 45-degree angle. Simple uncluttered background in soft warm cream and light terracotta tones, gently blurred. At most one or two simple props. Soft natural light, realistic, clean and appetizing. No small scattered objects, no cutlery piles, no people, no hands, no text, no letters, no logos. Vertical 4:5, calm empty space in the lower quarter for a caption.";
+// Two shapes: tall 4:5 for phones, wide 3:2 for computers (three cards in a row there).
+const STYLE = "Close-up food photography: the main subject is large and fills most of the frame, shot from a 45-degree angle. Simple uncluttered background in soft warm cream and light terracotta tones, gently blurred. At most one or two simple props. Soft natural light, realistic, clean and appetizing. No small scattered objects, no cutlery piles, no people, no hands, no text, no letters, no logos.";
+const SHAPE = {
+  tall: "Vertical 4:5, calm empty space in the lower quarter for a caption.",
+  wide: "Horizontal 3:2 wide frame, the subject in the centre, calm empty space along the bottom for a caption.",
+};
+export type CoverShape = keyof typeof SHAPE;
 
 const SCENES: Record<string, string> = {
   romantic: "One elegant plate of pan-seared salmon with lemon and herbs next to a single lit candle, warm candlelight, romantic evening mood.",
@@ -26,8 +32,8 @@ const SCENES: Record<string, string> = {
   summer: "A bowl of cold okroshka with an ice cube and fresh cucumber and dill, bright summer daylight.",
 };
 
-/** The prompt for a collection; an own collection gets one from its title and line. */
-export function coverPrompt(key: string, title: string, hint: string): string {
+/** The prompt for a collection's cover of the given shape; an own collection gets one from its title and line. */
+export function coverPrompt(key: string, title: string, hint: string, shape: CoverShape = "tall"): string {
   const scene = SCENES[key] ?? `One dish that says «${title}»${hint ? " (" + hint + ")" : ""} at a glance, served simply on a plate.`;
-  return scene + " " + STYLE;
+  return scene + " " + STYLE + " " + SHAPE[shape];
 }
