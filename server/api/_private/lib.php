@@ -235,6 +235,24 @@ function catalog_files(): array {
     }
     return $files;
 }
+// A catalog file as visitors get it: compact (no indents) and without what the site never shows — «sources» and
+// «look». About a quarter less to download and much less for a phone to parse. Kept in storage/site-catalog until
+// the file changes, so the 8 MB are repacked once, not on every visit. Objects stay objects ({} is still {}).
+function catalog_site_json(array $f): string {
+    $dir = __DIR__ . '/storage/site-catalog';
+    $base = preg_replace('/[^A-Za-z0-9_.-]/', '_', (string)$f['name']);
+    $path = $dir . '/' . $base . '-' . substr(sha1((string)$f['raw']), 0, 12) . '.json';
+    if (is_file($path)) { $kept = file_get_contents($path); if (is_string($kept) && $kept !== '') return $kept; }
+    $data = json_decode((string)$f['raw']);
+    if (!is_object($data)) return (string)$f['raw'];
+    foreach ((isset($data->recipes) && is_array($data->recipes) ? $data->recipes : []) as $r) if (is_object($r)) unset($r->sources, $r->look);
+    $out = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION);
+    if (!is_string($out)) return (string)$f['raw'];
+    if (!is_dir($dir)) @mkdir($dir, 0775, true);
+    foreach (glob($dir . '/' . $base . '-*.json') ?: [] as $old) @unlink($old);
+    if (@file_put_contents($path . '.tmp', $out) !== false) @rename($path . '.tmp', $path);
+    return $out;
+}
 function catalog_recipes(): array { $out = []; foreach (catalog_files() as $f) foreach (($f['data']['recipes'] ?? []) as $r) if (is_array($r) && isset($r['id'])) $out[(string)$r['id']] = $r; return array_values($out); }
 function catalog_ingredients(): array { $out = []; foreach (catalog_files() as $f) foreach (($f['data']['ingredients'] ?? []) as $i) if (is_array($i) && isset($i['id'], $i['name'])) $out[(string)$i['id']] = $i; return $out; }
 // Ingredients that are used in recipes, for the AI prompt.

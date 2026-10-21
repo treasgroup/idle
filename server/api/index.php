@@ -106,11 +106,13 @@ try {
         send_json(['v' => catalog_version()]);
     }
     elseif ($route === 'catalog' && $method === 'GET') {
-        // Files are passed through as written (so {} stays an object); the app validates every entry.
+        // Visitors get each file compact, without what the site never shows (catalog_site_json); the owner's admin
+        // gets the files as written. Either way {} stays an object; the app validates every entry.
+        $site = !(function_exists('is_admin') && is_admin());
         $parts = [];
         foreach (catalog_files() as $f) $parts[] = isset($f['error'])
             ? json_encode(['name' => $f['name'], 'error' => $f['error']], JSON_UNESCAPED_UNICODE)
-            : '{"name":' . json_encode($f['name'], JSON_UNESCAPED_UNICODE) . ',"data":' . $f['raw'] . '}';
+            : '{"name":' . json_encode($f['name'], JSON_UNESCAPED_UNICODE) . ',"data":' . ($site ? catalog_site_json($f) : $f['raw']) . '}';
         http_response_code(200);
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-cache');
