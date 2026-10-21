@@ -1,32 +1,33 @@
-// Cover prompts for the image generator: one style for every collection (so the cards look like one set),
-// the scene is the collection's own. English: image models follow it best.
-const STYLE = "Realistic food photography, warm natural window light, cozy home kitchen, soft shadows, shallow depth of field, appetizing and calm, muted warm colors, no people, no hands, no text, no letters, no logos, vertical 4:5 composition with the main subject in the center and some empty space at the bottom for a caption.";
+// Cover prompts for the image generator. One subject that says the theme at a glance, big, on a calm background:
+// a whole table of small things comes out busy, with artefacts, and the theme gets lost on a small card.
+// The same style for every collection, so the cards look like one set. English: image models follow it best.
+const STYLE = "Close-up food photography: the main subject is large and fills most of the frame, shot from a 45-degree angle. Simple uncluttered background in soft warm cream and light terracotta tones, gently blurred. At most one or two simple props. Soft natural light, realistic, clean and appetizing. No small scattered objects, no cutlery piles, no people, no hands, no text, no letters, no logos. Vertical 4:5, calm empty space in the lower quarter for a caption.";
 
 const SCENES: Record<string, string> = {
-  romantic: "A romantic dinner table for two in the evening: two plates of pan-seared salmon with lemon and herbs, two wine glasses with juice, a lit candle, a small vase with one flower, linen napkins.",
-  kids: "A bright breakfast table for children: golden cottage cheese pancakes (syrniki) with sour cream and berries, a glass of milk, a colorful plate, a few strawberries, playful but tidy.",
-  guests: "A festive table for guests seen from above: a big dish of pilaf in the center, bowls of salads, sliced vegetables, bread, several plates and forks around, generous and welcoming.",
-  movie: "A cozy movie night snack spread on a coffee table: homemade pizza slices, crispy chicken wings, a bowl of popcorn, garlic toasts, a blanket and a dim TV glow in the background.",
-  sick: "Comfort food for when you feel unwell: a steaming bowl of clear chicken noodle soup, a cup of tea with lemon and honey, a knitted blanket corner, soft morning light.",
-  picnic: "A summer picnic on a checkered blanket in green grass: skewers of grilled meat, sandwiches, fresh vegetables, a basket, a bottle of lemonade, sunny daylight.",
-  lenten: "Simple lenten meals on a wooden table: a bowl of hearty bean and tomato soup, buckwheat with mushrooms, a vegetable salad, rye bread, no meat, no dairy, no eggs.",
-  newyear: "A New Year's Eve table: Olivier salad, herring under a fur coat salad, tangerines, a small fir branch with ornaments, warm garland lights in the background.",
-  afterny: "A light meal after the holidays: a bowl of vegetable soup, oatmeal with apple, a cup of tea, tangerine peels, calm winter morning light.",
-  maslenitsa: "A stack of thin golden Russian blini with butter, sour cream, honey and red caviar in small bowls, a samovar softly in the background.",
-  easter: "An Easter table: a tall kulich with white icing, a paskha, dyed red eggs, willow branches, an embroidered towel.",
-  feb23: "A hearty dinner: juicy meat cutlets with mashed potatoes, pickles, rye bread, a dark wooden table, masculine and cozy.",
-  mar8: "A tender spring dinner: a delicate salad, a slice of cake with berries, tulips in a vase, pastel colors, soft morning light.",
-  lent: "Simple lenten meals on a wooden table: a bowl of hearty bean and tomato soup, buckwheat with mushrooms, a vegetable salad, rye bread, no meat, no dairy, no eggs.",
-  may: "A spring picnic by the river: shashlik on skewers over a grill, fresh herbs, radishes, flatbread, green leaves, sunny day.",
-  halloween: "A cozy autumn Halloween table: a bowl of creamy pumpkin soup, pumpkin pastries, small decorative pumpkins, candles, warm orange tones, friendly not scary.",
-  autumn: "An autumn harvest table: mushroom soup, baked apples with cinnamon, a pumpkin, fallen maple leaves, warm golden light.",
-  winter: "A warming winter meal: a steaming bowl of beef stew, a pot of soup, rye bread, a window with snow outside, warm light.",
-  spring: "A fresh spring meal: green sorrel soup with egg, a salad of radish and cucumber with dill, young potatoes with herbs, bright daylight.",
-  summer: "A cold summer meal: a bowl of okroshka with ice, a fresh cucumber and tomato salad, berries, a sunny garden table.",
+  romantic: "One elegant plate of pan-seared salmon with lemon and herbs next to a single lit candle, warm candlelight, romantic evening mood.",
+  kids: "A stack of golden cottage cheese pancakes (syrniki) on a bright plate with a smiling face made of berries and a dollop of sour cream, cheerful and playful.",
+  guests: "A large festive platter of steaming pilaf seen from slightly above, generous and inviting, golden rice with carrots and meat.",
+  movie: "A big bowl overflowing with popcorn, a slice of pizza beside it, cozy dim evening light like a home cinema.",
+  sick: "A steaming bowl of clear chicken noodle soup, a cup of tea with a lemon slice softly blurred behind it, comforting and gentle.",
+  picnic: "A wicker picnic basket on a red-and-white checkered blanket in green grass, sunny summer day.",
+  lenten: "A rustic clay bowl of buckwheat with mushrooms and fresh dill, simple and modest, earthy tones.",
+  newyear: "A bowl of Olivier salad decorated with a sprig of fir and a few tangerines, warm festive glow of garland lights in the background.",
+  afterny: "A bowl of light vegetable soup with a few tangerines beside it, calm winter morning light.",
+  maslenitsa: "A tall stack of thin golden blini with a melting piece of butter on top and a small bowl of sour cream.",
+  easter: "A tall kulich with white icing and colorful sprinkles next to two red dyed eggs.",
+  feb23: "A plate of juicy meat cutlets with mashed potatoes and a pickle, hearty and homely.",
+  mar8: "A slice of delicate berry cake with a small bouquet of tulips behind it, pastel spring colors.",
+  lent: "A rustic clay bowl of buckwheat with mushrooms and fresh dill, simple and modest, earthy tones.",
+  may: "Grilled shashlik skewers on a plate with fresh herbs and radishes, sunny spring day outdoors.",
+  halloween: "A bowl of creamy pumpkin soup with a small decorative pumpkin beside it, warm orange autumn tones, friendly not scary.",
+  autumn: "A bowl of mushroom soup with a baked apple and an autumn maple leaf beside it, golden autumn light.",
+  winter: "A steaming bowl of hearty beef stew, a slice of rye bread beside it, snowy window softly blurred behind.",
+  spring: "A bowl of green sorrel soup with half a boiled egg and fresh dill, bright spring daylight.",
+  summer: "A bowl of cold okroshka with an ice cube and fresh cucumber and dill, bright summer daylight.",
 };
 
 /** The prompt for a collection; an own collection gets one from its title and line. */
 export function coverPrompt(key: string, title: string, hint: string): string {
-  const scene = SCENES[key] ?? `Dishes for a recipe collection called "${title}"${hint ? " (" + hint + ")" : ""}: two or three home-cooked dishes that fit it, on one table.`;
+  const scene = SCENES[key] ?? `One dish that says «${title}»${hint ? " (" + hint + ")" : ""} at a glance, served simply on a plate.`;
   return scene + " " + STYLE;
 }
