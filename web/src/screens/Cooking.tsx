@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
-  LifeBuoy, MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
+  LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
@@ -272,7 +272,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
         <div ref={pane} className="min-w-0" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           <div className="sticky top-0 z-10 -mx-4 bg-paper px-4 pb-3 pt-3 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 lg:pt-6">
             <Progress step={dish.step} total={total} />
-            <TimerStrip onJump={jump} className="mt-3 lg:hidden" />
+            <TimerStrip onJump={jump} hide={(t) => seconds > 0 && t.recipeId === r.id && t.step === dish.step} className="mt-3 lg:hidden" />
             <span aria-hidden className="pointer-events-none absolute inset-x-0 top-full h-4 bg-gradient-to-b from-paper to-transparent" />
           </div>
 
@@ -291,16 +291,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <div key={dish.key + dish.step} className="anim-rise">
             {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
             <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{curText}</p>
-            {uses.length > 0 && (
-              <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
-                {uses.map((i) => (
-                  <li key={i.id + i.unit} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-sunken px-3 text-body-sm">
-                    {displayName(i.id, i.name)}<b className="whitespace-nowrap font-semibold">{homeAmount(i)}</b>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {tip && <ChefSecret text={tip} className="mt-5" large />}
+            <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
             )}
@@ -330,10 +321,6 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
               <span className="min-w-0 flex-1 truncate">{nextText}</span>
             </button>
           ))}
-          {/* «Спасти блюдо»: one quiet line, no block of its own (app/rescue). */}
-          <button onClick={() => setSheet("rescue")} className="mx-auto mt-6 flex min-h-11 items-center gap-2 rounded-full px-4 text-body-sm text-ink-soft hover:bg-sunken hover:text-ink">
-            <LifeBuoy size={18} aria-hidden />Что-то не так?
-          </button>
         </div>
 
         <aside className="hidden lg:block" aria-label="Продукты, таймеры и второе блюдо">
@@ -367,8 +354,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
       </div>
 
       <BottomBar listening={handsFree ? { on: hf.listening, heard: hf.heard, off: () => setHandsFree(false) } : null}>
-        <button className="btn-outline h-13 px-4 text-body" onClick={() => setSheet("ask")} aria-label="Спросить Шефа">
-          <MessageCircleQuestion size={20} aria-hidden /><span className="max-[359px]:hidden">Спросить</span>
+        {/* One way to help: what went wrong with this dish (app/rescue), or any question to Шеф. */}
+        <button className="btn-outline h-13 px-4 text-body" onClick={() => setSheet("rescue")} aria-label="Помощь: что-то не так или вопрос Шефу">
+          <LifeBuoy size={20} aria-hidden /><span className="max-[359px]:hidden">Помощь</span>
         </button>
         <button className="btn-outline h-13 w-13 px-0 text-body sm:w-auto sm:px-5" disabled={dish.step === 0} onClick={() => go(-1)} aria-label="Назад">
           <ChevronLeft size={22} aria-hidden /><span className="hidden sm:inline">Назад</span>
@@ -423,6 +411,29 @@ function Progress({ step, total }: { step: number; total: number }) {
 }
 
 /** The fixed bar at the bottom (52px buttons) and, while hands-free is on, what the microphone hears. */
+/** The step's amounts and «Секрет шефа» folded into a chip beside them: a tap shows the tip; the step text stays on top. */
+function StepFacts({ uses, tip }: { uses: { key: string; name: string; amount: string }[]; tip: string | null | undefined }) {
+  const [open, setOpen] = useState(false);
+  if (!uses.length && !tip) return null;
+  return (
+    <>
+      <ul className="mt-5 flex flex-wrap gap-2" aria-label="Продукты для шага">
+        {uses.map((i) => (
+          <li key={i.key} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-sunken px-3 text-body-sm">
+            {i.name}<b className="whitespace-nowrap font-semibold">{i.amount}</b>
+          </li>
+        ))}
+        {tip && !open && (
+          <li><button className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full bg-herb-soft px-3 text-body-sm font-semibold text-herb" onClick={() => setOpen(true)} aria-expanded={false}>
+            <Lightbulb size={16} aria-hidden />Секрет шефа
+          </button></li>
+        )}
+      </ul>
+      {tip && open && <ChefSecret text={tip} className="mt-3" large />}
+    </>
+  );
+}
+
 function BottomBar({ children, listening }: { children: ReactNode; listening: { on: boolean; heard: string; off: () => void } | null }) {
   const ref = useRef<HTMLDivElement>(null);
   // --dock: toasts float above the bar.

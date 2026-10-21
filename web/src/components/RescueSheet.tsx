@@ -1,7 +1,7 @@
-// «Что-то не так?» in cooking (app/rescue): what went wrong with this dish, then 2–3 short actions and, where the
-// answer has a wait, a timer button. Anything else goes to Шеф. The recipe's steps stay as they are.
+// «Помощь» in cooking: what went wrong with this dish (app/rescue) — 2–3 short actions and, where the answer has a
+// wait, a timer button — or any other question to Шеф. The recipe's steps stay as they are.
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, ChefHat, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MessageCircleQuestion } from "lucide-react";
 import { track, type Recipe } from "../engine";
 import { troublesFor, type Trouble } from "../app/rescue";
 import { startTimer } from "../app/timers";
@@ -22,7 +22,7 @@ export function RescueSheet({ open, recipe, onClose, onAsk }: { open: boolean; r
     close();
   };
   return (
-    <Sheet open={open} title={picked ? picked.title : "Что случилось?"} onClose={close}>
+    <Sheet open={open} title={picked ? picked.title : "Что-то пошло не так?"} onClose={close}>
       {picked ? (
         <div className="pb-2">
           <ol className="space-y-3">
@@ -47,7 +47,7 @@ export function RescueSheet({ open, recipe, onClose, onAsk }: { open: boolean; r
               </li>
             ))}
           </ul>
-          <button className="btn-ghost mt-2 w-full text-brand" onClick={() => { close(); onAsk(); }}><ChefHat size={18} aria-hidden />Другое — спросить Шефа</button>
+          <button className="btn-outline mt-4 h-12 w-full" onClick={() => { close(); onAsk(); }}><MessageCircleQuestion size={20} aria-hidden />Другой вопрос Шефу</button>
         </div>
       )}
     </Sheet>

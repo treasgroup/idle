@@ -23,9 +23,14 @@ export function TimerRing({ t, size = 28, now }: { t: CookTimer; size?: number; 
  * `flush`: no edge-to-edge bleed (inside cards).
  * Renders nothing when there are no timers.
  */
-export function TimerStrip({ only, onJump, className, flush }: { only?: string; onJump?: (t: CookTimer) => void; className?: string; flush?: boolean }) {
+export function TimerStrip({ only, hide, onJump, className, flush }: {
+  only?: string;
+  /** A timer shown big elsewhere on the screen (the current step's card in cooking): not twice. */
+  hide?: (t: CookTimer) => boolean;
+  onJump?: (t: CookTimer) => void; className?: string; flush?: boolean;
+}) {
   const all = useTimers();
-  const list = only ? all.filter((t) => t.recipeId === only || !t.recipeId) : all;
+  const list = (only ? all.filter((t) => t.recipeId === only || !t.recipeId) : all).filter((t) => !hide?.(t));
   const now = useTick(list.some((t) => t.end && !t.rang));
   const [menu, setMenu] = useState<CookTimer | null>(null);
   if (!list.length) return null;
