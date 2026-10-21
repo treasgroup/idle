@@ -3320,6 +3320,12 @@ var UNUSUAL_ING = new Set(["nori", "miso-paste", "tofu", "oyster-sauce", "fish-s
 function inSeason(e, t) {
   return !COLD_SOUP.test(e.title) || (t >= 4 && t <= 8);
 }
+// Pasta, risotto, lasagne, ravioli… familiar, but not every day: two a week at most. Home «макароны по-флотски» and
+// «макароны с сыром» do not count.
+var ITALIAN = /(?<![а-яё])паст[аыу](?![а-яё])|спагетти|аматричан|путтанеск|ризотто|аранчини|лазань|карбонар|болоньез|песто|ньокки|равиоли|пицц|фокачч|брускетт|минестроне|капрезе|альо-олио|пенне|фетучин|феттучин|фузилли|тальятел|каннеллони|кальцоне|оссобуко|салтимбокк|фриттат|итальян|пармиджан|каччатор|чиабатт/i;
+function italian(e) {
+  return ITALIAN.test(e.title) || e.ingredients.some((t) => !t.optional && t.id === "arborio-rice");
+}
 function unusual(e) {
   return UNUSUAL_TITLE.test(e.title) || e.ingredients.some((t) => !t.optional && UNUSUAL_ING.has(t.id));
 }
@@ -3354,6 +3360,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
       .filter((R) => !!R),
     w = new Set(S.map((R) => gn(R))),
     odd = S.filter(unusual).length,
+    pasta = S.filter(italian).length,
     v = new Set(S.map((R) => Us(R))),
     b = new Set(S.flatMap(Am)),
     g = y
@@ -3391,6 +3398,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
         G = (W) =>
           !w.has(gn(W)) &&
           !(odd >= 1 && unusual(W)) &&
+          !(pasta >= 2 && italian(W)) &&
           !(M === "dinner" && Ru(W) && (g >= 2 || _)) &&
           x(W) !== N[M],
         Q = m[M],
@@ -3412,7 +3420,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
           Math.min(2, Am(W).filter((le) => b.has(le)).length),
         He = P[0];
       for (let W of P.slice(1)) vt(W) > vt(He) && (He = W);
-      w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++;
+      w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++, italian(He) && pasta++;
       for (let W of Am(He)) b.add(W);
       M === "dinner" && ((_ = Ru(He)), _ && g++), (N[M] = x(He));
       let ze = U && Y(He);

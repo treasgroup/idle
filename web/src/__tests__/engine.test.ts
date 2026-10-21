@@ -76,7 +76,7 @@ describe("week menu", () => {
     expect(menu.filter((d) => d.items.length).length).toBe(7);
     expect(new Set(cooked).size).toBe(cooked.length);
   });
-  it("keeps cold soups to the warm months and unusual dishes to one a week", () => {
+  it("keeps cold soups to the warm months, unusual dishes to one a week and Italian to two", () => {
     const s = structuredClone(DEFAULT_STATE);
     const week = (from: string) => Array.from({ length: 7 }, (_, i) => ({ date: new Date(Date.parse(from) + i * 864e5).toISOString().slice(0, 10), items: [] }));
     const titles = (m: { items: { recipeId: string }[] }[]) => m.flatMap((d) => d.items.map((i) => recipes().find((r) => r.id === i.recipeId)?.title ?? ""));
@@ -86,6 +86,7 @@ describe("week menu", () => {
       const october = titles(generateMenu(week("2026-10-19"), s.preferences, 2, seed, s.menuPlan));
       expect(october.filter((t) => /окрошк|холодник|свекольник холодн|гаспачо/i.test(t))).toEqual([]);
       expect(october.filter((t) => odd.test(t)).length).toBeLessThanOrEqual(1);
+      expect(october.filter((t) => /(?<![а-яё])паст[аыу](?![а-яё])|спагетти|ризотто|лазань|равиоли|ньокки|карбонар|аранчини|минестроне/i.test(t)).length).toBeLessThanOrEqual(2);
       summerCold += titles(generateMenu(week("2026-07-13"), s.preferences, 2, seed, s.menuPlan)).filter((t) => /окрошк|холодник|свекольник холодн|гаспачо/i.test(t)).length;
     }
     expect(summerCold).toBeGreaterThan(0);
