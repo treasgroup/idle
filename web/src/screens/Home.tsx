@@ -346,12 +346,20 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const thaw = new Date().getHours() >= 15 ? thawTomorrow(s, new Date()) : null;
   // The week plan is not in the bottom bar: from here it is one tap away (or one tap to make it).
   const planned = s.menu.filter((d) => d.date >= today && d.items.length > 0).length;
+  // On phones «Мои продукты» and the School live only in Профиль — here they are one tap away too (a computer has them
+  // in the side menu). Not in the simple mode, which keeps only the main things.
+  const sections = !profile.simple;
+  const soon = expiringSoon(s.fridge);
+  const nextLesson = LESSONS.find((l) => !profile.lessonsDone.includes(l.id));
+  const lessonNo = nextLesson ? LESSONS.indexOf(nextLesson) + 1 : 0;
   if (!menu.length && !toBuy && !timers && !thaw && !dayDish && profile.simple) return null;
-  const tile = "w-[168px] shrink-0 snap-start sm:w-[200px]";
-  const action = (icon: ReactNode, title: string, line: string, onClick: () => void) => (
-    <button onClick={onClick} className={cx("card flex flex-col items-start justify-between gap-3 p-4 text-left transition-[border-color,transform] duration-150 hover:border-line-strong/60 active:scale-[.99]", tile)}>
-      <span className="grid h-11 w-11 place-items-center rounded-full bg-sunken text-ink" aria-hidden>{icon}</span>
-      <span><span className="block text-title leading-snug">{title}</span><span className="mt-1 block text-caption text-ink-soft">{line}</span></span>
+  // 150 px on phones: the third tile peeks out at the edge, so it is clear the row scrolls.
+  const tile = "w-[150px] shrink-0 snap-start sm:w-[200px]";
+  const action = (icon: ReactNode, title: string, line: string, onClick: () => void, school?: boolean) => (
+    <button onClick={onClick} className={cx("flex flex-col items-start justify-between gap-3 p-4 text-left transition-[border-color,transform] duration-150 active:scale-[.99]", tile,
+      school ? "rounded-card bg-herb-soft lg:hidden" : "card hover:border-line-strong/60")}>
+      <span className={cx("grid h-11 w-11 place-items-center rounded-full", school ? "bg-card text-herb" : "bg-sunken text-ink")} aria-hidden>{icon}</span>
+      <span><span className="block text-title leading-snug">{title}</span><span className={cx("mt-1 line-clamp-2 block text-caption", school ? "text-herb" : "text-ink-soft")}>{line}</span></span>
     </button>
   );
   return (
@@ -370,6 +378,12 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
           "После «" + left[0].from + "» — что из этого приготовить",
           () => { void ask.ask("что приготовить из " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(" и "), { fresh: true, source: "leftovers" }); goChat(); })}
         {action(<CalendarDays size={22} />, planned ? "План на неделю" : "Составить план", planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") : "Ужины без повторов и список покупок", () => openLayer(routeHash({ tab: "menu" })))}
+        {sections && <span className="contents lg:hidden">{action(<Refrigerator size={22} />, "Мои продукты",
+          s.fridge.length ? "Дома " + s.fridge.length + (soon.length ? " · скоро испортится: " + shortName(soon[0].id).toLowerCase() : "") : "Что есть дома — подскажу, что приготовить",
+          () => openLayer(routeHash({ tab: "pantry" })))}</span>}
+        {sections && action(<GraduationCap size={22} />, "Школа готовки",
+          !nextLesson ? "Все " + LESSONS.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + LESSONS.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
+          () => openLayer(routeHash({ tab: "learn" })), true)}
         {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
         {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
       </ScrollRow>
@@ -445,7 +459,7 @@ function CourseCard({ rail }: { rail?: boolean }) {
   if (!next || (profile.level !== "beginner" && !rail)) return null;
   if (rail && profile.level !== "beginner" && profile.lessonsDone.length === 0) return null;
   return (
-    <div className={rail ? "pt-2" : "mt-8"}>
+    <div className={rail ? "pt-2" : "mt-8 hidden lg:block"}>
       <button onClick={() => openLayer(routeHash({ tab: "learn" }))} className="flex w-full items-center gap-3 rounded-card bg-herb-soft p-4 text-left">
         <GraduationCap className="shrink-0 text-herb" aria-hidden />
         <span className="min-w-0 flex-1">
