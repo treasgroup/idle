@@ -22,12 +22,15 @@ function parseAnswer(text: string): Record<string, unknown> {
 
 /** Steps the cook follows on a phone: few and whole. The catalog has ~6 per recipe, 10 at most; a first version of this
  * prompt («one step — one or two actions») made the AI chop a pilaf into 25 two-word steps, so the rules now say:
- * as few steps as possible, touch only the overlong ones, a new step only for a wait with its own timer. */
-const MAX_STEPS = 12;
+ * as few steps as possible, touch only the overlong ones, a new step only for a wait with its own timer.
+ * No fixed cap on the count: a cake with sponge, cream and assembly may truly need 15 steps. Chopping is told by
+ * the size of the steps — many tiny ones, or a short average — not by how many there are. */
 const chopped = (r: RawRecipe) => {
   const n = r.steps.length;
+  if (n < 8) return false;
   const tiny = r.steps.filter((s) => s.text.length < 80 && !s.timerSeconds).length;
-  return n > MAX_STEPS || (n >= 8 && tiny / n >= 0.4);
+  const avg = r.steps.reduce((a, s) => a + s.text.length, 0) / n;
+  return tiny / n >= 0.4 || avg < 90;
 };
 
 const STEP_RULES = [
@@ -59,7 +62,7 @@ function stepsTask(list: RawRecipe[]): string {
     "Правила:",
     "1. Шаги короче 300 знаков не трогай. Длинный шаг сократи простыми словами или перенеси его конец в начало следующего шага. Делить на два — только если иначе никак; на три — никогда.",
     "Новый отдельный шаг — только там, где есть своё ожидание с таймером (замочить на час, тушить 40 минут). Шаг в пару слов («Посолите.», «Перемешайте.») — нельзя: присоедини к соседнему.",
-    "Хороший шаг — законченный этап на 120–280 знаков. Шагов в итоге — не больше, чем было, плюс один-два, и не больше " + MAX_STEPS + ".",
+    "Хороший шаг — законченный этап на 120–280 знаков. Шагов в итоге — не больше, чем было, плюс один-два.",
     ...STEP_RULES,
     ...listing(list),
   ].join("\n");
@@ -71,7 +74,7 @@ function mergeTask(list: RawRecipe[]): string {
     "",
     "Правила:",
     "1. Каждый шаг — законченный этап: подготовить продукты, обжарить, тушить, собрать и подать. 120–280 знаков. Шаг в пару слов присоедини к соседнему.",
-    "Отдельный шаг — только там, где своё ожидание с таймером (замочить на час, тушить 40 минут). Обычно получается 5–8 шагов, не больше " + MAX_STEPS + ".",
+    "Отдельный шаг — только там, где своё ожидание с таймером (замочить на час, тушить 40 минут). Обычно получается 5–8 шагов. Сложному блюду из нескольких частей (торт с кремом и пропиткой, хинкали, лазанья) можно больше — но каждый шаг всё равно цельный этап, не кусочек.",
     ...STEP_RULES,
     ...listing(list),
   ].join("\n");
@@ -169,7 +172,7 @@ function LongSteps({ all, onSaved }: { all: RawRecipe[]; onSaved: () => Promise<
       for (const [id, v] of Object.entries(j)) {
         const r = all.find((x) => x.id === id);
         if (!r) { bad.push(id + ": такого рецепта нет"); continue; }
-        if (!Array.isArray(v) || v.length < 2 || v.length > MAX_STEPS) { bad.push(r.title + ": шагов должно быть от 2 до " + MAX_STEPS + " — попросите нейросеть собрать мелкие шаги в цельные"); continue; }
+        if (!Array.isArray(v) || v.length < 2) { bad.push(r.title + ": нет шагов"); continue; }
         if (mode === "long" && v.length > r.steps.length + 2) { bad.push(r.title + ": было " + r.steps.length + " шагов, стало " + v.length + " — слишком дробно, попросите нейросеть делить меньше"); continue; }
         if (mode === "chopped" && v.length >= r.steps.length) { bad.push(r.title + ": шаги не собраны (было " + r.steps.length + ", стало " + v.length + ")"); continue; }
         const ids = new Set(r.ingredients.map((i) => i.id));
@@ -180,6 +183,7 @@ function LongSteps({ all, onSaved }: { all: RawRecipe[]; onSaved: () => Promise<
         if (long) notes.push(long + " шаг(а) всё ещё длиннее 300 знаков");
         const tiny = steps.filter((s) => s.text.length < 60 && !s.timerSeconds).length;
         if (tiny) notes.push(tiny + " шаг(а) в пару слов");
+        if (steps.length > 12) notes.push(steps.length + " шагов — проверьте, что блюдо правда такое сложное");
         const used = new Set(steps.flatMap((s) => s.uses));
         const lost = r.ingredients.filter((i) => !used.has(i.id) && !i.optional).map((i) => i.name);
         if (lost.length) notes.push("не отмечены в шагах: " + lost.slice(0, 4).join(", "));
@@ -204,7 +208,7 @@ function LongSteps({ all, onSaved }: { all: RawRecipe[]; onSaved: () => Promise<
         <div>
           <h2 style={{ marginBottom: 2 }}>Шаги рецептов</h2>
           <p className="adm-muted" style={{ margin: 0 }}>{mode === "chopped"
-            ? "Рецепты, раздробленные на мелкие шаги (больше " + MAX_STEPS + " или много шагов в пару слов). Нейросеть собирает их в цельные — обычно 5–8 шагов."
+            ? "Рецепты, раздробленные на мелкие шаги (много шагов в пару слов). Нейросеть собирает их в цельные — обычно 5–8, у сложных блюд больше."
             : "Шаг-«простыня» тяжело читать на телефоне. Нейросеть правит только длинные шаги: сокращает или переносит часть в соседний, шагов почти не прибавляется."}</p>
         </div>
         <div className="cx-pills" style={{ margin: 0 }}>
