@@ -62,7 +62,8 @@ export function Learn({ onClose }: { onClose: () => void }) {
 
         {tab === "rescue" ? <RescueList /> : (
           <>
-            {next && (tab === "beginner" ? BEGINNER.includes(next.id) : next.section === tab) && (
+            {/* Not when the lesson to take is the first one of the list right below: the card would repeat it. */}
+            {next && (tab === "beginner" ? BEGINNER.includes(next.id) : next.section === tab) && list[0]?.id !== next.id && (
               <button onClick={() => setPlaying(next)} className="card mt-4 flex w-full items-center gap-3 border-brand/40 p-4 text-left hover:border-brand">
                 <span className="min-w-0 flex-1">
                   <span className="block text-caption font-semibold text-brand">{doneCount ? "Продолжить" : "Начать"}</span>

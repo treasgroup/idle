@@ -434,9 +434,12 @@ function nO(e, t, n = new Set()) {
   let r = ku([e.title, ...(e.aliases || [])].join(" ")),
     o = qC(e),
     l = (f, p) => (n.has(f) ? p.startsWith(f) : tO(f, p)),
+    // «борщ»: dishes called so go first — the title's first word, then any word of the title, before an
+    // «also called» name («Щи со щавелем» is «зелёный борщ» too).
+    ti = ku(e.title),
     u = 0;
   for (let f of s)
-    if (r.some((p) => l(f, p))) u += 2;
+    if (r.some((p) => l(f, p))) u += 2 + (ti[0] && l(f, ti[0]) ? 1.5 : ti.some((p) => l(f, p)) ? 1 : 0);
     else if (o.some((p) => p.startsWith(f))) u += 1;
     else return 0;
   return u;

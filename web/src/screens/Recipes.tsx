@@ -270,7 +270,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
               </div>
             </section>
           )}
-          {!bare && <p className={cx("text-small text-ink-soft", desktop ? "flex min-h-[44px] items-center" : "mt-4")} aria-live="polite">{countLine}</p>}
+          {/* Nothing found: the empty card below says it, «Нашлось: 0 рецептов» above it would repeat. */}
+          {!bare && list.length > 0 && <p className={cx("text-small text-ink-soft", desktop ? "flex min-h-[44px] items-center" : "mt-4")} aria-live="polite">{countLine}</p>}
 
           {list.length === 0 ? (
             view === "saved" && !query && !filtered ? (

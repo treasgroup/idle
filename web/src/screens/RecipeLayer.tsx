@@ -187,6 +187,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const { isFavorite, toggleFavorite, addRecipeToShopping, startCooking, openRecipe } = useActions();
   const reviews = useReviews(base.id);
   const [servings, setServings] = useState(() => clampServings(base, s.conditions.servings || profile.eaters));
+  // Борщ for 2 opens for 3: the pot is not made smaller than that. Said once, so the 3 is not a surprise.
+  const atLeast = (s.conditions.servings || profile.eaters) < base.minServings && servings === base.minServings;
   const [sideId, setSideId] = useState<string | null>(null);
   const [have, setHave] = useState<string[]>(() => haveIds(s));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -358,7 +360,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <h2 className="text-h2">Продукты</h2>
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
-                {(!!base.yields || haveHint) && <p className="-mt-2 mb-3 text-small text-ink-soft">{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
+                {(!!base.yields || haveHint || atLeast) && <p className="-mt-2 mb-3 text-small text-ink-soft">{atLeast && "Меньше чем на " + base.minServings + " " + plural(base.minServings, "человека", "человека", "человек") + " не приготовить — останется на завтра. "}{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
                 <HaveBar owned={owned} total={needed.length} missing={missing} marked={marked} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (
