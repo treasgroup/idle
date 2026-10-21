@@ -3,10 +3,11 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PlaceHint } from "../components/PlaceHint";
 import { Check, ChevronDown, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
-  addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, packageHint, plural, searchIngredients, shoppingName, shoppingText,
+  addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients, shoppingText,
   shortName, useVoiceInput, type ShoppingItem,
 } from "../engine";
 import { useStore } from "../app/store";
+import { shopLine } from "../app/amounts";
 import { replace, routeHash } from "../app/router";
 import { Empty, Sheet, cx, haptic } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
@@ -79,8 +80,8 @@ export function Shopping() {
   };
 
   const row = (i: ShoppingItem) => {
-    const hint = !i.checked ? packageHint(i.ingredientId, i.amount, i.unit) : null;
-    const name = shoppingName(i.ingredientId, i.name);
+    const line = shopLine(i);
+    const name = line.name;
     return (
       <li key={i.key} className="flex items-center">
         <button className="flex min-h-[56px] min-w-0 flex-1 items-center gap-3 py-2 pl-3 text-left" onClick={() => toggle(i.key)} aria-pressed={i.checked}
@@ -91,10 +92,10 @@ export function Shopping() {
           <span className="min-w-0 flex-1">
             <span className="block text-body-sm">
               <span className={cx(i.checked && "text-ink-faint line-through")}>{name}</span>
-              {!i.checked && <span className="whitespace-nowrap text-ink-soft"> · {hint ?? formatAmount(i.amount, i.unit)}</span>}
+              {!i.checked && <span className="whitespace-nowrap text-ink-soft"> · {line.text}</span>}
             </span>
             {/* Under the name only how much is really needed when a whole pack is bought; which dishes — in «…». */}
-            {!i.checked && hint && <span className="block truncate text-caption text-ink-soft">нужно {formatAmount(i.amount, i.unit)}</span>}
+            {!i.checked && line.need && <span className="block truncate text-caption text-ink-soft">{line.need}</span>}
           </span>
         </button>
         <button className="icon-btn mr-1 shrink-0 text-ink-soft" onClick={() => setMore(i)} aria-label={"Ещё: " + name}><MoreHorizontal size={18} /></button>
@@ -190,7 +191,7 @@ export function Shopping() {
           <button className="btn-ghost" onClick={() => setClear(false)}>Отмена</button>
         </div>
       </Sheet>
-      <Sheet open={!!more} title={more ? shoppingName(more.ingredientId, more.name) : ""} onClose={() => setMore(null)}>
+      <Sheet open={!!more} title={more ? shopLine(more).name : ""} onClose={() => setMore(null)}>
         {more && (
           <div className="grid gap-2">
             {!!more.recipes?.length && <p className="mb-1 text-small text-ink-soft">{formatAmount(more.amount, more.unit)} · для: {more.recipes.join(", ")}</p>}

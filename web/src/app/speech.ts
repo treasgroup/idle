@@ -27,7 +27,7 @@ const UNIT = /(\d+(?:[.,]\d+)?)\s?(ст\.?\s?л\.?|ч\.?\s?л\.?|кг\.?|мл\.?
 
 export function speechText(raw: string): string {
   let t = raw
-    .replace(/½/g, " половина ").replace(/¼/g, " четверть ").replace(/¾/g, " три четверти ")
+    .replace(/½\s*шт\.?/g, " половина штуки ").replace(/½/g, " половина ").replace(/¼/g, " четверть ").replace(/¾/g, " три четверти ")
     .replace(/[«»"“”„()[\]•*]/g, "")
     .replace(/\s*—\s*/g, ", ");
   // Ranges: «3–4» → «3 или 4», «180–200 градусов» → «180 или 200 градусов».

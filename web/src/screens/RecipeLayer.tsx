@@ -643,7 +643,8 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
         </span>
         <span className="shrink-0 pl-2 text-right">
           <span className={cx("block whitespace-nowrap text-body-sm tabular-nums", q.toTaste ? "text-ink-faint" : "text-ink-soft")}>{q.text}</span>
-          {q.hint && <span className="block whitespace-nowrap text-caption text-ink-faint">≈ {q.hint}</span>}
+          {q.grams ? <span className="block whitespace-nowrap text-caption text-ink-faint">{q.grams}</span>
+            : q.hint && <span className="block whitespace-nowrap text-caption text-ink-faint">≈ {q.hint}</span>}
         </span>
       </button>
     </li>

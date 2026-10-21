@@ -2,7 +2,8 @@
 // bought and it slides down to «Куплено», the screen stays on. Nothing else on the screen.
 import { useMemo, useRef, useState } from "react";
 import { Check, Refrigerator } from "lucide-react";
-import { formatAmount, groupShopping, packageHint, plural, shoppingName, type ShoppingItem } from "../engine";
+import { groupShopping, plural, type ShoppingItem } from "../engine";
+import { shopLine } from "../app/amounts";
 import { useWakeLock } from "../app/wakeLock";
 import { Layer, cx } from "./ui";
 
@@ -50,8 +51,8 @@ function BigRow({ i, onToggle }: { i: ShoppingItem; onToggle: (key: string) => v
   const start = useRef<{ x: number; y: number } | null>(null);
   const [dx, setDx] = useState(0);
   const swiped = useRef(false);
-  const name = shoppingName(i.ingredientId, i.name);
-  const hint = !i.checked ? packageHint(i.ingredientId, i.amount, i.unit) : null;
+  const line = shopLine(i);
+  const name = line.name;
   return (
     <li className="relative">
       {/* What the swipe uncovers */}
@@ -75,7 +76,7 @@ function BigRow({ i, onToggle }: { i: ShoppingItem; onToggle: (key: string) => v
         </span>
         <span className="min-w-0 flex-1">
           <span className={cx("block text-[1.25rem] leading-snug", i.checked && "text-ink-faint line-through")}>{name}</span>
-          {!i.checked && <span className="block text-body text-ink-soft">{hint ?? formatAmount(i.amount, i.unit)}</span>}
+          {!i.checked && <span className="block text-body text-ink-soft">{line.text}{line.need && <span className="block text-small">{line.need}</span>}</span>}
         </span>
       </button>
     </li>
