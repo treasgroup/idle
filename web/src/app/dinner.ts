@@ -6,7 +6,14 @@ import type { Recipe } from "../engine";
 
 export interface DinnerDish { recipeId: string; servings: number }
 /** What is kept on the device: the dishes, when to serve and which steps are done. */
-export interface DinnerPlan { serveAt: number; dishes: DinnerDish[]; done: string[]; at: number }
+export interface DinnerPlan {
+  serveAt: number; dishes: DinnerDish[]; done: string[]; at: number;
+  /** «prep»: a meal-prep session (components/MealPrep) — cooked to be packed away, not served. */
+  kind?: "prep";
+}
+/** «Ужин к 19:00» or «Заготовки к 14:30». */
+export const dinnerTitle = (p: DinnerPlan): string =>
+  (p.kind === "prep" ? "Заготовки к " : "Ужин к ") + new Date(p.serveAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 
 export interface Item {
   key: string;

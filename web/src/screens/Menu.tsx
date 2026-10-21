@@ -1,7 +1,7 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, Clock, Pencil, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, BookOpen, CalendarPlus, Repeat2, Bookmark, X,
+  CalendarDays, ChevronDown, Clock, MoreHorizontal, Package, Pencil, ArrowRightLeft, Eraser, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, CalendarPlus, Repeat2, Bookmark, X,
 } from "lucide-react";
 import {
   MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
@@ -13,6 +13,8 @@ import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
 import { replace, routeHash } from "../app/router";
 import { DinnerSetup } from "../components/DinnerPlan";
+import { AddToDaySheet } from "../components/AddToDay";
+import { MealPrepSheet } from "../components/MealPrep";
 import { PlaceHint } from "../components/PlaceHint";
 import { downloadIcs, planIcs } from "../app/calendar";
 import { applyWeek, removeWeek, saveWeek, savedWeeks } from "../app/savedWeeks";
@@ -52,9 +54,21 @@ export function Menu() {
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
   const [noWaste, setNoWaste] = useState(false);
   const [again, setAgain] = useState(false);
+  // «+ Добавить в этот день», «⋯ Ещё», «Заполню сам» (an empty week to fill by hand), moving a dish to another day.
+  const [addDay, setAddDay] = useState<string | null>(null);
+  const [more, setMore] = useState(false);
+  const [manual, setManual] = useState(false);
+  const [moving, setMoving] = useState(false);
+  const [prep, setPrep] = useState(false);
   const [weeks, setWeeks] = useState(savedWeeks);
   const servings = profile.eaters;
   const today = dateKey(new Date());
+  // «Пт, 23» for the chips that move a dish to another day.
+  const dayShort = (date: string) => {
+    if (date === today) return "Сегодня";
+    const t = new Date(date + "T12:00").toLocaleDateString("ru-RU", { weekday: "short", day: "numeric" });
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  };
   const days = weekDays(s.menu);
   const filled = days.some((d) => d.items.length);
   const plan: MenuPlan = s.menuPlan;
@@ -76,7 +90,18 @@ export function Menu() {
   };
   const fill = () => save(generateMenu(days, s.preferences, servings, Date.now(), enginePlan));
   // The whole week empty in one tap; «Отменить» brings it back.
-  const clear = () => { withUndo("План очищен"); save([]); };
+  const clear = () => { withUndo("План очищен"); save([]); setManual(false); };
+  const addTo = (date: string, r: Recipe) => {
+    save(days.map((d) => (d.date === date ? { ...d, items: [...d.items, { recipeId: r.id, servings, meal: "dinner" as const }].slice(0, 6) } : d)));
+    toast("«" + r.title + "» — " + dayLabel(date).toLowerCase());
+  };
+  const moveTo = (from: string, index: number, to: string) => {
+    const item = days.find((d) => d.date === from)?.items[index];
+    if (!item) return;
+    save(days.map((d) => (d.date === from ? { ...d, items: d.items.filter((_, i) => i !== index) } : d.date === to ? { ...d, items: [...d.items, item] } : d)));
+    withUndo("Перенесено: " + dayLabel(to).toLowerCase());
+  };
+  const clearDay = (date: string) => { save(days.map((d) => (d.date === date ? { ...d, items: [] } : d))); withUndo("День очищен"); };
 
   const toShopping = () => {
     const prev = loadRows();
@@ -128,11 +153,13 @@ export function Menu() {
       </div>
       {filled && <PlaceHint id="menu" className="mt-3" text="Любое блюдо можно заменить — карандаш рядом с ним. «В покупки» соберёт продукты на всю неделю." />}
 
-      {!filled ? (
+      {!filled && !manual ? (
         <div className="mt-6">
           <Empty icon={<CalendarDays size={48} />} title="Составлю план за секунду" mood="plan"
             actions={<>
               <button className="btn-primary h-13" onClick={make}><Sparkles size={18} />Составить план</button>
+              <button className="btn-outline h-13" onClick={() => setManual(true)}><Pencil size={18} />Заполню сам</button>
+              <button className="btn-outline h-13" onClick={() => setPrep(true)}><Package size={18} />Заготовить на неделю</button>
               {weeks.length > 0 && <button className="btn-outline h-13" onClick={() => setAgain(true)}><Repeat2 size={18} />Повторить свою неделю</button>}
             </>}>
             Блюда без повторов, в будни — быстрые, с общими продуктами, чтобы ничего не пропадало. Список покупок соберётся сам.
@@ -142,7 +169,7 @@ export function Menu() {
         <>
           <div className="mt-4 flex gap-2">
             <button className="btn-primary flex-1 sm:flex-none" onClick={toShopping}><ShoppingCart size={18} />В покупки</button>
-            <button className="btn-outline" onClick={() => (weeks.length ? setAgain(true) : make())}><RefreshCw size={18} />Составить заново</button>
+            <button className="btn-outline" onClick={() => setMore(true)} aria-label="Ещё действия с планом"><MoreHorizontal size={18} />Ещё</button>
           </div>
 
           {/* The week in one column, a block per day: the day as a heading, its dishes in a card under it. */}
@@ -153,7 +180,7 @@ export function Menu() {
                 {d.items.length === 0 ? (
                   <div className="card flex flex-wrap gap-2 p-3">
                     <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
-                    <button className="btn-outline h-11" onClick={() => replace(routeHash({ tab: "recipes" }))}><BookOpen size={16} />Из рецептов</button>
+                    <button className="btn-outline h-11" onClick={() => setAddDay(d.date)}><Plus size={16} />Добавить</button>
                   </div>
                 ) : (
                   <div className={cx("card divide-y divide-line overflow-hidden", d.date === today && "border-brand/40")}>
@@ -168,7 +195,7 @@ export function Menu() {
                             <span className="min-w-0">
                               {meal && <span className="block text-caption text-ink-soft">{meal}</span>}
                               <span className="line-clamp-2 text-body-sm font-semibold leading-snug">{r.title}</span>
-                              <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : timeShort(r)}</span>
+                              <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : it.prepped === "freezer" ? "Из заготовки · достать из морозилки накануне" : it.prepped ? "Из заготовки · 15 мин" : timeShort(r)}</span>
                             </span>
                           </button>
                           {/* One clear button per dish: replace, remove and the day's actions are inside. Phones: just the pencil. */}
@@ -178,6 +205,9 @@ export function Menu() {
                         </div>
                       );
                     })}
+                    <button className="flex min-h-[44px] w-full items-center gap-2 px-3 text-left text-body-sm text-brand hover:bg-brand-soft" onClick={() => setAddDay(d.date)}>
+                      <Plus size={18} aria-hidden />Добавить в этот день
+                    </button>
                     {d.date >= today && dinnerDishes(d.date).length >= 2 && (
                       <button className="flex min-h-[48px] w-full items-center gap-2 px-3 text-left text-body-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setDinnerDay(d.date)}>
                         <Clock size={18} aria-hidden />Ужин к сроку — все блюда к одному времени
@@ -187,12 +217,6 @@ export function Menu() {
                 )}
               </section>
             ))}
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {days.some((d) => !d.items.length) && <button className="btn-ghost" onClick={fill}><Plus size={18} />Заполнить пустые дни</button>}
-            {/* A week that went well: keep it and repeat it later from «Составить заново». */}
-            <button className="btn-ghost" onClick={() => { saveWeek(days); setWeeks(savedWeeks()); toast("Неделя сохранена — повторить можно в «Составить заново»"); }}><Bookmark size={18} />Сохранить эту неделю</button>
-            <button className="btn-ghost text-ink-soft" onClick={clear}><Trash2 size={18} />Очистить план</button>
           </div>
 
           {(shared.length > 0 || leftovers.length > 0) && (
@@ -235,17 +259,39 @@ export function Menu() {
         <PlanSettings plan={plan} servings={servings}
           onChange={(p, n) => { update((st) => ({ ...st, menuPlan: p })); setProfile((x) => ({ ...x, eaters: n })); }} />
       </Sheet>
-      <Sheet open={!!itemMenu} title={itemMenu ? recipeById(days.find((d) => d.date === itemMenu.date)?.items[itemMenu.index]?.recipeId ?? "")?.title ?? "Блюдо" : ""} onClose={() => setItemMenu(null)}>
+      <Sheet open={!!itemMenu} title={itemMenu ? recipeById(days.find((d) => d.date === itemMenu.date)?.items[itemMenu.index]?.recipeId ?? "")?.title ?? "Блюдо" : ""} onClose={() => { setItemMenu(null); setMoving(false); }}>
         {itemMenu && (
           <div className="grid gap-2">
             <button className="btn-primary justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), enginePlan)); withUndo("Блюдо заменено"); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
+            <button className="btn-outline justify-start" onClick={() => setMoving((v) => !v)} aria-expanded={moving}><ArrowRightLeft size={18} />Перенести на другой день</button>
+            {moving && (
+              <div className="flex flex-wrap gap-2 pb-1">
+                {days.filter((d) => d.date !== itemMenu.date).map((d) => (
+                  <Chip key={d.date} onClick={() => { moveTo(itemMenu.date, itemMenu.index, d.date); setMoving(false); setItemMenu(null); }}>{dayShort(d.date)}</Chip>
+                ))}
+              </div>
+            )}
             <button className="btn-outline justify-start" onClick={() => { save(removeMenuItem(days, itemMenu.date, itemMenu.index, servings)); withUndo("Блюдо убрано"); setItemMenu(null); }}><Trash2 size={18} />Убрать из плана</button>
             <p className="label mt-3">{dayLabel(itemMenu.date)}</p>
             <button className="btn-outline justify-start" onClick={() => { save(regenerateDay(days, itemMenu.date, s.preferences, servings, Date.now(), enginePlan)); withUndo("День пересобран"); setItemMenu(null); }}><Sparkles size={18} />Подобрать весь день заново</button>
-            <button className="btn-outline justify-start" onClick={() => { setItemMenu(null); replace(routeHash({ tab: "recipes" })); }}><Plus size={18} />Добавить блюдо из рецептов</button>
+            <button className="btn-outline justify-start" onClick={() => { const d = itemMenu.date; setItemMenu(null); setAddDay(d); }}><Plus size={18} />Добавить ещё блюдо в этот день</button>
+            <button className="btn-outline justify-start" onClick={() => { clearDay(itemMenu.date); setItemMenu(null); }}><Eraser size={18} />Очистить весь день</button>
             <button className="btn-outline justify-start" onClick={() => { const d = itemMenu.date; setItemMenu(null); void startPoll(d); }}><Vote size={18} />Спросить семью, что приготовить</button>
           </div>
         )}
+      </Sheet>
+      <AddToDaySheet open={!!addDay} title={addDay ? "Добавить: " + dayLabel(addDay).toLowerCase() : ""} onClose={() => setAddDay(null)}
+        onAdd={(r) => addDay && addTo(addDay, r)}
+        onPick={addDay && !days.find((d) => d.date === addDay)?.items.length ? () => { save(regenerateDay(days, addDay, s.preferences, servings, Date.now(), enginePlan)); } : undefined} />
+      <MealPrepSheet open={prep} onClose={() => setPrep(false)} />
+      <Sheet open={more} title="План на неделю" onClose={() => setMore(false)}>
+        <div className="grid gap-2">
+          <button className="btn-outline justify-start" onClick={() => { setMore(false); if (weeks.length) setAgain(true); else make(); }}><RefreshCw size={18} />Составить заново</button>
+          {days.some((d) => !d.items.length) && <button className="btn-outline justify-start" onClick={() => { setMore(false); fill(); }}><Plus size={18} />Заполнить пустые дни</button>}
+          <button className="btn-outline justify-start" onClick={() => { setMore(false); setPrep(true); }}><Package size={18} />Заготовить на неделю</button>
+          <button className="btn-outline justify-start" onClick={() => { setMore(false); saveWeek(days); setWeeks(savedWeeks()); toast("Неделя сохранена — повторить можно в «Составить заново»"); }}><Bookmark size={18} />Сохранить эту неделю</button>
+          <button className="btn-outline justify-start text-ink-soft" onClick={() => { setMore(false); clear(); }}><Trash2 size={18} />Очистить план</button>
+        </div>
       </Sheet>
       <Sheet open={share} title="Поделиться планом" onClose={() => setShare(false)}>
         <ShareOptions title="План на неделю" text={menuText(days)} onDone={() => setShare(false)} onPrint={() => printText("План на неделю", menuText(days))} />

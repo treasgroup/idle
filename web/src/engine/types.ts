@@ -105,7 +105,7 @@ export interface ShoppingItem {
   recipes?: string[];
 }
 
-export interface MenuItem { recipeId: string; servings: number; meal?: "breakfast" | "lunch" | "dinner"; leftover?: boolean }
+export interface MenuItem { recipeId: string; servings: number; meal?: "breakfast" | "lunch" | "dinner"; leftover?: boolean; /** Cooked ahead on a meal-prep day (components/MealPrep): from the fridge or the freezer. */ prepped?: "fridge" | "freezer" }
 export interface MenuDay { date: string; items: MenuItem[] }
 export interface MenuPlan { meals: ("breakfast" | "lunch" | "dinner")[]; quickWeekdays: boolean; cookAhead: boolean }
 

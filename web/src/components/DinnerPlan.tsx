@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Bell, Check, ChefHat, Clock, Coffee, X } from "lucide-react";
 import { courseOf, recipeById, recipes, suggestSides, type Recipe } from "../engine";
-import { DINNER_EVENT, loadDinner, saveDinner, schedule, type DinnerPlan, type Schedule } from "../app/dinner";
+import { DINNER_EVENT, dinnerTitle, loadDinner, saveDinner, schedule, type DinnerPlan, type Schedule } from "../app/dinner";
 import { startTimer, stopTimer, useTimers } from "../app/timers";
 import { push, replace, routeHash } from "../app/router";
 import { useStore } from "../app/store";
@@ -109,8 +109,8 @@ export function useDinnerReminders(): void {
   // Recomputed when the full catalog arrives: on a first start some dishes are not loaded yet.
   const p = useMemo(() => planOf(plan), [plan, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const title = plan ? "Ужин к " + hhmm(plan.serveAt) : "";
-    const mine = timers.filter((t) => t.dish.startsWith("Ужин к "));
+    const title = plan ? dinnerTitle(plan) : "";
+    const mine = timers.filter((t) => t.dish.startsWith("Ужин к ") || t.dish.startsWith("Заготовки к "));
     const next = p?.s.items.find((it) => !plan!.done.includes(it.key) && it.start > Date.now() + 30e3);
     const want = next ? { label: short(p!.list[next.dish].title, next.text), end: next.start } : null;
     for (const t of mine) if (!want || t.label !== want.label || t.dish !== title || Math.abs((t.end ?? 0) - want.end) > 60e3) { if (!t.rang) stopTimer(t.id); }
@@ -147,9 +147,9 @@ export function DinnerLayer({ onClose }: { onClose: () => void }) {
   const end = () => { saveDinner(null); onClose(); };
   const finished = !current;
   return (
-    <Layer title={"Ужин к " + hhmm(s.serveAt)} onClose={onClose} width="max-w-xl">
+    <Layer title={dinnerTitle(plan)} onClose={onClose} width="max-w-xl">
       <div className="mx-auto max-w-xl px-4 pb-40 pt-2 sm:px-6">
-        <h1 className="text-h1">Ужин к {hhmm(s.serveAt)}</h1>
+        <h1 className="text-h1">{dinnerTitle(plan)}</h1>
         <p className="mt-1 text-body-sm text-ink-soft">Начать в {hhmm(s.start)} · у плиты около {s.handsOn} мин</p>
         <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
           {list.map((r, i) => <li key={r.id} className="flex items-center gap-1.5 text-small"><span className={cx("h-2.5 w-2.5 rounded-full", COLORS[i])} aria-hidden />{r.title}</li>)}
@@ -181,7 +181,7 @@ export function DinnerLayer({ onClose }: { onClose: () => void }) {
           })}
           <li className="flex gap-3 px-3 py-2.5">
             <span className="w-12 shrink-0 text-body font-semibold tabular-nums">{hhmm(s.serveAt)}</span>
-            <span className="text-body font-semibold">Подавайте! 🍽</span>
+            <span className="text-body font-semibold">{plan.kind === "prep" ? "Остудите и разложите по контейнерам — что на 4-й и 5-й день, в морозилку" : "Подавайте! 🍽"}</span>
           </li>
         </ol>
         <p className="mt-4 flex items-center gap-2 text-small text-ink-soft"><Bell size={16} aria-hidden />Перед каждым шагом прозвенит напоминание — и при выключенном экране.</p>
@@ -191,7 +191,7 @@ export function DinnerLayer({ onClose }: { onClose: () => void }) {
         <div className="mx-auto flex max-w-xl gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 sm:px-6">
           <button className="btn-outline h-13 px-4" onClick={late}>Опаздываю на 10 мин</button>
           {finished
-            ? <button className="btn-primary h-13 flex-1" onClick={end}><Check size={20} aria-hidden />Приятного аппетита</button>
+            ? <button className="btn-primary h-13 flex-1" onClick={end}><Check size={20} aria-hidden />{plan.kind === "prep" ? "Всё заготовлено" : "Приятного аппетита"}</button>
             : <button className="btn-primary h-13 flex-1" onClick={markDone}><Check size={20} aria-hidden />Готово — дальше</button>}
         </div>
       </div>

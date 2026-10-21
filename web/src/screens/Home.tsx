@@ -16,6 +16,7 @@ import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
 import { openLayer, openRecipesView, push, replace, routeHash } from "../app/router";
 import { useDinner } from "../components/DinnerPlan";
+import { dinnerTitle } from "../app/dinner";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
 import { Deck } from "../components/Deck";
@@ -362,7 +363,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {dayDish && <RecipeTile recipe={dayDish} badge="Рецепт дня" onOpen={() => openRecipe(dayDish)} className={tile} />}
         {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? "Приготовлено вчера" : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
         {action(<CalendarDays size={22} />, planned ? "План на неделю" : "Составить план", planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") : "Ужины без повторов и список покупок", () => openLayer(routeHash({ tab: "menu" })))}
-        {dinner && action(<Clock size={22} />, "Ужин к " + new Date(dinner.serveAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
+        {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
         {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
       </ScrollRow>
     </Section>
