@@ -95,15 +95,26 @@ function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRec
   }, [ready, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
-/** The on-screen keyboard is open (the visual viewport shrank a lot): the bottom bar steps aside. */
+/** The on-screen keyboard is open: the bottom bar steps aside, so the chat keeps its room above the keys.
+ * With «resizes-content» (and in the Android app) the whole page shrinks with the keyboard, so innerHeight and the
+ * visual viewport shrink together — the screen is compared with its full height instead (reset on a turn of the phone),
+ * and only while a text field has the focus. */
 function useKeyboardOpen(): boolean {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     const vv = window.visualViewport;
     if (!vv) return;
-    const on = () => setOpen(window.innerHeight - vv.height > 150);
+    let full = vv.height, width = vv.width;
+    const typing = () => { const el = document.activeElement; return !!el && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && !/^(checkbox|radio|range|button|submit|file)$/.test((el as HTMLInputElement).type)) || (el as HTMLElement).isContentEditable); };
+    const on = () => {
+      if (Math.abs(vv.width - width) > 40) { width = vv.width; full = vv.height; }
+      full = Math.max(full, vv.height);
+      setOpen(typing() && full - vv.height > 150);
+    };
     vv.addEventListener("resize", on);
-    return () => vv.removeEventListener("resize", on);
+    document.addEventListener("focusin", on);
+    document.addEventListener("focusout", on);
+    return () => { vv.removeEventListener("resize", on); document.removeEventListener("focusin", on); document.removeEventListener("focusout", on); };
   }, []);
   return open;
 }

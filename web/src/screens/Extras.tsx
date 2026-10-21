@@ -213,7 +213,8 @@ export function PollSheet({ token, onClose }: { token: string; onClose: () => vo
 
 const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Молочное"], ["gluten", "Глютен"], ["nuts", "Орехи"], ["mushrooms", "Грибы"], ["spicy", "Острое"]] as const;
 
-/** First visit: two short steps (text size, who eats what), the four-card tour, then «Знакомьтесь — Шеф». Can be skipped. */
+/** First visit: two short steps (text size, who eats what), two tour cards, then «Знакомьтесь — Шеф» — five screens.
+ * «Пропустить» anywhere goes straight to the home screen. */
 const LAST = 2;
 const TOUR = LAST;
 
@@ -303,7 +304,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             </div>
           </>
         ) : step === TOUR ? (
-          <div className="anim-rise flex flex-1 flex-col"><Tour onDone={() => setStep(TOUR + 1)} /></div>
+          <div className="anim-rise flex flex-1 flex-col"><Tour first onDone={() => setStep(TOUR + 1)} onSkip={() => finish()} /></div>
         ) : (
           <div className="anim-rise flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
             <div className="flex flex-1 flex-col justify-center py-8">

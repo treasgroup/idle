@@ -1,4 +1,5 @@
-// «Как пользоваться»: four cards about the main things — Шеф, cooking by steps, the plan, saved recipes. Swiped with a
+// «Как пользоваться»: four cards about the main things — Шеф, cooking by steps, the plan, saved recipes (the first visit
+// shows only the middle two, see `first`). Swiped with a
 // finger (native scroll snapping: smooth on any phone) or «Дальше»; «Пропустить» always in sight. Each card shows a
 // small piece of the real interface instead of a drawing: it shows what the buttons look like, and never gets stale.
 // Shown once after «Для кого готовите?» on the first visit; again from Профиль → «Как пользоваться». Phones and tablets
@@ -14,7 +15,7 @@ const Box = ({ children, className }: { children: ReactNode; className?: string 
   <div className={cx("rounded-input bg-sunken px-3.5 py-2.5 text-body-sm", className)}>{children}</div>
 );
 
-const CARDS: { title: string; line: string; pic: ReactNode }[] = [
+const ALL_CARDS: { title: string; line: string; pic: ReactNode }[] = [
   {
     title: "Скажите Шефу, что есть дома, — он подберёт блюдо",
     line: "Текстом или голосом. Ещё он подскажет, сколько варить и чем заменить.",
@@ -69,7 +70,16 @@ const CARDS: { title: string; line: string; pic: ReactNode }[] = [
 export const tourWanted = (): boolean =>
   typeof matchMedia === "undefined" || !matchMedia("(min-width: 1024px) and (pointer: fine)").matches;
 
-export function Tour({ onDone, last = "Дальше" }: { onDone: () => void; /** The last card's button. */ last?: string }) {
+export function Tour({ onDone, onSkip, first, last = "Дальше" }: {
+  onDone: () => void;
+  /** «Пропустить»; without it, the same as finishing. */
+  onSkip?: () => void;
+  /** The first visit: only cooking and the plan. «Знакомьтесь — Шеф» comes right after it, and the heart needs no card. */
+  first?: boolean;
+  /** The last card's button. */
+  last?: string;
+}) {
+  const CARDS = first ? ALL_CARDS.slice(1, 3) : ALL_CARDS;
   const rail = useRef<HTMLDivElement>(null);
   const [at, setAt] = useState(0);
   const aim = useRef<number | null>(null);
@@ -106,7 +116,7 @@ export function Tour({ onDone, last = "Дальше" }: { onDone: () => void; /*
               className={cx("h-2 rounded-full transition-all", i === at ? "w-6 bg-brand-fill" : "w-2 bg-line-strong/40")} />
           ))}
         </div>
-        <button className="btn-ghost h-10 px-3" onClick={onDone}>Пропустить</button>
+        <button className="btn-ghost h-10 px-3" onClick={onSkip ?? onDone}>Пропустить</button>
       </div>
 
       <div ref={rail} className="-mx-5 mt-4 flex flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain" style={{ scrollbarWidth: "none" }}>
