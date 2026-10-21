@@ -50,4 +50,33 @@ main.adm-main.cook-extra-on > :not(#cook-extra) { display: none !important; }
 .cx-toggle input { width: 18px; height: 18px; accent-color: #b7432f; }
 .cx-saved { font-size: 13px; color: #36703f; }
 .cx-err { font-size: 13px; color: #a3311f; }
+.adm-nav a .cx-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 99px; background: #b7432f; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
+
+/* The older scripts' blocks (messages, statistics, VK, catalog restore) in the panel's look. */
+.ins { --brand: #b7432f; --herb: #36703f; --soft: #6f7062; --line: var(--border); }
+.ins h2 { margin: 22px 0 10px; font-size: 18px; font-weight: 700; }
+.ins .card { border: 1px solid var(--border); background: rgb(255, 253, 248); border-radius: 18px; padding: 20px 22px; margin-bottom: 16px; min-width: 0; }
+.ins .muted, .ins .empty { color: #6f7062; font-size: 14px; }
+.ins .empty { padding: 4px 0; }
+.ins a { color: #a83e2b; }
+.ins .row { display: flex; align-items: center; gap: 12px; padding: 9px 0; border-top: 1px solid var(--border); }
+.ins .row:first-child { border-top: 0; }
+.ins .bar { height: 10px; border-radius: 99px; background: #f2ece2; flex: 1; overflow: hidden; }
+.ins .bar > span { display: block; height: 100%; background: #b7432f; border-radius: 99px; }
+.ins .num { min-width: 64px; text-align: right; font-variant-numeric: tabular-nums; }
+.ins .label { min-width: 190px; }
+.ins .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.ins .grid .card { margin-bottom: 0; }
+.ins .big { font-size: 30px; font-weight: 650; }
+.ins .err { font-family: ui-monospace, Menlo, monospace; font-size: 13px; word-break: break-word; }
+.ins button, #cook-extra select { font: inherit; font-size: 14px; height: 34px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--border); background: #fffdf8; color: inherit; cursor: pointer; }
+.ins button:hover { background: #f3eee2; }
+.ins .reply { margin-top: 8px; padding: 8px 12px; border-radius: 12px; background: #eef5ee; font-size: 15px; }
+.ins .reply-form { margin-top: 8px; display: grid; gap: 8px; }
+.ins .reply-form[hidden] { display: none; }
+.ins .reply-form textarea, .ins textarea { font: inherit; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); width: 100%; box-sizing: border-box; }
+.ins .reply-form button, .ins .vk-form .primary, .ins button.primary { background: #b7432f; color: #fff; border-color: #b7432f; justify-self: start; }
+.ins .vk-form { display: grid; gap: 10px; }
+.ins .vk-form input[type=text], .ins .vk-form input[type=password] { font: inherit; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); width: 100%; box-sizing: border-box; }
+.ins .vk-ok { color: #36703f; } .ins .vk-err { color: #a3311f; }
 `;

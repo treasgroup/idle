@@ -25,7 +25,9 @@ const versioned = (): Plugin => ({
 
 export default defineConfig({
   plugins: [react(), versioned()],
-  define: { "process.env.NODE_ENV": JSON.stringify("production"), __INTENT_V__: JSON.stringify("admin") },
+  // __ADMIN_V__: the older scripts (insights.js, vk.js, heal.js) are asked for with the build's number, so an updated
+  // one is not taken from the browser's 45-day cache.
+  define: { "process.env.NODE_ENV": JSON.stringify("production"), __INTENT_V__: JSON.stringify("admin"), __ADMIN_V__: JSON.stringify(Date.now().toString(36)) },
   build: {
     outDir: out,
     emptyOutDir: false,
