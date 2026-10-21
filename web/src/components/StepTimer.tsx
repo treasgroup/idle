@@ -1,6 +1,8 @@
 // The timer card of a cooking step: «Таймер на 3 мин · Запустить», then the live countdown with pause, +1 мин and stop.
 // It is one of the app's kitchen timers (app/timers.ts): it keeps running in the timer strip and the shell rings it.
-import { BellRing, Check, Pause, Play, Timer, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { BellRing, Check, ChevronDown, Pause, Play, Timer, X } from "lucide-react";
 import { formatMinutes } from "../engine";
 import { addMinute, secondsLeft, startTimer, stopTimer, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { TimerRing } from "./TimerStrip";
@@ -37,6 +39,19 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
   const ring: CookTimer = t ?? { id: "idle", dish, step, label: "", end: null, pausedLeft: seconds, total: seconds };
   const start = () => { cue("wind"); startTimer({ dish, recipeId, step, label, seconds }); onStart?.(seconds); };
 
+  // With very large text the card can sit under the bottom bar: then a small copy of it floats just above the bar.
+  const card = useRef<HTMLElement>(null);
+  const [hidden, setHidden] = useState(false);
+  useEffect(() => {
+    const el = card.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const dock = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--dock")) || 0;
+    // Hidden = less than 60 % of the card is above the bar (above the cooking layer z-40, under the sheets z-50).
+    const io = new IntersectionObserver(([e]) => setHidden(e.intersectionRatio < 0.6), { rootMargin: "0px 0px -" + Math.round(dock) + "px 0px", threshold: [0, 0.6, 1] });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   const status = rang ? "Время вышло" : paused ? "На паузе" : running ? "Осталось" : "Таймер на " + durationText(seconds) + " · нажмите круг";
   const icon = "shrink-0 max-[359px]:hidden";
   const buttons = !t ? (
@@ -57,7 +72,8 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
   );
 
   return (
-    <section aria-label="Таймер шага" className={cx("rounded-card border p-4 transition-colors duration-150 sm:p-5", rang ? "border-brand bg-brand-soft" : t ? "border-brand/30 bg-card shadow-e1" : "border-line bg-card shadow-e1", className)}>
+    <>
+    <section ref={card} aria-label="Таймер шага" className={cx("rounded-card border p-4 transition-colors duration-150 sm:p-5", rang ? "border-brand bg-brand-soft" : t ? "border-brand/30 bg-card shadow-e1" : "border-line bg-card shadow-e1", className)}>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-4">
         <div className="flex min-w-0 flex-1 items-center gap-4">
           {/* Before the start the circle itself is ▶: with very large text «Запустить» below can end up under the bottom bar. */}
@@ -83,5 +99,23 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
         <div className="flex w-full gap-2 sm:w-auto">{buttons}</div>
       </div>
     </section>
+    {hidden && createPortal(
+      <div className="fixed inset-x-3 z-[45] mx-auto flex max-w-md items-center gap-3 rounded-full border bg-card p-1.5 pr-2 shadow-e1 anim-fade" style={{ bottom: "calc(var(--dock, 0px) + 8px)", borderColor: t && !rang ? "rgb(var(--brand))" : undefined }} role="group" aria-label="Таймер шага">
+        {!t ? (
+          <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-fill text-white active:scale-[.96]" onClick={start} aria-label={"Запустить таймер на " + durationText(seconds)}><Play size={22} className="translate-x-px" aria-hidden /></button>
+        ) : rang ? (
+          <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-fill text-white" onClick={() => stopTimer(t.id)} aria-label="Готово"><Check size={22} aria-hidden /></button>
+        ) : (
+          <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-brand text-brand" onClick={() => togglePause(t.id)} aria-label={paused ? "Продолжить" : "Пауза"}>{paused ? <Play size={22} aria-hidden /> : <Pause size={22} aria-hidden />}</button>
+        )}
+        <span className="min-w-0 flex-1">
+          <span className={cx("block text-caption", rang ? "font-semibold text-brand-ink" : "text-ink-soft")}>{!t ? "Таймер шага" : status}</span>
+          <span className={cx("block text-body font-semibold tabular-nums", t && !paused && !rang ? "text-brand" : "text-ink")}>{mmss(left)}</span>
+        </span>
+        <button type="button" className="icon-btn border border-line" onClick={() => card.current?.scrollIntoView({ behavior: "smooth", block: "center" })} aria-label="Показать таймер целиком"><ChevronDown size={20} /></button>
+      </div>,
+      document.body,
+    )}
+    </>
   );
 }
