@@ -9432,6 +9432,8 @@ function __(e) {
               lang: s.lang || "ru-RU",
               rate: s.rate || 1,
               id: r,
+            // The voice chosen in Профиль (app/voice): its id travels as voiceURI.
+            voice: s.voice && s.voice.voiceURI !== "android" ? s.voice.voiceURI : void 0,
             })
             .catch(() => {
               n?.id === r &&

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, CircleHelp, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -17,6 +17,7 @@ import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
 import { Tour, tourWanted } from "../components/Tour";
+import { VoiceSheet } from "../components/VoiceSheet";
 import { WriteUs } from "../components/WriteUs";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
 import { WeatherSheet, degrees } from "../components/WeatherSheet";
@@ -43,6 +44,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const reminders = useReminders();
   const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs">(null);
   const [tour, setTour] = useState(false);
+  const [voice, setVoice] = useState(false);
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
   const [writeUs, setWriteUs] = useState(false);
@@ -102,6 +104,9 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         <div className="border-t border-line px-4">
           <Toggle on={profile.simple} onChange={(v) => setProfile((p) => ({ ...p, simple: v }))} label="Простой режим" hint="Крупно и только главное: Главная, Шеф, Избранное" />
           <Toggle on={profile.sounds} onChange={(v) => { setProfile((p) => ({ ...p, sounds: v })); if (v) setTimeout(() => cue("listen"), 50); }} label="Звуки и вибрация" hint="Тихие сигналы при готовке и ответах Шефа. Таймер звенит всегда" />
+        </div>
+        <div className="border-t border-line">
+          <Row icon={<Volume2 size={18} />} title="Голос для чтения шагов" hint={(profile.voice ? "Свой голос" : "Лучший на телефоне") + " · " + (profile.voiceRate >= 1.2 ? "быстрее" : profile.voiceRate <= 1 ? "спокойно" : "обычная скорость")} onClick={() => setVoice(true)} />
         </div>
       </div>
 
@@ -223,6 +228,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         </div>,
         document.body,
       )}
+      <VoiceSheet open={voice} onClose={() => setVoice(false)} />
       <Sheet open={sheet === "docs"} title="Документы и мои данные" onClose={close}>
         <div className="grid gap-1">
           {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (

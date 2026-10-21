@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { askNativeNotifications, cancelNativeTimer, isNativeApp, scheduleNativeTimer } from "../engine";
 import { audio as getAudio } from "./feedback";
 import { SOUNDS } from "./sounds";
+import { say } from "./voice";
 
 export interface CookTimer {
   id: string;
@@ -121,18 +122,8 @@ export function beep(): void {
   } catch { /* no audio */ }
 }
 
-export function speak(text: string): void {
-  try {
-    const synth = window.speechSynthesis;
-    if (!synth) return;
-    synth.cancel();
-    const u = new SpeechSynthesisUtterance(text.replace(/[«»•]/g, ""));
-    u.lang = "ru-RU";
-    const v = synth.getVoices().find((x) => x.lang.startsWith("ru"));
-    if (v) u.voice = v;
-    synth.speak(u);
-  } catch { /* no speech */ }
-}
+/** Reads aloud with the voice and speed chosen in Профиль, the text cleaned for reading (app/voice). */
+export function speak(text: string): void { say(text); }
 
 async function notify(title: string, body: string) {
   try {
