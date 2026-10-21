@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
-  MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
+  LifeBuoy, MessageCircle, MessageCircleQuestion, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
@@ -25,6 +25,7 @@ import { AddToMenuSheet } from "../components/AddToMenu";
 import { TimerRing, TimerStrip } from "../components/TimerStrip";
 import { StepTimer } from "../components/StepTimer";
 import { AskSheet } from "../components/AskSheet";
+import { RescueSheet } from "../components/RescueSheet";
 import { homeAmount, mergeSame } from "../app/amounts";
 import { cue } from "../app/feedback";
 import { stepTips } from "../app/stepTips";
@@ -70,7 +71,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const par = profile.parallel;
   const second = par ? findRecipe(par.recipeId) ?? null : null;
   const [tab, setTab] = useState<Key>("main");
-  const [sheet, setSheet] = useState<"ingredients" | "second" | "ask" | "more" | null>(null);
+  const [sheet, setSheet] = useState<"ingredients" | "second" | "ask" | "more" | "rescue" | null>(null);
   const [handsFree, setHandsFree] = useState(false);
   const [hint, setHint] = useState(false);
   const [checked, setChecked] = useState<Record<string, string[]>>({});
@@ -329,6 +330,10 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
               <span className="min-w-0 flex-1 truncate">{nextText}</span>
             </button>
           ))}
+          {/* «Спасти блюдо»: one quiet line, no block of its own (app/rescue). */}
+          <button onClick={() => setSheet("rescue")} className="mx-auto mt-6 flex min-h-11 items-center gap-2 rounded-full px-4 text-body-sm text-ink-soft hover:bg-sunken hover:text-ink">
+            <LifeBuoy size={18} aria-hidden />Что-то не так?
+          </button>
         </div>
 
         <aside className="hidden lg:block" aria-label="Продукты, таймеры и второе блюдо">
@@ -399,6 +404,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
         <PickSecond main={c?.recipe ?? r} onClose={() => setSheet(null)}
           onPick={(x, n) => { setProfile((p) => ({ ...p, parallel: { recipeId: x.id, servings: n, step: 0, timerEnd: null } })); setSheet(null); }} />
       )}
+      <RescueSheet key={"rescue-" + r.id} open={sheet === "rescue"} recipe={r} onClose={() => setSheet(null)} onAsk={() => setSheet("ask")} />
       <AskSheet key={r.id} open={sheet === "ask"} onClose={() => setSheet(null)} recipe={r} servings={dish.servings} prefs={s.preferences}
         onServings={(n) => setServings(dish.key, n)} />
     </Layer>
