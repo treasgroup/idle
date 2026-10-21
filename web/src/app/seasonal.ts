@@ -17,33 +17,44 @@ const title = (re: RegExp) => (r: Recipe) => re.test(r.title);
 const occasion = (...o: string[]) => (r: Recipe) => o.some((x) => r.occasions?.includes(x));
 const course = (...c: string[]) => (r: Recipe) => c.includes(courseOf(r));
 
-/** The holiday that is near — about two weeks before it — or a church time; null when there is none (no shelf then). */
-export function holidayCollection(now = new Date()): Collection | null {
-  const y = now.getFullYear(), m = now.getMonth() + 1, d = now.getDate();
-  const today = new Date(y, m - 1, d);
-  const toEaster = days(orthodoxEaster(y), today);
-  const until = (mm: number, dd: number) => days(new Date(y, mm - 1, dd), today);
-  const near = (mm: number, dd: number, before = 14) => { const n = until(mm, dd); return n >= 0 && n <= before; };
-  if (m === 12) return { key: "newyear", emoji: "🎄", title: "К Новому году", hint: "Салаты, горячее и закуски к столу", test: (r) => occasion("new-year")(r) || title(/оливье|шуб|холодец|заливн/i)(r) };
+/** A holiday or a season: when it is shown (`active`) and the same in words for the admin panel (`when`). */
+export interface Timed extends Collection { when: string; active: (now: Date) => boolean }
+
+// Day counts from `now` to a date of its year; Easter's comes from orthodoxEaster.
+const dayOf = (now: Date) => new Date(now.getFullYear(), now.getMonth(), now.getDate());
+const toEaster = (now: Date) => days(orthodoxEaster(now.getFullYear()), dayOf(now));
+const near = (mm: number, dd: number, before = 14) => (now: Date) => { const n = days(new Date(now.getFullYear(), mm - 1, dd), dayOf(now)); return n >= 0 && n <= before; };
+const month = (now: Date) => now.getMonth() + 1;
+
+/** In order of priority: the first active one is shown. */
+export const HOLIDAYS: Timed[] = [
+  { key: "newyear", emoji: "🎄", title: "К Новому году", hint: "Салаты, горячее и закуски к столу", when: "весь декабрь", active: (n) => month(n) === 12, test: (r) => occasion("new-year")(r) || title(/оливье|шуб|холодец|заливн/i)(r) },
   // After the holiday: something light and simple, soups and porridge, and ideas for what is left.
-  if (m === 1 && d <= 8) return { key: "afterny", emoji: "🥣", title: "После праздника", hint: "Лёгкое, супы и что сделать с остатками", test: (r) => !occasion("new-year")(r) && r.difficulty !== "hard" && (r.tags.includes("light") || course("soup", "breakfast")(r) || title(/омлет|каш[аи]|запеканк|овощ/i)(r)) };
-  if (toEaster >= 49 && toEaster <= 55) return { key: "maslenitsa", emoji: "🥞", title: "Масленица", hint: "Блины, оладьи и всё к ним", test: (r) => occasion("maslenitsa")(r) || title(/блин|олад|сырник|панкейк/i)(r) };
-  if (toEaster >= 0 && toEaster <= 7) return { key: "easter", emoji: "🥚", title: "К Пасхе", hint: "Выпечка и праздничный стол", test: (r) => occasion("easter")(r) || course("baking", "dessert")(r) || title(/кулич|пасх|творож/i)(r) };
-  if (near(2, 23, 11)) return { key: "feb23", emoji: "🎖️", title: "К 23 февраля", hint: "Сытное горячее и закуски", test: (r) => (occasion("holiday", "guests")(r) || r.tags.includes("hearty")) && course("main", "snack")(r) };
-  if (near(3, 8, 10)) return { key: "mar8", emoji: "💐", title: "К 8 Марта", hint: "Нежные салаты, десерты и ужин для двоих", test: (r) => occasion("date")(r) || (occasion("holiday", "guests")(r) && course("salad", "dessert", "baking")(r)) };
-  if (toEaster >= 1 && toEaster <= 48) return { key: "lent", emoji: "🌿", title: "Великий пост", hint: "Постные блюда на каждый день", test: (r) => isLenten(r) && course("main", "soup", "salad")(r) };
-  if ((m === 4 && d >= 26) || (m === 5 && d <= 10)) return { key: "may", emoji: "🔥", title: "Майские: на природу", hint: "Шашлык, гриль и всё для пикника", test: (r) => occasion("picnic")(r) || title(/шашлык|гриль|мангал|кебаб|люля/i)(r) };
-  if (near(10, 31)) return { key: "halloween", emoji: "🎃", title: "К Хеллоуину", hint: "Тыквенное и для детского праздника", test: (r) => occasion("kids-party")(r) || title(/тыкв/i)(r) };
-  return null;
+  { key: "afterny", emoji: "🥣", title: "После праздника", hint: "Лёгкое, супы и что сделать с остатками", when: "1–8 января", active: (n) => month(n) === 1 && n.getDate() <= 8, test: (r) => !occasion("new-year")(r) && r.difficulty !== "hard" && (r.tags.includes("light") || course("soup", "breakfast")(r) || title(/омлет|каш[аи]|запеканк|овощ/i)(r)) },
+  { key: "maslenitsa", emoji: "🥞", title: "Масленица", hint: "Блины, оладьи и всё к ним", when: "масленичная неделя", active: (n) => toEaster(n) >= 49 && toEaster(n) <= 55, test: (r) => occasion("maslenitsa")(r) || title(/блин|олад|сырник|панкейк/i)(r) },
+  { key: "easter", emoji: "🥚", title: "К Пасхе", hint: "Выпечка и праздничный стол", when: "неделя перед Пасхой", active: (n) => toEaster(n) >= 0 && toEaster(n) <= 7, test: (r) => occasion("easter")(r) || course("baking", "dessert")(r) || title(/кулич|пасх|творож/i)(r) },
+  { key: "feb23", emoji: "🎖️", title: "К 23 февраля", hint: "Сытное горячее и закуски", when: "12–23 февраля", active: near(2, 23, 11), test: (r) => (occasion("holiday", "guests")(r) || r.tags.includes("hearty")) && course("main", "snack")(r) },
+  { key: "mar8", emoji: "💐", title: "К 8 Марта", hint: "Нежные салаты, десерты и ужин для двоих", when: "26 февраля – 8 марта", active: near(3, 8, 10), test: (r) => occasion("date")(r) || (occasion("holiday", "guests")(r) && course("salad", "dessert", "baking")(r)) },
+  { key: "lent", emoji: "🌿", title: "Великий пост", hint: "Постные блюда на каждый день", when: "весь Великий пост", active: (n) => toEaster(n) >= 1 && toEaster(n) <= 48, test: (r) => isLenten(r) && course("main", "soup", "salad")(r) },
+  { key: "may", emoji: "🔥", title: "Майские: на природу", hint: "Шашлык, гриль и всё для пикника", when: "26 апреля – 10 мая", active: (n) => (month(n) === 4 && n.getDate() >= 26) || (month(n) === 5 && n.getDate() <= 10), test: (r) => occasion("picnic")(r) || title(/шашлык|гриль|мангал|кебаб|люля/i)(r) },
+  { key: "halloween", emoji: "🎃", title: "К Хеллоуину", hint: "Тыквенное и для детского праздника", when: "17–31 октября", active: near(10, 31), test: (r) => occasion("kids-party")(r) || title(/тыкв/i)(r) },
+];
+
+/** The holiday that is near — about two weeks before it — or a church time; null when there is none (no shelf then). */
+export function holidayCollection(now = new Date()): Timed | null {
+  return HOLIDAYS.find((h) => h.active(now)) ?? null;
 }
 
+export const SEASONS: Timed[] = [
+  { key: "summer", emoji: "☀️", title: "Летнее", hint: "Окрошка, холодные супы и салаты", when: "июнь – август", active: (n) => month(n) >= 6 && month(n) <= 8, test: title(/окрошк|холодник|гаспачо|свекольник|салат|огур|кабач/i) },
+  { key: "autumn", emoji: "🍂", title: "Осеннее", hint: "Тыква, грибы и яблоки", when: "сентябрь – ноябрь", active: (n) => month(n) >= 9 && month(n) <= 11, test: title(/тыкв|гриб|шампиньон|яблок|шарлотк/i) },
+  { key: "spring", emoji: "🌱", title: "Весеннее", hint: "Зелень, щавель, редис и молодые овощи", when: "март – май", active: (n) => month(n) >= 3 && month(n) <= 5, test: (r) => r.tags.includes("fresh") || title(/щавел|зелен|редис|молод|шпинат|огур|салат/i)(r) },
+  { key: "winter", emoji: "❄️", title: "Согревающее", hint: "Супы, рагу и всё горячее", when: "декабрь – февраль", active: (n) => month(n) === 12 || month(n) <= 2, test: (r) => course("soup")(r) || title(/рагу|жарк|туш/i)(r) },
+];
+
 /** The time of year: always one. */
-export function seasonCollection(now = new Date()): Collection {
-  const m = now.getMonth() + 1;
-  if (m >= 6 && m <= 8) return { key: "summer", emoji: "☀️", title: "Летнее", hint: "Окрошка, холодные супы и салаты", test: title(/окрошк|холодник|гаспачо|свекольник|салат|огур|кабач/i) };
-  if (m >= 9 && m <= 11) return { key: "autumn", emoji: "🍂", title: "Осеннее", hint: "Тыква, грибы и яблоки", test: title(/тыкв|гриб|шампиньон|яблок|шарлотк/i) };
-  if (m >= 3 && m <= 5) return { key: "spring", emoji: "🌱", title: "Весеннее", hint: "Зелень, щавель, редис и молодые овощи", test: (r) => r.tags.includes("fresh") || title(/щавел|зелен|редис|молод|шпинат|огур|салат/i)(r) };
-  return { key: "winter", emoji: "❄️", title: "Согревающее", hint: "Супы, рагу и всё горячее", test: (r) => course("soup")(r) || title(/рагу|жарк|туш/i)(r) };
+export function seasonCollection(now = new Date()): Timed {
+  return SEASONS.find((s) => s.active(now)) ?? SEASONS[3];
 }
 
 export interface Theme extends Collection { when?: (now: Date) => boolean }
@@ -73,5 +84,41 @@ export function themesNow(now = new Date()): Theme[] {
   return holidayCollection(now)?.key === "lent" ? [...list.filter((t) => t.key === "lenten"), ...list.filter((t) => t.key !== "lenten")] : list;
 }
 
-/** The cover drawn for a collection (collections/<key>.jpg on the site); the card falls back to a dish photo without it. */
-export const coverUrl = (key: string): string => apiUrl("today").replace(/api\/index\.php.*$/, "") + "collections/" + key + ".jpg";
+/** The cover drawn for a collection (collections/<key>.jpg on the site), with its version so a new one shows at once. */
+export const coverUrl = (key: string, v: number): string => apiUrl("today").replace(/api\/index\.php.*$/, "") + "collections/" + key + ".jpg?v=" + v;
+
+// ---------- The owner's changes from the admin panel ----------
+
+/** Per collection: shown or not, its own title and line, recipes added or taken out by hand, the cover's version.
+ * `custom`: a collection the owner made, only of hand-picked recipes. */
+export interface Custom { on?: boolean; title?: string; hint?: string; emoji?: string; add?: string[]; remove?: string[]; custom?: boolean; cover?: number }
+export type Customs = Record<string, Custom>;
+
+const SAVED = "cook-collections";
+const saved = (): Customs => { try { return JSON.parse(localStorage.getItem(SAVED) || "{}"); } catch { return {}; } };
+let asked: Promise<Customs> | null = null;
+
+/** Fetched once per start, kept for the next one (and for use without the internet). */
+export function loadCustoms(): Promise<Customs> {
+  asked ??= fetch(apiUrl("collections")).then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then((j: { collections?: Customs }) => { const c = j.collections ?? {}; try { localStorage.setItem(SAVED, JSON.stringify(c)); } catch { /* private mode */ } return c; })
+    .catch(() => saved());
+  return asked;
+}
+export const savedCustoms = saved;
+
+/** A collection with the owner's title and line, and its rule with the hand-picked changes; null when switched off. */
+export function withCustom<T extends Collection>(c: T, x: Custom | undefined): T | null {
+  if (!x) return c;
+  if (x.on === false) return null;
+  const add = new Set(x.add ?? []), remove = new Set(x.remove ?? []);
+  return { ...c, title: x.title ?? c.title, hint: x.hint ?? c.hint, emoji: x.emoji ?? c.emoji, test: (r: Recipe) => add.has(r.id) || (!remove.has(r.id) && c.test(r)) };
+}
+
+/** The owner's own collections (only hand-picked recipes), after the built-in themes. */
+export function customThemes(all: Customs): Theme[] {
+  return Object.entries(all).filter(([, x]) => x.custom && x.on !== false && x.title).map(([key, x]) => {
+    const ids = new Set(x.add ?? []);
+    return { key, title: x.title!, hint: x.hint ?? "", emoji: x.emoji ?? "🍽️", test: (r: Recipe) => ids.has(r.id) };
+  });
+}

@@ -1,6 +1,6 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ChevronRight, ShoppingCart, GraduationCap, Flame, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
 import {
   courseOf, dateKey, expiryLabel, expiringSoon, formatMinutes, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
@@ -11,7 +11,7 @@ import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { goalConditions } from "../app/profile";
-import { MIN_DISHES, coverUrl, holidayCollection, seasonCollection, themesNow, type Collection } from "../app/seasonal";
+import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
 import { openLayer, openRecipesView, replace, routeHash } from "../app/router";
@@ -96,8 +96,12 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const ranked = useRanked();
   const meal = mealNow();
   const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0);
-  const holiday = holidayCollection();
-  const season = seasonCollection();
+  // The owner's changes from the admin panel: titles, hand-picked recipes, switched-off collections, covers.
+  const [custom, setCustom] = useState(savedCustoms);
+  useEffect(() => { void loadCustoms().then(setCustom); }, []);
+  const holidayBase = holidayCollection();
+  const holiday = holidayBase && withCustom(holidayBase, custom[holidayBase.key]);
+  const season = withCustom(seasonCollection(), custom[seasonCollection().key]);
   // Only when «Погода за окном» is on in the profile.
   const weather = weatherLine(useWeather());
 
@@ -107,9 +111,12 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const planned = s.menu.find((d) => d.date === dateKey(new Date()))?.items.map((i) => recipeById(i.recipeId)).find((r): r is Recipe => !!r) ?? null;
   const hero = planned ?? today;
 
-  const holidayDishes = holiday ? photoFirst(ranked.filter(holiday.test)) : [];
-  const seasonDishes = photoFirst(ranked.filter(season.test));
-  const themes = themesNow().map((t) => ({ t, list: photoFirst(ranked.filter(t.test)) })).filter((x) => x.list.length >= MIN_DISHES);
+  // Dishes the owner added by hand go first, then the rule's ones in the person's order (photos first).
+  const dishes = (c: Collection, x?: Custom) => { const add = new Set(x?.add ?? []); const list = ranked.filter(c.test); return [...list.filter((r) => add.has(r.id)), ...photoFirst(list.filter((r) => !add.has(r.id)))]; };
+  const holidayDishes = holiday ? dishes(holiday, custom[holiday.key]) : [];
+  const seasonDishes = season ? dishes(season, custom[season.key]) : [];
+  const themes = [...themesNow(), ...customThemes(custom)].map((t) => withCustom(t, custom[t.key])).filter((t): t is NonNullable<typeof t> => !!t)
+    .map((t) => ({ t, list: dishes(t, custom[t.key]) })).filter((x) => x.list.length >= MIN_DISHES);
 
   return (
     <div className="pb-4" data-list="home">
@@ -155,11 +162,11 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         extra={holiday.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
           : FESTIVE.includes(holiday.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{holiday.key === "newyear" ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
-      {seasonDishes.length >= 4 && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
+      {season && seasonDishes.length >= 4 && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
       {themes.length > 0 && (
         <Section title="Подборки">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
+            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} drawn={custom[t.key]?.cover} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
           </div>
         </Section>
       )}
@@ -260,13 +267,13 @@ function Shelf({ c, list, all, extra }: { c: Collection; list: Recipe[]; all: ()
   );
 }
 
-/** A theme as a card: its own drawn cover (made in the admin), or the best dish's photo until there is one. */
-function ThemeCard({ c, cover, onOpen }: { c: Collection; cover: Recipe; onOpen: () => void }) {
+/** A theme as a card: its own drawn cover (uploaded in the admin), or the best dish's photo until there is one. */
+function ThemeCard({ c, cover, drawn, onOpen }: { c: Collection; cover: Recipe; drawn?: number; onOpen: () => void }) {
   const [own, setOwn] = useState(true);
   return (
     <button onClick={onOpen} className="relative aspect-[4/5] overflow-hidden rounded-card text-left transition-transform active:scale-[.98]">
-      {own
-        ? <img src={coverUrl(c.key)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
+      {drawn && own
+        ? <img src={coverUrl(c.key, drawn)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
         : <RecipeImage recipe={cover} className="absolute inset-0 h-full w-full" rounded="rounded-none" />}
       <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white">{c.title}</span>
     </button>

@@ -15,8 +15,9 @@ require __DIR__ . '/_private/community.php';
 require __DIR__ . '/_private/vk.php';
 require __DIR__ . '/_private/weather.php';
 require __DIR__ . '/_private/catalog_heal.php';
+require __DIR__ . '/_private/home_collections.php';
 
-const VERSION = '0.40.0';
+const VERSION = '0.41.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
 try { config(); } catch (Throwable $e) {}
 $route = isset($_GET['r']) ? (string)$_GET['r'] : '';
@@ -119,6 +120,10 @@ try {
     elseif ($route === 'message.send' && $method === 'POST') message_send(read_json_body(8000));
     elseif ($route === 'weather' && $method === 'GET') weather_now();
     elseif ($route === 'weather.city' && $method === 'GET') weather_city();
+    elseif ($route === 'collections' && $method === 'GET') collections_public();
+    elseif ($route === 'admin.collection.save' && $method === 'POST') { require_admin(true); admin_collection_save(read_json_body(40000)); }
+    elseif ($route === 'admin.collection.cover' && $method === 'POST') { require_admin(true); admin_collection_cover(); }
+    elseif ($route === 'admin.collection.cover.delete' && $method === 'POST') { require_admin(true); admin_collection_cover_delete(read_json_body(2000)); }
     elseif ($route === 'today' && $method === 'GET') { $t = recipe_of_day(); send_json($t ?? ['error' => 'Нет рецепта'], $t ? 200 : 404); }
     elseif ($route === 'message.replies' && $method === 'POST') message_replies(read_json_body(8000));
     elseif ($route === 'recipe.stats' && $method === 'GET') send_json(['stats' => (object)recipe_stats()]); // recounted at most hourly
