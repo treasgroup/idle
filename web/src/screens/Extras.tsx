@@ -1,6 +1,6 @@
 // Smaller screens: the beginner course, legal documents, the family poll, first-run questions.
 import { useEffect, useState } from "react";
-import { Check, CircleCheck, ArrowUpRight, Search, Egg, Soup } from "lucide-react";
+import { Check, CircleCheck, ArrowUpRight, Search, Egg, Soup, CalendarDays } from "lucide-react";
 import { apiUrl, legalDoc, legalInfo, recipeById, type LegalInfo, type LegalKey } from "../engine";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
@@ -12,6 +12,8 @@ import { ChefAvatar, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui"
 import { LESSONS } from "./learn-data";
 import { SchoolArt } from "../components/SchoolArt";
 import { Mascot } from "../components/Mascot";
+import { Tour, tourWanted } from "../components/Tour";
+import { PlaceHint } from "../components/PlaceHint";
 
 /** «Школа готовки»: short lessons, each with a skill and recipes to practise it. */
 export function Learn({ onClose }: { onClose: () => void }) {
@@ -26,6 +28,7 @@ export function Learn({ onClose }: { onClose: () => void }) {
         <p className="mt-1 text-body-sm text-ink-soft">{LESSONS.length} коротких уроков: навык и рецепт, чтобы сразу попробовать.</p>
         <div className="mt-4 h-2 overflow-hidden rounded-full bg-sunken"><div className="h-full rounded-full bg-herb transition-all" style={{ width: (done / LESSONS.length) * 100 + "%" }} /></div>
         <p className="mt-1.5 text-caption text-ink-soft">Пройдено {done} из {LESSONS.length}</p>
+        <PlaceHint id="learn" className="mt-4" text="Начните с первого урока — он уже открыт. В конце каждого урока — рецепт, чтобы сразу попробовать." />
         <div className="mt-5 grid gap-2">
           {LESSONS.map((l, n) => {
             const isDone = profile.lessonsDone.includes(l.id);
@@ -135,8 +138,9 @@ export function PollSheet({ token, onClose }: { token: string; onClose: () => vo
 
 const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Молочное"], ["gluten", "Глютен"], ["nuts", "Орехи"], ["mushrooms", "Грибы"], ["spicy", "Острое"]] as const;
 
-/** First visit: two short steps (text size, who eats what), then «Знакомьтесь — Шеф». Can be skipped. */
+/** First visit: two short steps (text size, who eats what), the four-card tour, then «Знакомьтесь — Шеф». Can be skipped. */
 const LAST = 2;
+const TOUR = LAST;
 
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const { s, profile, setProfile, update } = useStore();
@@ -199,6 +203,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
     { icon: <Search size={20} />, text: "Есть курица и картошка — что приготовить?", ask: "курица и картошка" },
     { icon: <Soup size={20} />, text: "Холодно, хочу горячего", ask: "холодно, хочу горячего" },
     { icon: <Egg size={20} />, text: "Сколько варить яйца?", ask: "сколько варить яйца?" },
+    // Шеф also knows where things are (app/navigator).
+    { icon: <CalendarDays size={20} />, text: "Где мой план?", ask: "где мой план?" },
   ];
 
   return (
@@ -214,13 +220,15 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             </div>
             <div className="anim-rise mt-8 flex-1" key={step}>{steps[step]}</div>
             <div className="sticky bottom-0 -mx-5 mt-8 bg-paper px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
-              <button className="btn-primary h-13 w-full" onClick={() => { if (step === LAST - 1) save(false); setStep(step + 1); }}>Дальше</button>
+              <button className="btn-primary h-13 w-full" onClick={() => { if (step === LAST - 1) save(false); setStep(step === LAST - 1 && !tourWanted() ? TOUR + 1 : step + 1); }}>Дальше</button>
               <div className="mt-1 flex">
                 {step > 0 && <button className="btn-ghost flex-1" onClick={() => setStep(step - 1)}>Назад</button>}
                 <button className="btn-ghost flex-1" onClick={() => { save(true); onDone(); }}>Пропустить</button>
               </div>
             </div>
           </>
+        ) : step === TOUR ? (
+          <div className="anim-rise flex flex-1 flex-col"><Tour onDone={() => setStep(TOUR + 1)} /></div>
         ) : (
           <div className="anim-rise flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
             <div className="flex flex-1 flex-col justify-center py-8">

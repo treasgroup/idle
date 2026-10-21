@@ -12,6 +12,7 @@ import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { weekLeftovers, amountText } from "../app/nowaste";
 import { replace, routeHash } from "../app/router";
+import { PlaceHint } from "../components/PlaceHint";
 import { downloadIcs, planIcs } from "../app/calendar";
 import { applyWeek, removeWeek, saveWeek, savedWeeks } from "../app/savedWeeks";
 import type { Profile } from "../app/profile";
@@ -118,6 +119,7 @@ export function Menu() {
         <p className="min-w-0 text-body-sm text-ink-soft">{planChips.join(" · ")}</p>
         <button className="-mr-2 inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-3 text-small font-semibold text-brand hover:bg-brand-soft" onClick={() => setSettings(true)}><Settings2 size={16} aria-hidden />Настроить</button>
       </div>
+      {filled && <PlaceHint id="menu" className="mt-3" text="Любое блюдо можно заменить — карандаш рядом с ним. «В покупки» соберёт продукты на всю неделю." />}
 
       {!filled ? (
         <div className="mt-6">

@@ -1,7 +1,8 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -15,6 +16,7 @@ import { ShareOptions } from "../components/ShareOptions";
 import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
+import { Tour, tourWanted } from "../components/Tour";
 import { WriteUs } from "../components/WriteUs";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
 import { WeatherSheet, degrees } from "../components/WeatherSheet";
@@ -40,6 +42,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const { s, update, profile, setProfile, sync, toast, wipe, server } = useStore();
   const reminders = useReminders();
   const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs">(null);
+  const [tour, setTour] = useState(false);
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
   const [writeUs, setWriteUs] = useState(false);
@@ -164,6 +167,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
           </Section>
 
           <div className="card mt-8 divide-y divide-line overflow-hidden">
+            {tourWanted() && <Row icon={<CircleHelp size={18} />} title="Как пользоваться" hint="Четыре карточки о главном" onClick={() => setTour(true)} />}
             <Row icon={<MessageSquareHeart size={18} />} title="Написать нам" hint={mine.unread ? "Пришёл ответ на ваше сообщение" : "Что улучшить или что мешает"} dot={mine.unread > 0} onClick={() => setWriteUs(true)} />
             <Row icon={<Shield size={18} />} title="Документы и мои данные" hint="Политика, правила, удаление данных" onClick={() => setSheet("docs")} />
           </div>
@@ -212,6 +216,13 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
       <TasteSheet open={tasteOpen} onClose={() => setTasteOpen(false)} />
       <WeatherSheet open={weatherOpen} onClose={() => setWeatherOpen(false)} />
+      {/* On the page itself: the screen under it fades in and would make it see-through. */}
+      {tour && createPortal(
+        <div className="anim-fade fixed inset-0 z-50 overflow-y-auto bg-paper" role="dialog" aria-modal="true" aria-label="Как пользоваться">
+          <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)]"><Tour onDone={() => setTour(false)} last="Понятно" /></div>
+        </div>,
+        document.body,
+      )}
       <Sheet open={sheet === "docs"} title="Документы и мои данные" onClose={close}>
         <div className="grid gap-1">
           {(Object.keys(LEGAL_TITLES) as LegalKey[]).map((k) => (

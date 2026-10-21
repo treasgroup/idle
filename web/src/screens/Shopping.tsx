@@ -1,5 +1,6 @@
 // «Покупки»: the list by shop aisle. A tap on the row marks it bought; bought items move into «Мои продукты» in one go.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { PlaceHint } from "../components/PlaceHint";
 import { Check, ChevronDown, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, packageHint, plural, searchIngredients, shoppingName, shoppingText,
@@ -114,6 +115,7 @@ export function Shopping() {
         </div>
       </div>
 
+      {toBuy.length > 0 && <PlaceHint id="shopping" className="mt-4" text="Нажимайте на продукт, когда положили его в корзину. В магазине удобнее крупный список — кнопка ниже." />}
       {toBuy.length > 0 && (
         <button className="btn-outline mt-4 w-full sm:w-auto" onClick={() => setStore(true)}>
           <ShoppingBasket size={20} className="text-brand" />Я в магазине — крупный список
