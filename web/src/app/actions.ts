@@ -48,7 +48,7 @@ export function useActions() {
 
   const toggleFavorite = useCallback((r: Recipe) => {
     const on = s.favorites.some((f) => f.id === r.id);
-    cue(on ? "tap" : "success");
+    cue(on ? "tap" : "save");
     if (!on) { track({ type: "favorite", recipeId: r.id }); signal(recipeById(r.id) ?? r, "save"); }
     update((st) => ({
       ...st,
@@ -66,7 +66,7 @@ export function useActions() {
     const items = ingredientsToBuy(r, clampServings(r, servings), has).filter((i) => !i.optional);
     if (!items.length) return toast("Всё для этого блюда уже есть дома.");
     track({ type: "cart", recipeId: r.id });
-    cue("success");
+    cue("list");
     update((st) => ({ ...st, shopping: addToShopping(st.shopping, items, r.title) }));
     toast("В списке покупок: " + items.length + " " + (items.length === 1 ? "продукт" : items.length < 5 ? "продукта" : "продуктов"));
   }, [s, update, toast]);

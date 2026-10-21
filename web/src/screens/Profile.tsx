@@ -98,7 +98,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         </div>
         <div className="border-t border-line px-4">
           <Toggle on={profile.simple} onChange={(v) => setProfile((p) => ({ ...p, simple: v }))} label="Простой режим" hint="Крупно и только главное: Главная, Шеф, Избранное" />
-          <Toggle on={profile.sounds} onChange={(v) => { setProfile((p) => ({ ...p, sounds: v })); if (v) setTimeout(() => cue("success"), 50); }} label="Звуки и вибрация" hint="Тихие сигналы при готовке и ответах Шефа. Таймер звенит всегда" />
+          <Toggle on={profile.sounds} onChange={(v) => { setProfile((p) => ({ ...p, sounds: v })); if (v) setTimeout(() => cue("save"), 50); }} label="Звуки и вибрация" hint="Тихие сигналы при готовке и ответах Шефа. Таймер звенит всегда" />
         </div>
       </div>
 

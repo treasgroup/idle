@@ -43,7 +43,7 @@ export function Shopping() {
   const toggle = (key: string) => {
     const item = s.shopping.find((x) => x.key === key);
     const last = !!item && !item.checked && s.shopping.filter((x) => !x.checked).length === 1;
-    if (last) cue("success"); else haptic();
+    if (last) cue("bought"); else haptic();
     set((l) => l.map((x) => (x.key === key ? { ...x, checked: !x.checked } : x)));
   };
   const withUndo = (text: string, fn: (l: ShoppingItem[]) => ShoppingItem[]) => {

@@ -35,7 +35,7 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
   const left = rang ? 0 : t ? secondsLeft(t, now) : seconds;
   // Before the start the ring is full: the whole time is still ahead.
   const ring: CookTimer = t ?? { id: "idle", dish, step, label: "", end: null, pausedLeft: seconds, total: seconds };
-  const start = () => { cue("success"); startTimer({ dish, recipeId, step, label, seconds }); onStart?.(seconds); };
+  const start = () => { cue("wind"); startTimer({ dish, recipeId, step, label, seconds }); onStart?.(seconds); };
 
   const status = rang ? "Время вышло" : paused ? "На паузе" : running ? "Осталось" : "Таймер на " + durationText(seconds);
   const icon = "shrink-0 max-[359px]:hidden";

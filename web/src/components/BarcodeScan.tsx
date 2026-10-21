@@ -52,7 +52,7 @@ export function BarcodeScan({ onFound, onClose }: { onFound: (r: { id: string | 
         if (!r.ok) throw new Error(j.error || "Не получилось узнать продукт.");
         const name = typeof j.name === "string" ? j.name : null;
         const id = name ? matchProduct(name) : null;
-        cue(id ? "success" : "error");
+        cue(id ? "scan" : "error");
         onFound({ id, name });
       } catch (e) {
         cue("error"); setError(e instanceof Error ? e.message : "Не получилось узнать продукт."); setState("error");

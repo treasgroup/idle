@@ -128,8 +128,8 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     const r = dish.recipe, i = dish.step;
     const mine = timers.filter((t) => t.recipeId === r.id && !t.rang);
     switch (cmd.type) {
-      case "next": if (i < r.steps.length - 1) { cue("step"); setStep(dish.key, i + 1); speak(r.steps[i + 1].text); } else speak("Это последний шаг."); break;
-      case "back": if (i > 0) { cue("step"); setStep(dish.key, i - 1); speak(r.steps[i - 1].text); } break;
+      case "next": if (i < r.steps.length - 1) { cue("page"); setStep(dish.key, i + 1); speak(r.steps[i + 1].text); } else speak("Это последний шаг."); break;
+      case "back": if (i > 0) { cue("page"); setStep(dish.key, i - 1); speak(r.steps[i - 1].text); } break;
       case "repeat": speak(r.steps[i].text); break;
       case "timer": {
         const sec = cmd.seconds ?? r.steps[i].timerSeconds;
@@ -168,7 +168,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   useEffect(() => { pane.current?.closest(".overflow-y-auto")?.scrollTo({ top: 0 }); }, [dish?.key, dish?.step]);
 
   const total = dish?.recipe.steps.length ?? 0;
-  const go = useCallback((delta: number) => { if (dish) { cue("step"); setStep(dish.key, dish.step + delta); } }, [dish, setStep]);
+  const go = useCallback((delta: number) => { if (dish) { cue("page"); setStep(dish.key, dish.step + delta); } }, [dish, setStep]);
 
   // ←/→ on a keyboard (not while typing or with a sheet open).
   useEffect(() => {

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { askNativeNotifications, cancelNativeTimer, isNativeApp, scheduleNativeTimer } from "../engine";
 import { audio as getAudio } from "./feedback";
+import { SOUNDS } from "./sounds";
 
 export interface CookTimer {
   id: string;
@@ -112,18 +113,11 @@ export function timerTitle(t: CookTimer): string {
 
 const REPEAT_MS = 60000;
 
+/** The alarm: a wind-up kitchen timer's bell (app/sounds), loud enough across the kitchen. */
 export function beep(): void {
   try {
     const audio = getAudio();
-    if (!audio) return;
-    const t0 = audio.currentTime + 0.05;
-    for (let n = 0; n < 3; n++)
-      for (const [k, f] of [[0, 880], [1, 660], [2, 880]] as const) {
-        const t = t0 + n + k * 0.22, o = audio.createOscillator(), g = audio.createGain();
-        o.type = "sine"; o.frequency.value = f;
-        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.35, t + 0.02); g.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
-        o.connect(g); g.connect(audio.destination); o.start(t); o.stop(t + 0.22);
-      }
+    if (audio) SOUNDS.alarm(audio);
   } catch { /* no audio */ }
 }
 

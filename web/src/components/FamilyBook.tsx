@@ -70,7 +70,7 @@ function RecipeEditor({ initial, photo, onClose, onSaved }: { initial: MyRecipe;
         ingredients: [x.ingredients, part.ingredients].filter(Boolean).join("\n"),
         steps: [x.steps, part.steps].filter(Boolean).join("\n"),
       }));
-      cue(text ? "success" : "error");
+      cue(text ? "scan" : "error");
       toast(text ? "Текст распознан — проверьте и поправьте, если нужно" : "Не удалось прочитать текст — попробуйте снять ровнее и при свете");
     } catch {
       cue("error");
@@ -81,7 +81,7 @@ function RecipeEditor({ initial, photo, onClose, onSaved }: { initial: MyRecipe;
   const save = () => {
     if (!r.title.trim()) return toast("Напишите название рецепта");
     update((st) => saveRecipe(st, r));
-    cue("success");
+    cue("save");
     onSaved(r);
   };
 
@@ -198,7 +198,7 @@ export function IncomingRecipe({ data, onClose }: { data: Partial<MyRecipe>; onC
   const r: MyRecipe = { ...newRecipe(), ...data, id: newRecipe().id, at: Date.now() };
   return (
     <Sheet open title="Вам прислали рецепт" onClose={onClose} tall
-      footer={<button className="btn-primary h-13 w-full" onClick={() => { update((st) => saveRecipe(st, r)); cue("success"); toast("Сохранено в «Избранное» → «Семейная книга»"); onClose(); }}>Сохранить в мою книгу</button>}>
+      footer={<button className="btn-primary h-13 w-full" onClick={() => { update((st) => saveRecipe(st, r)); cue("save"); toast("Сохранено в «Избранное» → «Семейная книга»"); onClose(); }}>Сохранить в мою книгу</button>}>
       <h2 className="text-h2">{r.title}</h2>
       {r.from && <p className="mt-1 text-small text-ink-soft">{r.from}</p>}
       <pre className="mt-4 whitespace-pre-wrap font-sans text-body-sm text-ink">{recipeText(r).split("\n").slice(1).join("\n").trim()}</pre>

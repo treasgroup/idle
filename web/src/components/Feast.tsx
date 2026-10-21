@@ -91,7 +91,7 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
       }
       return { ...st, shopping: list };
     });
-    cue("success");
+    cue("list");
     toast("Продукты на всех — в списке покупок");
   };
   const remind = () => {
