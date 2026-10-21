@@ -7944,6 +7944,19 @@ function tn(e) {
     e
   ).toLowerCase();
 }
+// A product as said in a chat sentence: «фарш», not «свино-говяжий фарш»; «тунец», not «консервированный тунец».
+function chatName(e) {
+  let t = tn(e);
+  if (!t.includes(" ")) return t;
+  let n = me(e)?.aliases.find((a) => !a.includes(" "));
+  if (n) return n.toLowerCase();
+  let a = t.split(" ").filter((w) => !/(ый|ий|ой|ая|яя|ое|ее|ые|ие|ого|его)$/.test(w));
+  return a.length === 1 ? a[0] : t;
+}
+// «за 40 минут», «за 21 минуту»; past an hour «за 1 ч 30 мин».
+function forMinutes(e) {
+  return "за " + (e < 60 ? e + " " + Jb(e, "минуту", "минуты", "минут") : mn(e));
+}
 function Wp(e) {
   return [...new Set(e.flatMap((t) => t.results?.map((n) => n.id) || []))];
 }
@@ -8742,27 +8755,25 @@ function Er(e) {
     M = _.filter((k) => !r0.has(k) && !k.startsWith("dish:")),
     Z = (k) => M.every((U) => k.ingredients.some((Y) => ia(Y.id, U)));
   if (M.length >= 2 && !R.some((k) => Z(k.recipe))) {
+    // «Блюда сразу с курицей, картофелем и сметаной за 40 минут нет.» The time and the products are said in it,
+    // so the «Подобрал — до 40 минут, есть дома: …» line is not repeated; anything else it noted stays in front.
+    let kept = (e.reply && /^Подобрал — /.test(e.reply)
+      ? e.reply.replace(/^Подобрал — /, "").replace(/ Поправить можно.*$/, "").replace(/:\s*$/, "")
+          .replace(/(^|, )до \d+ минут/, "").replace(/(^|, )есть дома: .*?(?=, (?:нет дома|без |снова можно)|$)/, "")
+          .replace(/^, /, "").trim()
+      : "");
     C =
-      (e.reply && /^Подобрал — /.test(e.reply)
-        ? e.reply.replace(/ Поправить можно.*$/, "") +
-          `
-
-`
-        : "") +
-      "Блюд, где есть сразу " +
-      _i(M.map(tn)) +
-      ", под эти условия нет — показываю, где есть что-то одно.";
+      (kept ? "Учёл: " + kept + ". " : "") +
+      Cr("Блюда сразу с " + _i(M.map((Y) => aa(chatName(Y)))) + (w.maxMinutes !== null ? " " + forMinutes(w.maxMinutes) : "") + " нет. Вот что получится из части продуктов:");
     let k = F.filter((U) => !g.includes(U.id) && Z(U));
     if (w.maxMinutes !== null) {
       let U = Qe(k, { ...w, maxMinutes: null }, a, 1)[0];
       U &&
         b.push({
-          label:
-            "Сразу с " +
-            M.map((Y) => aa(tn(Y))).join(" и ") +
-            ", до " +
-            Math.ceil(U.recipe.totalMinutes / 10) * 10 +
-            " мин",
+          label: (() => {
+            let m = Math.ceil(U.recipe.totalMinutes / 10) * 10;
+            return "Всё вместе — за " + (m < 100 ? m + " мин" : mn(m));
+          })(),
           relax: "time:" + Math.ceil(U.recipe.totalMinutes / 10) * 10,
         });
     }
@@ -8948,17 +8959,19 @@ function S_(e, t, n, a) {
       (w) => w.recipe.totalMinutes,
     );
     if (S.length) {
-      let w = Math.min(...S);
+      let w = Math.min(...S),
+        // «25 мин у плиты, потом ждать 12 ч» when most of the time is waiting, like on the recipe cards.
+        fast = i({ ...e, maxMinutes: null }, 1 / 0).find((v) => v.recipe.totalMinutes === w)?.recipe,
+        act = fast?.activeMinutes || 0,
+        wait = w - act,
+        when = act && wait >= 60
+          ? act + " мин у плиты, потом ждать " + (wait >= 180 ? Math.round(wait / 60) + " ч" : mn(wait))
+          : forMinutes(w);
       l.push({
         key: "time",
         cost: w <= f * 1.5 ? 1 : 3,
         cond: { ...e, maxMinutes: w },
-        text: () =>
-          "За " +
-          f +
-          " минут не нашёл. Самое быстрое — до " +
-          w +
-          " минут:",
+        text: () => (forMinutes(f).replace(/^за/, "За")) + " ничего не успеть. Самое быстрое — " + when + ":",
       });
     }
   }

@@ -43,6 +43,19 @@ describe("requests", () => {
     const r = ask("картошка в аэрогриле");
     expect(r.results.map((m: { recipe: Recipe }) => m.recipe.id)).toContain("airfryer-potato-wedges");
   });
+  it("says plainly when the products never meet in one dish", () => {
+    const r = ask("есть курица, картошка и сметана, минут 40");
+    expect(r.text).toMatch(/^Блюда сразу с курицей, (картофелем|картошкой) и сметаной за 40 минут нет\. Вот что получится из части продуктов:/);
+    expect(r.text).not.toMatch(/Подобрал|Блюд, где|под эти условия/);
+    for (const o of r.options ?? []) expect(o.label).not.toMatch(/^Сразу с /);
+    const minced = ask("есть кабачок, фарш и рис, минут 30");
+    expect(minced.text).toContain("с кабачком, фаршем и рисом");
+  });
+  it("says the time of the quickest dish the way people read it", () => {
+    const r = ask("хочу с креветками и грибами за 15 минут");
+    expect(r.text).toMatch(/^За 15 минут ничего не успеть\. Самое быстрое — /);
+    expect(r.text).not.toMatch(/\d{3,} минут/);
+  });
   it("answers kitchen questions written casually", () => {
     const r = ask("скока варить яйца");
     expect(r.kind).toBe("talk");
