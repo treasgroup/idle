@@ -1,6 +1,6 @@
 // Cooking mode (#/cook): one step at a time in large type, the step's own timer, voice control, a second dish
 // cooked alongside, and a finish screen. Timers are the app's kitchen timers (app/timers.ts); the shell rings them.
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode, type TouchEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import {
   Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
   LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
@@ -211,12 +211,6 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
     if (dx > 0 && dish.step > 0) go(-1);
   };
 
-  const tapStep = (e: MouseEvent<HTMLElement>) => {
-    if (!dish || window.getSelection()?.toString()) return;
-    const box = e.currentTarget.getBoundingClientRect();
-    if (e.clientX - box.left < box.width * 0.3) { if (dish.step > 0) go(-1); }
-    else if (dish.step < total - 1) go(1);
-  };
   // Opened and closed straight away (first step, no timer): nothing was started, so nothing stays at the bottom.
   const closeCook = () => {
     const untouched = !!c && !c.done && c.step === 0 && !par && !timers.some((t) => t.recipeId === c.recipe.id);
@@ -303,8 +297,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
           <h1 className="sr-only">{r.title}</h1>
           <p className="sr-only" aria-live="polite">Шаг {dish.step + 1} из {total}. {curText}</p>
           <div key={dish.key + dish.step} className="anim-rise">
-            {/* Like stories: a tap on the right of the text — next step, on the left — back. */}
-            <p className="mt-5 cursor-pointer select-none text-step md:text-step-lg lg:mt-8" onClick={tapStep}>{terms.render(curText)}</p>
+            {/* A tap on the text does nothing: with wet hands a brush of the finger skipped a step unnoticed. «Дальше»,
+                «‹» and a swipe change it; underlined kitchen words still open their hint. */}
+            <p className="mt-5 text-step md:text-step-lg lg:mt-8">{terms.render(curText)}</p>
             <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
