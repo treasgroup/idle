@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { MoreHorizontal, Pause, Play, Plus, X, BellRing } from "lucide-react";
 import { addMinute, secondsLeft, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
-import { Sheet, cx, mmss } from "./ui";
+import { Sheet, cx, mmss, useEdgeFade } from "./ui";
 
 export function TimerRing({ t, size = 28, now }: { t: CookTimer; size?: number; now: number }) {
   const left = secondsLeft(t, now);
@@ -33,9 +33,10 @@ export function TimerStrip({ only, hide, onJump, className, flush }: {
   const list = (only ? all.filter((t) => t.recipeId === only || !t.recipeId) : all).filter((t) => !hide?.(t));
   const now = useTick(list.some((t) => t.end && !t.rang));
   const [menu, setMenu] = useState<CookTimer | null>(null);
+  const [fadeRef, fade] = useEdgeFade();
   if (!list.length) return null;
   return (
-    <div className={cx("scroller fade-x", !flush && "-mx-4 px-4", className)} role="group" aria-label="Таймеры">
+    <div ref={fadeRef} className={cx("scroller", fade, !flush && "-mx-4 px-4", className)} role="group" aria-label="Таймеры">
       {list.map((t) => {
         const left = secondsLeft(t, now);
         const paused = t.pausedLeft != null;

@@ -222,12 +222,35 @@ export function Segmented<T extends string>({ value, options, onChange, label }:
 }
 
 /** A horizontal card carousel with edge fades; arrows for mouse users. */
+/** A carousel's edges fade only where cards are hidden: none at the start on the left, none at the end on the right,
+ * none at all when everything fits. A fade over the first card at rest looked like a broken picture. */
+export function useEdgeFade(): [(el: HTMLElement | null) => void, string] {
+  const [el, setEl] = useState<HTMLElement | null>(null);
+  const [fade, setFade] = useState("");
+  useEffect(() => {
+    if (!el) return;
+    const on = () => {
+      const left = el.scrollLeft > 4, right = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+      setFade(left && right ? "fade-x" : left ? "fade-l" : right ? "fade-r" : "");
+    };
+    on();
+    el.addEventListener("scroll", on, { passive: true });
+    const ro = new ResizeObserver(on);
+    ro.observe(el);
+    const mo = new MutationObserver(on);
+    mo.observe(el, { childList: true });
+    return () => { el.removeEventListener("scroll", on); ro.disconnect(); mo.disconnect(); };
+  }, [el]);
+  return [setEl, fade];
+}
+
 export function ScrollRow({ children, label }: { children: ReactNode; label: string }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [fadeRef, fade] = useEdgeFade();
   const by = (d: number) => ref.current?.scrollBy({ left: d * (ref.current.clientWidth * 0.8), behavior: "smooth" });
   return (
     <div className="group relative -mx-4 sm:mx-0" role="region" aria-label={label}>
-      <div ref={ref} className="scroller fade-x px-4 pb-1 sm:px-0">{children}</div>
+      <div ref={(el) => { ref.current = el; fadeRef(el); }} className={cx("scroller px-4 pb-1 sm:px-0", fade)}>{children}</div>
       <button className="icon-btn absolute left-1 top-1/2 hidden -translate-y-1/2 bg-card shadow-e2 [@media(pointer:fine)]:group-hover:inline-grid" onClick={() => by(-1)} aria-label="Назад"><ChevronLeft size={20} /></button>
       <button className="icon-btn absolute right-1 top-1/2 hidden -translate-y-1/2 bg-card shadow-e2 [@media(pointer:fine)]:group-hover:inline-grid" onClick={() => by(1)} aria-label="Дальше"><ChevronRight size={20} /></button>
     </div>

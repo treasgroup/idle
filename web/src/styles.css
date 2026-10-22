@@ -149,6 +149,9 @@
 .scroller::-webkit-scrollbar { display: none; }
 .scroller > * { scroll-snap-align: start; }
 .fade-x { mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 24px), transparent 100%); }
+/* Only the side where cards are hidden (components/ui useEdgeFade). */
+.fade-l { mask-image: linear-gradient(to right, transparent 0, #000 16px); }
+.fade-r { mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent 100%); }
 
 @keyframes rise { from { transform: translateY(4px); opacity: 0 } to { transform: none; opacity: 1 } }
 @keyframes sheet-in { from { transform: translateY(24px); opacity: 0 } to { transform: none; opacity: 1 } }

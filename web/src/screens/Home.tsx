@@ -119,6 +119,9 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const dishes = (c: Collection, x?: Custom) => { const add = new Set(x?.add ?? []); const list = ranked.filter(c.test); return [...list.filter((r) => add.has(r.id)), ...photoFirst(list.filter((r) => !add.has(r.id)))]; };
   const holidayDishes = holiday ? dishes(holiday, custom[holiday.key]) : [];
   const seasonDishes = season ? dishes(season, custom[season.key]) : [];
+  const holidayShelf = !!holiday && holidayDishes.length >= 4;
+  // Near a holiday the season is a wide card in «Подборки» instead of a second shelf (one live shelf at a time).
+  const seasonCard = holidayShelf && !!season && seasonDishes.length >= 4;
   const themes = [...themesNow(), ...customThemes(custom)].map((t) => withCustom(t, custom[t.key])).filter((t): t is NonNullable<typeof t> => !!t)
     .map((t) => ({ t, list: dishes(t, custom[t.key]) })).filter((x) => x.list.length >= MIN_DISHES);
 
@@ -165,14 +168,18 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <Rescue />
 
       {/* The holiday shelf only while a holiday is near; the season's shelf always; then the themes as cards. */}
-      {holiday && holidayDishes.length >= 4 && <Shelf c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true })}
+      {holidayShelf && <Shelf c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true })}
         extra={holiday.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
           : FESTIVE.includes(holiday.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{holiday.key === "newyear" ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
-      {season && seasonDishes.length >= 4 && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
-      {themes.length > 0 && (
+      {/* One live shelf at a time: near a holiday its shelf is up there, and the season steps into «Подборки» as the
+          first, wide card — two look-alike carousels in a row read as one long one. */}
+      {season && seasonDishes.length >= 4 && !holidayShelf && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
+      {(themes.length > 0 || seasonCard) && (
         <Section title="Подборки">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-4">
+            {seasonCard && season && <ThemeCard c={season} cover={seasonDishes[0]} drawn={custom[season.key]?.cover} wide={custom[season.key]?.coverWide} span
+              onOpen={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
             {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} drawn={custom[t.key]?.cover} wide={custom[t.key]?.coverWide} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
           </div>
         </Section>
@@ -180,7 +187,6 @@ export function Home({ pwa }: { pwa?: Pwa }) {
 
       <BackupCard />
       <Saved />
-      <CourseCard />
       {deck && <Deck title={deck.title} pool={deck.pool} askTime={deck.askTime} startList={deck.list} onClose={() => setDeck(null)} />}
     </div>
   );
@@ -275,19 +281,24 @@ function Shelf({ c, list, all, extra }: { c: Collection; list: Recipe[]; all: ()
 /** A theme as a card: its own drawn cover (uploaded in the admin), or the best dish's photo until there is one.
  * Phones and tablets: tall 4:5 cards, two or three in a row. Computers: three wide 3:2 cards in a row — with the wide
  * cover when there is one, otherwise the tall one cut to the middle. */
-function ThemeCard({ c, cover, drawn, wide, onOpen }: { c: Collection; cover: Recipe; drawn?: number; wide?: number; onOpen: () => void }) {
+/** `span`: the whole row (the season near a holiday), the wide cover on every screen, and the line under the title. */
+function ThemeCard({ c, cover, drawn, wide, span, onOpen }: { c: Collection; cover: Recipe; drawn?: number; wide?: number; span?: boolean; onOpen: () => void }) {
   const [own, setOwn] = useState(true);
   return (
-    <button onClick={onOpen} className="relative aspect-[4/5] overflow-hidden rounded-card text-left transition-transform active:scale-[.98] lg:aspect-[3/2]">
+    <button onClick={onOpen} className={cx("relative overflow-hidden rounded-card text-left transition-transform active:scale-[.98]",
+      span ? "col-span-2 aspect-[2/1] sm:col-span-3 lg:aspect-[3/1]" : "aspect-[4/5] lg:aspect-[3/2]")}>
       {drawn && own
         ? (
           <picture>
-            {wide && <source media="(min-width: 1024px)" srcSet={coverUrl(c.key, wide, true)} />}
+            {wide && <source media={span ? "(min-width: 0px)" : "(min-width: 1024px)"} srcSet={coverUrl(c.key, wide, true)} />}
             <img src={coverUrl(c.key, drawn)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
           </picture>
         )
         : <RecipeImage recipe={cover} className="absolute inset-0 h-full w-full" rounded="rounded-none" />}
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white lg:px-5 lg:pb-4 lg:text-h3">{c.title}</span>
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white lg:px-5 lg:pb-4 lg:text-h3">
+        {c.title}
+        {span && c.hint && <span className="mt-0.5 block text-small font-normal text-white/85">{c.hint}</span>}
+      </span>
     </button>
   );
 }
@@ -346,8 +357,8 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const thaw = new Date().getHours() >= 15 ? thawTomorrow(s, new Date()) : null;
   // The week plan is not in the bottom bar: from here it is one tap away (or one tap to make it).
   const planned = s.menu.filter((d) => d.date >= today && d.items.length > 0).length;
-  // On phones «Мои продукты» and the School live only in Профиль — here they are one tap away too (a computer has them
-  // in the side menu). Not in the simple mode, which keeps only the main things.
+  // «Мои продукты» and the School are one tap away here too (on phones they are otherwise only in Профиль; on a computer
+  // the side menu repeats them, and the shelf is not left with one lonely tile). Not in the simple mode.
   const sections = !profile.simple;
   const soon = expiringSoon(s.fridge);
   const nextLesson = LESSONS.find((l) => !profile.lessonsDone.includes(l.id));
@@ -357,7 +368,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const tile = "w-[150px] shrink-0 snap-start sm:w-[200px]";
   const action = (icon: ReactNode, title: string, line: string, onClick: () => void, school?: boolean) => (
     <button onClick={onClick} className={cx("flex flex-col items-start justify-between gap-3 p-4 text-left transition-[border-color,transform] duration-150 active:scale-[.99]", tile,
-      school ? "rounded-card bg-herb-soft lg:hidden" : "card hover:border-line-strong/60")}>
+      school ? "rounded-card bg-herb-soft" : "card hover:border-line-strong/60")}>
       <span className={cx("grid h-11 w-11 place-items-center rounded-full", school ? "bg-card text-herb" : "bg-sunken text-ink")} aria-hidden>{icon}</span>
       <span><span className="block text-title leading-snug">{title}</span><span className={cx("mt-1 line-clamp-2 block text-caption", school ? "text-herb" : "text-ink-soft")}>{line}</span></span>
     </button>
@@ -378,7 +389,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
           "После «" + left[0].from + "» — что из этого приготовить",
           () => { void ask.ask("что приготовить из " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(" и "), { fresh: true, source: "leftovers" }); goChat(); })}
         {action(<CalendarDays size={22} />, planned ? "План на неделю" : "Составить план", planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") : "Ужины без повторов и список покупок", () => openLayer(routeHash({ tab: "menu" })))}
-        {sections && <span className="contents lg:hidden">{action(<Refrigerator size={22} />, "Мои продукты",
+        {sections && <span className="contents">{action(<Refrigerator size={22} />, "Мои продукты",
           s.fridge.length ? "Дома " + s.fridge.length + (soon.length ? " · скоро испортится: " + shortName(soon[0].id).toLowerCase() : "") : "Что есть дома — подскажу, что приготовить",
           () => openLayer(routeHash({ tab: "pantry" })))}</span>}
         {sections && action(<GraduationCap size={22} />, "Школа готовки",
@@ -453,24 +464,6 @@ export function Sections() {
   );
 }
 
-function CourseCard({ rail }: { rail?: boolean }) {
-  const { profile } = useStore();
-  const next = LESSONS.find((l) => !profile.lessonsDone.includes(l.id));
-  if (!next || (profile.level !== "beginner" && !rail)) return null;
-  if (rail && profile.level !== "beginner" && profile.lessonsDone.length === 0) return null;
-  return (
-    <div className={rail ? "pt-2" : "mt-8 hidden lg:block"}>
-      <button onClick={() => openLayer(routeHash({ tab: "learn" }))} className="flex w-full items-center gap-3 rounded-card bg-herb-soft p-4 text-left">
-        <GraduationCap className="shrink-0 text-herb" aria-hidden />
-        <span className="min-w-0 flex-1">
-          <span className="block text-caption font-semibold text-herb">Школа готовки · урок {LESSONS.indexOf(next) + 1} из {LESSONS.length}</span>
-          <span className="block text-body-sm font-semibold">{next.title}</span>
-        </span>
-        <ChevronRight size={18} className="text-herb" aria-hidden />
-      </button>
-    </div>
-  );
-}
 
 function Saved() {
   const { s } = useStore();
