@@ -1,0 +1,1551 @@
+{
+    "batch": "23-bystrye-uzhiny-1",
+    "description": "Быстрый ужин до 30 минут",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-fillet-sour-cream-garlic-sauce",
+            "title": "Куриное филе в сметанно-чесночном соусе",
+            "summary": "Нежные кусочки куриного филе в густом сметанном соусе с чесноком и укропом. Готовятся на обычной сковороде без долгого тушения.",
+            "aliases": [
+                "Куриная грудка в сметане с чесноком",
+                "Куриное филе с чесночным соусом"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 28,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана 15–20%",
+                    "amount": 180,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Пшеничная мука",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort",
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте куриное филе поперёк волокон полосками толщиной около 1 см. Очистите и мелко нарежьте чеснок, а укроп измельчите.",
+                    "uses": [
+                        "chicken-fillet",
+                        "garlic",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "Смешайте сметану с мукой. Постепенно влейте воду и размешайте, чтобы не осталось комочков. Разогрейте масло в широкой сковороде на среднем огне.",
+                    "uses": [
+                        "sour-cream",
+                        "wheat-flour",
+                        "water",
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Выложите половину курицы одним слоем. На среднем огне жарьте 3 минуты до золотистой корочки снизу, переверните и жарьте ещё 3 минуты; переложите на тарелку. Так же обжарьте оставшуюся курицу по 3 минуты с каждой стороны. Таймер на 6 минут повторите для второй партии.",
+                    "uses": [
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Верните всю курицу в сковороду, добавьте чеснок и перемешивайте 30 секунд. Затем влейте подготовленную сметанную смесь с мукой и водой, добавьте соль и перец.",
+                    "uses": [
+                        "chicken-fillet",
+                        "garlic",
+                        "sour-cream",
+                        "wheat-flour",
+                        "water",
+                        "salt",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 30
+                },
+                {
+                    "text": "Готовьте на слабом огне 4 минуты, помешивая. Разрежьте самый крупный кусочек: внутри не должно быть розового мяса. Посыпьте укропом и подавайте.",
+                    "uses": [
+                        "chicken-fillet",
+                        "dill"
+                    ],
+                    "timerSeconds": 240
+                }
+            ],
+            "tips": [
+                "Не кипятите сметанный соус слишком сильно, иначе он может свернуться.",
+                "Если соус густой, добавьте немного воды и размешайте.",
+                "Подавайте с картофельным пюре, гречкой или макаронами."
+            ],
+            "storageDays": 2,
+            "freezerDays": 0,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см",
+                "Миска",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Небольшие золотистые кусочки куриного филе покрыты густым светлым сметанным соусом с мелкими кусочками чеснока. Сверху свежий укроп. Соус слегка обволакивает мясо."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-broccoli-creamy-sauce",
+            "title": "Курица с брокколи в сливочном соусе",
+            "summary": "Куриное филе и мягкая брокколи в нежном сливочном соусе с сыром. Сытное блюдо, для которого нужна только одна сковорода.",
+            "aliases": [
+                "Куриная грудка с брокколи в сливках",
+                "Брокколи с курицей и сыром"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 27,
+            "activeMinutes": 19,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 550,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "broccoli",
+                    "name": "Брокколи",
+                    "amount": 450,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cauliflower"
+                    ]
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10%",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "processed-cheese"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light",
+                "comfort",
+                "fresh"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте 550 г куриного филе небольшими кусочками толщиной около 1,5 см. Разделите 450 г брокколи на небольшие соцветия, крупные стебли разрежьте на несколько частей. Натрите 50 г твёрдого сыра на мелкой тёрке, очистите и измельчите 10 г чеснока.",
+                    "uses": [
+                        "chicken-fillet",
+                        "broccoli",
+                        "hard-cheese",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Разогрейте 20 мл растительного масла в широкой сковороде. Выложите нарезанную курицу и обжаривайте 6 минут, периодически переворачивая кусочки.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Добавьте к курице подготовленные соцветия и нарезанные стебли брокколи, влейте 80 мл воды. Накройте сковороду крышкой и готовьте 5 минут на среднем огне.",
+                    "uses": [
+                        "broccoli",
+                        "water"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте чеснок, 5 г соли и 1 г чёрного перца. Перемешайте и готовьте 1 минуту. Влейте 250 мл сливок 10%, убавьте огонь и готовьте 4 минуты при слабом кипении, иногда помешивая.",
+                    "uses": [
+                        "garlic",
+                        "salt",
+                        "black-pepper",
+                        "cream"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Всыпьте тёртый сыр и перемешивайте 2 минуты, пока он не расплавится. Проверьте готовность: брокколи должна легко протыкаться вилкой, а курица внутри быть полностью белой. Снимите сковороду с огня.",
+                    "uses": [
+                        "hard-cheese"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Не передерживайте брокколи, чтобы она не превратилась в кашу.",
+                "Если берёте молоко вместо сливок, соус получится более жидким.",
+                "Твёрдый сыр добавляйте на небольшом огне, чтобы он плавился равномерно."
+            ],
+            "storageDays": 2,
+            "freezerDays": 0,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Тёрка",
+                "Лопатка"
+            ],
+            "look": "Светлые сочные кусочки курицы и ярко-зелёные соцветия брокколи в нежном сливочном соусе. Соус слегка густой, с расплавленным сыром. Брокколи сохраняет форму."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "sweet-sour-chicken-bell-pepper",
+            "title": "Куриные кусочки в кисло-сладком соусе с перцем",
+            "summary": "Румяная курица и сладкий болгарский перец в густом кисло-сладком соусе. Простой домашний вариант блюда в азиатском стиле.",
+            "aliases": [
+                "Курица в кисло-сладком соусе",
+                "Курица с болгарским перцем по-азиатски"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 28,
+            "activeMinutes": 22,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "carrot"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Репчатый лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-ketchup",
+                    "name": "Кетчуп томатный",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "soy-sauce",
+                    "name": "Соевый соус",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 25,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "honey"
+                    ]
+                },
+                {
+                    "id": "potato-starch",
+                    "name": "Картофельный крахмал",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 120,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "fresh",
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте 600 г куриного филе кубиками около 1,5 см. Удалите семена из 300 г болгарского перца и нарежьте его полосками. Нарежьте 100 г лука полукольцами, очистите и мелко нарежьте 12 г чеснока.",
+                    "uses": [
+                        "chicken-fillet",
+                        "bell-pepper",
+                        "onion",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Смешайте 100 г кетчупа, 50 мл соевого соуса, 25 мл лимонного сока, 25 г сахара и половину воды из общих 120 мл. В отдельной чашке размешайте 12 г крахмала в оставшейся холодной воде.",
+                    "uses": [
+                        "tomato-ketchup",
+                        "soy-sauce",
+                        "lemon-juice",
+                        "sugar",
+                        "water",
+                        "potato-starch"
+                    ]
+                },
+                {
+                    "text": "Разогрейте 25 мл растительного масла в сковороде. Добавьте подготовленные лук и перец и жарьте 4 минуты, помешивая овощи.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "bell-pepper"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Добавьте нарезанную курицу к обжаренным овощам. Жарьте 8 минут на среднем огне, часто перемешивая, пока куриное мясо внутри не станет белым.",
+                    "uses": [
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Добавьте измельчённый чеснок и перемешивайте 30 секунд. Влейте подготовленный кисло-сладкий соус и готовьте 3 минуты при слабом кипении.",
+                    "uses": [
+                        "garlic",
+                        "tomato-ketchup",
+                        "soy-sauce",
+                        "lemon-juice",
+                        "sugar",
+                        "water"
+                    ],
+                    "timerSeconds": 180
+                },
+                {
+                    "text": "Ещё раз размешайте крахмал с водой и влейте в сковороду. Готовьте 2 минуты, пока соус не загустеет. Проверьте крупный кусочек курицы: внутри не должно быть розового мяса. Снимите сковороду с огня.",
+                    "uses": [
+                        "potato-starch",
+                        "water"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Крахмал смешивайте только с холодной водой, иначе появятся комочки.",
+                "Если соус слишком кислый, добавьте немного сахара.",
+                "Подавайте с рисом или простой лапшой."
+            ],
+            "storageDays": 2,
+            "freezerDays": 30,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см",
+                "Нож",
+                "Разделочная доска",
+                "2 небольшие миски",
+                "Лопатка"
+            ],
+            "look": "Румяные небольшие кусочки курицы и яркие полоски болгарского перца в густом блестящем красновато-оранжевом соусе. Видны мягкие кусочки лука. Соус покрывает каждый кусочек."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "turkey-zucchini-skillet",
+            "title": "Индейка с кабачками на сковороде",
+            "summary": "Нежные кусочки индейки с кабачками, помидорами и луком. Лёгкий ужин с овощами, который готовится на одной сковороде.",
+            "aliases": [
+                "Филе индейки с кабачками",
+                "Индейка с овощами на сковороде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 27,
+            "activeMinutes": 22,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "turkey-fillet",
+                    "name": "Филе грудки индейки",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Репчатый лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Молотая паприка",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-oregano"
+                    ]
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light",
+                "fresh"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте 600 г индейки кубиками около 1,5 см, а 500 г кабачка — тонкими полукружиями толщиной около 7 мм. Мелко нарежьте 100 г лука и 10 г чеснока, нарежьте 200 г помидоров кубиками.",
+                    "uses": [
+                        "turkey-fillet",
+                        "zucchini",
+                        "onion",
+                        "garlic",
+                        "tomato"
+                    ]
+                },
+                {
+                    "text": "Разогрейте 25 мл растительного масла в широкой сковороде. Выложите нарезанную индейку и жарьте 7 минут, периодически переворачивая кусочки.",
+                    "uses": [
+                        "vegetable-oil",
+                        "turkey-fillet"
+                    ],
+                    "timerSeconds": 420
+                },
+                {
+                    "text": "Добавьте лук, перемешайте и жарьте 3 минуты, пока он не станет мягче. Положите кабачки и жарьте 6 минут без крышки, периодически помешивая.",
+                    "uses": [
+                        "onion",
+                        "zucchini"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Положите помидоры и чеснок, добавьте 3 г молотой паприки, 5 г соли и 1 г чёрного перца. Перемешайте и готовьте ещё 3 минуты: кабачки должны стать мягкими, но сохранить форму.",
+                    "uses": [
+                        "tomato",
+                        "garlic",
+                        "paprika",
+                        "salt",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 180
+                },
+                {
+                    "text": "Разрежьте крупный кусочек индейки: внутри не должно быть розового мяса. Нарежьте 12 г петрушки и посыпьте ею готовую индейку с овощами.",
+                    "uses": [
+                        "turkey-fillet",
+                        "parsley"
+                    ]
+                }
+            ],
+            "tips": [
+                "Не нарезайте кабачок слишком тонко, иначе он быстро размякнет.",
+                "Жарьте без крышки, чтобы лишняя жидкость испарялась.",
+                "Молодой кабачок можно готовить вместе с мягкой кожицей."
+            ],
+            "storageDays": 2,
+            "freezerDays": 0,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "turkey-fillet",
+            "needsSide": false,
+            "season": [
+                "spring",
+                "summer",
+                "autumn",
+                "winter"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Небольшие золотистые кусочки индейки смешаны с зелёными полукружиями кабачка, мягким луком и красными кусочками помидоров. Немного овощного сока на дне, сверху свежая петрушка."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "turkey-mushrooms-sour-cream",
+            "title": "Индейка с грибами в сметане",
+            "summary": "Мягкие полоски индейки и обжаренные шампиньоны в густой сметанной подливке. Простой сытный ужин, который хорошо сочетается с любым гарниром.",
+            "aliases": [
+                "Индейка с шампиньонами в сметане",
+                "Филе индейки с грибной подливкой"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 29,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "turkey-fillet",
+                    "name": "Филе грудки индейки",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "mushroom",
+                    "name": "Шампиньоны",
+                    "amount": 350,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана 15–20%",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Репчатый лук",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Пшеничная мука",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Молотая паприка",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте 600 г индейки тонкими полосками толщиной около 1 см. Нарежьте 350 г шампиньонов пластинками, а 120 г лука — мелкими кубиками. Измельчите 10 г петрушки.",
+                    "uses": [
+                        "turkey-fillet",
+                        "mushroom",
+                        "onion",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Смешайте 200 г сметаны 15–20% с 12 г пшеничной муки. Постепенно влейте 80 мл воды и тщательно размешайте, чтобы сметанная смесь стала однородной.",
+                    "uses": [
+                        "sour-cream",
+                        "wheat-flour",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Разогрейте 25 мл растительного масла в широкой сковороде. Выложите шампиньоны и жарьте 6 минут, пока большая часть жидкости не испарится. Добавьте лук и жарьте ещё 2 минуты, помешивая.",
+                    "uses": [
+                        "vegetable-oil",
+                        "mushroom",
+                        "onion"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Положите индейку и обжаривайте 7 минут, часто перемешивая, пока кусочки не станут светлыми со всех сторон. Добавьте 5 г соли, 1 г чёрного перца и 2 г молотой паприки, хорошо перемешайте.",
+                    "uses": [
+                        "turkey-fillet",
+                        "salt",
+                        "black-pepper",
+                        "paprika"
+                    ],
+                    "timerSeconds": 420
+                },
+                {
+                    "text": "Влейте сметанную смесь, накройте сковороду крышкой и готовьте 5 минут на слабом огне. Проверьте индейку: внутри мясо должно быть полностью светлым. Посыпьте измельчённой петрушкой и подавайте.",
+                    "uses": [
+                        "sour-cream",
+                        "wheat-flour",
+                        "water",
+                        "parsley"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Не накрывайте грибы крышкой во время обжаривания, чтобы испарилась лишняя влага.",
+                "Добавляйте сметану на слабом огне, иначе соус может свернуться.",
+                "К блюду подойдут гречка, рис или картофельное пюре."
+            ],
+            "storageDays": 2,
+            "freezerDays": 0,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "turkey-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Миска",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Светлые полоски индейки и коричневатые пластинки жареных шампиньонов покрыты густой кремовой сметанной подливкой. Видны мягкие кусочки лука и немного свежей петрушки."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chopped-chicken-cutlets-pan",
+            "title": "Куриные котлеты рубленые на сковороде",
+            "summary": "Сочные рубленые котлеты из мелко нарезанного куриного филе с яйцом, сметаной и зеленью. Без мясорубки и долгой подготовки.",
+            "aliases": [
+                "Рубленые котлеты из куриной грудки",
+                "Куриные котлеты кусочками",
+                "Куриные растрёпки"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 26,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо без скорлупы",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Пшеничная мука",
+                    "amount": 35,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана 15–20%",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley"
+                    ]
+                },
+                {
+                    "id": "paprika",
+                    "name": "Молотая паприка",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте 600 г куриного филе очень мелкими кубиками около 5 мм: чем мельче кусочки, тем лучше котлеты держат форму. Очистите и измельчите 10 г чеснока, мелко нарежьте 15 г укропа.",
+                    "uses": [
+                        "chicken-fillet",
+                        "garlic",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "Разбейте яйца в миску, отмерив около 110 г без скорлупы. Добавьте 60 г сметаны 15–20% и размешайте. Всыпьте 35 г муки, 5 г соли и 2 г паприки, добавьте чеснок и укроп, перемешайте до однородности.",
+                    "uses": [
+                        "egg",
+                        "sour-cream",
+                        "wheat-flour",
+                        "salt",
+                        "paprika",
+                        "garlic",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "Добавьте нарезанную курицу и хорошо перемешайте: масса должна получиться густой и держаться на ложке. Разогрейте 30 мл растительного масла в широкой сковороде на среднем огне.",
+                    "uses": [
+                        "chicken-fillet",
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Выложите ложкой половину приготовленной смеси, сформировав 4 плоские котлеты толщиной не больше 1 см. Жарьте 4 минуты до золотистой корочки снизу.",
+                    "uses": [
+                        "chicken-fillet",
+                        "egg",
+                        "wheat-flour",
+                        "sour-cream",
+                        "garlic",
+                        "dill",
+                        "paprika",
+                        "salt"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Аккуратно переверните первые 4 котлеты и жарьте ещё 4 минуты на среднем огне. За это время с другой стороны должна появиться румяная корочка.",
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Из оставшейся смеси сделайте ещё 4 котлеты и жарьте по 4 минуты с каждой стороны. Разрежьте самую толстую котлету: внутри курица должна быть полностью белой, без розовых участков.",
+                    "uses": [
+                        "chicken-fillet",
+                        "egg",
+                        "wheat-flour",
+                        "sour-cream",
+                        "garlic",
+                        "dill",
+                        "paprika",
+                        "salt"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Нарезайте курицу мелко, чтобы котлеты не распадались.",
+                "Не делайте котлеты толстыми, иначе середина будет готовиться дольше.",
+                "Переворачивайте котлеты только после появления корочки."
+            ],
+            "storageDays": 2,
+            "freezerDays": 30,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 8,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Сковорода 28 см",
+                "Миска",
+                "Нож",
+                "Разделочная доска",
+                "Столовая ложка",
+                "Лопатка"
+            ],
+            "look": "Восемь небольших плоских куриных котлет неправильной округлой формы. Снаружи золотистая румяная корочка, видны маленькие кусочки куриного мяса и зелень. В разрезе сочная светлая середина."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "asian-chicken-vegetables-egg-noodles",
+            "title": "Курица с овощами и лапшой по-азиатски",
+            "summary": "Пшеничная яичная лапша с кусочками курицы, морковью и сладким перцем в соевом соусе. Быстрое полноценное блюдо для ужина.",
+            "aliases": [
+                "Лапша с курицей и овощами",
+                "Жареная лапша с курицей на сковороде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 23,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg-noodles",
+                    "name": "Лапша яичная сухая",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "ramen-noodles"
+                    ]
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "zucchini"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Репчатый лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "ginger",
+                    "name": "Имбирь свежий",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "soy-sauce",
+                    "name": "Соевый соус",
+                    "amount": 60,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для варки лапши",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sesame-seed",
+                    "name": "Кунжут",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": true,
+                    "swap": [
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan",
+                "pot"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "fresh"
+            ],
+            "steps": [
+                {
+                    "text": "Налейте 1500 мл воды в кастрюлю, накройте крышкой и поставьте на сильный огонь. Нарежьте 500 г куриного филе тонкими полосками толщиной около 1 см.",
+                    "uses": [
+                        "water",
+                        "chicken-fillet"
+                    ]
+                },
+                {
+                    "text": "Нарежьте 200 г болгарского перца полосками, натрите 150 г моркови на крупной тёрке, нарежьте 100 г лука тонкими полукольцами. Очистите и мелко нарежьте 12 г чеснока и 10 г свежего имбиря.",
+                    "uses": [
+                        "bell-pepper",
+                        "carrot",
+                        "onion",
+                        "garlic",
+                        "ginger"
+                    ]
+                },
+                {
+                    "text": "Положите 250 г сухой яичной лапши в кипящую воду. Варите около 6 минут до мягкости, но не разваривайте. Откиньте на дуршлаг и не промывайте холодной водой.",
+                    "uses": [
+                        "egg-noodles",
+                        "water"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Разогрейте 25 мл растительного масла в широкой сковороде. Обжаривайте курицу 6 минут, периодически переворачивая. Добавьте лук, морковь и перец и жарьте 5 минут, часто перемешивая.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-fillet",
+                        "onion",
+                        "carrot",
+                        "bell-pepper"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Положите чеснок и имбирь, перемешивайте 1 минуту. Смешайте 60 мл соевого соуса с 12 г сахара и влейте в сковороду. Готовьте 2 минуты, перемешивая.",
+                    "uses": [
+                        "garlic",
+                        "ginger",
+                        "soy-sauce",
+                        "sugar"
+                    ],
+                    "timerSeconds": 120
+                },
+                {
+                    "text": "Добавьте готовую лапшу, перемешивайте и прогревайте 2 минуты, чтобы соус распределился. Проверьте курицу: внутри она должна быть полностью белой. Разложите по тарелкам и при желании посыпьте 10 г кунжута.",
+                    "uses": [
+                        "egg-noodles",
+                        "sesame-seed"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Лапшу лучше немного недоварить: она ещё прогреется на сковороде.",
+                "Если блюдо получается сухим, добавьте немного горячей воды.",
+                "Солить отдельно обычно не нужно: соевый соус уже солёный."
+            ],
+            "storageDays": 2,
+            "freezerDays": 0,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см",
+                "Кастрюля 2,5 л",
+                "Дуршлаг",
+                "Нож",
+                "Разделочная доска",
+                "Тёрка",
+                "Лопатка"
+            ],
+            "look": "Длинная яичная лапша золотистого цвета смешана с тонкими полосками курицы, оранжевой морковью, красным перцем и луком. Лапша слегка блестит от соевого соуса, сверху немного кунжута."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-liver-onion-sour-cream",
+            "title": "Куриная печень с луком в сметане",
+            "summary": "Мягкая куриная печень с золотистым луком в нежной сметанной подливке. Быстрый домашний ужин из доступных продуктов.",
+            "aliases": [
+                "Куриная печень в сметанном соусе",
+                "Печень куриная тушёная с луком"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 18,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-liver",
+                    "name": "Куриная печень очищенная",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Репчатый лук",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана 15–20%",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Пшеничная мука",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Осмотрите 600 г очищенной куриной печени и удалите оставшиеся плёнки и прожилки, если они есть. Крупные кусочки разрежьте пополам. Очистите 250 г лука и нарежьте тонкими полукольцами. Измельчите 10 г укропа.",
+                    "uses": [
+                        "chicken-liver",
+                        "onion",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "В отдельной миске смешайте 200 г сметаны 15–20% с 12 г пшеничной муки. Постепенно влейте 100 мл воды и тщательно размешайте сметанную смесь, чтобы не осталось комочков.",
+                    "uses": [
+                        "sour-cream",
+                        "wheat-flour",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Разогрейте 25 мл растительного масла в широкой сковороде. Добавьте нарезанный лук и жарьте 5 минут: он должен стать мягким и приобрести лёгкий золотистый цвет.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Выложите подготовленную печень к обжаренному луку в сковороду. Жарьте 5 минут на среднем огне, осторожно переворачивая кусочки печени.",
+                    "uses": [
+                        "chicken-liver"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте к печени 5 г соли и 1 г чёрного перца. Влейте подготовленную сметанную смесь и аккуратно перемешайте. Накройте сковороду крышкой и готовьте на слабом огне 6 минут, пока соус слегка не загустеет.",
+                    "uses": [
+                        "salt",
+                        "black-pepper",
+                        "sour-cream",
+                        "wheat-flour",
+                        "water"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Разрежьте самый крупный кусочек печени: внутри он должен быть полностью готовым, без сырой красной или розовой середины. Посыпьте печень измельчённым укропом и подавайте с готовым гарниром.",
+                    "uses": [
+                        "chicken-liver",
+                        "dill"
+                    ]
+                }
+            ],
+            "tips": [
+                "Не жарьте печень слишком долго на сильном огне, иначе она станет жёсткой.",
+                "Перед готовкой удалите зелёные участки печени, если они встречаются: они могут горчить.",
+                "Подавайте с картофельным пюре, гречкой или рисом."
+            ],
+            "storageDays": 2,
+            "freezerDays": 0,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-liver",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Миска",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Крупные мягкие кусочки куриной печени коричневатого цвета в светлой густой сметанной подливке. Между кусочками видны золотистые мягкие полукольца лука. Сверху немного свежего укропа."
+        }
+    ]
+}

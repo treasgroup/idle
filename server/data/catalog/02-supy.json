@@ -2131,19 +2131,29 @@
                     "id": "carrot",
                     "name": "Морковь",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "pumpkin"
+                    ]
                 },
                 {
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "leek",
+                        "red-onion"
+                    ]
                 },
                 {
                     "id": "butter",
                     "name": "Сливочное масло",
                     "amount": 25,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "vegetable-oil"
+                    ]
                 },
                 {
                     "id": "water",
@@ -2168,7 +2178,11 @@
                     "name": "Укроп для подачи",
                     "amount": 10,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 }
             ],
             "appliances": [
@@ -2279,7 +2293,12 @@
                     "id": "boiled-sausage",
                     "name": "Варёная колбаса",
                     "amount": 400,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "ham",
+                        "frankfurters",
+                        "smoked-pork"
+                    ]
                 },
                 {
                     "id": "potato",
@@ -2291,7 +2310,10 @@
                     "id": "egg",
                     "name": "Яйца для варки (масса без скорлупы)",
                     "amount": 220,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "quail-egg"
+                    ]
                 },
                 {
                     "id": "cucumber",
@@ -2309,13 +2331,20 @@
                     "id": "green-onion",
                     "name": "Зелёный лук",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "leek",
+                        "wild-garlic"
+                    ]
                 },
                 {
                     "id": "dill",
                     "name": "Укроп",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley"
+                    ]
                 },
                 {
                     "id": "water",

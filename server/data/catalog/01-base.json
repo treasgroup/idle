@@ -1195,7 +1195,11 @@
                     "id": "pasta",
                     "name": "Макароны с варкой до 10 минут",
                     "amount": 180,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "wheat-noodle",
+                        "egg-noodles"
+                    ]
                 },
                 {
                     "id": "spinach",
@@ -1207,19 +1211,29 @@
                     "id": "garlic",
                     "name": "Чеснок",
                     "amount": 2,
-                    "unit": "зубчика"
+                    "unit": "зубчика",
+                    "swap": [
+                        "wild-garlic"
+                    ]
                 },
                 {
                     "id": "lemon-juice",
                     "name": "Лимонный сок",
                     "amount": 15,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "lime-juice",
+                        "lemon"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 25,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1328,25 +1342,41 @@
                     "id": "egg",
                     "name": "Яйца",
                     "amount": 2,
-                    "unit": "шт."
+                    "unit": "шт.",
+                    "swap": [
+                        "quail-egg"
+                    ]
                 },
                 {
                     "id": "frozen-peas",
                     "name": "Замороженный зелёный горошек",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-peas",
+                        "canned-corn",
+                        "green-beans-frozen"
+                    ]
                 },
                 {
                     "id": "soy-sauce",
                     "name": "Соевый соус",
                     "amount": 20,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "dark-soy-sauce",
+                        "oyster-sauce"
+                    ]
                 },
                 {
                     "id": "green-onion",
                     "name": "Зелёный лук",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "leek",
+                        "wild-garlic"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -1737,19 +1767,31 @@
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 80,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 25,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 15,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -2154,25 +2196,41 @@
                     "id": "tomato",
                     "name": "Свежие помидоры",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "sun-dried-tomatoes"
+                    ]
                 },
                 {
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 60,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "evaporated-milk",
+                        "cream"
+                    ]
                 },
                 {
                     "id": "hard-cheese",
                     "name": "Твёрдый сыр",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "mozzarella",
+                        "processed-cheese",
+                        "pecorino-romano"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 10,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -2420,19 +2478,29 @@
                     "id": "egg",
                     "name": "Яйца",
                     "amount": 3,
-                    "unit": "шт."
+                    "unit": "шт.",
+                    "swap": [
+                        "quail-egg"
+                    ]
                 },
                 {
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 80,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 25,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -2693,19 +2761,29 @@
                     "id": "mushroom",
                     "name": "Шампиньоны",
                     "amount": 250,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "dried-porcini"
+                    ]
                 },
                 {
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 30,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -2824,7 +2902,11 @@
                     "id": "rice",
                     "name": "Длиннозёрный рис",
                     "amount": 140,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "short-grain-rice",
+                        "arborio-rice"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -2836,13 +2918,20 @@
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 80,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 20,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -3087,7 +3176,12 @@
                     "id": "bell-pepper",
                     "name": "Болгарский перец",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "zucchini",
+                        "green-beans-frozen",
+                        "broccoli"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -3099,13 +3193,20 @@
                     "id": "garlic",
                     "name": "Чеснок",
                     "amount": 2,
-                    "unit": "зубчика"
+                    "unit": "зубчика",
+                    "swap": [
+                        "wild-garlic"
+                    ]
                 },
                 {
                     "id": "soy-sauce",
                     "name": "Соевый соус",
                     "amount": 25,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "dark-soy-sauce",
+                        "oyster-sauce"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -3117,7 +3218,12 @@
                     "id": "chili",
                     "name": "Молотый перец чили",
                     "amount": 0.3,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "fresh-chili",
+                        "hot-pepper-sauce",
+                        "gochujang"
+                    ]
                 },
                 {
                     "id": "water",
@@ -3233,19 +3339,31 @@
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 60,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "leek",
+                        "red-onion"
+                    ]
                 },
                 {
                     "id": "wheat-noodle",
                     "name": "Пшеничная вермишель",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "egg-noodles",
+                        "pasta",
+                        "ramen-noodles"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 10,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -3852,7 +3970,11 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 350,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "evaporated-milk",
+                        "cream"
+                    ]
                 },
                 {
                     "id": "water",
@@ -3864,7 +3986,11 @@
                     "id": "apple",
                     "name": "Яблоко",
                     "amount": 180,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "pear",
+                        "plum"
+                    ]
                 },
                 {
                     "id": "sugar",
@@ -3876,7 +4002,10 @@
                     "id": "cinnamon",
                     "name": "Молотая корица",
                     "amount": 1,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cardamom-ground"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -3967,13 +4096,19 @@
                     "id": "egg",
                     "name": "Яйца",
                     "amount": 2,
-                    "unit": "шт."
+                    "unit": "шт.",
+                    "swap": [
+                        "quail-egg"
+                    ]
                 },
                 {
                     "id": "wheat-flour",
                     "name": "Пшеничная мука",
                     "amount": 60,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "strong-wheat-flour"
+                    ]
                 },
                 {
                     "id": "water",
@@ -3985,13 +4120,20 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 15,
-                    "unit": "мл"
+                    "unit": "мл",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "cinnamon",
                     "name": "Молотая корица",
                     "amount": 1,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cardamom-ground",
+                        "vanilla-sugar"
+                    ]
                 },
                 {
                     "id": "salt",
