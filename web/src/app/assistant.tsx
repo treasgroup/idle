@@ -20,7 +20,7 @@ import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
 let sounds: { n: number; book: ReturnType<typeof soundBook> } | null = null;
 function titleSounds() {
   const list = recipes();
-  if (!sounds || sounds.n !== list.length) sounds = { n: list.length, book: soundBook(list.map((r) => r.title), list.flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text)])) };
+  if (!sounds || sounds.n !== list.length) sounds = { n: list.length, book: soundBook(list.map((r) => r.title), list.flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text), ...(r.tips ?? [])])) };
   return sounds.book;
 }
 

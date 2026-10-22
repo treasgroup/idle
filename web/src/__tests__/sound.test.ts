@@ -8,14 +8,14 @@ beforeAll(() => useCatalog(buildCatalog(readdirSync(dir).filter((f) => f.endsWit
   .map((name) => ({ name, data: JSON.parse(readFileSync(new URL(name, dir), "utf8")) })))));
 
 test("dish names written as heard become the recipe words", () => {
-  const book = soundBook(recipes().map((r) => r.title), recipes().flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text)]));
+  const book = soundBook(recipes().map((r) => r.title), recipes().flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text), ...(r.tips ?? [])]));
   expect(fixBySound("Хочу хочопури", book)).toBe("Хочу хачапури");
   expect(fixBySound("пильмени на ужин", book)).toBe("пельмени на ужин");
   expect(fixBySound("хочу чибуреки", book)).toBe("хочу чебуреки");
 });
 
 test("ordinary requests stay as they are", () => {
-  const book = soundBook(recipes().map((r) => r.title), recipes().flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text)]));
+  const book = soundBook(recipes().map((r) => r.title), recipes().flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text), ...(r.tips ?? [])]));
   const asked = [
     "есть курица и картошка", "что приготовить на ужин быстро", "хочу что-нибудь сладкое", "нет духовки, есть фарш", "сколько варить гречку",
     "2 стакана муки это сколько грамм", "сколько запекать курицу 1,5 кг", "чем заменить сметану", "у меня диабет, что можно", "рецепт без мяса на 4 человека",
