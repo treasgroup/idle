@@ -23,9 +23,11 @@ interface Partner { id: string; label: string; note?: string }
 /** Spices and other pinches: most homes have them, so they are checked at home rather than bought. */
 const isPinch = (i: ShoppingItem) => (i.unit === "г" || i.unit === "мл") && i.amount > 0 && i.amount < 5;
 const products = (n: number) => n + " " + plural(n, "продукт", "продукта", "продуктов");
+/** Dishes named in «Для блюд» before «Ещё N». */
+const SHOWN = 3;
 
 export function Shopping() {
-  const { s, update, toast, online, clearToast } = useStore();
+  const { s, update, toast, online, clearToast, catalog } = useStore();
   // «Продукты на неделю — в списке покупок · Открыть» has done its job once the list is open: it must not cover it.
   useEffect(() => clearToast(), [clearToast]);
   const [adding, setAdding] = useState(false);
@@ -33,6 +35,7 @@ export function Shopping() {
   const [clear, setClear] = useState(false);
   const [more, setMore] = useState<ShoppingItem | null>(null);
   const [dish, setDish] = useState<ListDish | null>(null);
+  const [allDishes, setAllDishes] = useState(false);
   const { openRecipe } = useActions();
   const [showPinch, setShowPinch] = useState(false);
   const [showBought, setShowBought] = useState(false);
@@ -48,7 +51,8 @@ export function Shopping() {
   const groups = useMemo(() => groupShopping(toBuy.filter((i) => !isPinch(i))), [s.shopping]); // eslint-disable-line react-hooks/exhaustive-deps
   const pinches = toBuy.filter(isPinch);
   // «Для блюд»: back to a recipe the list was filled from, by its name rather than from memory.
-  const dishes = useMemo(() => dishesInList(s.shopping), [s.shopping]);
+  // Recomputed when the catalog arrives: on a fresh start the list is there before the recipes are.
+  const dishes = useMemo(() => dishesInList(s.shopping), [s.shopping, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const bought = s.shopping.filter((i) => i.checked);
   const set = (fn: (l: ShoppingItem[]) => ShoppingItem[]) => update((st) => ({ ...st, shopping: fn(st.shopping) }));
   const toggle = (key: string) => {
@@ -136,11 +140,17 @@ export function Shopping() {
         <div className="mt-4">
           <p className="label mb-2">Для блюд</p>
           <div className="flex flex-wrap gap-2">
-            {dishes.map((d) => (
+            {/* Three at most: a week plan brings 7–14 dishes, and the list itself must stay near the top. */}
+            {dishes.slice(0, SHOWN).map((d) => (
               <button key={d.id} className="chip h-9 max-w-full" onClick={() => setDish(d)}>
                 <span className="truncate">{d.title}</span><ChevronRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
               </button>
             ))}
+            {dishes.length > SHOWN && (
+              <button className="chip h-9 font-semibold" onClick={() => setAllDishes(true)}>
+                Ещё {dishes.length - SHOWN}<ChevronRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -213,11 +223,24 @@ export function Shopping() {
           <button className="btn-ghost" onClick={() => setClear(false)}>Отмена</button>
         </div>
       </Sheet>
+      <Sheet open={allDishes && !dish} title={"Для блюд · " + dishes.length} onClose={() => setAllDishes(false)}>
+        <ul className="card divide-y divide-line">
+          {dishes.map((d) => (
+            <li key={d.id}>
+              <button className="flex min-h-[52px] w-full items-center gap-2 px-4 py-2 text-left" onClick={() => setDish(d)}>
+                <span className="min-w-0 flex-1 text-body-sm">{d.title}</span>
+                <span className="shrink-0 text-caption text-ink-soft">{products(d.rows)}</span>
+                <ChevronRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
+              </button>
+            </li>
+          ))}
+        </ul>
+      </Sheet>
       <Sheet open={!!dish} title={dish?.title ?? ""} onClose={() => setDish(null)}>
         {dish && (
           <div className="grid gap-2">
             <p className="mb-1 text-small text-ink-soft">В списке {products(dish.rows)} для этого блюда.</p>
-            <button className="btn-outline justify-start" onClick={() => { const id = dish.id; setDish(null); openRecipe(id); }}><BookOpen size={18} />Открыть рецепт</button>
+            <button className="btn-outline justify-start" onClick={() => { const id = dish.id; setDish(null); setAllDishes(false); openRecipe(id); }}><BookOpen size={18} />Открыть рецепт</button>
             <button className="btn-outline justify-start text-brand" onClick={() => { const d = dish; withUndo("Продукты блюда убраны из списка", (l) => removeDish(l, d)); setDish(null); }}><Trash2 size={18} />Убрать его продукты из списка</button>
           </div>
         )}
