@@ -9,6 +9,7 @@ import {
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { homeAmount, mergeSame } from "../app/amounts";
+import { answerFromRecipe } from "../app/recipeAsk";
 import { ChefAvatar, Chip, Sheet } from "./ui";
 
 export interface AskRequest { text: string; key: number }
@@ -80,7 +81,7 @@ export function AskSheet({ open, onClose, recipe, servings, prefs, onServings, r
     run: () => { a.opened(recipe.id, servings); void a.ask(q, { fresh: false }); goChat(); },
   });
 
-  const answer = (q: string): Omit<Msg, "id" | "role"> => {
+  const answer = (q: string, previous?: string): Omit<Msg, "id" | "role"> => {
     // «На 6 порций?» — the list right here, and a button to switch the page to it.
     const want = q.match(/на\s+(\d{1,2})\s*(порц|человек|персон|гост|едок)/i);
     if (want) {
@@ -110,6 +111,9 @@ export function AskSheet({ open, onClose, recipe, servings, prefs, onServings, r
         action: { label: "Подобрать без духовки", icon: <Search size={18} />, run: () => { void a.ask(main + "без духовки", { fresh: true }); goChat(); } },
       };
     }
+    // This recipe's own steps and products first: «сколько варить фрикадельки» is step 5 here, not a general note on cutlets.
+    const mine = answerFromRecipe(q, recipe, previous);
+    if (mine) return { text: mine.text, action: mine.search ? { label: "Подобрать похожее", icon: <Search size={18} />, run: () => { void a.ask(mine.search!, { fresh: true }); goChat(); } } : undefined };
     const own = answerRecipeQuestion(q, [recipe], servings) ?? answerKitchenQuestion(q, true);
     if (own) return { text: own.text };
     return { text: "Точного ответа у меня здесь нет. В общем чате разберу вопрос подробнее и подберу варианты.", action: toChat(q) };
@@ -119,11 +123,12 @@ export function AskSheet({ open, onClose, recipe, servings, prefs, onServings, r
     const q = raw.trim();
     if (!q || busy) return;
     setText("");
+    const previous = [...msgs].reverse().find((m) => m.role === "user")?.text;
     setMsgs((m) => [...m, { id: ++seq.current, role: "user", text: q }]);
     setBusy(true);
     // A short pause, so the answer does not flash in before the question has settled.
     window.setTimeout(() => {
-      setMsgs((m) => [...m, { id: ++seq.current, role: "chef", ...answer(q) }]);
+      setMsgs((m) => [...m, { id: ++seq.current, role: "chef", ...answer(q, previous) }]);
       setBusy(false);
     }, 450);
   };

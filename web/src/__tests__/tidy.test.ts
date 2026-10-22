@@ -24,6 +24,10 @@ describe("tidyRecipe", () => {
     expect(r.steps[1].text).not.toMatch(/°C/);
     expect(r.steps[1].text).toMatch(/без розового/);
   });
+  it("takes «с температурой» away with the degrees", () => {
+    const r = tidyRecipe(base({ title: "Суп с фрикадельками", steps: [{ text: "Нарежьте." }, { text: "Варите ещё 5 минут. Фрикадельки должны стать полностью готовыми, с температурой в центре не ниже 72 °C." }] }));
+    expect(r.steps[1].text).toBe("Варите ещё 5 минут. Фрикадельки должны стать полностью готовыми, пока внутри не исчезнет розовый цвет.");
+  });
   it("drops an optional thermometer after a check that is already there", () => {
     const r = tidyRecipe(base({ steps: [{ text: "Мякоть должна быть белой, без розовой середины. При наличии термометра проверьте температуру внутри — 75 °C." }, { text: "Тушите 5 минут." }] }));
     expect(r.steps[0].text).toBe("Мякоть должна быть белой, без розовой середины.");
