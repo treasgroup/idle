@@ -7,13 +7,14 @@ import {
   Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon, Users, Soup } from "lucide-react";
 import {
   LABELS, basics, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
-  recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide, yieldText,
+  recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide,
   type Recipe, type RecipeIngredient,
 } from "../engine";
 import { useStore } from "../app/store";
 import { signal } from "../app/personal";
 import { useActions, haveIds } from "../app/actions";
 import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
+import { yieldLine } from "../app/yieldLine";
 import { printPage } from "../app/print";
 import { useHint } from "../app/hints";
 import { PAN_CHOICES, area, panOf, panText, type Pan } from "../app/pan";
@@ -360,7 +361,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <h2 className="text-h2">Продукты</h2>
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
-                {(!!base.yields || haveHint || atLeast) && <p className="-mt-2 mb-3 text-small text-ink-soft">{atLeast && "Меньше чем на " + base.minServings + " " + plural(base.minServings, "человека", "человека", "человек") + " не приготовить — останется на завтра. "}{base.yields ? ("Получится " + yieldText(base, servings).replace(/^≈\s*/, "около ")).replace(/\.?$/, ". ") : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
+                {(!!base.yields || haveHint || atLeast) && <p className="-mt-2 mb-3 text-small text-ink-soft">{atLeast && "Меньше чем на " + base.minServings + " " + plural(base.minServings, "человека", "человека", "человек") + " не приготовить — останется на завтра. "}{base.yields ? yieldLine(base, servings) + " " : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
                 <HaveBar owned={owned} total={needed.length} missing={missing} marked={marked} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (
