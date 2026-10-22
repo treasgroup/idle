@@ -473,9 +473,6 @@ function BottomBar({ children, listening }: { children: ReactNode; listening: { 
       )}
       <div className={cx("mx-auto px-4 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 sm:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-12 lg:px-8", WIDTH)}>
         <div className="flex gap-2">{children}</div>
-        <p className="hidden items-center gap-2 text-caption text-ink-faint lg:flex">
-          <kbd className="rounded-md border border-line bg-card px-1.5 font-sans">←</kbd><kbd className="rounded-md border border-line bg-card px-1.5 font-sans">→</kbd>листают шаги
-        </p>
       </div>
     </div>
   );
