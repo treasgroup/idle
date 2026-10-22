@@ -1,6 +1,6 @@
-// «Рецепты → Фото»: the recipes without a photo one at a time — copy the prompt, make the picture in an image
-// generator, copy it there and press Ctrl+V here (or drop / choose a file): it goes up as JPEG and the next recipe
-// opens. The ones people open most go first. The prompt is the same as on the recipe's own page (the older panel).
+// «Рецепты → Фото»: the recipes without a photo in numbered batches of 5–10 — copy each prompt into its own chat of
+// an image generator; when a picture is ready, copy it, click the card with the same number and press Ctrl+V (or drop
+// a file on the card): it goes up as JPEG and Ctrl+V moves on to the next empty card. The ones people open most go first. The prompt is the same as on the recipe's own page (the older panel).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { buildCatalog, matchesDish, recipes, useCatalog, type Recipe } from "../engine";
 import { get, post, upload } from "./api";
@@ -69,17 +69,24 @@ function imageOf(list: DataTransferItemList | FileList | null | undefined): File
   return null;
 }
 
+type Busy = Record<string, boolean>;
+
 export function Photos() {
   const [photos, setPhotos] = useState<Record<string, number> | null>(null);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
   const [opens, setOpens] = useState<Record<string, number>>({});
   const [order, setOrder] = useState<Order>("popular");
-  const [skipped, setSkipped] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
+  const [size, setSize] = useState(10);
+  // The batch on screen: fixed ids, so the cards keep their numbers (card 3 ↔ chat 3) while photos come in.
+  const [batch, setBatch] = useState<string[]>([]);
+  const [active, setActive] = useState<string | null>(null);
+  const [copied, setCopied] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState<Busy>({});
+  const [local, setLocal] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
-  const [last, setLast] = useState<{ id: string; title: string; url: string } | null>(null);
-  const [over, setOver] = useState(false);
+  const [over, setOver] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const pickFor = useRef<string | null>(null);
 
   useEffect(() => {
     get<CatalogAnswer>("catalog").then((cat) => {
@@ -91,59 +98,83 @@ export function Photos() {
   }, []);
 
   const all = useMemo(() => (photos ? recipes().filter((r) => !hidden.has(r.id)) : []), [photos, hidden]);
+  const byId = useMemo(() => new Map(all.map((r) => [r.id, r])), [all]);
   const queue = useMemo(() => {
     if (!photos) return [];
     const list = all.map((r, i) => ({ r, i })).filter(({ r }) => !photos[r.id]);
     list.sort((a, b) => order === "abc" ? a.r.title.localeCompare(b.r.title, "ru")
       : order === "new" ? b.i - a.i
       : (opens[b.r.id] ?? 0) - (opens[a.r.id] ?? 0) || a.i - b.i);
-    // «Пропустить» moves a recipe to the end, not away.
-    const later = new Set(skipped);
-    return [...list.filter((x) => !later.has(x.r.id)), ...skipped.map((id) => list.find((x) => x.r.id === id)).filter((x): x is { r: Recipe; i: number } => !!x)].map((x) => x.r);
-  }, [all, photos, order, opens, skipped]);
-  const cur = queue[0] ?? null;
-  const prompt = cur ? recipePrompt(cur) : "";
+    return list.map((x) => x.r);
+  }, [all, photos, order, opens]);
+
+  // A new batch: the next recipes of the queue that are not on screen yet.
+  const nextBatch = useCallback((n = size, skip: string[] = []) => {
+    const out = queue.filter((r) => !skip.includes(r.id)).slice(0, n).map((r) => r.id);
+    setBatch(out); setActive(out[0] ?? null); setCopied(new Set()); setLocal({}); setMsg({});
+  }, [queue, size]);
+  // The first batch once the catalog is here, and a new one when the order or size changes.
+  const ready = !!photos && all.length > 0;
+  useEffect(() => { if (ready) nextBatch(); }, [ready, order, size, Object.keys(opens).length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const cards = batch.map((id) => byId.get(id)).filter((r): r is Recipe => !!r);
+  const done = cards.filter((r) => photos?.[r.id]).length;
   const dayStart = new Date().setHours(0, 0, 0, 0) / 1000;
   const today = photos ? Object.values(photos).filter((v) => v >= dayStart).length : 0;
   const withPhoto = all.length - queue.length;
 
-  const copy = (text: string, what: string) => navigator.clipboard.writeText(text).then(() => setMsg({ ok: what + " скопирован" }), () => setMsg({ err: "Не получилось скопировать — выделите текст вручную" }));
+  const copy = (r: Recipe) => navigator.clipboard.writeText(recipePrompt(r)).then(
+    () => { setCopied((s) => new Set(s).add(r.id)); setActive((a) => a ?? r.id); setMsg({ ok: "Промпт №" + (batch.indexOf(r.id) + 1) + " скопирован" }); },
+    () => setMsg({ err: "Не получилось скопировать — выделите текст вручную" }));
 
-  const send = useCallback(async (file: File | Blob | null) => {
-    if (!file || !cur || busy) return;
-    setBusy(true); setMsg({});
+  const send = useCallback(async (id: string | null, file: File | Blob | null) => {
+    if (!file || !id || busy[id]) return;
+    const r = byId.get(id);
+    if (!r) return;
+    setBusy((b) => ({ ...b, [id]: true })); setMsg({});
     try {
       const jpeg = await toJpeg(file);
-      const form = new FormData(); form.append("recipeId", cur.id); form.append("photo", jpeg, cur.id + ".jpg");
+      const form = new FormData(); form.append("recipeId", id); form.append("photo", jpeg, id + ".jpg");
       const j = await upload<{ saved: boolean; version: number }>("admin.photo.upload", form);
-      setPhotos((p) => ({ ...(p ?? {}), [cur.id]: j.version }));
-      setSkipped((s) => s.filter((id) => id !== cur.id));
-      setLast({ id: cur.id, title: cur.title, url: URL.createObjectURL(jpeg) });
-      setMsg({ ok: "Фото сохранено — следующий рецепт" });
+      setPhotos((p) => ({ ...(p ?? {}), [id]: j.version }));
+      setLocal((l) => ({ ...l, [id]: URL.createObjectURL(jpeg) }));
+      setMsg({ ok: "№" + (batch.indexOf(id) + 1) + " «" + r.title + "» — фото сохранено" });
+      // The next card of the batch still without a photo becomes the one Ctrl+V goes to.
+      const k = batch.indexOf(id);
+      const next = [...batch.slice(k + 1), ...batch.slice(0, k)].find((x) => x !== id && !photos?.[x]);
+      setActive(next ?? null);
     } catch (e) {
-      setMsg({ err: (e as Error).message || "Фото не загрузилось" });
-    } finally { setBusy(false); }
-  }, [cur, busy]);
+      setMsg({ err: "№" + (batch.indexOf(id) + 1) + ": " + ((e as Error).message || "фото не загрузилось") });
+    } finally { setBusy((b) => ({ ...b, [id]: false })); }
+  }, [busy, byId, batch, photos]);
 
-  // Ctrl+V anywhere on the tab (not inside a text field).
+  // Ctrl+V anywhere on the tab goes to the chosen card (not inside a text field).
   useEffect(() => {
     const onPaste = (e: ClipboardEvent) => {
       const t = e.target as HTMLElement | null;
       if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
       const f = imageOf(e.clipboardData?.items);
-      if (f) { e.preventDefault(); void send(f); }
-      else if (e.clipboardData?.types.includes("text/plain")) setMsg({ err: "В буфере текст, а не картинка: скопируйте саму картинку (правой кнопкой → «Копировать изображение»)" });
+      if (!f) { if (e.clipboardData?.types.includes("text/plain")) setMsg({ err: "В буфере текст, а не картинка: скопируйте саму картинку (правой кнопкой → «Копировать изображение»)" }); return; }
+      e.preventDefault();
+      if (!active) { setMsg({ err: "Сначала нажмите на карточку рецепта, к которому эта картинка" }); return; }
+      void send(active, f);
     };
     window.addEventListener("paste", onPaste);
     return () => window.removeEventListener("paste", onPaste);
-  }, [send]);
+  }, [send, active]);
 
-  const undo = () => {
-    if (!last) return;
-    post("admin.photo.delete", { recipeId: last.id }).then(() => {
-      setPhotos((p) => { const n = { ...(p ?? {}) }; delete n[last.id]; return n; });
-      setMsg({ ok: "Фото «" + last.title + "» удалено — рецепт снова в очереди" }); setLast(null);
+  const remove = (r: Recipe) => {
+    post("admin.photo.delete", { recipeId: r.id }).then(() => {
+      setPhotos((p) => { const n = { ...(p ?? {}) }; delete n[r.id]; return n; });
+      setLocal((l) => { const n = { ...l }; delete n[r.id]; return n; });
+      setActive(r.id); setMsg({ ok: "Фото «" + r.title + "» удалено — вставьте другое" });
     }, (e) => setMsg({ err: (e as Error).message }));
+  };
+  const swap = (r: Recipe) => {
+    // «Пропустить»: this card takes the next recipe of the queue that is not on screen.
+    const fresh = queue.find((q) => !batch.includes(q.id));
+    setBatch((b) => b.map((x) => (x === r.id ? fresh?.id : x)).filter((x): x is string => !!x));
+    if (active === r.id) setActive(fresh?.id ?? null);
   };
 
   if (!photos) return <div className="adm-card"><p className="adm-muted">{msg.err ?? "Загружаю каталог…"}</p></div>;
@@ -151,63 +182,72 @@ export function Photos() {
     <div className="adm-card">
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
         <div><b>Без фото: {queue.length} из {all.length}</b>{today > 0 && <span className="adm-muted"> · сегодня добавлено {today}</span>}</div>
-        <label className="adm-muted">Сначала:{" "}
-          <select value={order} onChange={(e) => setOrder(e.target.value as Order)} style={{ height: 32, borderRadius: 8, border: "1px solid #d8d0c4", padding: "0 6px" }}>
-            <option value="popular">те, что чаще открывают</option><option value="new">новые</option><option value="abc">по алфавиту</option>
-          </select>
-        </label>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+          <label className="adm-muted">По{" "}
+            <select value={size} onChange={(e) => setSize(Number(e.target.value))} style={{ height: 32, borderRadius: 8, border: "1px solid #d8d0c4", padding: "0 6px" }}>
+              {[1, 3, 5, 10, 15].map((n) => <option key={n} value={n}>{n}</option>)}
+            </select>
+          </label>
+          <label className="adm-muted">Сначала:{" "}
+            <select value={order} onChange={(e) => setOrder(e.target.value as Order)} style={{ height: 32, borderRadius: 8, border: "1px solid #d8d0c4", padding: "0 6px" }}>
+              <option value="popular">те, что чаще открывают</option><option value="new">новые</option><option value="abc">по алфавиту</option>
+            </select>
+          </label>
+        </div>
       </div>
       <div style={{ height: 8, borderRadius: 8, background: "#efe7da", overflow: "hidden", margin: "8px 0 4px" }}>
         <div style={{ height: "100%", width: (all.length ? Math.round((withPhoto / all.length) * 100) : 0) + "%", background: "#3f7a4f" }} />
       </div>
+      <p className="adm-muted" style={{ margin: "8px 0 0", fontSize: 14 }}>
+        Скопируйте промпты по номерам в разные чаты. Когда картинка готова — скопируйте её, нажмите на карточку с тем же номером и <kbd>Ctrl</kbd> + <kbd>V</kbd> (или перетащите файл на карточку).
+        {" "}<button className={BTN_SM} onClick={() => void navigator.clipboard.writeText(NEGATIVE).then(() => setMsg({ ok: "«Чего не должно быть» скопировано" }))}>«Чего не должно быть»</button>
+      </p>
 
-      {!cur ? <p style={{ fontSize: 18, marginTop: 20 }}>🎉 У всех рецептов есть фото.</p> : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 18, marginTop: 14 }}>
-          <div>
-            <div className="adm-muted" style={{ fontSize: 13 }}>{opens[cur.id] ? "Открывали " + opens[cur.id] + " раз за месяц" : "За месяц не открывали"}</div>
-            <h2 style={{ fontSize: 22, margin: "2px 0 8px" }}>{cur.title}</h2>
-            <p style={{ background: "#f5f0e7", borderRadius: 10, padding: "12px 14px", fontSize: 14, lineHeight: 1.55, margin: "0 0 10px" }}>{prompt}</p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className={BTN} onClick={() => void copy(prompt, "Промпт")}>Скопировать промпт</button>
-              <button className={BTN_OUTLINE} onClick={() => void copy(NEGATIVE, "Список «чего не должно быть»")}>«Чего не должно быть»</button>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
-              <button className={BTN_SM} onClick={() => { setSkipped((s) => [...s.filter((id) => id !== cur.id), cur.id]); setMsg({}); }}>Пропустить</button>
-              <a className={BTN_SM} href={"../#/r/" + encodeURIComponent(cur.id)} target="_blank" rel="noreferrer">Открыть рецепт ↗</a>
-            </div>
-          </div>
-          <div
-            role="button" tabIndex={0} aria-label="Вставить или выбрать картинку"
-            onClick={() => fileInput.current?.click()}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInput.current?.click(); }}
-            onDragOver={(e) => { e.preventDefault(); setOver(true); }}
-            onDragLeave={() => setOver(false)}
-            onDrop={(e) => { e.preventDefault(); setOver(false); void send(imageOf(e.dataTransfer.files) ?? imageOf(e.dataTransfer.items)); }}
-            style={{ border: "2px dashed " + (over ? "#B7432F" : "#d3c4ae"), background: over ? "#fbefe9" : "#fffdf9", borderRadius: 14, minHeight: 250, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", gap: 8, padding: 18, cursor: "pointer", color: "#6b6560" }}>
-            {busy ? <b style={{ color: "#211D1A", fontSize: 17 }}>Загружаю…</b> : <>
-              <div style={{ fontSize: 34 }} aria-hidden>🖼️</div>
-              <b style={{ color: "#211D1A", fontSize: 17 }}>Вставьте картинку сюда</b>
-              <span>Скопируйте картинку в нейросети и нажмите <kbd>Ctrl</kbd> + <kbd>V</kbd><br />— или перетащите файл, или нажмите, чтобы выбрать</span>
-              <span style={{ fontSize: 13 }}>Сразу загрузится и откроется следующий рецепт</span>
-            </>}
-            <input ref={fileInput} type="file" accept="image/*" hidden onChange={(e) => { void send(imageOf(e.target.files)); e.target.value = ""; }} />
-          </div>
+      {(msg.ok || msg.err) && <p className={msg.err ? "cx-err" : "cx-saved"} style={{ margin: "10px 0 0" }}>{msg.err ?? "✓ " + msg.ok}</p>}
+
+      {!queue.length && !cards.length ? <p style={{ fontSize: 18, marginTop: 20 }}>🎉 У всех рецептов есть фото.</p> : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12, marginTop: 14 }}>
+          {cards.map((r, i) => {
+            const has = !!photos[r.id], on = active === r.id && !has, up = !!busy[r.id];
+            const src = local[r.id] ?? (has ? "../photos/" + r.id + ".jpg?v=" + photos[r.id] : "");
+            return (
+              <div key={r.id}
+                onClick={() => !has && setActive(r.id)}
+                onDragOver={(e) => { e.preventDefault(); setOver(r.id); }}
+                onDragLeave={() => setOver((o) => (o === r.id ? null : o))}
+                onDrop={(e) => { e.preventDefault(); setOver(null); void send(r.id, imageOf(e.dataTransfer.files) ?? imageOf(e.dataTransfer.items)); }}
+                style={{ border: "2px solid " + (over === r.id || on ? "#B7432F" : has ? "#bcd8c2" : "#eee7dc"), background: on ? "#fbefe9" : has ? "#f3f8f4" : "#fff", borderRadius: 12, padding: 10, cursor: has ? "default" : "pointer", display: "flex", flexDirection: "column", gap: 8 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                  <span style={{ flex: "none", width: 26, height: 26, borderRadius: 999, background: has ? "#3f7a4f" : "#211D1A", color: "#fff", display: "grid", placeItems: "center", fontWeight: 700, fontSize: 13 }}>{has ? "✓" : i + 1}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <b style={{ fontSize: 14, lineHeight: 1.3, display: "block" }}>{r.title}</b>
+                    <span className="adm-muted" style={{ fontSize: 12 }}>{opens[r.id] ? "открывали " + opens[r.id] + " раз за месяц" : "за месяц не открывали"}</span>
+                  </div>
+                </div>
+                <div style={{ aspectRatio: "4 / 3", borderRadius: 8, overflow: "hidden", background: "#f5f0e7", display: "grid", placeItems: "center", textAlign: "center", color: "#6b6560", fontSize: 13, padding: src ? 0 : 8 }}>
+                  {up ? <b style={{ color: "#211D1A" }}>Загружаю…</b>
+                    : src ? <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    : on ? <span><b style={{ color: "#B7432F" }}>Ctrl + V</b><br />вставит картинку сюда</span>
+                    : <span>Нажмите, чтобы вставить сюда,<br />или перетащите файл</span>}
+                </div>
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }} onClick={(e) => e.stopPropagation()}>
+                  {has ? <button className={BTN_SM} onClick={() => remove(r)}>Не то — удалить</button> : <>
+                    <button className={copied.has(r.id) ? BTN_SM : BTN + " h-8 px-3"} onClick={() => void copy(r)}>{copied.has(r.id) ? "✓ Промпт" : "Промпт"}</button>
+                    <button className={BTN_SM} title="Выбрать файл на компьютере" onClick={() => { pickFor.current = r.id; fileInput.current?.click(); }}>Файл</button>
+                    <button className={BTN_SM} title="Заменить другим рецептом из очереди" onClick={() => swap(r)}>Пропустить</button>
+                  </>}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
+      <input ref={fileInput} type="file" accept="image/*" hidden onChange={(e) => { void send(pickFor.current, imageOf(e.target.files)); e.target.value = ""; }} />
 
-      {(msg.ok || msg.err) && <p className={msg.err ? "cx-err" : "cx-saved"} style={{ margin: "12px 0 0" }}>{msg.err ?? "✓ " + msg.ok}</p>}
-      {last && (
-        <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 12, padding: 8, border: "1px solid #eee7dc", borderRadius: 10 }}>
-          <img src={last.url} alt="" style={{ width: 72, height: 54, objectFit: "cover", borderRadius: 6 }} />
-          <span style={{ flex: 1, fontSize: 14 }}>Только что: <b>{last.title}</b></span>
-          <button className={BTN_SM} onClick={undo}>Не то фото — удалить</button>
-        </div>
-      )}
-      {cur && queue.length > 1 && (
-        <div style={{ display: "flex", gap: 8, marginTop: 14, overflow: "hidden", flexWrap: "wrap" }}>
-          <span className="adm-muted" style={{ fontSize: 13, alignSelf: "center" }}>Дальше:</span>
-          {queue.slice(1, 6).map((r) => <span key={r.id} style={{ border: "1px solid #eee7dc", borderRadius: 9, padding: "4px 10px", fontSize: 13, color: "#6b6560", background: "#fff" }}>{r.title}</span>)}
-          {queue.length > 6 && <span className="adm-muted" style={{ fontSize: 13, alignSelf: "center" }}>…ещё {queue.length - 6}</span>}
+      {cards.length > 0 && (
+        <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 14, flexWrap: "wrap" }}>
+          <button className={done === cards.length ? BTN : BTN_OUTLINE} onClick={() => nextBatch(size, batch)}>Следующие {size}</button>
+          <span className="adm-muted" style={{ fontSize: 14 }}>В этой пачке готово {done} из {cards.length}{done < cards.length ? " — остальные останутся в очереди" : ""}</span>
         </div>
       )}
     </div>
