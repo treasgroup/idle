@@ -2,7 +2,8 @@
 // Owner's admin panel: login, anonymous statistics, catalog files, hidden recipes, photos.
 // Compatible with PHP 7.4+. All admin routes need the admin cookie; changes also need a same-origin request.
 
-const EVENT_TYPES = ['visit', 'query', 'open', 'cart', 'favorite', 'cook_start', 'cook_done', 'wrong', 'share', 'rate', 'trouble', 'pick'];
+// 'search': a query typed in «Поиск» (value = how many it found); Шеф's questions stay 'query'.
+const EVENT_TYPES = ['visit', 'query', 'open', 'cart', 'favorite', 'cook_start', 'cook_done', 'wrong', 'share', 'rate', 'trouble', 'pick', 'search'];
 const EVENT_SOURCES = ['chat', 'voice', 'search', 'filters', 'option', 'mobile', 'desktop', 'pwa', 'app', 'home', ''];
 // Where a recipe was opened (app/openFrom.ts): a place on Главная or the screen. For «Откуда открывают» in the admin.
 const OPEN_SOURCES = ['hero', 'today', 'holiday', 'season', 'collections', 'pick', 'recent', 'home', 'chat', 'recipes', 'favorites', 'menu', 'shopping', 'pantry', 'learn', 'profile', 'cook', 'dinner'];
@@ -59,7 +60,7 @@ function record_events(array $body): void {
             $recipe = isset($e['recipeId']) && is_string($e['recipeId']) && strlen($e['recipeId']) <= 60 && preg_match(RECIPE_ID, $e['recipeId']) ? $e['recipeId'] : null;
             $text = isset($e['text']) && is_string($e['text']) ? cut($e['text'], 300) : null;
             if ($e['type'] === 'trouble' && $text !== null) $text = cut($text, 60); // a chosen reason, not a story
-            if ($e['type'] === 'query' && ($text === null || $text === '')) continue;
+            if (($e['type'] === 'query' || $e['type'] === 'search') && ($text === null || $text === '')) continue;
             $value = isset($e['count']) && is_int($e['count']) ? max(-1, min(9999, $e['count'])) : null; // -1 = the request was not understood
             $source = in_array($e['source'] ?? '', $e['type'] === 'open' ? OPEN_SOURCES : EVENT_SOURCES, true) ? (string)($e['source'] ?? '') : '';
             // A visit says where it came from and what it opened first (short keys, checked here).
@@ -71,6 +72,25 @@ function record_events(array $body): void {
     } catch (Throwable $err) { if ($pdo->inTransaction()) $pdo->exec('ROLLBACK'); throw $err; }
     if (mt_rand(1, 200) === 1) cleanup();
     send_json(['saved' => true]);
+}
+
+// «Статистика → Что ищут»: what people looked for and did not find — typed in «Поиск» (found nothing) and asked of
+// Шеф (no such recipe: value 0; not understood: -1). Buttons of the chat and «где мой план» questions are left out.
+function admin_searches(int $days): void {
+    $days = max(1, min(365, $days));
+    $from = date('Y-m-d', time() - ($days - 1) * 86400);
+    $st = db()->prepare("SELECT norm, MAX(text) AS text, COUNT(*) AS n, COUNT(DISTINCT visitor) AS people, MAX(ts) AS last,
+        SUM(type = 'search') AS search, SUM(type = 'query') AS chat, MIN(value) AS worst
+        FROM events WHERE day >= ? AND norm IS NOT NULL AND norm <> '' AND value <= 0
+          AND ((type = 'search') OR (type = 'query' AND source NOT IN ('option', 'nav')))
+        GROUP BY norm ORDER BY people DESC, n DESC, last DESC LIMIT 300");
+    $st->execute([$from]);
+    $rows = array_map(fn($r) => ['text' => (string)$r['text'], 'n' => (int)$r['n'], 'people' => (int)$r['people'], 'last' => (int)$r['last'],
+        'search' => (int)$r['search'], 'chat' => (int)$r['chat'], 'unclear' => (int)$r['worst'] === -1 && (int)$r['search'] === 0], $st->fetchAll(PDO::FETCH_ASSOC));
+    $all = db()->prepare("SELECT SUM(type = 'search') AS search, SUM(type = 'query') AS chat FROM events WHERE day >= ? AND type IN ('search', 'query')");
+    $all->execute([$from]);
+    $t = $all->fetch(PDO::FETCH_ASSOC) ?: [];
+    send_json(['rows' => $rows, 'total' => ['search' => (int)($t['search'] ?? 0), 'chat' => (int)($t['chat'] ?? 0)]]);
 }
 
 // ---------- Admin auth ----------

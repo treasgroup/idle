@@ -3,7 +3,7 @@ import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState
 import { ArrowUpRight, BookOpen, Heart, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
 import { useRatings } from "../app/ratings";
 import {
-  CATALOG_SECTIONS, courseOf, freshConditions, isLenten, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, searchRecipes,
+  CATALOG_SECTIONS, courseOf, freshConditions, isLenten, track, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, searchRecipes,
   type Recipe,
 } from "../engine";
 import { photoFirst } from "../app/photoFirst";
@@ -163,6 +163,15 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     return narrowed.length ? { found: both, said: read.said } : { found: plain, said: [] };
   }, [query, view, base, ordered]);
   const list = useMemo(() => applyFilters(found, f, dish), [found, f, dish]);
+  // What people look for: a query once they stop typing for 2 s, with how many it found (before the chips) — for
+  // the admin's «Статистика → Что ищут». Once per query per visit; anonymous like the rest of the statistics.
+  const sent = useRef(new Set<string>());
+  useEffect(() => {
+    const key = query.toLowerCase();
+    if (mode !== "search" || view !== "all" || key.length < 3 || sent.current.has(key)) return;
+    const t = window.setTimeout(() => { sent.current.add(key); track({ type: "search", text: query, count: found.length, source: "search" }); }, 2000);
+    return () => window.clearTimeout(t);
+  }, [query, found.length, mode, view]);
   // Device chips appear only when the catalog has dishes for them.
   const devices = useMemo(() => new Set(ALL.filter((x) => x.device && ranked.some(x.test)).map((x) => x.id)), [ranked]);
 
