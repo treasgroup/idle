@@ -181,8 +181,16 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
     if (!isNativeApp() || !nearest || nearest <= Date.now()) return;
     const t = running[0];
     void scheduleNativeTimer(nearest, "Таймер закончился", (t.dish ? "«" + t.dish + "»: " : "") + (t.label || "проверьте блюдо"));
-    return () => cancelNativeTimer();
-  }, [nearest]); // eslint-disable-line react-hooks/exhaustive-deps
+    // The countdown on the lock screen and in the shade, the nearest timer (Android 2.0.9+; older builds lack it).
+    const cook = (window as unknown as { CookNative?: { Cook?: { countdownShow?: (o: object) => Promise<void>; countdownHide?: () => Promise<void> } } }).CookNative?.Cook;
+    const more = running.length - 1;
+    cook?.countdownShow?.({
+      end: nearest,
+      title: t.dish && t.dish !== "Таймер" ? t.dish : "Таймер",
+      text: (t.label ? "Таймер: " + t.label : "Идёт таймер") + (more > 0 ? " · ещё " + more : ""),
+    })?.catch(() => { /* an older app without it */ });
+    return () => { cancelNativeTimer(); cook?.countdownHide?.()?.catch(() => {}); };
+  }, [nearest, running.length]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 /** Old builds kept one timer per dish in the cooking state; bring it over once. */
