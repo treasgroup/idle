@@ -3507,6 +3507,13 @@ function uD() {
 function uu(e) {
   return pt(e).filter((t) => !/^[,.;:!?]$/.test(t));
 }
+// After the common beginning, one consonant for another (р/д): a different word, not a form of the same one.
+function otherWord(u, p) {
+  let k = 0;
+  while (k < u.length && u[k] === p[k]) k++;
+  let x = u.slice(k), y = p.slice(k);
+  return x.length > 0 && x.length === y.length && /^[бвгджзйклмнпрстфхцчшщ]+$/.test(x + y);
+}
 function $o() {
   var s;
   if (Zp?.version === bt) return Zp;
@@ -3520,12 +3527,14 @@ function $o() {
   let i = new Set(Oi.flatMap((r) => r.words));
   for (let r of F) {
     let o = new Set();
-    for (let l of uu(r.title)) {
+    // The first word of a title that differs from a product by a consonant is another word, the dish
+    // («Карбонара с беконом» is not «карбонад»); «Кабачки…» is still the product «кабачок».
+    for (let [at, l] of uu(r.title).entries()) {
       let u = Xe(l);
       o.add(u);
       let f = cD.has(l);
       (!f && (DS.has(l) || DS.has(u) || l.length < 3 || lD.test(l))) ||
-        (!f && (n.has(u) || [...n].some((p) => p.length >= 5 && u.slice(0, 4) === p.slice(0, 4) && !p.startsWith(u) && !u.startsWith(p) && Fa(u, p)))) ||
+        (!f && (n.has(u) || [...n].some((p) => p.length >= 5 && u.slice(0, 4) === p.slice(0, 4) && !p.startsWith(u) && !u.startsWith(p) && !(at === 0 && otherWord(u, p)) && Fa(u, p)))) ||
         i.has(u) ||
         a.has(u) ||
         (a.add(u),

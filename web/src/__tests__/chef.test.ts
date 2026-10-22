@@ -61,3 +61,7 @@ test("no cold soup out of season unless asked", () => {
   if ([9, 10, 11, 0, 1, 2, 3].includes(new Date().getMonth())) expect(titles("что приготовить из свёклы")[0]).not.toMatch(/холодн|окрошк/i);
   expect(first("хочу окрошку")).toMatch(/Окрошка/);
 });
+
+test("the first word of a title is the dish, not a product with a typo", () => {
+  expect(first("хочу карбонару")).toMatch(/^Карбонара/); // not «карбонад», the pork cut
+});
