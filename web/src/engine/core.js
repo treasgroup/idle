@@ -2853,6 +2853,9 @@ var Qa = {
   },
   ambiguousAliases: {
     масло: ["vegetable-oil", "butter"],
+    // «печень» is any liver (not «печенье»); cod liver only when said so.
+    печень: ["chicken-liver", "beef-liver", "pork-liver", "lamb-liver"],
+    печенка: ["chicken-liver", "beef-liver", "pork-liver", "lamb-liver"],
     перец: ["bell-pepper", "black-pepper", "chili"],
     лук: ["onion", "red-onion", "green-onion"],
     нут: ["dry-chickpea", "canned-chickpea", "cooked-chickpea"],
@@ -3204,6 +3207,9 @@ var NS = /[жшчщц]$/,
   };
 function ES(e) {
   if (MS[e]) return MS[e];
+  if (/^(брокколи|киви|чили|спагетти|равиоли|кольраби|авокадо|манго|какао|кофе|пюре|филе|рагу|карри|тофу|кешью|суши|салями|пепперони|моцарелла)$/.test(e)) return e;
+  if (e === "молочное") return "молочными продуктами";
+  if (e === "мясное") return "мясом";
   if (/ок$/.test(e) && e.length > 4) return e.slice(0, -2) + "ком";
   if (/[ыи]$/.test(e)) {
     let t = e.slice(0, -1);
@@ -3241,8 +3247,13 @@ function oD(e) {
   return e;
 }
 function aa(e) {
-  let t = e.split(" ");
+  // «кефир 2,5 %» → «кефиром»: numbers are not said.
+  let t = e.split(" ").filter((w) => !/[\d%]/.test(w));
+  if (!t.length) return e;
   if (t.length === 1) return /^[а-яё]+$/.test(t[0]) ? ES(t[0]) : t[0];
+  // «Печень курицы», «Молоко коровье»: a noun first — only it changes («печенью курицы»), a trailing adjective goes.
+  if (!/(ый|ий|ой|ая|яя|ое|ее|ье|ые|ие|ья)$/.test(t[0].toLowerCase()) && /^[а-яё]+$/i.test(t[0]))
+    return [ES(t[0]), ...t.slice(1).filter((w) => !/(ый|ий|ой|ая|яя|ое|ее|ье|ые|ие|ья)$/.test(w.toLowerCase()))].join(" ");
   let n = t.findIndex((s, r) => r > 0 && /^(в|на|с|из|без|для|по)$/.test(s)),
     a = n > 0 ? t.slice(0, n) : t,
     i = n > 0 ? t.slice(n) : [];
@@ -3364,7 +3375,9 @@ var Oi = [
       "кекс",
       "торт",
       "печенье",
-      "печень",
+      // «печенья», «печеньки» — not «печень» (liver) itself.
+      "печенья",
+      "печеньк",
       "булочк",
     ],
   },
@@ -3484,7 +3497,11 @@ function uD() {
       ...Za().flatMap((n) => [n.name, ...n.aliases]),
       ...Object.values(Qa.groupAliases).flat(),
     ];
-  for (let n of t) for (let a of pt(n)) e.add(Xe(a));
+  // «Рис для ризотто», «Булочки для бургеров», «Рис для суши»: the words after «для» name a dish, not the product.
+  for (let n of t) {
+    let w = pt(n);
+    for (let k = 0; k < w.length; k++) if (w[k - 1] !== "для" && w[k - 2] !== "для") e.add(Xe(w[k]));
+  }
   return e;
 }
 function uu(e) {
@@ -3508,7 +3525,7 @@ function $o() {
       o.add(u);
       let f = cD.has(l);
       (!f && (DS.has(l) || DS.has(u) || l.length < 3 || lD.test(l))) ||
-        (!f && (n.has(u) || [...n].some((p) => p.length >= 5 && Fa(u, p)))) ||
+        (!f && (n.has(u) || [...n].some((p) => p.length >= 5 && u.slice(0, 4) === p.slice(0, 4) && !p.startsWith(u) && !u.startsWith(p) && Fa(u, p)))) ||
         i.has(u) ||
         a.has(u) ||
         (a.add(u),
@@ -3550,7 +3567,7 @@ function nt(e, t) {
   if (n === "freezer") return !!e.freezerDays;
   let a = Oi.find((s) => s.key === n);
   return a
-    ? uu(e.title).some((r) => a.title.some((o) => r.startsWith(o)))
+    ? uu(e.title).some((r) => a.title.some((o) => r.startsWith(o) && !(o === "торт" && r.startsWith("тортил"))))
     : n.startsWith("r:")
       ? e.id === n.slice(2)
       : ($o().titleStems.get(e.id) ?? new Set(uu(e.title).map(Xe))).has(n);
@@ -4040,6 +4057,8 @@ function CD(e, t) {
     ? n.some((a) => a === "guests" || a === "holiday" || a === "new-year")
     : n.some((a) => a === "date" || a === "guests" || a === "holiday");
 }
+var COLD_MONTHS = [9, 10, 11, 0, 1, 2, 3],
+  COLD_SOUP_TITLE = /(окрошк|свекольник холодн|холодн\S* суп|суп холодн|гаспачо|таратор|ботвинь|холодник)/i;
 function Qe(e, t, n, a = 3, i = {}) {
   let s = [...new Set([...t.excluded, ...n.excluded])],
     // Asking "в аэрогриле" means the person has one, even if the profile does not say so.
@@ -4108,7 +4127,7 @@ function Qe(e, t, n, a = 3, i = {}) {
         // What was not asked for goes lower: a side, a sauce or a drink is not a dinner by itself («блюда без мяса» is
         // not «Кускус с маслом»); a dish asked by name comes as it usually is — «хочу борщ» is not first the lenten,
         // the children's or the multicooker one.
-        askedKind = t.desired.some((R) => Hp(R) && nt(p, R)),
+        askedKind = t.desired.some((R) => Hp(R) && !/^dish:(multicooker|airfryer|microwave|oven|freezer)$/.test(R) && nt(p, R)),
         byName = t.desired.some((R) => R.startsWith("dish:") && !/^dish:(multicooker|airfryer|microwave|oven|freezer)$/.test(R)),
         course = Ne(p),
         device = /в (мультиварке|аэрогриле|микроволновке)/i.exec(p.title),
@@ -4116,11 +4135,18 @@ function Qe(e, t, n, a = 3, i = {}) {
           (askedKind ? 0 : ["side", "sauce", "drink"].includes(course) ? 4 : course === "snack" ? 2 : 0) +
           (device && !t.desired.includes("dish:" + { мультиварке: "multicooker", аэрогриле: "airfryer", микроволновке: "microwave" }[device[1].toLowerCase()]) ? 1 : 0) +
           (/для (детей|малышей|ребёнка|ребенка)/i.test(p.title) && t.occasion !== "kids" ? 1.5 : 0) +
-          (byName && !t.vegetarian && /постн/i.test(p.title) ? 1.5 : 0),
+          (byName && !t.vegetarian && /постн/i.test(p.title) ? 1.5 : 0) +
+          // A cold soup out of its season (October to April) only when asked for by name.
+          (!askedKind && COLD_MONTHS.includes(new Date().getMonth()) && COLD_SOUP_TITLE.test(p.title) ? 3 : 0),
+        lowTitle = p.title.toLowerCase().replace(/ё/g, "е"),
+        said = i.words
+          ? i.words.filter((R) => lowTitle.includes(R)).length * 1.5 + (i.words.some((R) => lowTitle.startsWith(R)) ? 1 : 0) - (byName ? Math.max(0, lowTitle.split(" ").length - 3) * 0.25 : 0)
+          : 0,
         x =
           (b ? 8 : 0) +
           g -
           aside +
+          said +
           y.length * 4 -
           S.length * 3 -
           (t.available.length ? v.length : 0) +
@@ -4480,7 +4506,8 @@ function zD(e) {
     n = [],
     a = new Set(Object.keys(Qa.ambiguousAliases).map(_e)),
     i = (o, l, u) => {
-      let f = pt(l).map(Xe);
+      // «печенье» keeps its ending: stemmed it would be «печень», the liver.
+      let f = pt(l).map((w) => (w === "печенье" ? w : Xe(w)));
       f.length && o.length && n.push({ ids: o, words: f, group: u });
     };
   for (let o of e) a.has(_e(o.name)) || i([o.id], o.name, !1);
@@ -4502,7 +4529,7 @@ function zD(e) {
   let s = new Map();
   for (let o of e) {
     let l = pt(o.name)[0];
-    l && l.length >= 4 && s.set(Xe(l), [...(s.get(Xe(l)) || []), o.id]);
+    l && l.length >= 4 && l !== "печенье" && s.set(Xe(l), [...(s.get(Xe(l)) || []), o.id]);
   }
   let r = new Set(n.filter((o) => o.words.length === 1).map((o) => o.words[0]));
   for (let [o, l] of s)
@@ -4517,6 +4544,13 @@ var ZD = [
     ["бес"],
     ["не", "ем"],
     ["не", "ешь"],
+    ["не", "ест"],
+    ["не", "едим"],
+    ["не", "едят"],
+    ["не", "любит"],
+    ["не", "любим"],
+    ["не", "любят"],
+    ["не", "переносит"],
     ["не", "люблю"],
     ["не", "хочу"],
     ["не", "надо"],
@@ -4836,6 +4870,13 @@ function tl(e, t, n) {
       /^сыр(ая|ой|ое|ые|ого|ую|ым|ых|ыми)$/.test(U)
     )
       continue;
+    // «хочу салат», «греческий салат», «салатик на праздник» is the dish; only «есть салат» (or «листья салата»)
+    // is the leaves.
+    if (/^салат/.test(U) && w !== "available" && !/^(лист|листья|листьев)$/.test(s[k - 1] || "")) {
+      w === null && N.push(x.length),
+        x.push({ mode: w ?? "desired", ids: ["dish:salad"], group: !1, dish: !0, bare: w === null });
+      continue;
+    }
     let He = $o().entries,
       ze = He.find((le) => le.words.length >= 2 && P(le.words)),
       W = ze
@@ -8080,7 +8121,9 @@ function em(e, t, n, a, i) {
       (l >>>= 0),
       l / 4294967296
     );
+  // A different three each time, but among the forty that rank best (not a kids' soup or a rare stew at random).
   return o
+    .slice(0, 40)
     .map((f) => ({ c: f, k: u() }))
     .sort((f, p) => f.k - p.k)
     .slice(0, 3)
@@ -8482,6 +8525,11 @@ function k_(e, t) {
 function x_(e) {
   return !!u0(e) || Yp(e);
 }
+// The words of a request worth finding in a title («хочу блины» → «блин»), for the title bonus in Qe.
+var WORD_STOP = /^(хочу|хочется|хотим|приготов|сделат|сделай|давай|можно|нибуд|рецеп|есть|нужно|надо|какой|какое|какую|чтобы|сегодн|завтра)/;
+function wordsOf(t) {
+  return (t || "").toLowerCase().replace(/ё/g, "е").split(/[^а-яa-z]+/).filter((w) => w.length >= 4 && !WORD_STOP.test(w)).map((w) => w.slice(0, Math.max(4, w.length - 2)));
+}
 function Er(e) {
   let { message: t, local: n, preferences: a, conversation: i } = e,
     s = e.conditions,
@@ -8686,7 +8734,7 @@ function Er(e) {
       w,
       a,
       3,
-      { meal: N },
+      { meal: N, words: wordsOf(t) },
     );
   if (!R.length && _.length && !F.some(B)) {
     let k = Qe(

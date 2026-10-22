@@ -4,6 +4,7 @@
 import { measureAnswer, roastAnswer } from "./kitchenMath";
 import { leftoverAnswer } from "./leftovers";
 import { drinkAnswer, sideAnswer } from "./pairing";
+import { saidAnswer, saidPick, titleAnswer } from "./chefFallback";
 import { navigatorAnswer } from "./navigator";
 import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
@@ -19,14 +20,14 @@ import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
 
 // The recipe titles by sound («хочопури» → «хачапури»), made again when the catalog changes.
 let sounds: { n: number; v: number; book: ReturnType<typeof soundBook> } | null = null;
-function titleSounds() {
+export function titleSounds() {
   const list = recipes();
   if (!sounds || sounds.n !== list.length || sounds.v !== catalogVersion()) sounds = { n: list.length, v: catalogVersion(), book: soundBook(list.map((r) => r.title), list.flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text), ...(r.tips ?? [])])) };
   return sounds.book;
 }
 
 /** «курица и картошка»: a dish named after the products («Курица с картошкой») goes before one that only contains them. */
-function namedFirst(list: Match[], c: Conditions): Match[] {
+export function namedFirst(list: Match[], c: Conditions): Match[] {
   const stems = c.desired.filter((d) => !d.includes(":")).map((id) => shortName(id).toLowerCase().slice(0, 5)).filter((x) => x.length >= 3);
   if (stems.length < 2) return list;
   const hits = (m: Match) => stems.filter((st) => m.recipe.title.toLowerCase().includes(st)).length;
@@ -47,7 +48,7 @@ const simpleScore = (m: Match) => (m.recipe.difficulty === "easy" ? 0 : m.recipe
  * The last word on what is shown: no кутья unless asked; «проще» means simple to cook (easy, few products, quick);
  * and without «сытное», «для гостей» or a holiday a dish of 2+ hours or 900+ kcal does not go first.
  */
-function tidyResults(list: Match[], c: Conditions, text: string, simpler: boolean, found: (c: Conditions, limit?: number) => Match[]): Match[] {
+export function tidyResults(list: Match[], c: Conditions, text: string, simpler: boolean, found: (c: Conditions, limit?: number) => Match[]): Match[] {
   const asked = MEMORIAL.test(text);
   let out = asked ? list : list.filter((m) => !MEMORIAL.test(m.recipe.title));
   if (simpler) {
@@ -283,6 +284,21 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       if (soft.length && out.conditions.available.length && out.results.length && out.results.every((m) => !m.available.length)) {
         const alt = found({ ...out.conditions, excluded: out.conditions.excluded.filter((x) => !soft.includes(x)) }).filter((m) => m.available.length);
         if (alt.length) Object.assign(out, { kind: "found", results: alt, text: "Таких блюд совсем без " + SOFT[soft[0]] + " у меня нет — вот где " + SOFT_ONE[soft[0]] + " можно просто не класть:" });
+      }
+      // Not understood by the parser: phrases it has no words for («что-нибудь вкусненькое», «нечего есть»), then the
+      // words as a title search («тортик», «хочу том ям») — before «не понял» (app/chefFallback).
+      if (out.kind === "unclear") {
+        const said = saidAnswer(text);
+        const titled = said ? null : titleAnswer(text);
+        if (said) {
+          const pool = found({ ...base(), servings: st.conditions.servings, ...said.conditions }, said.only ? 400 : 5);
+          const picked = saidPick(said, pool.map((m) => m.recipe));
+          const results = picked.map((r) => pool.find((m) => m.recipe.id === r.id)!).slice(0, 5);
+          if (results.length) Object.assign(out, { kind: "found", text: said.text, results, options: undefined });
+        } else if (titled) {
+          Object.assign(out, { kind: "found", text: titled.text, options: undefined,
+            results: titled.results.map((r) => ({ recipe: r, available: [], missing: [], unknown: [], toBuy: [], reason: r.summary })) });
+        }
       }
       // Not understood: say so, and offer the closest things Шеф does understand.
       if (out.kind === "unclear") {
