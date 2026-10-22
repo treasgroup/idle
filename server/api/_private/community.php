@@ -146,6 +146,19 @@ function admin_recipe_step(array $b): void {
 
 // ---------- «Рецепт дня» for the Android home-screen widget ----------
 // One dish a day, the same for everybody: a main course or a soup with a photo, not longer than an hour and a half.
+/** Familiar home food in its season, as in the week plan (engine/services.js inSeason / unusual): no miso, tofu, curry
+ * pastes, tortillas or rice noodles for the whole service's dish of the day, no cold soups out of May–September. */
+function recipe_of_day_fits(array $r, int $month): bool {
+    $title = (string)($r['title'] ?? '');
+    if (preg_match('/окрошк|холодник|свекольник холодн|ботвин|гаспачо|таратор|холодн\S* суп/iu', $title) && ($month < 5 || $month > 9)) return false;
+    if (preg_match('/чапче|пад тай|том ям|рамен|фо бо|бибимбап|пибимпап|кимчи|ларб|терияки|карри|буррито|тако|кесадиль|гуакамоле|мисо|тайск|японск|вьетнам|индийск|мексикан|начос|фахитас|поке|суши|ролл/iu', $title)) return false;
+    // The dish of the day is said to everybody at once (VK, the widget, Главная): no dishes known by a foreign name only.
+    if (preg_match('/авголемоно|палак|панир|джамбала|слоппи|шпецле|лохикейтто|кацу|бургер|ризотто|полент|минестроне|риболлит|путтанеск|карбонар|аматричан|паэль|гумбо|фалафел|шакшук|тикка|корма|бирьяни|каччатор|пармиджан|оссобуко|кассуле|рататуй|фрикасе|гуляш по-сегедски|чили кон|фахит|муджадар|дал тадк|по-каджунск|по-мароккан|тортилья/iu', $title)) return false;
+    static $odd = ['nori', 'miso-paste', 'tofu', 'oyster-sauce', 'fish-sauce', 'rice-noodles', 'tamarind-paste', 'canned-coconut-milk', 'star-anise', 'rice-paper', 'gochujang', 'glass-noodles', 'corn-tortilla', 'wheat-tortilla', 'canned-black-beans', 'green-curry-paste', 'massaman-curry-paste', 'tom-yum-paste', 'udon-noodles', 'soba-noodles', 'lime-juice', 'garam-masala', 'tahini', 'sumac', 'dark-soy-sauce', 'quinoa', 'matcha-powder', 'curry-powder'];
+    foreach ((array)($r['ingredients'] ?? []) as $i) if (is_array($i) && empty($i['optional']) && in_array((string)($i['id'] ?? ''), $odd, true)) return false;
+    return true;
+}
+
 /** The dish of a day (today by default): the same for everyone that day — the widget, the VK post. */
 function recipe_of_day(?int $ts = null): ?array {
     $ts = $ts ?? time();
@@ -160,6 +173,7 @@ function recipe_of_day(?int $ts = null): ?array {
             $seen[$id] = true;
             $course = (string)($r['course'] ?? '');
             if (!in_array($course, ['main', 'soup'], true) || (int)($r['totalMinutes'] ?? 999) > 90 || ($r['difficulty'] ?? '') === 'hard') continue;
+            if (!recipe_of_day_fits($r, (int)date('n', $ts))) continue;
             $pool[] = $r;
         }
     }

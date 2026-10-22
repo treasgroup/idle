@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
 import {
-  courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
+  apiUrl, courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -72,10 +72,35 @@ function dayPick<T>(list: T[], salt = 0): T | null {
   return list[(n * 7919) % Math.min(list.length, 25)];
 }
 
-/** «Рецепт дня» stays the same all day (per meal), even when the saved data or the catalog changes the list. */
-function useToday(pick: Recipe | null, meal: string, ready: boolean): Recipe | null {
+/** The server's «Рецепт дня» — the same for everybody that day, as in the VK post and the phone widget. Asked once a day. */
+// One request per page load, kept outside the screen: Главная is drawn again while the catalog loads.
+let serverToday: Promise<string | null> | null = null;
+function askServerToday(day: string): Promise<string | null> {
+  serverToday ??= fetch(apiUrl("today")).then((r) => (r.ok ? r.json() : null)).then((j: { id?: string; day?: string } | null) => {
+    if (!j?.id || j.day !== day) return null;
+    try { localStorage.setItem("cook-today-server-" + day, j.id); } catch { /* private mode */ }
+    return j.id;
+  }, () => null); // offline: the personal pick stays
+  return serverToday;
+}
+function useServerToday(): string | null {
+  const day = dateKey(new Date());
+  const [id, setId] = useState<string | null>(() => { try { return localStorage.getItem("cook-today-server-" + day); } catch { return null; } });
+  useEffect(() => {
+    if (id) return;
+    let on = true;
+    void askServerToday(day).then((x) => { if (on && x) setId(x); });
+    return () => { on = false; };
+  }, [id, day]);
+  return id;
+}
+
+/** «Рецепт дня» stays the same all day (per meal), even when the saved data or the catalog changes the list.
+ * `common`: the day's dish for everybody, when it suits this person — it wins, so the app, VK and the widget agree. */
+function useToday(pick: Recipe | null, meal: string, ready: boolean, common?: Recipe | null): Recipe | null {
   const key = "cook-today-" + dateKey(new Date()) + "-" + meal;
   if (!ready) return pick;
+  if (common) { try { localStorage.setItem(key, common.id); } catch { /* private mode */ } return common; }
   let kept: string | null = null;
   try { kept = localStorage.getItem(key); } catch { /* private mode */ }
   const was = kept ? recipeById(kept) : null;
@@ -99,7 +124,10 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const all = useSuitable();
   const ranked = useRanked();
   const meal = mealNow();
-  const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0);
+  // From lunch on, the day's dish of the whole service (VK, the widget) when it suits the person; a breakfast in the morning.
+  const serverToday = useServerToday();
+  const common = meal !== "breakfast" && serverToday ? all.find((r) => r.id === serverToday) ?? null : null;
+  const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0, common);
   // The owner's changes from the admin panel: titles, hand-picked recipes, switched-off collections, covers.
   const [custom, setCustom] = useState(savedCustoms);
   useEffect(() => { void loadCustoms().then(setCustom); }, []);
