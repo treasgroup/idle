@@ -160,6 +160,8 @@ export function shopQuantity(id: string, amount: number, unit: string): { text: 
   const medium = MEDIUM[id];
   if (medium && grams(unit)) {
     const n = Math.max(1, Math.ceil(amount / medium - 0.15));
+    // Over fifteen pieces a week is bought by weight: «≈ 9,2 кг», not «61 шт.».
+    if (n > 15) return { text: "≈ " + String(Math.ceil(amount / 100) / 10).replace(".", ",") + " кг", need: "это примерно " + n + " шт." };
     return { text: n + " шт.", need: "нужно " + formatAmount(amount, unit) };
   }
   if (HERB.test(id) && grams(unit)) {
@@ -203,5 +205,9 @@ export function shopLine(i: { ingredientId: string; name: string; amount: number
   const name = q?.name ?? displayName(i.ingredientId, i.name);
   if (q) return { name, text: q.text, need: q.need };
   const pack = packageHint(i.ingredientId, i.amount, i.unit);
-  return pack ? { name, text: pack, need: "нужно " + formatAmount(i.amount, i.unit) } : { name, text: formatAmount(i.amount, i.unit) };
+  if (pack) return { name, text: pack, need: "нужно " + formatAmount(i.amount, i.unit) };
+  // Spices and such for a week: «немного», not «0,33 г» — a packet is bought anyway.
+  if ((grams(i.unit) || i.unit.trim() === "мл") && i.amount > 0 && i.amount < 10)
+    return { name, text: "немного", need: i.amount < 1 ? "на кончике ножа" : "нужно ≈ " + Math.round(i.amount) + " " + i.unit.trim() };
+  return { name, text: formatAmount(i.amount, i.unit) };
 }

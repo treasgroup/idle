@@ -174,3 +174,4 @@ export declare const unusual: any;
 export declare const inSeason: any;
 export declare const italian: any;
 export declare const catalogLight: () => boolean;
+export declare const proteinOf: (r: unknown) => string | null;

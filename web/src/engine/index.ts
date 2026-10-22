@@ -141,6 +141,8 @@ export const weekDays = (menu: MenuDay[], from?: Date): MenuDay[] => svc.Nm(menu
 export const generateMenu = (days: MenuDay[], prefs: Preferences, servings: number, seed?: number, plan?: MenuPlan): MenuDay[] =>
   svc.Mu(days, prefs, servings, seed, plan);
 /** The plan's rules for a dish: unusual for a home cook (miso, tofu, curry pastes…), Italian, a cold soup in season. */
+/** The meat or fish a dish is made of («птица», «фарш», «рыба»…), or null: the plan does not repeat it day after day. */
+export const proteinOf = (r: Recipe): string | null => svc.proteinOf(r);
 export const isUnusual = (r: Recipe): boolean => svc.unusual(r);
 export const isItalian = (r: Recipe): boolean => svc.italian(r);
 export const inSeason = (r: Recipe, month: number): boolean => svc.inSeason(r, month);
@@ -150,7 +152,20 @@ export const removeMenuItem = (menu: MenuDay[], date: string, index: number, ser
 export const replaceMenuItem = (menu: MenuDay[], date: string, index: number, prefs: Preferences, servings: number, seed?: number, plan?: MenuPlan): MenuDay[] =>
   svc.MA(menu, date, index, prefs, servings, seed, plan);
 export const menuEntries = (menu: MenuDay[]): { date: string; item: MenuItem; recipe: Recipe }[] => svc.cl(menu);
-export const menuShopping = (menu: MenuDay[], list?: ShoppingItem[], have?: string[]): ShoppingItem[] => svc.EA(menu, list, have);
+export const menuShopping = (menu: MenuDay[], list?: ShoppingItem[], have?: string[]): ShoppingItem[] => foldLemons(svc.EA(menu, list, have));
+/** Lemon juice is bought as lemons: a juice row goes into the lemon row (35 ml of juice ≈ one 90 g lemon), so the list
+ * does not say «Лимон 1 шт.» twice. */
+function foldLemons(list: ShoppingItem[]): ShoppingItem[] {
+  const juice = list.filter((i) => i.ingredientId === "lemon-juice" && !i.checked && (i.unit === "мл" || i.unit === "г"));
+  const lemon = list.find((i) => i.ingredientId === "lemon" && !i.checked && i.unit === "г");
+  if (!juice.length || !lemon) return list;
+  const g = (ml: number) => Math.round((ml * 90) / 35);
+  const parts = { ...(lemon.parts ?? {}) };
+  for (const j of juice) for (const [k, v] of Object.entries(j.parts ?? {})) parts[k] = (parts[k] ?? 0) + g(v);
+  const merged: ShoppingItem = { ...lemon, amount: lemon.amount + juice.reduce((s, j) => s + g(j.amount), 0),
+    recipes: [...new Set([...(lemon.recipes ?? []), ...juice.flatMap((j) => j.recipes ?? [])])], ...(Object.keys(parts).length ? { parts } : {}) };
+  return list.filter((i) => !juice.includes(i)).map((i) => (i === lemon ? merged : i));
+}
 /** Perishables shared by 2+ dishes of the week: one pack covers several dinners. */
 export const sharedPerishables = (menu: MenuDay[]): { id: string; name: string; dishes: number }[] => svc.DA(menu);
 export const menuText = (menu: MenuDay[], now?: Date): string => svc._A(menu, now);

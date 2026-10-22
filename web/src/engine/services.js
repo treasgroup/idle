@@ -3376,6 +3376,27 @@ function italian(e) {
 function unusual(e) {
   return UNUSUAL_TITLE.test(e.title) || e.ingredients.some((t) => !t.optional && UNUSUAL_ING.has(t.id));
 }
+var PLAN_WEEKDAY = { breakfast: 40, lunch: 120, dinner: 120 },
+  PLAN_WEEKEND = { breakfast: 90, lunch: 240, dinner: 240 };
+// The meat or fish a dish is made of, by its products (the first that is one): for not repeating it day after day.
+var PROTEIN_IDS = [
+  ["птица", /(chicken|turkey|duck|goose|rabbit|quail)/],
+  ["субпродукты", /(liver|heart|kidney|tongue|gizzard|offal)/],
+  ["фарш", /minced/],
+  ["свинина", /(pork|bacon|ham|lard|sausage|frankfurter|salami|brisket)/],
+  ["говядина", /(beef|veal)/],
+  ["баранина", /(lamb|mutton)/],
+  ["рыба", /(fish|salmon|cod|pollock|hake|tuna|herring|mackerel|pike|carp|trout|perch|zander|sprat|saury|sardine|halibut|tilapia|catfish|flounder|capelin|smelt|sea-bass|dorado)/],
+  ["морепродукты", /(shrimp|squid|mussel|crab|octopus|scallop|seafood)/],
+];
+function proteinOf(r) {
+  for (let ing of r.ingredients) {
+    if (ing.optional) continue;
+    let hit = PROTEIN_IDS.find(([, re]) => re.test(ing.id));
+    if (hit && !/(broth|stock|bouillon|sauce)/.test(ing.id)) return hit[0];
+  }
+  return null;
+}
 function Mu(e, t, n, a = Date.now(), i = U0) {
   let s = a >>> 0 || 7,
     r = () => (
@@ -3418,8 +3439,12 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
       R.ingredients.find((T) => !/^(вода|соль|масло|растительн)/i.test(T.name))
         ?.id,
     N = {},
+    // The meat or fish of the dish chosen last for this meal, and how many times each one is in the week.
+    PROT = {},
+    protCount = {},
     _ = !1,
     B = i.meals.length > 1 || i.meals[0] !== "dinner";
+  for (let it of y.flatMap((d) => d.items.filter((t) => !t.leftover))) { let r0 = ll(it.recipeId), p0 = r0 && proteinOf(r0); p0 && (protCount[p0] = (protCount[p0] || 0) + 1); }
   for (let R = 0; R < y.length; R++) {
     let T = y[R],
       C = y[R + 1];
@@ -3428,10 +3453,12 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
       let Z = T.items.find((W) => Hn(W) === M);
       if (Z) {
         let W = ll(Z.recipeId);
-        (N[M] = W ? x(W) : void 0), M === "dinner" && (_ = !!W && Ru(W));
+        (N[M] = W ? x(W) : void 0), (PROT[M] = W ? proteinOf(W) : null), M === "dinner" && (_ = !!W && Ru(W));
         continue;
       }
-      let V = i.quickWeekdays && !EO(T.date) ? OO[M] : null,
+      // «Быстро в будни»: 20/40/40 minutes; without it still no four-hour dish on a Tuesday — two hours on weekdays,
+      // four at the weekend (the quickest are taken when nothing fits).
+      let V = i.quickWeekdays && !EO(T.date) ? OO[M] : EO(T.date) ? PLAN_WEEKEND[M] : PLAN_WEEKDAY[M],
         k =
           M === "dinner" && i.cookAhead && C
             ? i.meals.includes("lunch")
@@ -3449,7 +3476,10 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
           !(M === "dinner" && Ru(W) && (g >= 2 || _)) &&
           x(W) !== N[M],
         Q = m[M],
-        ne = Q.filter((W) => G(W) && (V === null || W.totalMinutes <= V));
+        // Not the same meat or fish two days running, nor more than three times a week, while there is a choice.
+        fresh = (W) => { let p = proteinOf(W); return !p || (p !== PROT[M] && (protCount[p] || 0) < 3); },
+        ne = Q.filter((W) => G(W) && fresh(W) && (V === null || W.totalMinutes <= V));
+      ne.length || (ne = Q.filter((W) => G(W) && (V === null || W.totalMinutes <= V)));
       if (
         (ne.length ||
           (ne = Q.filter(G).sort((W, le) =>
@@ -3470,6 +3500,8 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
       w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++, italian(He) && pasta++;
       for (let W of Am(He)) b.add(W);
       M === "dinner" && ((_ = Ru(He)), _ && g++), (N[M] = x(He));
+      let pHe = proteinOf(He);
+      (PROT[M] = pHe), pHe && (protCount[pHe] = (protCount[pHe] || 0) + 1);
       let ze = U && Y(He);
       T.items.push({
         recipeId: He.id,
@@ -4032,4 +4064,5 @@ export {
   inSeason,
   italian,
   catalogLight,
+  proteinOf,
 };
