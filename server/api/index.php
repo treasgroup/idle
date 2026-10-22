@@ -134,6 +134,8 @@ try {
     elseif ($route === 'school.images' && $method === 'GET') school_images_public();
     elseif ($route === 'admin.school.image' && $method === 'POST') { require_admin(true); admin_school_image(); }
     elseif ($route === 'admin.school.image.delete' && $method === 'POST') { require_admin(true); admin_school_image_delete(read_json_body(2000)); }
+    elseif ($route === 'menu.get' && $method === 'GET') menu_get((string)($_GET['code'] ?? ''));
+    elseif ($route === 'admin.menu.share' && $method === 'POST') { require_admin(true); admin_menu_share(read_json_body(4000)); }
     elseif ($route === 'today' && $method === 'GET') { $t = recipe_of_day(); send_json($t ?? ['error' => 'Нет рецепта'], $t ? 200 : 404); }
     elseif ($route === 'message.replies' && $method === 'POST') message_replies(read_json_body(8000));
     elseif ($route === 'recipe.stats' && $method === 'GET') send_json(['stats' => (object)recipe_stats()]); // recounted at most hourly

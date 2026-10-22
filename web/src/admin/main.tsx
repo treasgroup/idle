@@ -10,6 +10,7 @@ import { Messages, Vk } from "./Legacy";
 import { NewRecipes } from "./NewRecipes";
 import { School } from "./School";
 import { Opens } from "./Opens";
+import { VkPosts } from "./VkPosts";
 import { CSS } from "./ui";
 import { installFormShim } from "../app/formShim";
 
@@ -17,7 +18,9 @@ import { installFormShim } from "../app/formShim";
 installFormShim();
 
 /** The new pages; the other addresses are the old panel's. */
-const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": Vk, "#opens": Opens };
+// «ВКонтакте»: the old page (the dish of the day, posts for the week) and under it the ready posts.
+const VkPage = () => <><Vk /><VkPosts /></>;
+const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": VkPage, "#opens": Opens };
 
 interface Section { label: string; tabs: [hash: string, label: string][] }
 const SECTIONS: Section[] = [

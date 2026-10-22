@@ -105,6 +105,30 @@ function vk_daily(): void {
     catch (Throwable $e) { set_setting('vk_last', ['day' => date('Y-m-d'), 'at' => now_ms(), 'ok' => false, 'error' => mb_substr($e->getMessage(), 0, 300)]); }
 }
 
+// ---------- «Взять это меню себе»: a week's menu by a short link ----------
+// A VK post «Меню на неделю» ends with treas.su/cook/?m=<code>: the code keeps the 7 dishes here, and the site
+// (app/App.tsx) offers to put them into the person's plan and the products into the shopping list.
+const SHARED_MENUS_MAX = 300;
+function admin_menu_share(array $b): void {
+    $ids = array_values(array_filter((array)($b['ids'] ?? []), fn($x) => is_string($x) && strlen($x) <= 60 && preg_match(RECIPE_ID, $x)));
+    if (count($ids) < 1 || count($ids) > 14) throw new ApiError(400, 'validation', 'В меню должно быть от 1 до 14 блюд.');
+    $known = array_flip(array_column(catalog_recipes(), 'id'));
+    foreach ($ids as $id) if (!isset($known[$id])) throw new ApiError(400, 'validation', 'В каталоге нет блюда ' . $id . '.');
+    $code = substr(sha1(implode(',', $ids)), 0, 8);
+    $all = setting('shared_menus', []); if (!is_array($all)) $all = [];
+    $all[$code] = ['ids' => $ids, 'at' => now_ms()];
+    if (count($all) > SHARED_MENUS_MAX) { uasort($all, fn($x, $y) => ($y['at'] ?? 0) <=> ($x['at'] ?? 0)); $all = array_slice($all, 0, SHARED_MENUS_MAX, true); }
+    set_setting('shared_menus', $all);
+    send_json(['code' => $code]);
+}
+function menu_get(string $code): void {
+    if (!preg_match('/^[0-9a-f]{8}$/', $code)) throw new ApiError(400, 'validation', 'Неверная ссылка на меню.');
+    $all = setting('shared_menus', []);
+    $m = is_array($all) ? ($all[$code] ?? null) : null;
+    if (!$m) throw new ApiError(404, 'not_found', 'Это меню больше не найдено.');
+    send_json(['ids' => array_values((array)$m['ids'])]);
+}
+
 // ---------- Admin ----------
 function admin_vk_status(): void {
     $s = vk_settings();

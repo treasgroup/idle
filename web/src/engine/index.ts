@@ -138,6 +138,10 @@ export const DEFAULT_MENU_PLAN: MenuPlan = svc.U0;
 export const weekDays = (menu: MenuDay[], from?: Date): MenuDay[] => svc.Nm(menu, from);
 export const generateMenu = (days: MenuDay[], prefs: Preferences, servings: number, seed?: number, plan?: MenuPlan): MenuDay[] =>
   svc.Mu(days, prefs, servings, seed, plan);
+/** The plan's rules for a dish: unusual for a home cook (miso, tofu, curry pastes…), Italian, a cold soup in season. */
+export const isUnusual = (r: Recipe): boolean => svc.unusual(r);
+export const isItalian = (r: Recipe): boolean => svc.italian(r);
+export const inSeason = (r: Recipe, month: number): boolean => svc.inSeason(r, month);
 export const regenerateDay = (menu: MenuDay[], date: string, prefs: Preferences, servings: number, seed?: number, plan?: MenuPlan): MenuDay[] =>
   svc.NA(menu, date, prefs, servings, seed, plan);
 export const removeMenuItem = (menu: MenuDay[], date: string, index: number, servings: number): MenuDay[] => svc.L0(menu, date, index, servings);

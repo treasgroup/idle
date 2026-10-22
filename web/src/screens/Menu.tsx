@@ -1,5 +1,5 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarDays, ChevronDown, Clock, MoreHorizontal, Package, Pencil, ArrowRightLeft, Eraser, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, CalendarPlus, Repeat2, Bookmark, X,
 } from "lucide-react";
@@ -24,6 +24,7 @@ import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
 import { printText } from "../app/print";
 import { timeShort } from "../app/recipeTime";
+import { TAKE_MENU, TakeMenu, dropTakeMenu, readTakeMenu } from "./TakeMenu";
 
 /** The person's goals narrow the dishes a menu is made of (passed to the engine only, never stored). */
 function goalFilter(p: Profile): ((r: Recipe) => boolean) | undefined {
@@ -61,6 +62,13 @@ export function Menu() {
   const [moving, setMoving] = useState(false);
   const [prep, setPrep] = useState(false);
   const [weeks, setWeeks] = useState(savedWeeks);
+  // «Взять это меню себе» from a VK post (App.tsx keeps the dishes for this screen).
+  const [take, setTake] = useState<string[] | null>(readTakeMenu);
+  useEffect(() => {
+    const on = () => setTake(readTakeMenu());
+    window.addEventListener(TAKE_MENU, on);
+    return () => window.removeEventListener(TAKE_MENU, on);
+  }, []);
   const servings = profile.eaters;
   const today = dateKey(new Date());
   // «Пт, 23» for the chips that move a dish to another day.
@@ -103,16 +111,27 @@ export function Menu() {
   };
   const clearDay = (date: string) => { save(days.map((d) => (d.date === date ? { ...d, items: [] } : d))); withUndo("День очищен"); };
 
-  const toShopping = () => {
+  const toShopping = (week: MenuDay[] = days, text = "Продукты на неделю — в списке покупок") => {
     const prev = loadRows();
     const kept = s.shopping.filter((x) => x.checked || !prev.includes(x.key));
-    const fresh = menuShopping(days, [], haveIds(s)).filter((f) => !kept.some((k) => k.key === f.key));
+    const fresh = menuShopping(week, [], haveIds(s)).filter((f) => !kept.some((k) => k.key === f.key));
     saveRows(fresh.map((f) => f.key));
     update((st) => {
       const rest = st.shopping.filter((x) => x.checked || !prev.includes(x.key));
       return { ...st, shopping: [...rest, ...fresh.filter((f) => !rest.some((k) => k.key === f.key))] };
     });
-    toast("Продукты на неделю — в списке покупок", { label: "Открыть", run: () => replace(routeHash({ tab: "shopping" })) });
+    toast(text, { label: "Открыть", run: () => replace(routeHash({ tab: "shopping" })) });
+  };
+  // The week's dinners from a VK menu, one a day from today; other meals of those days stay.
+  const takeMenu = (ids: string[], shopping: boolean) => {
+    const week = days.map((d, i) => (ids[i] && recipeById(ids[i])
+      ? { ...d, items: [...d.items.filter((it) => (it.meal ?? "dinner") !== "dinner"), { recipeId: ids[i], servings, meal: "dinner" as const }] }
+      : d));
+    const before = s.menu;
+    save(week);
+    dropTakeMenu(); setTake(null);
+    if (shopping) toShopping(week, "Меню в плане, продукты — в покупках");
+    else toast("Меню в плане", { label: "Отменить", run: () => update((st) => ({ ...st, menu: before })) });
   };
 
   const addToNearestFree = (r: Recipe) => {
@@ -168,7 +187,7 @@ export function Menu() {
       ) : (
         <>
           <div className="mt-4 flex gap-2">
-            <button className="btn-primary flex-1 sm:flex-none" onClick={toShopping}><ShoppingCart size={18} />В покупки</button>
+            <button className="btn-primary flex-1 sm:flex-none" onClick={() => toShopping()}><ShoppingCart size={18} />В покупки</button>
             <button className="btn-outline" onClick={() => setMore(true)} aria-label="Ещё действия с планом"><MoreHorizontal size={18} />Ещё</button>
           </div>
 
@@ -284,6 +303,7 @@ export function Menu() {
         onAdd={(r) => addDay && addTo(addDay, r)}
         onPick={addDay && !days.find((d) => d.date === addDay)?.items.length ? () => { save(regenerateDay(days, addDay, s.preferences, servings, Date.now(), enginePlan)); } : undefined} />
       <MealPrepSheet open={prep} onClose={() => setPrep(false)} />
+      {take && <TakeMenu ids={take} days={days} dayShort={dayShort} onTake={(shop) => takeMenu(take, shop)} onClose={() => { dropTakeMenu(); setTake(null); }} />}
       <Sheet open={more} title="План на неделю" onClose={() => setMore(false)}>
         <div className="grid gap-2">
           <button className="btn-outline justify-start" onClick={() => { setMore(false); if (weeks.length) setAgain(true); else make(); }}><RefreshCw size={18} />Составить заново</button>

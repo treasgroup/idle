@@ -7,7 +7,7 @@ import {
   CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
-import { expiringSoon, isNativeApp, recipeById, usePwa, type MyRecipe } from "../engine";
+import { apiUrl, expiringSoon, isNativeApp, recipeById, usePwa, type MyRecipe } from "../engine";
 import { useStore } from "./store";
 import { useActions } from "./actions";
 import { AssistantProvider } from "./assistant";
@@ -19,6 +19,7 @@ import { ScreenSkeleton } from "../components/Skeleton";
 import { lazyScreen, preload } from "./lazy";
 import { useWakeLock } from "./wakeLock";
 import { LINK_EVENT, openedByLink, takeLinks } from "./appLinks";
+import { TAKE_MENU } from "../screens/TakeMenu";
 import { preloadMascots } from "../components/Mascot";
 
 // Home and search come with the page; the rest loads when first opened (and quietly in the background).
@@ -82,7 +83,17 @@ function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRec
     else if (doc) { replace(routeHash({ doc: doc[1] })); }
     const tab = q.get("tab");
     const recipe = q.get("recipe");
-    if (tab || recipe) history.replaceState(null, "", location.pathname + location.hash);
+    // «Взять это меню себе» from a VK post: ?m=<code> — the plan screen offers the dishes (screens/Menu, TakeMenu).
+    const menuCode = q.get("m");
+    if (tab || recipe || menuCode) history.replaceState(null, "", location.pathname + location.hash);
+    if (menuCode && /^[0-9a-f]{8}$/.test(menuCode)) {
+      fetch(apiUrl("menu.get") + "&code=" + menuCode).then((r) => r.json()).then((j: { ids?: string[]; error?: string }) => {
+        if (!j.ids?.length) { toast(j.error || "Это меню больше не найдено"); return; }
+        try { sessionStorage.setItem(TAKE_MENU, JSON.stringify(j.ids)); } catch { /* private mode */ }
+        replace(routeHash({ tab: "menu" }));
+        window.dispatchEvent(new Event(TAKE_MENU));
+      }, () => toast("Не получилось открыть меню — проверьте интернет"));
+    }
     if (tab === "shopping" || tab === "menu" || tab === "recipes" || tab === "pantry" || tab === "favorites" || tab === "chat") replace(routeHash({ tab: tab as Tab }));
     if (recipe) openRecipe(recipe);
     };

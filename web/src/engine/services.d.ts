@@ -170,3 +170,6 @@ export declare const HA: any;
 export declare const ul: any;
 export declare const dl: any;
 export declare const P0: any;
+export declare const unusual: any;
+export declare const inSeason: any;
+export declare const italian: any;

@@ -3984,4 +3984,7 @@ export {
   ul,
   dl,
   P0,
+  unusual,
+  inSeason,
+  italian,
 };
