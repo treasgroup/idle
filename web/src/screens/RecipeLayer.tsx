@@ -21,6 +21,7 @@ import { printPage } from "../app/print";
 import { useHint } from "../app/hints";
 import { PAN_CHOICES, area, panOf, panText, type Pan } from "../app/pan";
 import { stepTips } from "../app/stepTips";
+import { catalogSides } from "../app/pairing";
 import { goChat } from "../app/chatNav";
 import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
@@ -215,7 +216,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const header = useHeader(root, h1);
   const fits = useFits(aside, header.box);
 
-  const sides = useMemo(() => (needsSide(base) ? suggestSides(base, s.preferences.excluded) : []), [base, s.preferences.excluded]);
+  // The classic sides, then two from the catalog that suit this dish (app/pairing).
+  const sides = useMemo(() => (needsSide(base) ? [...suggestSides(base, s.preferences.excluded), ...catalogSides(base, s.preferences.excluded, 2)] : []), [base, s.preferences.excluded]);
   const side = sides.find((x) => x.id === sideId) ?? null;
   // One recipe with the side merged in, for cooking and the shopping list.
   const recipe = useMemo(() => (side ? withSide(base, side) : base), [base, side]);

@@ -3,6 +3,7 @@
 // The server AI is used only when it is configured; otherwise the local engine answers (the default).
 import { measureAnswer, roastAnswer } from "./kitchenMath";
 import { leftoverAnswer } from "./leftovers";
+import { drinkAnswer, sideAnswer } from "./pairing";
 import { navigatorAnswer } from "./navigator";
 import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
@@ -192,6 +193,14 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     if (local) { push([{ role: "assistant", text: local }]); setBusy(false); return; }
     const left = leftoverAnswer(text);
     if (left) { push([{ role: "assistant", text: left.text, ...(left.options ? { options: left.options } : {}) }]); setBusy(false); return; }
+    // «гарнир к котлетам», «что выпить»: sides that suit the dish, drinks for the season — from the catalog.
+    const pair = sideAnswer(text) ?? drinkAnswer(text);
+    if (pair) {
+      push([{ role: "assistant", text: pair.text, results: toStoredResults(pair.results) }]);
+      track({ type: "query", text, count: pair.results.length, source: opts.source ?? (opts.voice ? "voice" : "chat") });
+      setBusy(false);
+      return;
+    }
     let patch: Record<string, unknown> | null = null;
     let reply = "";
     let note = "";
