@@ -2,6 +2,10 @@
 // dough…). Each tip is shown at most once per recipe, on the first step it fits.
 import type { Recipe } from "../engine";
 
+// The oven tip talks about dough, so meat, vegetables and the rest get their own (see stepTips).
+const DOUGH_OVEN = "Включите духовку за 10–15 минут до выпечки: в холодной духовке тесто не поднимется.";
+const HOT_OVEN = "Ставьте форму в уже разогретую духовку: время в рецепте рассчитано на неё. В холодной блюдо готовится дольше и может пересохнуть.";
+
 const TIPS: [RegExp, string][] = [
   [/(отварите|сварите|варите)[^.]*яйц|яйц[^.]*(отварите|сварите|в кипящ)/i, "Яйца опускайте в кипящую воду ложкой, а после варки сразу в холодную — так их легче чистить."],
   [/(обжар|пассеру|жар)\S*[^.]*(?<![а-яё])лук|(?<![а-яё])лук[^.]*(обжар|пассеру|до золотист|до прозрачн)/i, "Лук жарьте на среднем огне 6–8 минут, помешивая: он станет сладким и золотистым, а не горьким."],
@@ -37,7 +41,7 @@ const TIPS: [RegExp, string][] = [
   [/(остудите|охладите|остынет|остыть)/i, "Убирайте в холодильник, когда блюдо остынет до комнатной температуры, но не позже чем через 2 часа."],
   [/(тушите|потушите|томите)|под крышкой[^.]*(медленном|слабом|маленьком) огне|(медленном|слабом|маленьком) огне[^.]*под крышкой/i, "На маленьком огне под крышкой должно едва побулькивать — так ничего не пригорит и не разварится."],
   [/(доведите до кипения|дайте закипеть|как только закипит|после закипания)/i, "Как только закипит, убавьте огонь: бурное кипение мутит бульон и разваривает продукты."],
-  [/(разогрейте|включите|нагрейте)[^.]*духовк|духовк[^.]*(разогре|до \d+)/i, "Включите духовку за 10–15 минут до выпечки: в холодной духовке тесто не поднимется."],
+  [/(разогрейте|включите|нагрейте)[^.]*духовк|духовк[^.]*(разогре|до \d+)/i, DOUGH_OVEN],
   [/(запекайте|выпекайте|в духовк)[^.]*\d+\s*(мин|ч)/i, "Проверьте готовность за 5 минут до конца: все духовки греют по-разному."],
   [/(разогрейте|раскалите|нагрейте)[^.]*(сковород|масло|сотейник|вок)/i, "Сковорода готова, когда капля воды на ней шипит и бегает. В холодное масло продукты прилипают и впитывают жир."],
   [/(посолите|посолить|солите)[^.]*(в конце|по вкусу)|по вкусу[^.]*сол/i, "Солите понемногу и пробуйте: добавить соль легко, убрать — почти нельзя."],
@@ -45,8 +49,9 @@ const TIPS: [RegExp, string][] = [
 ];
 
 /** Tips for each step of a recipe (null where none fits): at most three per recipe, the most specific ones first,
- * and every tip only once. */
-export function stepTips(recipe: Pick<Recipe, "steps">, max = 3): (string | null)[] {
+ * and every tip only once. The dough oven tip only where there is dough: baking, or a step that mentions it. */
+export function stepTips(recipe: Pick<Recipe, "steps" | "course">, max = 3): (string | null)[] {
+  const dough = recipe.course === "baking" || recipe.steps.some((st) => /(?<![а-яё])тест[оаеу]/i.test(st.text));
   const rank = (s: string) => TIPS.findIndex(([, tip]) => tip === s);
   const used = new Set<string>();
   const found = recipe.steps.map((st) => {
@@ -56,5 +61,5 @@ export function stepTips(recipe: Pick<Recipe, "steps">, max = 3): (string | null
     return hit[1];
   });
   const keep = new Set(found.filter((x): x is string => !!x).sort((a, b) => rank(a) - rank(b)).slice(0, max));
-  return found.map((x) => (x && keep.has(x) ? x : null));
+  return found.map((x) => (x && keep.has(x) ? (x === DOUGH_OVEN && !dough ? HOT_OVEN : x) : null));
 }
