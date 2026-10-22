@@ -10,6 +10,10 @@ import { Messages, Vk } from "./Legacy";
 import { NewRecipes } from "./NewRecipes";
 import { School } from "./School";
 import { CSS } from "./ui";
+import { installFormShim } from "../app/formShim";
+
+// Photos, covers and School pictures go as JSON — the old panel's uploads too: the hosting blocks forms with files.
+installFormShim();
 
 /** The new pages; the other addresses are the old panel's. */
 const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": Vk };

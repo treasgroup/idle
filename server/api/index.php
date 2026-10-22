@@ -26,6 +26,8 @@ $route = isset($_GET['r']) ? (string)$_GET['r'] : '';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
 try {
+    // A form with files arrives as JSON (the hosting blocks multipart): back into $_POST / $_FILES (lib.php).
+    cook_form_unpack();
     if ($route === 'status' && $method === 'GET') {
         // Reminders without cron: after answering, a few due ones are sent (at most once a minute).
         // And once a day, a copy of the database (after the answer has gone, so nobody waits for it).
@@ -79,7 +81,7 @@ try {
         $file = $_FILES['audio'] ?? null;
         $id = $_POST['operationId'] ?? '';
         $duration = (float)($_POST['duration'] ?? 0);
-        if (!$file || ($file['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($file['tmp_name']) || $file['size'] <= 0 || $file['size'] > 5 * 1024 * 1024 || !is_uuid($id) || $duration < 0.2 || $duration > 61)
+        if (!upload_ok($file) || $file['size'] <= 0 || $file['size'] > 5 * 1024 * 1024 || !is_uuid($id) || $duration < 0.2 || $duration > 61)
             throw new ApiError(400, 'audio', 'Нужна запись до 60 секунд и 5 МБ.');
         $mime = (string)($file['type'] ?? '');
         if (!preg_match('#^(audio/(webm|mp4|ogg|wav|mpeg|x-m4a)|video/webm)#', $mime)) throw new ApiError(415, 'audio_type', 'Этот формат записи не поддерживается.');

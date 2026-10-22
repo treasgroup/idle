@@ -346,7 +346,7 @@ function admin_photo_upload(): void {
     $id = (string)($_POST['recipeId'] ?? '');
     if (!preg_match(RECIPE_ID, $id) || strlen($id) > 60) throw new ApiError(400, 'validation', 'Неверный рецепт.');
     $f = $_FILES['photo'] ?? null;
-    if (!$f || ($f['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) throw new ApiError(400, 'upload', 'Фото не загрузилось. Попробуйте файл поменьше.');
+    if (!upload_ok($f)) throw new ApiError(400, 'upload', 'Фото не загрузилось. Попробуйте файл поменьше.');
     if ($f['size'] <= 0 || $f['size'] > 6 * 1024 * 1024) throw new ApiError(413, 'upload', 'Фото должно быть до 6 МБ.');
     $head = (string)file_get_contents($f['tmp_name'], false, null, 0, 3);
     if ($head !== "\xFF\xD8\xFF") throw new ApiError(415, 'upload', 'Нужен файл JPEG.');
@@ -354,7 +354,7 @@ function admin_photo_upload(): void {
     $dir = photos_dir();
     if (!is_dir($dir) && !@mkdir($dir, 0755, true)) throw new ApiError(500, 'write', 'Нет папки photos.');
     $tmp = $dir . '/.upload-' . bin2hex(random_bytes(4));
-    if (!@move_uploaded_file($f['tmp_name'], $tmp)) throw new ApiError(500, 'write', 'Не удалось сохранить фото. Проверьте права на папку photos.');
+    if (!upload_move($f['tmp_name'], $tmp)) throw new ApiError(500, 'write', 'Не удалось сохранить фото. Проверьте права на папку photos.');
     @chmod($tmp, 0644);
     if (!@rename($tmp, $dir . '/' . $id . '.jpg')) { @unlink($tmp); throw new ApiError(500, 'write', 'Не удалось сохранить фото.'); }
     clearstatcache();

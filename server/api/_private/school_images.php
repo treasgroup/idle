@@ -21,7 +21,7 @@ function admin_school_image(): void {
     $key = (string)($_POST['key'] ?? '');
     if (!preg_match(SCHOOL_IMAGE_KEY, $key)) throw new ApiError(400, 'validation', 'Неверная карточка урока.');
     $f = $_FILES['image'] ?? null;
-    if (!$f || ($f['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) throw new ApiError(400, 'upload', 'Картинка не загрузилась. Попробуйте файл поменьше.');
+    if (!upload_ok($f)) throw new ApiError(400, 'upload', 'Картинка не загрузилась. Попробуйте файл поменьше.');
     if ($f['size'] <= 0 || $f['size'] > 12 * 1024 * 1024) throw new ApiError(413, 'upload', 'Картинка должна быть до 12 МБ.');
     if (!function_exists('imagecreatefromstring')) throw new ApiError(500, 'gd', 'На хостинге не включена библиотека GD для картинок.');
     $info = @getimagesize($f['tmp_name']);

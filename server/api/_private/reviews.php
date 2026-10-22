@@ -80,7 +80,7 @@ function recipe_exists(string $id): bool { return preg_match(RECIPE_ID, $id) && 
 
 // Photo from the browser (already a JPEG up to 1600 px): checked, re-encoded when the server can, saved under a random name.
 function store_review_photo(array $f): string {
-    if (($f['error'] ?? 1) !== UPLOAD_ERR_OK || !is_uploaded_file($f['tmp_name'])) throw new ApiError(400, 'upload', 'Фото не загрузилось. Попробуйте ещё раз.');
+    if (!upload_ok($f)) throw new ApiError(400, 'upload', 'Фото не загрузилось. Попробуйте ещё раз.');
     if ($f['size'] <= 0 || $f['size'] > 4 * 1024 * 1024) throw new ApiError(413, 'upload', 'Фото должно быть до 4 МБ.');
     $info = @getimagesize($f['tmp_name']);
     if (!$info || !in_array($info[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true) || $info[0] < 64 || $info[1] < 64 || $info[0] > 6000 || $info[1] > 6000)
@@ -100,7 +100,7 @@ function store_review_photo(array $f): string {
         imagedestroy($img);
     } else {
         if ($info[2] !== IMAGETYPE_JPEG) throw new ApiError(415, 'upload', 'Нужен файл JPEG.');
-        if (!@move_uploaded_file($f['tmp_name'], $target)) throw new ApiError(500, 'write', 'Не удалось сохранить фото.');
+        if (!upload_move($f['tmp_name'], $target)) throw new ApiError(500, 'write', 'Не удалось сохранить фото.');
     }
     @chmod($target, 0644);
     return $name;

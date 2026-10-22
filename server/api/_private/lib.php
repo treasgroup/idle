@@ -52,6 +52,46 @@ function is_https(): bool {
     return strtolower((string)($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
 }
 
+// ---------- Forms with files, sent as JSON ----------
+// The hosting (reg.ru nginx) answers ANY multipart/form-data request on the whole domain with 403 (found 2026-10-22):
+// recipe photos, covers, School pictures, review photos — nothing reached PHP. Pages now send such a form as JSON
+// (header X-Cook-Form: 1; fields + files in base64, web/src/app/formShim.ts), and here it becomes $_POST and $_FILES
+// again, so every upload route works unchanged. upload_ok() / upload_move() accept these files too.
+function cook_form_unpack(): void {
+    if (($_SERVER['HTTP_X_COOK_FORM'] ?? '') !== '1' || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') return;
+    $b = json_decode((string)file_get_contents('php://input', false, null, 0, 40 * 1024 * 1024), true);
+    if (!is_array($b)) throw new ApiError(400, 'validation', 'Форма не прочиталась. Попробуйте файл поменьше.');
+    foreach ((array)($b['fields'] ?? []) as $k => $v) if (is_string($k) && (is_string($v) || is_array($v))) $_POST[$k] = $v;
+    foreach ((array)($b['files'] ?? []) as $k => $list) {
+        if (!is_string($k) || !is_array($list)) continue;
+        $one = [];
+        foreach ($list as $f) {
+            $data = is_array($f) ? base64_decode((string)($f['data'] ?? ''), true) : false;
+            if ($data === false) throw new ApiError(400, 'upload', 'Файл не прочитался. Попробуйте ещё раз.');
+            $tmp = (string)tempnam(sys_get_temp_dir(), 'cook');
+            file_put_contents($tmp, $data);
+            register_shutdown_function(function () use ($tmp) { if (is_file($tmp)) @unlink($tmp); });
+            $one[] = ['name' => (string)($f['name'] ?? 'file'), 'type' => (string)($f['type'] ?? ''), 'tmp_name' => $tmp, 'error' => UPLOAD_ERR_OK, 'size' => strlen($data)];
+        }
+        // As PHP itself does: «photos[]» is a list (name[i], tmp_name[i]…), any other name is one file.
+        if (substr($k, -2) === '[]') {
+            $out = [];
+            foreach (['name', 'type', 'tmp_name', 'error', 'size'] as $p) $out[$p] = array_column($one, $p);
+            $_FILES[substr($k, 0, -2)] = $out;
+        } elseif ($one) $_FILES[$k] = $one[0];
+    }
+    $GLOBALS['cook_form_files'] = true;
+}
+/** A file from a form: a real upload, or one cook_form_unpack() wrote. */
+function upload_ok(?array $f): bool {
+    if (!$f || ($f['error'] ?? 1) !== UPLOAD_ERR_OK) return false;
+    $tmp = (string)($f['tmp_name'] ?? '');
+    return is_uploaded_file($tmp) || (!empty($GLOBALS['cook_form_files']) && is_file($tmp));
+}
+function upload_move(string $from, string $to): bool {
+    return is_uploaded_file($from) ? @move_uploaded_file($from, $to) : (!empty($GLOBALS['cook_form_files']) && @rename($from, $to));
+}
+
 function require_same_origin(): void {
     $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
     $host = $_SERVER['HTTP_HOST'] ?? '';
