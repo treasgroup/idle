@@ -2,13 +2,15 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { PlaceHint } from "../components/PlaceHint";
 import { hintDone } from "../app/hints";
-import { Check, ChevronDown, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
+import { BookOpen, Check, ChevronDown, ChevronRight, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients, shoppingText,
   shortName, useVoiceInput, type ShoppingItem,
 } from "../engine";
 import { useStore } from "../app/store";
 import { shopLine } from "../app/amounts";
+import { dishesInList, removeDish, type ListDish } from "../app/shoppingDishes";
+import { useActions } from "../app/actions";
 import { replace, routeHash } from "../app/router";
 import { Empty, Sheet, cx, haptic } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
@@ -30,6 +32,8 @@ export function Shopping() {
   const [share, setShare] = useState(false);
   const [clear, setClear] = useState(false);
   const [more, setMore] = useState<ShoppingItem | null>(null);
+  const [dish, setDish] = useState<ListDish | null>(null);
+  const { openRecipe } = useActions();
   const [showPinch, setShowPinch] = useState(false);
   const [showBought, setShowBought] = useState(false);
   const [store, setStore] = useState(false);
@@ -43,6 +47,8 @@ export function Shopping() {
   const toBuy = s.shopping.filter((i) => !i.checked);
   const groups = useMemo(() => groupShopping(toBuy.filter((i) => !isPinch(i))), [s.shopping]); // eslint-disable-line react-hooks/exhaustive-deps
   const pinches = toBuy.filter(isPinch);
+  // «Для блюд»: back to a recipe the list was filled from, by its name rather than from memory.
+  const dishes = useMemo(() => dishesInList(s.shopping), [s.shopping]);
   const bought = s.shopping.filter((i) => i.checked);
   const set = (fn: (l: ShoppingItem[]) => ShoppingItem[]) => update((st) => ({ ...st, shopping: fn(st.shopping) }));
   const toggle = (key: string) => {
@@ -126,6 +132,18 @@ export function Shopping() {
           <ShoppingBasket size={20} className="text-brand" />Я в магазине — крупный список
         </button>
       )}
+      {dishes.length > 0 && (
+        <div className="mt-4">
+          <p className="label mb-2">Для блюд</p>
+          <div className="flex flex-wrap gap-2">
+            {dishes.map((d) => (
+              <button key={d.id} className="chip h-9 max-w-full" onClick={() => setDish(d)}>
+                <span className="truncate">{d.title}</span><ChevronRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       {store && <StoreMode items={s.shopping} onToggle={toggle} onToPantry={toPantry} onClose={() => setStore(false)} />}
 
       {s.shopping.length === 0 ? (
@@ -194,6 +212,15 @@ export function Shopping() {
           <button className="btn-outline border-brand text-brand" onClick={() => { withUndo("Список очищен", () => []); setClear(false); }}>Очистить весь список</button>
           <button className="btn-ghost" onClick={() => setClear(false)}>Отмена</button>
         </div>
+      </Sheet>
+      <Sheet open={!!dish} title={dish?.title ?? ""} onClose={() => setDish(null)}>
+        {dish && (
+          <div className="grid gap-2">
+            <p className="mb-1 text-small text-ink-soft">В списке {products(dish.rows)} для этого блюда.</p>
+            <button className="btn-outline justify-start" onClick={() => { const id = dish.id; setDish(null); openRecipe(id); }}><BookOpen size={18} />Открыть рецепт</button>
+            <button className="btn-outline justify-start text-brand" onClick={() => { const d = dish; withUndo("Продукты блюда убраны из списка", (l) => removeDish(l, d)); setDish(null); }}><Trash2 size={18} />Убрать его продукты из списка</button>
+          </div>
+        )}
       </Sheet>
       <Sheet open={!!more} title={more ? shopLine(more).name : ""} onClose={() => setMore(null)}>
         {more && (

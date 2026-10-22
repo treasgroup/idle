@@ -10012,6 +10012,8 @@ var w0 = D.object({
     unit: D.string().max(40),
     checked: D.boolean(),
     recipes: D.array(D.string().max(120)).max(20).optional(),
+    // How much of the amount each recipe asked for (recipe id → amount in this row's unit): «Для блюд» in «Покупки».
+    parts: D.record(D.string().max(80), D.number().nonnegative()).optional(),
   }),
   q_ = D.object({
     role: D.enum(["user", "assistant"]),

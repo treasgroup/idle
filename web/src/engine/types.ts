@@ -103,6 +103,8 @@ export interface ShoppingItem {
   unit: string;
   checked: boolean;
   recipes?: string[];
+  /** How much of `amount` each recipe asked for: recipe id → amount in this row's unit (app/shoppingDishes). */
+  parts?: Record<string, number>;
 }
 
 export interface MenuItem { recipeId: string; servings: number; meal?: "breakfast" | "lunch" | "dinner"; leftover?: boolean; /** Cooked ahead on a meal-prep day (components/MealPrep): from the fridge or the freezer. */ prepped?: "fridge" | "freezer" }

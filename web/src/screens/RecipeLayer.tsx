@@ -15,6 +15,7 @@ import { signal } from "../app/personal";
 import { useActions, haveIds } from "../app/actions";
 import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
 import { yieldLine } from "../app/yieldLine";
+import { rowsFor } from "../app/shoppingDishes";
 import { printPage } from "../app/print";
 import { useHint } from "../app/hints";
 import { PAN_CHOICES, area, panOf, panText, type Pan } from "../app/pan";
@@ -239,6 +240,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const needed = [...new Set(recipe.ingredients.filter((i) => !i.optional && i.id !== "water").map((i) => i.id))];
   const owned = needed.filter(hasIt).length;
   const missing = needed.length - owned;
+  // Rows of the shopping list that came from this recipe: then the button opens the list instead of adding again.
+  const inList = rowsFor(s.shopping, recipe);
   const firstMissing = recipe.ingredients.find((i) => i.id === needed.find((id) => !hasIt(id)));
   const swapQuestion = firstMissing ? "Чем заменить " + accusative(displayName(firstMissing.id, firstMissing.name)) + "?" : undefined;
   const toggleHave = (id: string) => setHave((h) => (hasIt(id) ? h.filter((x) => !ingredientMatches(id, x)) : [...h, id]));
@@ -362,7 +365,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
                 {(!!base.yields || haveHint || atLeast) && <p className="-mt-2 mb-3 text-small text-ink-soft">{atLeast && "Меньше чем на " + base.minServings + " " + plural(base.minServings, "человека", "человека", "человек") + " не приготовить — останется на завтра. "}{base.yields ? yieldLine(base, servings) + " " : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
-                <HaveBar owned={owned} total={needed.length} missing={missing} marked={marked} onBuy={() => addRecipeToShopping(recipe, servings, have)} />
+                <HaveBar owned={owned} total={needed.length} missing={missing} marked={marked} inList={inList} onBuy={() => addRecipeToShopping(recipe, servings, have)} onOpenList={() => openLayer(routeHash({ tab: "shopping" }))} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (
                     <div key={g.key} ref={g.added ? sideRows : undefined}>
@@ -577,13 +580,19 @@ function Nutrition({ recipe, n, side }: { recipe: Recipe; n: { kcal: number; pro
 }
 
 /** «У вас есть 5 из 7» with a progress line, and «Добавить 2 продукта в покупки». */
-function HaveBar({ owned, total, missing, marked, onBuy }: { owned: number; total: number; missing: number; marked: boolean; onBuy: () => void }) {
-  // Nothing marked yet: one button, no progress line.
-  if (!marked) return missing > 0 ? (
+function HaveBar({ owned, total, missing, marked, inList, onBuy, onOpenList }: { owned: number; total: number; missing: number; marked: boolean; inList: number; onBuy: () => void; onOpenList: () => void }) {
+  // Added already: the same place now leads to the list, so the recipe and the list are one tap apart.
+  const buy = inList > 0 ? (
+    <button className="btn h-11 w-full border border-herb/30 bg-herb-soft px-4 text-herb hover:border-herb/50" onClick={onOpenList}>
+      <Check size={18} aria-hidden />{inList} {plural(inList, "продукт", "продукта", "продуктов")} в покупках · Открыть
+    </button>
+  ) : (
     <button className="btn h-11 w-full border border-line bg-card px-4 text-ink shadow-e1 hover:border-line-strong" onClick={onBuy}>
       <ShoppingCart size={18} className="text-brand" />Добавить {missing} {plural(missing, "продукт", "продукта", "продуктов")} в покупки
     </button>
-  ) : null;
+  );
+  // Nothing marked yet: one button, no progress line.
+  if (!marked) return missing > 0 || inList > 0 ? buy : null;
   return (
     <div className="rounded-input bg-herb-soft p-3 pl-4 sm:flex sm:items-center sm:gap-4 lg:block">
       <div className="flex min-h-[32px] min-w-0 flex-1 items-center gap-3">
@@ -594,11 +603,7 @@ function HaveBar({ owned, total, missing, marked, onBuy }: { owned: number; tota
           <span className="block h-full rounded-full bg-herb transition-[width] duration-150" style={{ width: (total ? (owned / total) * 100 : 100) + "%" }} />
         </span>
       </div>
-      {missing > 0 && (
-        <button className="btn mt-3 h-11 w-full shrink-0 border border-line bg-card px-4 text-ink shadow-e1 hover:border-line-strong sm:mt-0 sm:w-auto lg:mt-3 lg:w-full" onClick={onBuy}>
-          <ShoppingCart size={18} className="text-brand" />Добавить {missing} {plural(missing, "продукт", "продукта", "продуктов")} в покупки
-        </button>
-      )}
+      {(missing > 0 || inList > 0) && <div className="mt-3 shrink-0 sm:mt-0 sm:w-auto lg:mt-3 lg:w-full">{buy}</div>}
     </div>
   );
 }

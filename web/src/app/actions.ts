@@ -1,12 +1,13 @@
 // Things people do from many screens: open a recipe, save it, put it into the list, cook it.
 import { useCallback } from "react";
 import {
-  addToFridge, addToShopping, basics, clampServings, ingredientMatches, ingredientsToBuy, recipeById, track, updateTaste, useUpFromFridge,
+  addToFridge, basics, clampServings, ingredientMatches, ingredientsToBuy, recipeById, track, updateTaste, useUpFromFridge,
   type EngineState, type Recipe,
 } from "../engine";
 import { useStore } from "./store";
 import { signal } from "./personal";
 import { takePick } from "./picks";
+import { addRecipeLines } from "./shoppingDishes";
 import { openLayer, close, routeHash, parseRoute } from "./router";
 import { stopTimersFor } from "./timers";
 import { cue } from "./feedback";
@@ -69,8 +70,8 @@ export function useActions() {
     if (!items.length) return toast("Всё для этого блюда уже есть дома.");
     track({ type: "cart", recipeId: r.id });
     cue("list");
-    update((st) => ({ ...st, shopping: addToShopping(st.shopping, items, r.title) }));
-    toast("В списке покупок: " + items.length + " " + (items.length === 1 ? "продукт" : items.length < 5 ? "продукта" : "продуктов"));
+    // No toast: the button on the recipe turns into «✓ 5 продуктов в покупках · Открыть» (screens/RecipeLayer).
+    update((st) => ({ ...st, shopping: addRecipeLines(st.shopping, items, r) }));
   }, [s, update, toast]);
 
   const startCooking = useCallback((r: Recipe, servings: number) => {
