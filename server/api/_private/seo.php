@@ -10,6 +10,52 @@ const SEO_COURSES = ['soup' => ['Супы', 'Суп', 'супов'], 'main' => [
     'salad' => ['Салаты и закуски', 'Салат', 'салатов и закусок'], 'breakfast' => ['Завтраки', 'Завтрак', 'завтраков'], 'baking' => ['Выпечка', 'Выпечка', 'выпечки'],
     'dessert' => ['Десерты', 'Десерт', 'десертов'], 'snack' => ['Перекусы', 'Перекус', 'перекусов'], 'sauce' => ['Соусы', 'Соус', 'соусов'], 'drink' => ['Напитки', 'Напиток', 'напитков']];
 const SEO_DIFFICULTY = ['easy' => 'Просто', 'medium' => 'Средне', 'hard' => 'Сложно'];
+// Lists for what people search beyond the kind of dish: «постные рецепты», «быстрый ужин», «в мультиварке»… at
+// /recipes/<key>, next to the kinds. [heading, title, description]; which recipes — seo_kind_test.
+const SEO_KINDS = [
+    'postnoe' => ['Постные блюда', 'Постные рецепты', 'Постные блюда без мяса, рыбы, молока и яиц: супы, вторые блюда, каши, выпечка. Время, продукты, шаги и калорийность.'],
+    'bystroe' => ['Быстрый ужин за 30 минут', 'Быстрые ужины за 30 минут', 'Что приготовить на ужин быстро: вторые блюда и супы, которые готовятся не дольше 30 минут вместе со всеми ожиданиями.'],
+    'multivarka' => ['Рецепты в мультиварке', 'Рецепты для мультиварки', 'Блюда в мультиварке: какой режим включить и на сколько минут. Супы, каши, вторые блюда и выпечка.'],
+    'aerogril' => ['Рецепты в аэрогриле', 'Рецепты для аэрогриля', 'Что приготовить в аэрогриле: мясо, рыба, овощи и гарниры с температурой и временем.'],
+    'mikrovolnovka' => ['Рецепты в микроволновке', 'Рецепты в микроволновке', 'Что приготовить в микроволновке: блюда с мощностью и временем, когда нет плиты или времени.'],
+    'detyam' => ['Детское меню', 'Детское меню — рецепты для детей', 'Блюда, которые подходят детям: не острые, без алкоголя, из привычных продуктов. Каши, супы, котлеты, запеканки.'],
+    'vegetarianskoe' => ['Вегетарианские блюда', 'Вегетарианские рецепты', 'Блюда без мяса и рыбы: супы, вторые блюда, салаты, выпечка. Время, продукты, шаги и калорийность.'],
+];
+const SEO_NOT_LENTEN = ['meat', 'poultry', 'chicken', 'fish', 'seafood', 'dairy', 'eggs'];
+const SEO_NOT_VEG = ['meat', 'poultry', 'chicken', 'fish', 'seafood'];
+/** Whether a recipe belongs to the list (the same rules as the app's filters). */
+function seo_kind_test(string $k, array $r): bool {
+    $groups = function (array $not) use ($r): bool {
+        $ings = catalog_ingredients();
+        foreach ($r['ingredients'] as $i) if (empty($i['optional']) && array_intersect((array)($ings[$i['id'] ?? '']['groups'] ?? []), $not)) return false;
+        return true;
+    };
+    $app = (array)($r['appliances'] ?? []);
+    switch ($k) {
+        case 'postnoe': return $groups(SEO_NOT_LENTEN);
+        case 'bystroe': return (int)$r['totalMinutes'] <= 30 && in_array($r['_course'], ['main', 'soup'], true);
+        case 'multivarka': return in_array('multicooker', $app, true);
+        case 'aerogril': return in_array('airfryer', $app, true);
+        case 'mikrovolnovka': return in_array('microwave', $app, true);
+        // Nearly every dish is marked «можно детям»: the menu is the ones written for children, and the simple, mild,
+        // quick ones — not an «Аварский хинкал» or 2600 kcal of «Аранчини».
+        case 'detyam':
+            if (preg_match('/для (детей|малышей|ребёнка|ребенка)/ui', (string)$r['title'])) return true;
+            $kcal = seo_nutrition($r)['kcal'] ?? 0;
+            return ($r['kids'] ?? null) === true && ($r['difficulty'] ?? '') === 'easy' && (int)$r['totalMinutes'] <= 60 && $kcal > 0 && $kcal <= 500
+                && in_array($r['_course'], ['breakfast', 'soup', 'main', 'side', 'dessert', 'baking'], true)
+                && !in_array((string)($r['cuisine'] ?? ''), ['caucasian', 'central-asian', 'international'], true);
+        case 'vegetarianskoe': return $groups(SEO_NOT_VEG);
+    }
+    return false;
+}
+/** The list's recipes (with a photo first); a list with fewer than six is not shown. */
+function seo_kind_list(string $k): array {
+    static $cache = [];
+    if (isset($cache[$k])) return $cache[$k];
+    $list = array_values(array_filter(seo_recipes(), fn($r) => seo_kind_test($k, $r)));
+    return $cache[$k] = count($list) >= 6 ? $list : [];
+}
 const SEO_CUISINE = ['russian' => 'Русская кухня', 'ukrainian' => 'Украинская кухня', 'belarusian' => 'Белорусская кухня', 'caucasian' => 'Кавказская кухня',
     'central-asian' => 'Среднеазиатская кухня', 'tatar' => 'Татарская кухня', 'international' => 'Европейская кухня'];
 
@@ -425,8 +471,42 @@ function seo_not_found(): void {
 }
 
 // ---------- recipes.php ----------
+/** «Постные блюда», «Быстрый ужин за 30 минут»…: one list, laid out like a kind's page. */
+function seo_kind_page(string $k): void {
+    $list = seo_kind_list($k);
+    if (!$list) { seo_not_found(); return; }
+    [$heading, $title, $desc] = SEO_KINDS[$k];
+    $n = count($list);
+    // Written for this list first («…для детей»), then with a photo; a long list shows its best 150 (every recipe
+    // is linked from its kind's page anyway), so the page stays light.
+    $own = fn($r) => $k === 'detyam' && preg_match('/для (детей|малышей|ребёнка|ребенка)|детск/ui', (string)$r['title']) ? 1 : 0;
+    usort($list, fn($a, $b) => $own($b) <=> $own($a) ?: (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0) ?: strcmp(mb_strtolower($a['title'], 'UTF-8'), mb_strtolower($b['title'], 'UTF-8')));
+    $more = max(0, $n - 150);
+    $list = array_slice($list, 0, 150);
+    $ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => $heading, 'numberOfItems' => $n,
+        'itemListElement' => array_values(array_map(fn($r, $i) => ['@type' => 'ListItem', 'position' => $i + 1, 'url' => seo_abs(seo_recipe_path($r['id'])), 'name' => (string)$r['title']], $list, array_keys($list)))];
+    header('Content-Type: text/html; charset=utf-8');
+    header('Cache-Control: public, max-age=300');
+    echo seo_head(['title' => $title . ' — ' . $n . ' ' . seo_plural($n, 'рецепт', 'рецепта', 'рецептов') . ' с фото и шагами | ' . SEO_SITE, 'description' => $desc, 'canonical' => seo_abs(seo_list_path($k)), 'ld' => [$ld]]);
+    echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_list_path()) . "\">Рецепты</a></nav>\n";
+    echo '<h1>' . h($heading) . '</h1><p class="lead">' . h($desc) . "</p>\n";
+    echo seo_kind_chips($k);
+    echo '<div class="cta"><p>Скажите, что есть дома, — Шеф подберёт блюдо из этого списка и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
+    echo '<ul class="grid">';
+    foreach ($list as $r) echo seo_card($r);
+    echo "</ul>\n";
+    if ($more) echo '<p class="more">И ещё ' . $more . ' ' . seo_plural($more, 'рецепт', 'рецепта', 'рецептов') . ' — в <a href="' . h(seo_path()) . '">приложении</a> и в разделах <a href="' . h(seo_list_path()) . "\">по видам блюд</a>.</p>\n";
+    echo seo_footer();
+}
+/** The lists as a row of links (on the catalog and on each list). */
+function seo_kind_chips(?string $on = null): string {
+    $out = '<ul class="cats">';
+    foreach (SEO_KINDS as $k => $names) { $n = count(seo_kind_list($k)); if ($n) $out .= '<li><a href="' . h(seo_list_path($k)) . '"' . ($on === $k ? ' class="on"' : '') . '>' . h($names[0]) . '<small>' . $n . '</small></a></li>'; }
+    return $out . "</ul>\n";
+}
 function seo_list_page(?string $course): void {
     $all = seo_recipes();
+    if ($course !== null && isset(SEO_KINDS[$course])) { seo_kind_page($course); return; }
     if ($course !== null && !isset(SEO_COURSES[$course])) { seo_not_found(); return; }
     $by = [];
     foreach ($all as $r) $by[$r['_course']][] = $r;
@@ -453,6 +533,7 @@ function seo_list_page(?string $course): void {
     echo '<ul class="cats"><li><a href="' . h(seo_list_path()) . '"' . ($course ? '' : ' class="on"') . '>Все<small>' . $count . '</small></a></li>';
     foreach (SEO_COURSES as $c => $names) if (!empty($by[$c])) echo '<li><a href="' . h(seo_list_path($c)) . '"' . ($course === $c ? ' class="on"' : '') . '>' . h($names[0]) . '<small>' . count($by[$c]) . '</small></a></li>';
     echo "</ul>\n";
+    if (!$course) echo seo_kind_chips();
     echo '<div class="cta"><p>Не знаете, что выбрать? Назовите продукты, время или настроение — Шеф подберёт рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
     // Dishes with a photo first, then by name.
     $photoFirst = function (array $list): array { usort($list, fn($a, $b) => (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0) ?: strcmp(mb_strtolower($a['title'], 'UTF-8'), mb_strtolower($b['title'], 'UTF-8'))); return $list; };
@@ -484,6 +565,7 @@ function seo_sitemap(): void {
     $courses = [];
     foreach ($all as $r) $courses[$r['_course']] = max($courses[$r['_course']] ?? 0, (int)$r['_mtime']);
     foreach (SEO_COURSES as $c => $_) if (isset($courses[$c])) $url(seo_abs(seo_list_path($c)), $courses[$c]);
+    foreach (SEO_KINDS as $k => $_) if (seo_kind_list($k)) $url(seo_abs(seo_list_path($k)), $newest);
     if (function_exists('seo_collection_list')) {
         $url(seo_abs(seo_collection_path()), $newest);
         foreach (seo_collection_list() as $k => $_) $url(seo_abs(seo_collection_path($k)), $newest);
@@ -529,6 +611,47 @@ function seo_ing_name(string $id): string {
     return mb_strtolower(preg_replace('/,.*$|\s+\d[\d.,]*\s*%?.*$/u', '', (string)$ing['name']), 'UTF-8');
 }
 function seo_ucfirst(string $s): string { return mb_strtoupper(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8'); }
+// «Что приготовить из тыквы»: the words people search with. The product's short name (seo_ing_name) → «из …», the way
+// it is said (картошки, not картофеля; фарша, not свино-говяжьего фарша). A product missing here keeps «Тыква: что приготовить».
+const SEO_OF = [
+    'макароны' => 'макарон', 'резаные томаты в банке' => 'консервированных томатов', 'чеснок' => 'чеснока', 'сыр' => 'сыра', 'шампиньоны' => 'шампиньонов',
+    'сливки' => 'сливок', 'лук' => 'лука', 'шпинат' => 'шпината', 'лимонный сок' => 'лимонного сока', 'вареный рис' => 'варёного риса', 'яйцо' => 'яиц',
+    'замороженный горошек' => 'замороженного горошка', 'соевый соус' => 'соевого соуса', 'зеленый лук' => 'зелёного лука', 'консервированный нут' => 'консервированного нута',
+    'петрушка' => 'петрушки', 'паприка' => 'паприки', 'кускус' => 'кускуса', 'огурец' => 'огурцов', 'помидор' => 'помидоров', 'красная чечевица' => 'красной чечевицы',
+    'морковь' => 'моркови', 'томатная паста' => 'томатной пасты', 'картофель' => 'картошки', 'фасоль в банке' => 'консервированной фасоли', 'молоко' => 'молока',
+    'болгарский перец' => 'болгарского перца', 'чили' => 'перца чили', 'натуральный йогурт' => 'йогурта', 'укроп' => 'укропа', 'куриное филе' => 'куриного филе',
+    'рис' => 'риса', 'сметана' => 'сметаны', 'вермишель' => 'вермишели', 'консервированный тунец' => 'консервированного тунца', 'красный лук' => 'красного лука',
+    'капуста' => 'капусты', 'творог' => 'творога', 'овсяные хлопья' => 'овсяных хлопьев', 'яблоко' => 'яблок', 'корица' => 'корицы', 'банан' => 'бананов',
+    'говядина' => 'говядины', 'свёкла' => 'свёклы', 'колотый горох' => 'гороха', 'варёно-копчёный окорок' => 'окорока', 'колбаса варёная с молоком и яйцом' => 'варёной колбасы',
+    'солёные огурцы' => 'солёных огурцов', 'маслины' => 'маслин', 'перловая крупа' => 'перловки', 'филе минтая' => 'минтая', 'свино-говяжий фарш' => 'фарша',
+    'кориандр молотый' => 'кориандра', 'плавленый сыр' => 'плавленого сыра', 'кефир' => 'кефира', 'редис' => 'редиски', 'белый хлеб' => 'хлеба', 'свинина' => 'свинины',
+    'зира' => 'зиры', 'филе куриного бедра' => 'куриных бёдер', 'печень говяжья' => 'говяжьей печени', 'горбуша' => 'горбуши', 'гречка' => 'гречки', 'кабачок' => 'кабачков',
+    'орех' => 'орехов', 'кинза' => 'кинзы', 'манка' => 'манки', 'пшено' => 'пшена', 'тыква' => 'тыквы', 'горошек' => 'горошка', 'майонез' => 'майонеза',
+    'квашеная капуста' => 'квашеной капусты', 'селёдка' => 'селёдки', 'крабовые палочки' => 'крабовых палочек', 'кукуруза' => 'кукурузы', 'горбуша в банке' => 'консервированной горбуши',
+    'баклажан' => 'баклажанов', 'изюм' => 'изюма', 'мёд' => 'мёда', 'какао' => 'какао', 'пельмени' => 'пельменей', 'лаваш' => 'лаваша', 'сухари' => 'сухарей',
+    'сосиски' => 'сосисок', 'ветчина' => 'ветчины', 'тушёнка' => 'тушёнки', 'говяжий фарш' => 'говяжьего фарша', 'вишня' => 'вишни', 'курага' => 'кураги',
+    'чернослив' => 'чернослива', 'салат' => 'листьев салата', 'фета' => 'феты', 'баранина' => 'баранины', 'индейка' => 'индейки', 'цветная капуста' => 'цветной капусты',
+    'брокколи' => 'брокколи', 'булгур' => 'булгура', 'скумбрия' => 'скумбрии', 'варёнка' => 'варёной колбасы', 'горчица' => 'горчицы', 'базилик' => 'базилика',
+    'лимон' => 'лимона', 'желатин' => 'желатина', 'печенье' => 'печенья', 'ананас' => 'ананаса', 'кукурузная крупа' => 'кукурузной крупы', 'клюква' => 'клюквы',
+    'бекон' => 'бекона', 'стебли сельдерея' => 'сельдерея', 'моцарелла' => 'моцареллы', 'свежий базилик' => 'свежего базилика', 'анчоусы' => 'анчоусов',
+    'арборио' => 'риса арборио', 'говяжий бульон' => 'говяжьего бульона', 'фило' => 'теста фило', 'креветки' => 'креветок', 'лосось' => 'лосося', 'имбирь' => 'имбиря',
+    'сухой нут' => 'нута', 'адыгейский сыр' => 'адыгейского сыра', 'мята' => 'мяты', 'цельная чечевица' => 'чечевицы', 'кунжут' => 'кунжута', 'круглый рис' => 'круглого риса',
+    'тофу' => 'тофу', 'рамен' => 'лапши рамен', 'арахис' => 'арахиса', 'рисовая лапша' => 'рисовой лапши', 'молоко кокоса' => 'кокосового молока',
+    'бургерная булочка' => 'булочек для бургеров', 'крем-чиз' => 'крем-чиза', 'кукурузная лепёшка' => 'кукурузных лепёшек', 'авокадо' => 'авокадо', 'тортилья' => 'тортильи',
+    'чёрная фасоль в банке' => 'чёрной фасоли', 'тёмный шоколад' => 'тёмного шоколада', 'маскарпоне' => 'маскарпоне', 'жирные сливки' => 'жирных сливок',
+    'стручки фасоли' => 'стручковой фасоли', 'абрикосовый джем' => 'абрикосового джема', 'сгущёнка' => 'сгущёнки', 'цыплёнок' => 'цыплёнка', 'печень курицы' => 'куриной печени',
+    'куриные сердца' => 'куриных сердечек', 'свиные рёбра' => 'свиных рёбер', 'кальмар' => 'кальмаров', 'брынза' => 'брынзы', 'рулька' => 'рульки',
+    'слоёное тесто' => 'слоёного теста', 'судак' => 'судака', 'пекинка' => 'пекинской капусты', 'фунчоза' => 'фунчозы', 'повидло' => 'повидла',
+    'кокосовая стружка' => 'кокосовой стружки', 'мороженая клубника' => 'клубники', 'треска' => 'трески', 'белый шоколад' => 'белого шоколада', 'шпик сырой' => 'сала',
+    'жирная сметана' => 'сметаны', 'яичная лапша' => 'яичной лапши', 'миндальная мука' => 'миндальной муки', 'миндаль' => 'миндаля',
+];
+/** «тыквы», «курицы и картошки» — or null when a product has no form here (the page keeps its old heading). */
+function seo_of(string $a, ?string $b = null): ?string {
+    $x = SEO_OF[seo_ing_name($a)] ?? null;
+    if ($b === null) return $x;
+    $y = SEO_OF[seo_ing_name($b)] ?? null;
+    return $x && $y ? $x . ' и ' . $y : null;
+}
 /** [ingredient id => [recipe ids]] for products worth a page. */
 function seo_combo_index(): array {
     static $idx = null;
@@ -565,8 +688,11 @@ function seo_combo_page(string $a, ?string $b): void {
     $n = count($list);
     $names = $b ? seo_ing_name($a) . ' и ' . seo_ing_name($b) : seo_ing_name($a);
     $quick = count(array_filter($list, fn($r) => (int)$r['totalMinutes'] <= 30));
-    $title = seo_ucfirst($names) . ': что приготовить — ' . $n . ' ' . seo_plural($n, 'рецепт', 'рецепта', 'рецептов');
-    $desc = 'Что приготовить, если дома есть ' . $names . ': ' . $n . ' ' . seo_plural($n, 'домашний рецепт', 'домашних рецепта', 'домашних рецептов')
+    // In the words of the search: «Что приготовить из тыквы» (seo_of); the old «Тыква: что приготовить» for the rest.
+    $of = seo_of($a, $b);
+    $heading = $of ? 'Что приготовить из ' . $of : seo_ucfirst($names) . ': что приготовить';
+    $title = $heading . ' — ' . $n . ' ' . seo_plural($n, 'рецепт', 'рецепта', 'рецептов');
+    $desc = ($of ? 'Что приготовить из ' . $of : 'Что приготовить, если дома есть ' . $names) . ': ' . $n . ' ' . seo_plural($n, 'домашний рецепт', 'домашних рецепта', 'домашних рецептов')
         . ($quick ? ', из них ' . $quick . ' — за 30 минут и быстрее' : '') . '. Время, ингредиенты, шаги и калорийность.';
     $canonical = seo_abs(seo_combo_path($a, $b));
     $ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => $title, 'numberOfItems' => $n,
@@ -575,7 +701,7 @@ function seo_combo_page(string $a, ?string $b): void {
     header('Cache-Control: public, max-age=600');
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_combo_path('')) . '">Что приготовить из продуктов</a>' . ($b ? ' › <a href="' . h(seo_combo_path($a)) . '">' . h(seo_ucfirst(seo_ing_name($a))) . '</a>' : '') . "</nav>\n";
-    echo '<h1>' . h(seo_ucfirst($names)) . ': что приготовить</h1><p class="lead">' . h($desc) . "</p>\n";
+    echo '<h1>' . h($heading) . '</h1><p class="lead">' . h($desc) . "</p>\n";
     echo '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — Шеф подберёт блюдо и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
     echo '<ul class="grid">';
     foreach ($list as $r) echo seo_card($r, true);

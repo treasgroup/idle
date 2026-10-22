@@ -8,6 +8,8 @@
     if (p.textSize === "l" || p.simple) root.classList.add("large-text");
     if (p.textSize === "xl") root.classList.add("xl-text");
     if (p.simple) root.classList.add("simple-mode");
+    // In the Android app the catalog links meant for search engines are not shown while it starts.
+    if (window.CookNative) root.classList.add("in-app");
   } catch (e) { /* private mode: defaults */ }
 })();
 // First visit: the recipe list (the biggest download; its light part, without steps) starts together with the page

@@ -12,10 +12,15 @@
   <meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="Что приготовить? — подберу рецепт по продуктам и настроению">
   <meta property="og:description" content="Скажите, что есть дома и сколько времени, — подберу домашний рецепт. Готовка по шагам с таймером, меню на неделю и список покупок.">
-  <meta property="og:image" content="./icons/icon-512.png">
+  <meta property="og:image" content="https://treas.su/cook/icons/icon-512.png">
+  <meta property="og:url" content="https://treas.su/cook/">
+  <!-- One address for search engines (not http://, www. or ?recipe=…). -->
+  <link rel="canonical" href="https://treas.su/cook/">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Что приготовить?","url":"https://treas.su/cook/","inLanguage":"ru","description":"Подбор домашних рецептов по продуктам, времени и настроению: голосом или текстом, готовка по шагам с таймером, меню на неделю и список покупок."}</script>
   <meta name="twitter:card" content="summary">
+  <style>.in-app .seo-links{display:none}</style>
   <link rel="preload" href="./fonts/GolosText-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="./boot.js?v=6e4404a7"></script>
+  <script src="./boot.js?v=f2db6ed4"></script>
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
@@ -34,6 +39,13 @@
       <span class="skeleton mt-4 block h-16 rounded-card"></span>
       <span class="skeleton mt-3 block h-16 rounded-card"></span>
     </div>
+    <!-- For search engines, until the app starts (it replaces all of this): the plain pages of the catalog. -->
+    <nav class="seo-links mx-auto max-w-3xl px-4 pt-10" style="font-size:13px;line-height:1.9;color:#8a8178" aria-label="Каталог">
+      <a href="./recipes/">Все рецепты</a> · <a href="./recipes/soup">Супы</a> · <a href="./recipes/main">Вторые блюда</a> · <a href="./recipes/salad">Салаты</a> ·
+      <a href="./recipes/breakfast">Завтраки</a> · <a href="./recipes/baking">Выпечка</a> · <a href="./recipes/dessert">Десерты</a> ·
+      <a href="./recipes/bystroe">Быстрый ужин</a> · <a href="./recipes/postnoe">Постное</a> · <a href="./recipes/multivarka">В мультиварке</a> ·
+      <a href="./recipes/detyam">Детское меню</a> · <a href="./iz/">Что приготовить из продуктов</a> · <a href="./podborka/">Подборки</a> · <a href="./shkola/">Школа готовки</a>
+    </nav>
   </div>
   <noscript><p>Для подбора рецептов включите JavaScript. Без него можно открыть <a href="./recipes.php">каталог всех рецептов</a>.</p></noscript>
 </body>
