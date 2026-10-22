@@ -1,0 +1,1869 @@
+{
+    "batch": "41-postnoe-bystro-2",
+    "description": "Постное на каждый день",
+    "ingredients": [
+        {
+            "id": "sparkling-mineral-water",
+            "name": "Минеральная вода газированная",
+            "aliases": [
+                "минералка",
+                "газированная вода"
+            ],
+            "groups": [],
+            "per100g": {
+                "kcal": 0,
+                "protein": 0,
+                "fat": 0,
+                "carbs": 0
+            },
+            "gramsPerUnit": {
+                "мл": 1
+            },
+            "aisle": "other"
+        }
+    ],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-potatoes-mushrooms-onion",
+            "title": "Картошка с грибами и луком постная",
+            "summary": "Жареная картошка с шампиньонами и золотистым луком на растительном масле. Сытно и вкусно без капли мяса.",
+            "aliases": [
+                "Жареная картошка с грибами",
+                "Картофель с шампиньонами постный"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 25,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 800,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "mushroom",
+                    "name": "Шампиньоны",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Очистите картофель, нарежьте брусочками, промойте и обсушите. Грибы нарежьте пластинками, лук — полукольцами.",
+                    "uses": [
+                        "potato",
+                        "mushroom",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Разогрейте треть масла и жарьте грибы с луком 8 минут на сильном огне, пока сок не испарится и они не подрумянятся. Переложите в миску.",
+                    "uses": [
+                        "vegetable-oil",
+                        "mushroom",
+                        "onion"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "В оставшемся масле жарьте картофель 15 минут на среднем огне, переворачивая раз в 3 минуты, пока он не станет румяным и мягким.",
+                    "uses": [
+                        "vegetable-oil",
+                        "potato"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Верните грибы с луком, добавьте чеснок, соль и перец и прогрейте 2 минуты. Посыпьте укропом.",
+                    "uses": [
+                        "mushroom",
+                        "onion",
+                        "garlic",
+                        "salt",
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Грибы и картофель жарьте отдельно — так они оба зарумянятся.",
+                "Солите в конце, иначе картофель потечёт."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "potato",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Золотистая жареная картошка с румяными ломтиками шампиньонов и луком, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lentils-carrot-onion",
+            "title": "Чечевица с морковью и луком",
+            "summary": "Коричневая чечевица, потушенная с морковью, луком и томатом. Сытный постный ужин и хороший гарнир.",
+            "aliases": [
+                "Тушёная чечевица с морковью",
+                "Чечевица постная"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 40,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "brown-lentil",
+                    "name": "Коричневая чечевица",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 700,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Промойте чечевицу, лук мелко нарежьте, морковь натрите. Разогрейте масло в кастрюле и жарьте лук с морковью 5 минут. Добавьте томатную пасту и чеснок и прогрейте минуту.",
+                    "uses": [
+                        "brown-lentil",
+                        "vegetable-oil",
+                        "onion",
+                        "carrot",
+                        "tomato-paste",
+                        "garlic"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Всыпьте чечевицу, влейте горячую воду, положите лавровый лист и доведите до кипения. Накройте и тушите на слабом огне 25 минут, пока чечевица не станет мягкой.",
+                    "uses": [
+                        "brown-lentil",
+                        "water",
+                        "bay-leaf"
+                    ],
+                    "timerSeconds": 1500
+                },
+                {
+                    "text": "Посолите, поперчите и перемешайте. Если осталась жидкость, подержите без крышки 2–3 минуты. Посыпьте петрушкой.",
+                    "uses": [
+                        "salt",
+                        "black-pepper",
+                        "parsley",
+                        "brown-lentil"
+                    ]
+                }
+            ],
+            "tips": [
+                "Солите в конце — от ранней соли чечевица дольше разваривается.",
+                "Красная чечевица сварится за 15 минут, но станет пюре."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "brown-lentil",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Кастрюля с толстым дном",
+                "Нож",
+                "Тёрка"
+            ],
+            "look": "Коричневая чечевица с оранжевой морковью в густом томатном соусе, сверху петрушка."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-cabbage-cutlets",
+            "title": "Постные котлеты из капусты",
+            "summary": "Нежные котлеты из капусты с манкой, обжаренные до румяной корочки. Без яиц и молока.",
+            "aliases": [
+                "Капустные котлеты постные",
+                "Котлеты из капусты без яиц"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 40,
+            "activeMinutes": 25,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "breadcrumbs",
+                    "name": "Панировочные сухари",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для капусты",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 40,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 7,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Мелко нашинкуйте капусту, опустите в кипящую подсоленную воду на 7 минут и откиньте на дуршлаг. Хорошо отожмите.",
+                    "uses": [
+                        "cabbage",
+                        "water",
+                        "salt"
+                    ],
+                    "timerSeconds": 420
+                },
+                {
+                    "text": "Пока капуста варится, мелко нарежьте лук и обжарьте на ложке масла 4 минуты. Смешайте капусту с луком, манкой, мукой, чесноком и перцем и оставьте на 10 минут, чтобы манка набухла.",
+                    "uses": [
+                        "onion",
+                        "vegetable-oil",
+                        "cabbage",
+                        "semolina",
+                        "wheat-flour",
+                        "garlic",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Мокрыми руками сформуйте 12 котлет и обваляйте в сухарях. Разогрейте оставшееся масло и жарьте котлеты по 4 минуты с каждой стороны до румяной корочки.",
+                    "uses": [
+                        "cabbage",
+                        "breadcrumbs",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Чем лучше отжата капуста, тем крепче котлеты.",
+                "Подавайте с грибным соусом или томатами."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cabbage",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "yields": {
+                "amount": 12,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Кастрюля",
+                "Миска",
+                "Дуршлаг"
+            ],
+            "look": "Румяные котлеты из капусты в золотистой панировке на тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-pasta-tomatoes-garlic",
+            "title": "Макароны с томатами и чесноком постные",
+            "summary": "Макароны в густом соусе из томатов с чесноком и базиликом на оливковом масле. Простое постное блюдо за 20 минут.",
+            "aliases": [
+                "Паста с томатами постная",
+                "Макароны в томатном соусе без мяса"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pasta",
+                    "name": "Макароны из твёрдых сортов",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "canned-tomato",
+                    "name": "Томаты в собственном соку",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "tomato",
+                        "tomato-paste"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Оливковое или растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dried-basil",
+                    "name": "Базилик сушёный",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-oregano"
+                    ]
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для макарон",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду для макарон. Чеснок тонко нарежьте, петрушку порубите.",
+                    "uses": [
+                        "water",
+                        "garlic",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Прогрейте масло в сковороде на слабом огне и подержите в нём чеснок 1 минуту, не давая потемнеть. Добавьте томаты, раздавите их ложкой, положите базилик, сахар, часть соли и перец и тушите 10 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "garlic",
+                        "canned-tomato",
+                        "dried-basil",
+                        "sugar",
+                        "salt",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Посолите кипящую воду и сварите макароны по времени на пачке. Откиньте, смешайте с соусом и посыпьте петрушкой.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "pasta",
+                        "parsley"
+                    ]
+                }
+            ],
+            "tips": [
+                "Проверьте состав макарон: постные — без яиц.",
+                "Подгоревший чеснок горчит — держите огонь слабым."
+            ],
+            "storageDays": 2,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pasta",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 26 см",
+                "Дуршлаг"
+            ],
+            "look": "Макароны в густом красном томатном соусе с ломтиками чеснока и петрушкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "quick-lenten-borscht",
+            "title": "Постный борщ быстрый",
+            "summary": "Яркий борщ без мяса за 40 минут: свёкла, капуста, картошка и фасоль. Фасоль делает его сытным.",
+            "aliases": [
+                "Борщ без мяса",
+                "Вегетарианский борщ"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 40,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beet",
+                    "name": "Свёкла",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cabbage",
+                    "name": "Капуста",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "canned-beans",
+                    "name": "Фасоль консервированная",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-chickpea",
+                        "canned-black-beans"
+                    ]
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 11,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте брусочками, капусту нашинкуйте, опустите в воду, посолите и варите 10 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "cabbage",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Пока варятся овощи, натрите свёклу и морковь, мелко нарежьте лук. Жарьте их на масле 8 минут, затем добавьте томатную пасту и лимонный сок и прогрейте 2 минуты.",
+                    "uses": [
+                        "beet",
+                        "carrot",
+                        "onion",
+                        "vegetable-oil",
+                        "tomato-paste",
+                        "lemon-juice"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Переложите зажарку в суп, добавьте фасоль без жидкости, лавровый лист и перец и варите 10 минут.",
+                    "uses": [
+                        "beet",
+                        "carrot",
+                        "onion",
+                        "canned-beans",
+                        "bay-leaf",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Добавьте измельчённый чеснок и укроп, выключите огонь и дайте борщу постоять 5 минут под крышкой.",
+                    "uses": [
+                        "garlic",
+                        "dill"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Лимонный сок сохраняет свёкле яркий цвет.",
+                "Вместо фасоли можно взять грибы."
+            ],
+            "storageDays": 3,
+            "freezerDays": 90,
+            "cuisine": "ukrainian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "beet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска",
+                "Тёрка"
+            ],
+            "look": "Тёмно-рубиновый борщ с фасолью и капустой, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-bean-soup",
+            "title": "Суп с фасолью постный",
+            "summary": "Густой суп с консервированной фасолью, картошкой, морковью и томатом. Сытный и готов за полчаса.",
+            "aliases": [
+                "Фасолевый суп без мяса",
+                "Постный фасолевый суп"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "canned-beans",
+                    "name": "Фасоль консервированная",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте кубиками, опустите в воду, посолите и варите 10 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Лук мелко нарежьте, морковь натрите и обжарьте на масле 5 минут. Добавьте томатную пасту и чеснок и прогрейте минуту.",
+                    "uses": [
+                        "onion",
+                        "carrot",
+                        "vegetable-oil",
+                        "tomato-paste",
+                        "garlic"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Положите в суп зажарку, фасоль без жидкости, лавровый лист и перец и варите 8 минут. Посыпьте петрушкой.",
+                    "uses": [
+                        "onion",
+                        "carrot",
+                        "canned-beans",
+                        "bay-leaf",
+                        "black-pepper",
+                        "parsley"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Половину фасоли можно размять вилкой — суп станет гуще.",
+                "Подавайте с ржаными сухариками."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "canned-beans",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Густой красноватый суп с белой фасолью и кубиками картофеля, сверху петрушка."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-mushroom-soup",
+            "title": "Грибной суп постный",
+            "summary": "Ароматный суп с шампиньонами, картошкой и вермишелью на растительном масле. Без мяса, но очень наваристый.",
+            "aliases": [
+                "Грибной суп без мяса",
+                "Суп из шампиньонов постный"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "mushroom",
+                    "name": "Шампиньоны",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-noodle",
+                    "name": "Вермишель",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "pasta"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте кубиками, опустите в воду, посолите и варите 8 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Грибы нарежьте пластинками, лук мелко, морковь натрите. Жарьте грибы с луком и морковью на масле 8 минут, пока они не подрумянятся.",
+                    "uses": [
+                        "mushroom",
+                        "onion",
+                        "carrot",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Переложите зажарку в суп, всыпьте вермишель, добавьте лавровый лист и перец и варите 6 минут. Посыпьте укропом.",
+                    "uses": [
+                        "mushroom",
+                        "onion",
+                        "carrot",
+                        "wheat-noodle",
+                        "bay-leaf",
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 360
+                }
+            ],
+            "tips": [
+                "Горсть сушёных белых грибов сделает суп ещё ароматнее.",
+                "Вермишель должна быть без яиц."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "mushroom",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Золотистый бульон с ломтиками грибов, вермишелью и картофелем, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-bean-crouton-salad",
+            "title": "Салат из фасоли с сухариками постный",
+            "summary": "Красная фасоль, кукуруза, солёные огурцы и домашние чесночные сухарики с заправкой из масла вместо майонеза.",
+            "aliases": [
+                "Салат с фасолью и сухариками без майонеза",
+                "Постный салат с фасолью"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "canned-beans",
+                    "name": "Красная фасоль консервированная",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "canned-corn",
+                    "name": "Кукуруза консервированная",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-peas"
+                    ]
+                },
+                {
+                    "id": "pickled-cucumber",
+                    "name": "Солёные огурцы",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "white-bread",
+                    "name": "Белый хлеб без молока и яиц",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте хлеб кубиками. Разогрейте половину масла, прогрейте в нём измельчённый чеснок 20 секунд и обжарьте хлеб 4 минуты, помешивая, до хруста.",
+                    "uses": [
+                        "white-bread",
+                        "vegetable-oil",
+                        "garlic"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "С фасоли и кукурузы слейте жидкость, огурцы нарежьте кубиками, петрушку порубите.",
+                    "uses": [
+                        "canned-beans",
+                        "canned-corn",
+                        "pickled-cucumber",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Смешайте фасоль, кукурузу, огурцы и петрушку с оставшимся маслом и солью. Сухарики добавьте перед самой подачей, чтобы они не размокли.",
+                    "uses": [
+                        "canned-beans",
+                        "canned-corn",
+                        "pickled-cucumber",
+                        "parsley",
+                        "vegetable-oil",
+                        "salt",
+                        "white-bread"
+                    ]
+                }
+            ],
+            "tips": [
+                "Проверьте, что хлеб без молока и яиц.",
+                "Огурцы солёные — соли почти не нужно."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "salad",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "canned-beans",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Сковорода",
+                "Салатник",
+                "Нож"
+            ],
+            "look": "Красная фасоль с жёлтой кукурузой, огурцами и золотистыми сухариками в салатнике."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-mineral-water-pancakes",
+            "title": "Постные оладьи на минералке",
+            "summary": "Пышные оладьи без яиц и молока — пузырьки газированной воды поднимают тесто. Подавайте с вареньем или мёдом.",
+            "aliases": [
+                "Оладьи без яиц и молока",
+                "Оладьи на газированной воде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sparkling-mineral-water",
+                    "name": "Газированная минеральная вода",
+                    "amount": 300,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "baking-soda",
+                    "name": "Сода",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 40,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте муку с сахаром, солью и содой. Влейте холодную минералку и ложку масла и быстро перемешайте венчиком до густого теста без комков.",
+                    "uses": [
+                        "wheat-flour",
+                        "sugar",
+                        "salt",
+                        "baking-soda",
+                        "sparkling-mineral-water",
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Сразу разогрейте сковороду с частью масла на среднем огне — пузырьки в тесте не должны выдохнуться.",
+                    "uses": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Выкладывайте тесто ложкой и жарьте оладьи по 2 минуты с каждой стороны до золотистого цвета, подливая масло. Перекладывайте на бумажное полотенце.",
+                    "uses": [
+                        "wheat-flour",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 240
+                }
+            ],
+            "tips": [
+                "Минералка должна быть холодной и сильно газированной.",
+                "Не мешайте тесто долго — уйдут пузырьки."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast",
+                "snack"
+            ],
+            "mainIngredient": "wheat-flour",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "yields": {
+                "amount": 16,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Сковорода 26 см",
+                "Миска",
+                "Венчик",
+                "Лопатка"
+            ],
+            "look": "Стопка пышных золотистых оладий с ложкой варенья."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-potato-pancakes",
+            "title": "Картофельные драники постные",
+            "summary": "Хрустящие драники без яиц: картофель, лук и немного муки. Снаружи румяные, внутри мягкие.",
+            "aliases": [
+                "Драники без яиц",
+                "Постные драники"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 25,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 800,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 60,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "vegetarian",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Натрите картофель и лук на мелкой тёрке и сразу хорошо отожмите сок.",
+                    "uses": [
+                        "potato",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Смешайте с мукой, солью и перцем. Тесто должно держать форму на ложке.",
+                    "uses": [
+                        "potato",
+                        "wheat-flour",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло на среднем огне, выкладывайте тесто ложкой и слегка приплющивайте. Жарьте по 3–4 минуты с каждой стороны до хрустящей корочки, подливая масло.",
+                    "uses": [
+                        "vegetable-oil",
+                        "potato"
+                    ],
+                    "timerSeconds": 420
+                }
+            ],
+            "tips": [
+                "Лук не даёт картофелю потемнеть — трите их по очереди.",
+                "Подавайте с грибным соусом или квашеной капустой."
+            ],
+            "storageDays": 1,
+            "cuisine": "belarusian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "potato",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "yields": {
+                "amount": 14,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Сковорода 28 см",
+                "Тёрка",
+                "Миска",
+                "Лопатка"
+            ],
+            "look": "Румяные хрустящие драники с кружевными краями на тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lenten-oatmeal-cookies",
+            "title": "Овсяное печенье постное",
+            "summary": "Хрустящее овсяное печенье на растительном масле с изюмом — без яиц, молока и масла.",
+            "aliases": [
+                "Овсяное печенье без яиц",
+                "Постное печенье из овсянки"
+            ],
+            "servings": 8,
+            "minServings": 4,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "oat-flakes",
+                    "name": "Овсяные хлопья",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "raisins",
+                    "name": "Изюм",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-apricot",
+                        "prunes"
+                    ]
+                },
+                {
+                    "id": "baking-soda",
+                    "name": "Сода",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cinnamon",
+                    "name": "Корица",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cardamom-ground"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "vegetarian",
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 180 °C. Смешайте хлопья, муку, сахар, соду, корицу и соль.",
+                    "uses": [
+                        "oat-flakes",
+                        "wheat-flour",
+                        "sugar",
+                        "baking-soda",
+                        "cinnamon",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Влейте масло и тёплую воду, добавьте промытый изюм и перемешайте. Оставьте на 10 минут, чтобы хлопья набухли.",
+                    "uses": [
+                        "vegetable-oil",
+                        "water",
+                        "raisins",
+                        "oat-flakes"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Выкладывайте тесто ложкой на пергамент и приплющивайте мокрыми пальцами. Выпекайте 15 минут до золотистых краёв. Остудите — печенье станет хрустящим.",
+                    "uses": [
+                        "oat-flakes"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Горячее печенье мягкое, хрустящим оно становится, когда остынет.",
+                "Изюм можно заменить орехами или курагой."
+            ],
+            "storageDays": 7,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "oat-flakes",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "yields": {
+                "amount": 20,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Духовка",
+                "Противень",
+                "Пергамент",
+                "Миска"
+            ],
+            "look": "Золотистое круглое овсяное печенье с изюмом на решётке."
+        }
+    ]
+}

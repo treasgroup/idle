@@ -1,0 +1,1297 @@
+{
+    "batch": "36-garniry-2",
+    "description": "Простые гарниры",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fluffy-buckwheat",
+            "title": "Гречка рассыпчатая",
+            "summary": "Как сварить гречку зёрнышко к зёрнышку: прокалить, залить водой в пропорции 1 к 2 и не мешать.",
+            "aliases": [
+                "Гречка на гарнир",
+                "Гречневая каша рассыпчатая"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "buckwheat",
+                    "name": "Гречка",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Переберите гречку и промойте, пока вода не станет прозрачной. Прогрейте её в сухой кастрюле на среднем огне 2–3 минуты, помешивая, пока она не запахнет орехом.",
+                    "uses": [
+                        "buckwheat"
+                    ]
+                },
+                {
+                    "text": "Залейте крупу кипятком — его должно быть вдвое больше по объёму, чем гречки. Посолите и доведите до кипения.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "buckwheat"
+                    ]
+                },
+                {
+                    "text": "Накройте плотной крышкой, убавьте огонь до самого слабого и варите 15 минут, не открывая и не помешивая, пока вода не впитается.",
+                    "uses": [
+                        "buckwheat"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Снимите с огня, положите масло, снова накройте и оставьте на 10 минут. Перемешайте вилкой.",
+                    "uses": [
+                        "butter",
+                        "buckwheat"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Мерьте одной кружкой: 1 кружка гречки на 2 кружки воды.",
+                "Не мешайте гречку во время варки — от этого она становится кашей."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "buckwheat",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля с толстым дном и крышкой",
+                "Сито",
+                "Ложка"
+            ],
+            "look": "Рассыпчатая коричневая гречка с растопленным сливочным маслом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fluffy-rice",
+            "title": "Рис рассыпчатый",
+            "summary": "Белый рис, который не слипается: промыть до прозрачной воды, точно отмерить воду и дать постоять под крышкой.",
+            "aliases": [
+                "Рис на гарнир",
+                "Как сварить рис"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "rice",
+                    "name": "Рис длиннозёрный",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 450,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Промойте рис в нескольких водах, пока вода не станет почти прозрачной, и дайте стечь в сите.",
+                    "uses": [
+                        "rice"
+                    ]
+                },
+                {
+                    "text": "Вскипятите воду в кастрюле, посолите и всыпьте рис. Когда снова закипит, один раз перемешайте.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "rice"
+                    ]
+                },
+                {
+                    "text": "Накройте крышкой и варите на самом слабом огне 15 минут, не открывая, пока вода не впитается.",
+                    "uses": [
+                        "rice"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Снимите с огня и оставьте под крышкой на 10 минут. Добавьте масло и разрыхлите рис вилкой.",
+                    "uses": [
+                        "rice",
+                        "butter"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Для длиннозёрного риса воды в полтора раза больше, чем риса; для круглого — вдвое.",
+                "Пропаренный рис промывать не нужно, но варить его на 5 минут дольше."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "rice",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля с толстым дном и крышкой",
+                "Сито",
+                "Ложка"
+            ],
+            "look": "Белоснежный рассыпчатый рис, каждое зёрнышко отдельно, с кусочком масла."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "boiled-pasta",
+            "title": "Макароны отварные",
+            "summary": "Как сварить макароны, чтобы они не слиплись: много воды, щедро соли и ровно столько минут, сколько на пачке.",
+            "aliases": [
+                "Макароны на гарнир",
+                "Как сварить макароны"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pasta",
+                    "name": "Макароны",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите в большой кастрюле воду — на 100 г макарон нужен литр. Посолите: примерно 1 чайная ложка на литр.",
+                    "uses": [
+                        "water",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Всыпьте макароны и сразу перемешайте, чтобы они не прилипли ко дну. Варите на среднем огне столько минут, сколько написано на пачке, помешивая 2–3 раза.",
+                    "uses": [
+                        "pasta"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Откиньте на дуршлаг, не промывая, верните в кастрюлю и перемешайте с маслом.",
+                    "uses": [
+                        "pasta",
+                        "butter"
+                    ]
+                }
+            ],
+            "tips": [
+                "Масло в воду добавлять не нужно — макароны не слипнутся, если воды много и вы перемешали их в начале.",
+                "Попробуйте одну макаронину за минуту до конца: она должна быть мягкой, но не разваренной."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pasta",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Дуршлаг",
+                "Ложка"
+            ],
+            "look": "Отварные макароны с блестящим растопленным маслом в миске."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "boiled-potatoes-dill",
+            "title": "Отварной картофель с укропом",
+            "summary": "Молодая или обычная картошка, отваренная целиком, с маслом и свежим укропом. Самый простой и любимый гарнир.",
+            "aliases": [
+                "Варёная картошка с укропом",
+                "Картофель отварной"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 1000,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Очистите картофель и разрежьте крупные клубни пополам, чтобы все кусочки были одного размера. Молодой картофель достаточно хорошо вымыть.",
+                    "uses": [
+                        "potato"
+                    ]
+                },
+                {
+                    "text": "Залейте картофель горячей водой так, чтобы она покрыла его на 2 см, посолите и доведите до кипения.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "potato"
+                    ]
+                },
+                {
+                    "text": "Варите под крышкой на среднем огне 20 минут, пока нож не будет легко входить в середину.",
+                    "uses": [
+                        "potato"
+                    ],
+                    "timerSeconds": 1200
+                },
+                {
+                    "text": "Слейте воду, добавьте масло и рубленый укроп, накройте крышкой и встряхните кастрюлю, чтобы масло и зелень покрыли каждую картофелину.",
+                    "uses": [
+                        "butter",
+                        "dill",
+                        "potato"
+                    ]
+                }
+            ],
+            "tips": [
+                "Не варите на сильном огне: картофель разварится снаружи, а внутри останется твёрдым.",
+                "Молодой картофель кладите в кипящую воду, а старый — в холодную."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "potato",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Нож"
+            ],
+            "look": "Целые отварные картофелины, блестящие от масла и посыпанные свежим укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fluffy-millet",
+            "title": "Пшено рассыпчатое",
+            "summary": "Пшено без горечи и комков: хорошо промыть кипятком и варить в пропорции 1 к 2. Хороший гарнир к мясу и тыкве.",
+            "aliases": [
+                "Пшено на гарнир",
+                "Пшённая каша рассыпчатая"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "millet",
+                    "name": "Пшено",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Промойте пшено несколько раз, последний раз — кипятком. Так уйдёт горечь и мучнистый налёт.",
+                    "uses": [
+                        "millet"
+                    ]
+                },
+                {
+                    "text": "Залейте пшено кипятком — по объёму вдвое больше, посолите и доведите до кипения. Снимите пену.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "millet"
+                    ]
+                },
+                {
+                    "text": "Накройте крышкой и варите на слабом огне 20 минут, пока вода не впитается.",
+                    "uses": [
+                        "millet"
+                    ],
+                    "timerSeconds": 1200
+                },
+                {
+                    "text": "Добавьте масло, накройте и оставьте на 10 минут, затем разрыхлите вилкой.",
+                    "uses": [
+                        "butter",
+                        "millet"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Ярко-жёлтое пшено самое свежее и вкусное.",
+                "Для каши помягче возьмите 2,5 части воды."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "millet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля с толстым дном и крышкой",
+                "Сито",
+                "Ложка"
+            ],
+            "look": "Рассыпчатое ярко-жёлтое пшено с кусочком сливочного масла."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fluffy-pearl-barley",
+            "title": "Перловка рассыпчатая",
+            "summary": "Мягкая рассыпчатая перловка на гарнир. Секрет — замочить её на ночь, тогда она сварится за 40 минут.",
+            "aliases": [
+                "Перловка на гарнир",
+                "Перловая каша рассыпчатая"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 60,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pearl-barley",
+                    "name": "Перловка",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для замачивания и варки",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Промойте перловку и заранее залейте третью воды — лучше с вечера или хотя бы за пару часов. Это время в готовку не входит.",
+                    "uses": [
+                        "pearl-barley",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Слейте воду, залейте крупу оставшейся свежей водой, посолите и доведите до кипения.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "pearl-barley"
+                    ]
+                },
+                {
+                    "text": "Варите на слабом огне под крышкой 40 минут, пока перловка не станет мягкой. Лишнюю воду слейте.",
+                    "uses": [
+                        "pearl-barley"
+                    ],
+                    "timerSeconds": 2400
+                },
+                {
+                    "text": "Добавьте масло, накройте и оставьте на 10 минут.",
+                    "uses": [
+                        "butter",
+                        "pearl-barley"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Без замачивания перловка варится 1,5 часа и получается жёстче.",
+                "Перловка вкусна с грибами и жареным луком."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pearl-barley",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля с толстым дном и крышкой",
+                "Сито",
+                "Ложка"
+            ],
+            "look": "Мягкая жемчужная перловка с растопленным маслом в тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "boiled-bulgur",
+            "title": "Булгур отварной",
+            "summary": "Рассыпчатый булгур за 20 минут — быстрая замена рису и гречке. Чуть ореховый вкус, хорошо держит форму.",
+            "aliases": [
+                "Булгур на гарнир",
+                "Как сварить булгур"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "bulgur",
+                    "name": "Булгур",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Растопите масло в кастрюле и прогрейте в нём булгур 2 минуты, помешивая, пока он не запахнет орехом.",
+                    "uses": [
+                        "butter",
+                        "bulgur"
+                    ]
+                },
+                {
+                    "text": "Залейте кипятком — по объёму вдвое больше крупы, посолите и доведите до кипения.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "bulgur"
+                    ]
+                },
+                {
+                    "text": "Накройте и варите на самом слабом огне 12 минут, затем снимите с огня и оставьте под крышкой на 5 минут.",
+                    "uses": [
+                        "bulgur"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Булгур не нужно промывать.",
+                "Мелкий булгур можно просто залить кипятком и оставить под крышкой на 20 минут."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "bulgur",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля с толстым дном и крышкой",
+                "Сито",
+                "Ложка"
+            ],
+            "look": "Рассыпчатый золотистый булгур в миске."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "stewed-vegetables-side",
+            "title": "Тушёные овощи на гарнир",
+            "summary": "Морковь, кабачок, перец, лук и помидор, потушенные до мягкости. Подходит к мясу, рыбе и курице.",
+            "aliases": [
+                "Овощи тушёные",
+                "Овощной гарнир"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте кабачок и перец кубиками, морковь — кружками, лук — полукольцами, помидоры — дольками, чеснок порубите.",
+                    "uses": [
+                        "zucchini",
+                        "bell-pepper",
+                        "carrot",
+                        "onion",
+                        "tomato",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в глубокой сковороде и жарьте лук с морковью 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте перец и кабачок и жарьте ещё 5 минут, помешивая. Положите помидоры, посолите и поперчите.",
+                    "uses": [
+                        "bell-pepper",
+                        "zucchini",
+                        "tomato",
+                        "salt",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Накройте крышкой и тушите на слабом огне 15 минут, пока овощи не станут мягкими. Добавьте чеснок и петрушку.",
+                    "uses": [
+                        "zucchini",
+                        "garlic",
+                        "parsley"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Зимой подойдёт замороженная овощная смесь — тушите её на 5 минут дольше.",
+                "Воду не добавляйте: овощам хватит своего сока."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "zucchini",
+            "needsSide": false,
+            "season": [
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Глубокая сковорода с крышкой",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Яркие тушёные овощи: кубики кабачка, перца, кружки моркови и помидоры с петрушкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "couscous-butter-herbs",
+            "title": "Кускус с маслом и зеленью",
+            "summary": "Самый быстрый гарнир: кускус заливают кипятком и через 5 минут он готов. С маслом и свежей зеленью.",
+            "aliases": [
+                "Кускус на гарнир",
+                "Как приготовить кускус"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 10,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "couscous",
+                    "name": "Кускус",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Кипяток",
+                    "amount": 400,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cilantro"
+                    ]
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Высыпьте кускус в кастрюлю или миску, посолите и залейте кипятком так, чтобы он покрыл крупу на 1 см.",
+                    "uses": [
+                        "couscous",
+                        "salt",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Накройте крышкой и оставьте на 5 минут, пока кускус не впитает воду.",
+                    "uses": [
+                        "couscous"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте масло и разрыхлите кускус вилкой, чтобы не было комков. Вмешайте мелко рубленную зелень.",
+                    "uses": [
+                        "butter",
+                        "couscous",
+                        "parsley",
+                        "dill"
+                    ]
+                }
+            ],
+            "tips": [
+                "Кипяток можно заменить бульоном — будет вкуснее.",
+                "Разрыхляйте только вилкой: ложка сминает крупинки."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "couscous",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля или миска с крышкой",
+                "Чайник",
+                "Вилка"
+            ],
+            "look": "Рассыпчатый светло-жёлтый кускус с зелёными вкраплениями петрушки и укропа."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "stewed-carrots-sour-cream",
+            "title": "Тушёная морковь со сметаной",
+            "summary": "Сладкая мягкая морковь, потушенная со сметаной и луком. Нравится детям, подходит к котлетам и курице.",
+            "aliases": [
+                "Морковь в сметане",
+                "Морковь тушёная на гарнир"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте морковь тонкими кружками или брусочками, лук мелко.",
+                    "uses": [
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Растопите масло в сковороде и жарьте лук 3 минуты. Добавьте морковь и жарьте ещё 5 минут, помешивая.",
+                    "uses": [
+                        "butter",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Влейте воду, посолите, добавьте сахар, накройте и тушите на слабом огне 12 минут, пока морковь не станет мягкой.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "sugar",
+                        "carrot"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Вмешайте сметану и прогрейте 3 минуты, не доводя до бурного кипения. Посыпьте укропом.",
+                    "uses": [
+                        "sour-cream",
+                        "dill",
+                        "carrot"
+                    ],
+                    "timerSeconds": 180
+                }
+            ],
+            "tips": [
+                "Щепотка сахара подчёркивает сладость моркови.",
+                "Со сливками вместо сметаны получится нежнее."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "carrot",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода с крышкой",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Оранжевые кружки моркови в светлом сметанном соусе с укропом."
+        }
+    ]
+}

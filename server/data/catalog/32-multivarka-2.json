@@ -1,0 +1,1594 @@
+{
+    "batch": "32-multivarka-2",
+    "description": "Мультиварка",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "borscht-multicooker",
+            "title": "Борщ в мультиварке",
+            "summary": "Наваристый борщ с говядиной, свёклой и капустой. Мультиварка варит его без присмотра, а цвет остаётся ярким.",
+            "aliases": [
+                "Борщ с говядиной в мультиварке",
+                "Красный борщ в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 120,
+            "activeMinutes": 25,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beef",
+                    "name": "Говядина",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "beet",
+                    "name": "Свёкла",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "table-vinegar-9",
+                    "name": "Уксус 9%",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "lemon-juice"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 14,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте говядину кусками по 3 см. Свёклу и морковь натрите на крупной тёрке, лук мелко нарежьте, капусту нашинкуйте, картофель нарежьте брусочками.",
+                    "uses": [
+                        "beef",
+                        "beet",
+                        "carrot",
+                        "onion",
+                        "cabbage",
+                        "potato"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка», налейте масло и обжарьте лук, морковь и свёклу 10 минут, помешивая. Добавьте томатную пасту и уксус и прогрейте ещё 2 минуты — так свёкла сохранит цвет.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot",
+                        "beet",
+                        "tomato-paste",
+                        "table-vinegar-9"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Положите говядину, картофель и капусту, добавьте соль, перец и лавровый лист и залейте водой до отметки максимума, не выше.",
+                    "uses": [
+                        "beef",
+                        "potato",
+                        "cabbage",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 90 минут, пока говядина не станет мягкой.",
+                    "uses": [
+                        "beef"
+                    ],
+                    "timerSeconds": 5400
+                },
+                {
+                    "text": "Добавьте измельчённый чеснок и укроп и оставьте борщ на «Подогреве» 10 минут, чтобы он настоялся. Подавайте со сметаной.",
+                    "uses": [
+                        "garlic",
+                        "dill"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Уксус можно заменить ложкой лимонного сока."
+            ],
+            "storageDays": 3,
+            "freezerDays": 90,
+            "cuisine": "ukrainian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "beet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник",
+                "Тёрка"
+            ],
+            "look": "Тёмно-рубиновый борщ с капустой, картофелем и кусочками говядины, сверху сметана и укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fresh-cabbage-shchi-multicooker",
+            "title": "Щи из свежей капусты в мультиварке",
+            "summary": "Классические щи с говядиной, капустой, картошкой и помидором. Простые, сытные и очень домашние.",
+            "aliases": [
+                "Щи в мультиварке",
+                "Щи с говядиной в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 110,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beef",
+                    "name": "Говядина",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте говядину кусками, капусту нашинкуйте, картофель — кубиками, лук мелко, морковь натрите, помидор — кубиками.",
+                    "uses": [
+                        "beef",
+                        "cabbage",
+                        "potato",
+                        "onion",
+                        "carrot",
+                        "tomato"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте лук с морковью на масле 5 минут, добавьте помидор и жарьте ещё 3 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot",
+                        "tomato"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Положите говядину, капусту и картофель, добавьте соль, перец и лавровый лист, залейте водой до отметки максимума.",
+                    "uses": [
+                        "beef",
+                        "cabbage",
+                        "potato",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 90 минут, пока говядина не станет мягкой. Посыпьте укропом и дайте постоять 10 минут.",
+                    "uses": [
+                        "beef",
+                        "dill"
+                    ],
+                    "timerSeconds": 5400
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Щи вкуснее на следующий день — им нужно настояться."
+            ],
+            "storageDays": 3,
+            "freezerDays": 90,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cabbage",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник"
+            ],
+            "look": "Золотистый бульон с капустой, кубиками картофеля и кусочками говядины, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pea-soup-multicooker",
+            "title": "Гороховый суп в мультиварке",
+            "summary": "Густой гороховый суп с копчёностями. Горох разваривается в мультиварке сам, даже без замачивания.",
+            "aliases": [
+                "Гороховый суп с копчёностями в мультиварке",
+                "Суп из гороха в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 150,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "split-pea",
+                    "name": "Горох колотый",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "smoked-pork",
+                    "name": "Копчёная свинина",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "ham",
+                        "bacon"
+                    ]
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Горох промойте до прозрачной воды. Копчёность нарежьте кубиками, картофель — кубиками, лук мелко, морковь натрите.",
+                    "uses": [
+                        "split-pea",
+                        "smoked-pork",
+                        "potato",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте копчёность с луком и морковью на масле 7 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "smoked-pork",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 420
+                },
+                {
+                    "text": "Добавьте горох и картофель, залейте водой до отметки максимума, положите лавровый лист и перец. Соль пока не кладите.",
+                    "uses": [
+                        "split-pea",
+                        "potato",
+                        "water",
+                        "bay-leaf",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 2 часа, пока горох не разварится. Посолите по вкусу, перемешайте и посыпьте укропом.",
+                    "uses": [
+                        "split-pea",
+                        "salt",
+                        "dill"
+                    ],
+                    "timerSeconds": 7200
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Если горох замочить на ночь, суп сварится за 1 час. Солите в конце — копчёности солёные, а соль мешает гороху развариться."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "split-pea",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter",
+                "spring",
+                "summer"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник"
+            ],
+            "look": "Густой жёлтый суп-полупюре с кубиками копчёной свинины и картофеля, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-noodle-soup-multicooker",
+            "title": "Куриный суп с лапшой в мультиварке",
+            "summary": "Прозрачный куриный бульон с лапшой, картошкой и морковью. Лучший суп для всей семьи и для тех, кто приболел.",
+            "aliases": [
+                "Куриная лапша в мультиварке",
+                "Суп с курицей и вермишелью в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 75,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-drumsticks",
+                    "name": "Куриные голени",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-noodle",
+                    "name": "Вермишель или лапша",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "egg-noodles",
+                        "pasta"
+                    ]
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 12,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "cozy",
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Голени промойте и положите в чашу. Картофель нарежьте кубиками, морковь — кружками, лук оставьте целой луковицей.",
+                    "uses": [
+                        "chicken-drumsticks",
+                        "potato",
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Добавьте картофель, морковь, лук, соль, перец и лавровый лист и залейте водой до отметки максимума.",
+                    "uses": [
+                        "potato",
+                        "carrot",
+                        "onion",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 50 минут. Достаньте лук и лавровый лист, а курицу снимите с костей и верните мясо в суп.",
+                    "uses": [
+                        "chicken-drumsticks",
+                        "onion",
+                        "bay-leaf"
+                    ],
+                    "timerSeconds": 3000
+                },
+                {
+                    "text": "Всыпьте лапшу, перемешайте и варите на режиме «Суп» с открытой крышкой 7 минут. Посыпьте укропом.",
+                    "uses": [
+                        "wheat-noodle",
+                        "dill"
+                    ],
+                    "timerSeconds": 420
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Лапшу кладите в самом конце — иначе она разварится и суп станет мутным."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-drumsticks",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник"
+            ],
+            "look": "Прозрачный золотистый бульон с тонкой лапшой, кусочками курицы, морковью и укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "rassolnik-multicooker",
+            "title": "Рассольник в мультиварке",
+            "summary": "Рассольник с говядиной, перловкой и солёными огурцами. Перловка в мультиварке разваривается мягкой и не требует присмотра.",
+            "aliases": [
+                "Рассольник с перловкой в мультиварке",
+                "Ленинградский рассольник в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 110,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beef",
+                    "name": "Говядина",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pearl-barley",
+                    "name": "Перловка",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pickled-cucumber",
+                    "name": "Солёные огурцы",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Перловку промойте. Говядину нарежьте кусками, картофель — кубиками, лук мелко, морковь и огурцы натрите на крупной тёрке.",
+                    "uses": [
+                        "pearl-barley",
+                        "beef",
+                        "potato",
+                        "onion",
+                        "carrot",
+                        "pickled-cucumber"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте лук с морковью на масле 5 минут. Добавьте огурцы и томатную пасту и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot",
+                        "pickled-cucumber",
+                        "tomato-paste"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Положите говядину, перловку и картофель, добавьте перец и лавровый лист, залейте водой до отметки максимума.",
+                    "uses": [
+                        "beef",
+                        "pearl-barley",
+                        "potato",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 90 минут. Попробуйте и досолите — огурцы уже дают соль. Посыпьте укропом.",
+                    "uses": [
+                        "beef",
+                        "pearl-barley",
+                        "salt",
+                        "dill"
+                    ],
+                    "timerSeconds": 5400
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Для кислинки добавьте в конце половину стакана огуречного рассола."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pickled-cucumber",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник",
+                "Тёрка"
+            ],
+            "look": "Светлый суп с перловкой, картофелем, тёртыми огурцами и кусочками говядины, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "meatball-soup-multicooker",
+            "title": "Суп с фрикадельками в мультиварке",
+            "summary": "Лёгкий суп с картошкой и нежными фрикадельками. В мультиварке фрикадельки не разваливаются и остаются мягкими.",
+            "aliases": [
+                "Суп с фрикадельками и картошкой в мультиварке",
+                "Фрикадельковый суп в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 55,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 11,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте фарш с яйцом, частью соли и перцем. Влажными руками скатайте фрикадельки размером с вишню. Картофель нарежьте кубиками, лук мелко, морковь натрите.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "egg",
+                        "salt",
+                        "black-pepper",
+                        "potato",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте лук с морковью на масле 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Положите картофель и фрикадельки, добавьте оставшуюся соль и лавровый лист и залейте водой до отметки максимума.",
+                    "uses": [
+                        "potato",
+                        "minced-pork-beef",
+                        "salt",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 35 минут. Посыпьте укропом.",
+                    "uses": [
+                        "potato",
+                        "minced-pork-beef",
+                        "dill"
+                    ],
+                    "timerSeconds": 2100
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Фрикадельки можно заморозить заранее и класть сразу из морозилки."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник",
+                "Миска"
+            ],
+            "look": "Прозрачный суп с маленькими фрикадельками, кубиками картофеля и морковью, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "ukha-multicooker",
+            "title": "Уха в мультиварке",
+            "summary": "Прозрачная уха из горбуши с картошкой, пшеном и укропом. Рыба остаётся целыми кусочками.",
+            "aliases": [
+                "Рыбный суп в мультиварке",
+                "Уха из горбуши в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 45,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pink-salmon-fillet",
+                    "name": "Филе горбуши",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "millet",
+                    "name": "Пшено",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 11,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "light",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Пшено промойте горячей водой. Картофель нарежьте кубиками, морковь — кружками, лук оставьте целой луковицей. Рыбу нарежьте крупными кусками.",
+                    "uses": [
+                        "millet",
+                        "potato",
+                        "carrot",
+                        "onion",
+                        "pink-salmon-fillet"
+                    ]
+                },
+                {
+                    "text": "Положите в чашу картофель, морковь, лук и пшено, посолите и залейте водой.",
+                    "uses": [
+                        "potato",
+                        "carrot",
+                        "onion",
+                        "millet",
+                        "salt",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Суп» 20 минут.",
+                    "uses": [
+                        "potato",
+                        "millet"
+                    ],
+                    "timerSeconds": 1200
+                },
+                {
+                    "text": "Достаньте лук, положите рыбу, лавровый лист и перец и варите ещё 10 минут. Посыпьте укропом и дайте постоять 5 минут.",
+                    "uses": [
+                        "onion",
+                        "pink-salmon-fillet",
+                        "bay-leaf",
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Рыбу не мешайте — пусть куски останутся целыми."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pink-salmon-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник"
+            ],
+            "look": "Прозрачный золотистый бульон с крупными розовыми кусками рыбы, картофелем и укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "solyanka-multicooker",
+            "title": "Солянка в мультиварке",
+            "summary": "Сборная мясная солянка с копчёностями, сосисками, солёными огурцами, маслинами и лимоном. Кислая, острая и очень сытная.",
+            "aliases": [
+                "Сборная солянка в мультиварке",
+                "Солянка мясная в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 50,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "smoked-pork",
+                    "name": "Копчёная свинина",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "ham",
+                    "name": "Ветчина",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "boiled-sausage",
+                        "smoked-chicken-breast"
+                    ]
+                },
+                {
+                    "id": "frankfurters",
+                    "name": "Сосиски",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "boiled-sausage"
+                    ]
+                },
+                {
+                    "id": "pickled-cucumber",
+                    "name": "Солёные огурцы",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-olive",
+                    "name": "Маслины",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon",
+                    "name": "Лимон",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "lemon-juice",
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте копчёность, ветчину и сосиски соломкой, огурцы — тонкими полосками, лук — мелко. Маслины разрежьте на кружочки, лимон — тонкими ломтиками.",
+                    "uses": [
+                        "smoked-pork",
+                        "ham",
+                        "frankfurters",
+                        "pickled-cucumber",
+                        "onion",
+                        "black-olive",
+                        "lemon"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте лук на масле 3 минуты. Добавьте все мясные продукты и огурцы и жарьте 5 минут, затем вмешайте томатную пасту на 2 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "smoked-pork",
+                        "ham",
+                        "frankfurters",
+                        "pickled-cucumber",
+                        "tomato-paste"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Залейте водой, добавьте лавровый лист и перец. Закройте крышку и варите в режиме «Суп» 25 минут.",
+                    "uses": [
+                        "water",
+                        "bay-leaf",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 1500
+                },
+                {
+                    "text": "Добавьте маслины, попробуйте и при необходимости досолите. Разлейте по тарелкам, положите в каждую ломтик лимона и посыпьте петрушкой.",
+                    "uses": [
+                        "black-olive",
+                        "lemon",
+                        "parsley"
+                    ]
+                }
+            ],
+            "tips": [
+                "Нет режима «Суп» — подойдёт «Тушение» на то же время.",
+                "Соль обычно не нужна: копчёности, огурцы и маслины уже солёные."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "smoked-pork",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "holiday"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Половник"
+            ],
+            "look": "Густой красно-оранжевый суп с копчёностями, маслинами, ломтиком лимона и петрушкой."
+        }
+    ]
+}

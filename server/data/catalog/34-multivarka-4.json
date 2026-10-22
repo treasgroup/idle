@@ -1,0 +1,1794 @@
+{
+    "batch": "34-multivarka-4",
+    "description": "Мультиварка",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "mannik-multicooker",
+            "title": "Манник в мультиварке",
+            "summary": "Пышный манник на кефире: манка набухает, а мультиварка печёт его ровно и без подгорания. Пирог для начинающих.",
+            "aliases": [
+                "Манник на кефире в мультиварке",
+                "Манный пирог в мультиварке"
+            ],
+            "servings": 8,
+            "minServings": 4,
+            "maxServings": 8,
+            "totalMinutes": 110,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "kefir",
+                    "name": "Кефир",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "matsun"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "baking-powder",
+                    "name": "Разрыхлитель",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "sweet",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте манку с кефиром и оставьте на 30 минут, чтобы манка набухла.",
+                    "uses": [
+                        "semolina",
+                        "kefir"
+                    ],
+                    "timerSeconds": 1800
+                },
+                {
+                    "text": "Растопите 50 г масла. Взбейте яйца с сахаром и солью до светлой пены, влейте масло и добавьте набухшую манку. Вмешайте муку с разрыхлителем до однородного теста.",
+                    "uses": [
+                        "butter",
+                        "egg",
+                        "sugar",
+                        "salt",
+                        "semolina",
+                        "wheat-flour",
+                        "baking-powder"
+                    ]
+                },
+                {
+                    "text": "Смажьте чашу оставшимся маслом, вылейте тесто и разровняйте. Закройте крышку и пеките в режиме «Выпечка» 60 минут.",
+                    "uses": [
+                        "butter",
+                        "semolina"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Проверьте шпажкой: она должна выйти сухой. Оставьте манник в чаше с открытой крышкой на 15 минут, затем достаньте.",
+                    "uses": [
+                        "semolina"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Готовую выпечку удобно доставать корзинкой для пара: накройте чашу, переверните и снимите."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "semolina",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Миска",
+                "Венчик или миксер"
+            ],
+            "look": "Высокий пышный пирог с золотистым верхом и мелкой крошкой на разрезе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "charlotte-multicooker",
+            "title": "Шарлотка в мультиварке",
+            "summary": "Классическая шарлотка с яблоками: воздушное тесто на трёх продуктах и много сочных яблок.",
+            "aliases": [
+                "Шарлотка с яблоками в мультиварке",
+                "Яблочный пирог в мультиварке"
+            ],
+            "servings": 8,
+            "minServings": 4,
+            "maxServings": 8,
+            "totalMinutes": 70,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "apple",
+                    "name": "Яблоки кисло-сладкие",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца (4 шт.)",
+                    "amount": 220,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 180,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 180,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло для чаши",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cinnamon",
+                    "name": "Корица",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cardamom-ground"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "sweet",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Яблоки очистите от сердцевины и нарежьте тонкими дольками. Посыпьте корицей.",
+                    "uses": [
+                        "apple",
+                        "cinnamon"
+                    ]
+                },
+                {
+                    "text": "Взбейте яйца с сахаром и солью миксером 7–8 минут, пока масса не станет светлой и пышной. Аккуратно вмешайте муку лопаткой снизу вверх.",
+                    "uses": [
+                        "egg",
+                        "sugar",
+                        "salt",
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Смажьте чашу маслом, выложите яблоки и залейте тестом. Закройте крышку и пеките в режиме «Выпечка» 45 минут, не открывая.",
+                    "uses": [
+                        "butter",
+                        "apple",
+                        "egg"
+                    ],
+                    "timerSeconds": 2700
+                },
+                {
+                    "text": "Проверьте шпажкой. Оставьте шарлотку в чаше с открытой крышкой на 10 минут, затем переверните на тарелку яблоками вверх.",
+                    "uses": [
+                        "apple"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Хорошо взбитые яйца — главное в шарлотке: без них тесто не поднимется."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "apple",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter",
+                "spring",
+                "summer"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Миска",
+                "Венчик или миксер",
+                "Нож"
+            ],
+            "look": "Пышная шарлотка с румяным верхом, на разрезе видны ломтики яблок."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "sponge-cake-multicooker",
+            "title": "Бисквит в мультиварке",
+            "summary": "Высокий пышный бисквит для тортов и к чаю. В мультиварке он поднимается ровно, без горки в центре.",
+            "aliases": [
+                "Бисквит классический в мультиварке",
+                "Пышный бисквит в мультиварке"
+            ],
+            "servings": 8,
+            "minServings": 4,
+            "maxServings": 8,
+            "totalMinutes": 85,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца (5 шт.)",
+                    "amount": 275,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 180,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 160,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vanilla-sugar",
+                    "name": "Ванильный сахар",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло для чаши",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Яйца должны быть комнатной температуры. Взбейте их с сахаром, ванильным сахаром и солью миксером на высокой скорости 10 минут, пока масса не увеличится в 3 раза.",
+                    "uses": [
+                        "egg",
+                        "sugar",
+                        "vanilla-sugar",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Просейте муку и в три приёма вмешайте её лопаткой снизу вверх, стараясь не осадить пену.",
+                    "uses": [
+                        "wheat-flour",
+                        "egg"
+                    ]
+                },
+                {
+                    "text": "Смажьте чашу маслом, вылейте тесто и закройте крышку. Пеките в режиме «Выпечка» 60 минут, первые 40 минут не открывая.",
+                    "uses": [
+                        "butter",
+                        "egg"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Проверьте шпажкой. Оставьте бисквит в чаше с открытой крышкой на 10 минут, затем достаньте и остудите на решётке.",
+                    "uses": [
+                        "egg"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Для торта дайте бисквиту постоять под полотенцем 6–8 часов — тогда он легко разрежется на коржи."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "egg",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "holiday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Миска",
+                "Венчик или миксер",
+                "Сито"
+            ],
+            "look": "Высокий светлый бисквит с ровным румяным верхом и пористой серединкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "cheesecake-multicooker",
+            "title": "Чизкейк в мультиварке",
+            "summary": "Нежный творожный чизкейк на песочной основе из печенья. Мультиварка печёт его мягко, и он не трескается.",
+            "aliases": [
+                "Творожный чизкейк в мультиварке",
+                "Чизкейк из творога в мультиварке"
+            ],
+            "servings": 8,
+            "minServings": 4,
+            "maxServings": 8,
+            "totalMinutes": 300,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cottage-cheese",
+                    "name": "Творог",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "plain-sugar-biscuits",
+                    "name": "Песочное печенье",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "kefir"
+                    ]
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato-starch",
+                    "name": "Крахмал",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "id": "vanilla-sugar",
+                    "name": "Ванильный сахар",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Измельчите печенье в крошку и смешайте с растопленным маслом. Выложите в чашу и плотно утрамбуйте ровным слоем с небольшими бортиками.",
+                    "uses": [
+                        "plain-sugar-biscuits",
+                        "butter"
+                    ]
+                },
+                {
+                    "text": "Пробейте блендером творог со сметаной, сахаром, ванильным сахаром и крахмалом до гладкости. Добавьте яйца и перемешайте ложкой, не взбивая.",
+                    "uses": [
+                        "cottage-cheese",
+                        "sour-cream",
+                        "sugar",
+                        "vanilla-sugar",
+                        "potato-starch",
+                        "egg"
+                    ]
+                },
+                {
+                    "text": "Вылейте творожную массу на основу и закройте крышку. Пеките в режиме «Выпечка» 60 минут.",
+                    "uses": [
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Оставьте чизкейк в выключенной мультиварке с закрытой крышкой на час, затем уберите в холодильник минимум на 3 часа, чтобы он схватился.",
+                    "uses": [
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 10800
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Чизкейк режьте холодным, ножом, смоченным в горячей воде."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "dessert",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "cottage-cheese",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "holiday",
+                "guests"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Мультиварка",
+                "Миска",
+                "Венчик или миксер",
+                "Блендер"
+            ],
+            "look": "Высокий светлый чизкейк на тёмной песочной основе, ровный ломтик на тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "raisin-cake-multicooker",
+            "title": "Кекс с изюмом в мультиварке",
+            "summary": "Плотный, ароматный кекс со сливочным маслом и изюмом — как в советской кулинарии.",
+            "aliases": [
+                "Кекс в мультиварке",
+                "Кекс с изюмом на сливочном масле"
+            ],
+            "servings": 10,
+            "minServings": 5,
+            "maxServings": 10,
+            "totalMinutes": 90,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло мягкое",
+                    "amount": 180,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 180,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца (3 шт.)",
+                    "amount": 165,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "raisins",
+                    "name": "Изюм",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "baking-powder",
+                    "name": "Разрыхлитель",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vanilla-sugar",
+                    "name": "Ванильный сахар",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "sweet",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Изюм залейте кипятком на 10 минут, затем откиньте и обсушите полотенцем.",
+                    "uses": [
+                        "raisins"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Взбейте мягкое масло с сахаром и ванильным сахаром до пышности. По одному вмешайте яйца, затем муку с разрыхлителем и солью. Добавьте изюм, обваляв его в ложке муки.",
+                    "uses": [
+                        "butter",
+                        "sugar",
+                        "vanilla-sugar",
+                        "egg",
+                        "wheat-flour",
+                        "baking-powder",
+                        "salt",
+                        "raisins"
+                    ]
+                },
+                {
+                    "text": "Смажьте чашу маслом, выложите густое тесто и разровняйте. Закройте крышку и пеките в режиме «Выпечка» 65 минут.",
+                    "uses": [
+                        "butter",
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 3900
+                },
+                {
+                    "text": "Проверьте шпажкой: она должна выйти сухой. Дайте кексу постоять в чаше 10 минут, затем достаньте и остудите.",
+                    "uses": [
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Изюм, обвалянный в муке, не опускается на дно."
+            ],
+            "storageDays": 5,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "raisins",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Миска",
+                "Венчик или миксер"
+            ],
+            "look": "Плотный золотистый кекс с тёмными изюминками на разрезе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "bread-multicooker",
+            "title": "Хлеб в мультиварке",
+            "summary": "Домашний белый хлеб с хрустящей корочкой из мультиварки. Тесто поднимается прямо в чаше на режиме подогрева.",
+            "aliases": [
+                "Белый хлеб в мультиварке",
+                "Домашний хлеб в мультиварке"
+            ],
+            "servings": 8,
+            "minServings": 4,
+            "maxServings": 8,
+            "totalMinutes": 180,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Тёплая вода",
+                    "amount": 320,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "instant-yeast",
+                    "name": "Сухие дрожжи",
+                    "amount": 7,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 25,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте муку с дрожжами, сахаром и солью. Влейте тёплую воду и масло и вымешивайте 10 минут до гладкого мягкого теста.",
+                    "uses": [
+                        "wheat-flour",
+                        "instant-yeast",
+                        "sugar",
+                        "salt",
+                        "water",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Смажьте чашу маслом, положите тесто, закройте крышку и включите «Подогрев» на 10 минут, затем выключите. Оставьте тесто подниматься ещё 50 минут, пока оно не вырастет вдвое.",
+                    "uses": [
+                        "wheat-flour",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Не открывая крышку, включите режим «Выпечка» на 60 минут.",
+                    "uses": [
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Переверните хлеб и пеките другой стороной ещё 20 минут, чтобы верх тоже подрумянился. Остудите на решётке, накрыв полотенцем.",
+                    "uses": [
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 1200
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Не держите тесто на «Подогреве» дольше 10 минут — дрожжи погибнут от жары."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "wheat-flour",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Миска",
+                "Венчик или миксер"
+            ],
+            "look": "Круглый высокий хлеб с золотистой корочкой и белым пористым мякишем."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "homemade-yogurt-multicooker",
+            "title": "Йогурт домашний в мультиварке",
+            "summary": "Густой натуральный йогурт из молока и ложки готового йогурта. Без сахара и добавок — только молоко и закваска.",
+            "aliases": [
+                "Йогурт в мультиварке",
+                "Домашний йогурт без йогуртницы"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 480,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "milk",
+                    "name": "Молоко 3,2%",
+                    "amount": 1000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "plain-yogurt",
+                    "name": "Натуральный йогурт без добавок (закваска)",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sour-cream",
+                        "matsun"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите молоко и остудите до тёплого, как парное: палец в нём не должен обжигаться. Пастеризованное молоко можно просто подогреть.",
+                    "uses": [
+                        "milk"
+                    ]
+                },
+                {
+                    "text": "Размешайте йогурт с половником тёплого молока до гладкости, затем влейте в остальное молоко и перемешайте. Разлейте по чистым банкам.",
+                    "uses": [
+                        "plain-yogurt",
+                        "milk"
+                    ]
+                },
+                {
+                    "text": "Поставьте банки в чашу, налейте тёплой воды до плечиков и закройте крышку. Включите режим «Йогурт» на 8 часов.",
+                    "uses": [
+                        "milk"
+                    ],
+                    "timerSeconds": 28800
+                },
+                {
+                    "text": "Не встряхивая, переставьте банки в холодильник на 2 часа — йогурт станет гуще.",
+                    "uses": [
+                        "milk"
+                    ],
+                    "timerSeconds": 7200
+                }
+            ],
+            "tips": [
+                "Нет режима «Йогурт» — включайте «Подогрев» на 15 минут каждый час.",
+                "Ложку этого йогурта оставьте закваской для следующего раза."
+            ],
+            "storageDays": 5,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast",
+                "snack"
+            ],
+            "mainIngredient": "milk",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Кастрюля",
+                "Банки с крышками"
+            ],
+            "look": "Густой белый йогурт в стеклянной банке, рядом ложка с йогуртом и ягоды."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "apple-jam-multicooker",
+            "title": "Варенье яблочное в мультиварке",
+            "summary": "Густое яблочное варенье с дольками, которое не нужно мешать и караулить у плиты.",
+            "aliases": [
+                "Яблочное варенье в мультиварке",
+                "Варенье из яблок дольками"
+            ],
+            "servings": 12,
+            "minServings": 6,
+            "maxServings": 12,
+            "totalMinutes": 140,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "apple",
+                    "name": "Яблоки",
+                    "amount": 1000,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "cinnamon",
+                    "name": "Корица",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": true,
+                    "swap": [
+                        "cardamom-ground"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Яблоки вымойте, удалите сердцевину и нарежьте тонкими дольками. Сбрызните лимонным соком.",
+                    "uses": [
+                        "apple",
+                        "lemon-juice"
+                    ]
+                },
+                {
+                    "text": "Сложите яблоки в чашу, засыпьте сахаром и оставьте на 1 час, чтобы они пустили сок.",
+                    "uses": [
+                        "apple",
+                        "sugar"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Добавьте корицу, если любите. Закройте крышку и варите в режиме «Тушение» 60 минут, один раз осторожно перемешав.",
+                    "uses": [
+                        "cinnamon",
+                        "apple"
+                    ],
+                    "timerSeconds": 3600
+                },
+                {
+                    "text": "Откройте крышку и варите ещё 15 минут в режиме «Выпечка», чтобы сироп загустел. Разложите горячее варенье по чистым банкам и закройте.",
+                    "uses": [
+                        "apple",
+                        "sugar"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Варенье» или «Суп».",
+                "Капля варенья на холодной тарелке не должна растекаться — значит, оно готово."
+            ],
+            "storageDays": 14,
+            "cuisine": "russian",
+            "course": "dessert",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "apple",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "summer"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Банки с крышками"
+            ],
+            "look": "Янтарные прозрачные дольки яблок в густом сиропе в стеклянной банке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "steamed-fish-vegetables-multicooker",
+            "title": "Рыба на пару с овощами в мультиварке",
+            "summary": "Треска на пару с брокколи, морковью и цветной капустой. Лёгкий ужин без масла и сковородки.",
+            "aliases": [
+                "Рыба на пару в мультиварке",
+                "Треска на пару с овощами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cod-fillet",
+                    "name": "Филе трески",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "broccoli",
+                    "name": "Брокколи",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cauliflower",
+                    "name": "Цветная капуста",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пара",
+                    "amount": 1000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "light",
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте треску порционными кусками, сбрызните лимонным соком, посолите частью соли и поперчите. Брокколи и цветную капусту разберите на соцветия, морковь нарежьте кружками.",
+                    "uses": [
+                        "cod-fillet",
+                        "lemon-juice",
+                        "salt",
+                        "black-pepper",
+                        "broccoli",
+                        "cauliflower",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Налейте в чашу воду. Разложите в корзинке для пара морковь и капусту, сверху положите рыбу и посолите овощи оставшейся солью.",
+                    "uses": [
+                        "water",
+                        "carrot",
+                        "broccoli",
+                        "cauliflower",
+                        "cod-fillet",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и готовьте в режиме «Пар» 20 минут, пока рыба не станет белой и не будет легко расслаиваться. Посыпьте укропом.",
+                    "uses": [
+                        "cod-fillet",
+                        "dill"
+                    ],
+                    "timerSeconds": 1200
+                }
+            ],
+            "tips": [
+                "Нет режима «Пар» — включите «Суп»: вода закипит и даст пар.",
+                "Морковь режьте тонко, она готовится дольше остальных овощей."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cod-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Корзинка для пара",
+                "Нож"
+            ],
+            "look": "Белые кусочки трески на пару с ярко-зелёной брокколи, цветной капустой и морковью."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "steamed-cutlets-multicooker",
+            "title": "Котлеты на пару в мультиварке",
+            "summary": "Мягкие котлеты на пару без капли масла. Подходят детям и тем, кто ест полегче.",
+            "aliases": [
+                "Паровые котлеты в мультиварке",
+                "Котлеты на пару из фарша"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 40,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-beef",
+                    "name": "Говяжий фарш",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "white-bread",
+                    "name": "Белый хлеб без корки",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пара",
+                    "amount": 1000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Замочите хлеб в молоке на 5 минут. Лук натрите на мелкой тёрке.",
+                    "uses": [
+                        "white-bread",
+                        "milk",
+                        "onion"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Смешайте фарш с размоченным хлебом, луком, яйцом, солью и перцем и хорошо вымешайте. Влажными руками сформуйте 10 котлет.",
+                    "uses": [
+                        "minced-beef",
+                        "white-bread",
+                        "onion",
+                        "egg",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Налейте в чашу воду, разложите котлеты в корзинке для пара. Закройте крышку и готовьте в режиме «Пар» 25 минут. Разрежьте одну: мясо внутри должно быть серым, сок — прозрачным.",
+                    "uses": [
+                        "water",
+                        "minced-beef"
+                    ],
+                    "timerSeconds": 1500
+                }
+            ],
+            "tips": [
+                "Нет режима «Пар» — включите «Суп».",
+                "В корзинку под котлеты можно положить нарезанный картофель — гарнир сварится одновременно."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 10,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Мультиварка",
+                "Корзинка для пара",
+                "Миска"
+            ],
+            "look": "Светлые аккуратные котлеты на пару на тарелке с картофельным пюре."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "vegetable-stew-multicooker",
+            "title": "Овощное рагу в мультиварке",
+            "summary": "Летнее рагу из кабачков, баклажанов, перца, картошки и помидоров. Овощи томятся в собственном соку.",
+            "aliases": [
+                "Рагу из овощей в мультиварке",
+                "Овощи тушёные в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 60,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "zucchini",
+                    "name": "Кабачки",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "eggplant",
+                    "name": "Баклажаны",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "light",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте все овощи кубиками по 2 см: кабачки, баклажаны, картофель, перец и помидоры. Лук нарежьте мелко, морковь — кружками, чеснок порубите.",
+                    "uses": [
+                        "zucchini",
+                        "eggplant",
+                        "potato",
+                        "bell-pepper",
+                        "tomato",
+                        "onion",
+                        "carrot",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте лук с морковью на масле 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Сложите слоями картофель, баклажаны, перец, кабачки и сверху помидоры. Посолите и поперчите, воду не добавляйте.",
+                    "uses": [
+                        "potato",
+                        "eggplant",
+                        "bell-pepper",
+                        "zucchini",
+                        "tomato",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 40 минут. Добавьте чеснок и петрушку, аккуратно перемешайте.",
+                    "uses": [
+                        "garlic",
+                        "parsley",
+                        "zucchini"
+                    ],
+                    "timerSeconds": 2400
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп».",
+                "Воду не добавляйте — кабачки и помидоры дадут достаточно сока."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "zucchini",
+            "needsSide": false,
+            "season": [
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Разноцветное рагу из кубиков кабачка, баклажана, перца и картофеля в томатном соке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "turkey-vegetable-stew-multicooker",
+            "title": "Рагу из индейки с овощами в мультиварке",
+            "summary": "Нежная индейка, потушенная с картошкой, кабачком, морковью и перцем. Сытно, но не тяжело.",
+            "aliases": [
+                "Индейка с овощами в мультиварке",
+                "Рагу с индейкой"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 60,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "turkey-fillet",
+                    "name": "Филе индейки",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "eggplant"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "light",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте индейку кубиками по 3 см, картофель и кабачок — кубиками, морковь — кружками, перец — полосками, лук мелко.",
+                    "uses": [
+                        "turkey-fillet",
+                        "potato",
+                        "zucchini",
+                        "carrot",
+                        "bell-pepper",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте индейку на масле 7 минут, добавьте лук и морковь и жарьте ещё 3 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "turkey-fillet",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Положите картофель, кабачок и перец. Размешайте томатную пасту с водой, солью и перцем и залейте.",
+                    "uses": [
+                        "potato",
+                        "zucchini",
+                        "bell-pepper",
+                        "tomato-paste",
+                        "water",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 40 минут, пока картофель не станет мягким. Посыпьте укропом.",
+                    "uses": [
+                        "potato",
+                        "turkey-fillet",
+                        "dill"
+                    ],
+                    "timerSeconds": 2400
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп».",
+                "Вместо филе можно взять мясо с бедра индейки — оно сочнее."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "turkey-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Кубики индейки с картофелем, кабачком, морковью и перцем в лёгком томатном соусе."
+        }
+    ]
+}

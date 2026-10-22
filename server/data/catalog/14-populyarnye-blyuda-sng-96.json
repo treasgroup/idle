@@ -1276,10 +1276,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 30,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "water",
@@ -2531,7 +2528,6 @@
           "amount": 90,
           "unit": "г",
           "swap": [
-            "egg-noodles",
             "pasta"
           ]
         },
@@ -2567,10 +2563,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 30,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "salt",
@@ -3901,10 +3894,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 30,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "parsley",
@@ -8353,10 +8343,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 30,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "water",

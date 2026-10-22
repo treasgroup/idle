@@ -1,0 +1,1088 @@
+{
+    "batch": "33-multivarka-3",
+    "description": "Мультиварка",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "rice-milk-porridge-multicooker",
+            "title": "Рисовая каша на молоке в мультиварке",
+            "summary": "Нежная молочная рисовая каша, которая не пригорает и не убегает. Можно поставить с вечера на отложенный старт.",
+            "aliases": [
+                "Молочная рисовая каша в мультиварке",
+                "Рисовая каша в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 40,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "short-grain-rice",
+                    "name": "Рис круглый",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 750,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "sweet",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Промойте рис в нескольких водах, пока вода не станет почти прозрачной. Смажьте верх чаши кусочком масла, чтобы молоко не убежало.",
+                    "uses": [
+                        "short-grain-rice",
+                        "butter"
+                    ]
+                },
+                {
+                    "text": "Положите рис в чашу, добавьте сахар и соль, влейте молоко и воду и перемешайте.",
+                    "uses": [
+                        "short-grain-rice",
+                        "sugar",
+                        "salt",
+                        "milk",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Молочная каша» 35 минут. После сигнала добавьте оставшееся масло, перемешайте и дайте постоять на «Подогреве» 5 минут.",
+                    "uses": [
+                        "short-grain-rice",
+                        "butter"
+                    ],
+                    "timerSeconds": 2100
+                }
+            ],
+            "tips": [
+                "Чтобы молоко не убежало, смажьте верхний край чаши сливочным маслом полоской в 2 см. Нет режима «Молочная каша» — возьмите «Каша» или «Тушение».",
+                "Для густой каши возьмите на 100 мл молока меньше."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast"
+            ],
+            "mainIngredient": "short-grain-rice",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Густая белая рисовая каша в тарелке с тающим кусочком сливочного масла."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "millet-pumpkin-porridge-multicooker",
+            "title": "Пшённая каша с тыквой в мультиварке",
+            "summary": "Яркая сладкая каша из пшена и тыквы на молоке. В мультиварке тыква разваривается и делает кашу нежной.",
+            "aliases": [
+                "Каша с тыквой в мультиварке",
+                "Пшёнка с тыквой"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 50,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "millet",
+                    "name": "Пшено",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pumpkin",
+                    "name": "Тыква",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sweet-potato"
+                    ]
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 25,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "sweet",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Тыкву очистите и нарежьте мелкими кубиками. Пшено промойте несколько раз горячей водой — так уйдёт горечь.",
+                    "uses": [
+                        "pumpkin",
+                        "millet"
+                    ]
+                },
+                {
+                    "text": "Смажьте верх чаши маслом. Положите тыкву и пшено, добавьте сахар и соль, влейте молоко и воду.",
+                    "uses": [
+                        "butter",
+                        "pumpkin",
+                        "millet",
+                        "sugar",
+                        "salt",
+                        "milk",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Молочная каша» 40 минут. Добавьте оставшееся масло, перемешайте и дайте постоять на «Подогреве» 10 минут.",
+                    "uses": [
+                        "millet",
+                        "pumpkin",
+                        "butter"
+                    ],
+                    "timerSeconds": 2400
+                }
+            ],
+            "tips": [
+                "Чтобы молоко не убежало, смажьте верхний край чаши сливочным маслом полоской в 2 см. Нет режима «Молочная каша» — возьмите «Каша» или «Тушение».",
+                "Сладкая тыква (мускатная) даёт самую яркую кашу — сахара тогда можно меньше."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast"
+            ],
+            "mainIngredient": "millet",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Густая оранжево-жёлтая каша с кусочками тыквы и тающим маслом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "semolina-porridge-multicooker",
+            "title": "Манная каша в мультиварке",
+            "summary": "Гладкая манная каша без комочков. Секрет — смешать манку с холодным молоком до включения мультиварки.",
+            "aliases": [
+                "Манка в мультиварке",
+                "Манная каша на молоке в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 800,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 25,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "sweet",
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Влейте в чашу холодное молоко и воду. Всыпьте манку, сахар и соль и сразу хорошо размешайте венчиком.",
+                    "uses": [
+                        "milk",
+                        "water",
+                        "semolina",
+                        "sugar",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Смажьте верх чаши маслом, закройте крышку и варите в режиме «Молочная каша» 15 минут. В середине один раз перемешайте.",
+                    "uses": [
+                        "butter",
+                        "semolina"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Добавьте оставшееся масло, перемешайте и дайте каше постоять 5 минут — она станет гуще.",
+                    "uses": [
+                        "butter",
+                        "semolina"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Чтобы молоко не убежало, смажьте верхний край чаши сливочным маслом полоской в 2 см. Нет режима «Молочная каша» — возьмите «Каша» или «Тушение».",
+                "Если каша вышла слишком густой, разбавьте её горячим молоком."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast"
+            ],
+            "mainIngredient": "semolina",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки",
+                "Венчик"
+            ],
+            "look": "Гладкая белая манная каша в тарелке с кусочком масла и ложкой варенья."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fluffy-omelet-multicooker",
+            "title": "Омлет пышный в мультиварке",
+            "summary": "Высокий омлет, как в детском саду. В мультиварке он поднимается и не опадает, если не открывать крышку раньше времени.",
+            "aliases": [
+                "Омлет как в детском саду в мультиварке",
+                "Высокий омлет в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца (8 шт.)",
+                    "amount": 440,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Смажьте чашу сливочным маслом по дну и стенкам. Слегка взбейте яйца вилкой с солью — пена не нужна. Влейте молоко, перемешайте и вылейте в чашу.",
+                    "uses": [
+                        "butter",
+                        "egg",
+                        "salt",
+                        "milk"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и готовьте в режиме «Выпечка» 20 минут. Не открывайте крышку, пока не прозвучит сигнал.",
+                    "uses": [
+                        "egg"
+                    ],
+                    "timerSeconds": 1200
+                },
+                {
+                    "text": "После сигнала оставьте омлет под закрытой крышкой ещё на 10 минут, чтобы он не опал. Достаньте и нарежьте на порции.",
+                    "uses": [
+                        "egg"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Не взбивайте яйца миксером: от лишнего воздуха омлет поднимется и сразу опадёт."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast"
+            ],
+            "mainIngredient": "egg",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки",
+                "Миска",
+                "Венчик"
+            ],
+            "look": "Высокий светло-жёлтый омлет с ровной поверхностью, нарезанный квадратами."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "cottage-cheese-casserole-multicooker",
+            "title": "Творожная запеканка в мультиварке",
+            "summary": "Пышная творожная запеканка с манкой и сметаной. В мультиварке она равномерно пропекается и не подгорает.",
+            "aliases": [
+                "Запеканка из творога в мультиварке",
+                "Творожная запеканка с манкой в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 85,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cottage-cheese",
+                    "name": "Творог",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 70,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "vanilla-sugar",
+                    "name": "Ванильный сахар",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло для чаши",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте сметану с манкой и оставьте на 15 минут, чтобы манка набухла.",
+                    "uses": [
+                        "sour-cream",
+                        "semolina"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Разомните творог вилкой или пробейте блендером. Добавьте яйца, сахар, ванильный сахар и соль, затем набухшую манку и перемешайте до гладкости.",
+                    "uses": [
+                        "cottage-cheese",
+                        "egg",
+                        "sugar",
+                        "vanilla-sugar",
+                        "salt",
+                        "semolina",
+                        "sour-cream"
+                    ]
+                },
+                {
+                    "text": "Смажьте чашу маслом, выложите массу и разровняйте. Закройте крышку и пеките в режиме «Выпечка» 50 минут.",
+                    "uses": [
+                        "butter",
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 3000
+                },
+                {
+                    "text": "После сигнала не открывайте крышку ещё 20 минут, затем достаньте запеканку с помощью корзинки для пара. Подавайте тёплой или холодной со сметаной.",
+                    "uses": [
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 1200
+                }
+            ],
+            "tips": [
+                "Нет режима «Выпечка» — подойдёт «Мультиповар» на 140–150 °C.",
+                "Сухой творог можно смягчить ложкой молока."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast",
+                "snack"
+            ],
+            "mainIngredient": "cottage-cheese",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки",
+                "Миска",
+                "Блендер или вилка"
+            ],
+            "look": "Высокая золотистая творожная запеканка, нарезанная кусками, с ложкой сметаны."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "syrniki-multicooker",
+            "title": "Сырники в мультиварке",
+            "summary": "Румяные сырники, обжаренные в чаше мультиварки. Масло не брызгает на плиту, а сырники получаются ровными.",
+            "aliases": [
+                "Сырники из творога в мультиварке",
+                "Творожники в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 25,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cottage-cheese",
+                    "name": "Творог",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Разомните творог вилкой с яйцом, сахаром и солью. Вмешайте две трети муки — тесто должно быть мягким и чуть липким.",
+                    "uses": [
+                        "cottage-cheese",
+                        "egg",
+                        "sugar",
+                        "salt",
+                        "wheat-flour"
+                    ]
+                },
+                {
+                    "text": "Мокрыми руками разделите массу на 12 частей, сформуйте толстые лепёшки и обваляйте в оставшейся муке.",
+                    "uses": [
+                        "cottage-cheese",
+                        "wheat-flour"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» или «Выпечка» и налейте половину масла. Выложите половину сырников и жарьте с открытой крышкой по 6 минут с каждой стороны до румяной корочки.",
+                    "uses": [
+                        "vegetable-oil",
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Так же обжарьте оставшиеся сырники на оставшемся масле. Подавайте со сметаной или вареньем.",
+                    "uses": [
+                        "vegetable-oil",
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Если нет режима «Жарка», возьмите «Выпечка» с открытой крышкой.",
+                "Слишком влажный творог отожмите через марлю, иначе понадобится много муки."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast"
+            ],
+            "mainIngredient": "cottage-cheese",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 12,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки",
+                "Миска"
+            ],
+            "look": "Румяные толстые сырники с золотистой корочкой, рядом сметана и ягоды."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fluffy-buckwheat-multicooker",
+            "title": "Гречневая каша рассыпчатая в мультиварке",
+            "summary": "Рассыпчатая гречка на гарнир — зёрнышко к зёрнышку. Мультиварка сама выключится, когда вода впитается.",
+            "aliases": [
+                "Гречка в мультиварке",
+                "Гречка на гарнир в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 45,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "buckwheat",
+                    "name": "Гречка",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Переберите гречку и промойте её, пока вода не станет прозрачной. Положите в чашу.",
+                    "uses": [
+                        "buckwheat"
+                    ]
+                },
+                {
+                    "text": "Залейте водой — по объёму её должно быть вдвое больше, чем крупы. Посолите и перемешайте.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "buckwheat"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и варите в режиме «Гречка» 35 минут. Добавьте масло, перемешайте и оставьте на «Подогреве» 10 минут.",
+                    "uses": [
+                        "buckwheat",
+                        "butter"
+                    ],
+                    "timerSeconds": 2100
+                }
+            ],
+            "tips": [
+                "Нет режима «Гречка» — возьмите «Крупа», «Рис» или «Плов».",
+                "Мерьте крупу и воду одним стаканом: 1 стакан гречки на 2 стакана воды."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "buckwheat",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Рассыпчатая коричневая гречка с блестящим растопленным маслом в тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pearl-barley-canned-stew-multicooker",
+            "title": "Перловка с тушёнкой в мультиварке",
+            "summary": "Сытная перловка с тушёнкой, луком и морковью — «солдатская каша» без возни. Мультиварка разваривает перловку мягкой.",
+            "aliases": [
+                "Перловая каша с тушёнкой",
+                "Солдатская каша в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 110,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pearl-barley",
+                    "name": "Перловка",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "canned-beef-stew",
+                    "name": "Тушёнка говяжья",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 700,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Перловку промойте несколько раз. Лук мелко нарежьте, морковь натрите.",
+                    "uses": [
+                        "pearl-barley",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка», выложите жир с тушёнки и обжарьте на нём лук с морковью 5 минут. Добавьте тушёнку и разомните её вилкой.",
+                    "uses": [
+                        "canned-beef-stew",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Всыпьте перловку, добавьте соль, перец и лавровый лист и влейте воду. Перемешайте.",
+                    "uses": [
+                        "pearl-barley",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и готовьте в режиме «Плов» или «Тушение» 90 минут, пока перловка не станет мягкой. Перемешайте и подавайте.",
+                    "uses": [
+                        "pearl-barley",
+                        "canned-beef-stew"
+                    ],
+                    "timerSeconds": 5400
+                }
+            ],
+            "tips": [
+                "Если замочить перловку на ночь, она сварится за 50 минут.",
+                "Тушёнка солёная — солите в конце, если нужно."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pearl-barley",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Мультиварка",
+                "Лопатка для мультиварки",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Мягкая перловая каша с волокнами тушёного мяса и оранжевой морковью."
+        }
+    ]
+}

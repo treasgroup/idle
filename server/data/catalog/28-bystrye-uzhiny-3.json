@@ -1,0 +1,1647 @@
+{
+    "batch": "28-bystrye-uzhiny-3",
+    "description": "Быстрый ужин до 30 минут",
+    "ingredients": [
+        {
+            "id": "hake-fillet",
+            "name": "Филе хека без кожи и костей, сырое",
+            "aliases": [
+                "хек",
+                "филе хека"
+            ],
+            "groups": [
+                "fish"
+            ],
+            "per100g": {
+                "kcal": 86,
+                "protein": 16.6,
+                "fat": 2.2,
+                "carbs": 0
+            },
+            "aisle": "fish"
+        },
+        {
+            "id": "hot-dog-bun",
+            "name": "Булочка для хот-дога пшеничная",
+            "aliases": [
+                "булочка для хот-дога",
+                "булка для хот-дога"
+            ],
+            "groups": [
+                "gluten"
+            ],
+            "per100g": {
+                "kcal": 280,
+                "protein": 8.5,
+                "fat": 5,
+                "carbs": 50
+            },
+            "gramsPerUnit": {
+                "шт.": 60
+            },
+            "aisle": "bread"
+        },
+        {
+            "id": "baguette",
+            "name": "Багет пшеничный",
+            "aliases": [
+                "багет",
+                "французский батон"
+            ],
+            "groups": [
+                "gluten"
+            ],
+            "per100g": {
+                "kcal": 262,
+                "protein": 8.5,
+                "fat": 1.5,
+                "carbs": 52
+            },
+            "gramsPerUnit": {
+                "шт.": 250
+            },
+            "aisle": "bread"
+        }
+    ],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "hake-sour-cream-skillet",
+            "title": "Хек в сметане на сковороде",
+            "summary": "Кусочки хека, слегка обжаренные в муке и потушенные с луком в сметане. Нежно, сочно и без костей.",
+            "aliases": [
+                "Рыба в сметане на сковороде",
+                "Хек тушёный в сметане"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "hake-fillet",
+                    "name": "Филе хека",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Обсушите филе бумажным полотенцем и нарежьте порционными кусками. Посолите половиной соли, поперчите и обваляйте в муке. Лук нарежьте полукольцами, укроп порубите.",
+                    "uses": [
+                        "hake-fillet",
+                        "salt",
+                        "black-pepper",
+                        "wheat-flour",
+                        "onion",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в сковороде на среднем огне. Обжарьте рыбу по 3 минуты с каждой стороны до лёгкой корочки и переложите на тарелку.",
+                    "uses": [
+                        "vegetable-oil",
+                        "hake-fillet"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "В той же сковороде жарьте лук 4 минуты, помешивая, пока он не станет мягким и прозрачным.",
+                    "uses": [
+                        "onion"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Выложите рыбу на лук. Размешайте сметану с водой и оставшейся солью и залейте рыбу. Накройте и тушите на слабом огне 8 минут, пока рыба не станет легко расслаиваться. Посыпьте укропом.",
+                    "uses": [
+                        "hake-fillet",
+                        "sour-cream",
+                        "water",
+                        "salt",
+                        "dill"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Замороженное филе разморозьте в холодильнике и хорошо обсушите.",
+                "Сметану не кипятите сильно — она может свернуться."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "hake-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Белые кусочки рыбы под густым сметанным соусом с мягким луком и зелёным укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "cod-vegetables-covered",
+            "title": "Треска с овощами под крышкой",
+            "summary": "Треска, потушенная на подушке из моркови, лука, перца и помидоров. Рыба получается сочной, а овощи — сладкими.",
+            "aliases": [
+                "Треска тушёная с овощами",
+                "Рыба с овощами на сковороде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cod-fillet",
+                    "name": "Филе трески",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте треску порционными кусками, сбрызните лимонным соком, посолите частью соли и поперчите. Морковь нарежьте тонкими кружками, лук — полукольцами, перец — соломкой, помидоры — дольками.",
+                    "uses": [
+                        "cod-fillet",
+                        "lemon-juice",
+                        "salt",
+                        "black-pepper",
+                        "carrot",
+                        "onion",
+                        "bell-pepper",
+                        "tomato"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в глубокой сковороде и жарьте лук с морковью 5 минут, помешивая, пока они не станут мягче.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте перец и помидоры, влейте воду, посолите оставшейся солью и готовьте ещё 3 минуты.",
+                    "uses": [
+                        "bell-pepper",
+                        "tomato",
+                        "water",
+                        "salt"
+                    ],
+                    "timerSeconds": 180
+                },
+                {
+                    "text": "Выложите рыбу на овощи, накройте крышкой и тушите на слабом огне 10 минут, пока треска не станет белой и не будет легко расслаиваться. Посыпьте петрушкой.",
+                    "uses": [
+                        "cod-fillet",
+                        "parsley"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Рыбу не перемешивайте — она мягкая и развалится. Просто разложите сверху.",
+                "Вместо трески подойдёт минтай или хек."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cod-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Белые кусочки трески на яркой подушке из моркови, перца и помидоров, посыпанные петрушкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pink-salmon-onion-carrot-skillet",
+            "title": "Горбуша на сковороде с луком и морковью",
+            "summary": "Обжаренная горбуша, потушенная с луком, морковью и томатом. Рыба не пересыхает и остаётся мягкой.",
+            "aliases": [
+                "Горбуша под овощами",
+                "Горбуша тушёная с морковью"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pink-salmon-fillet",
+                    "name": "Филе горбуши",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 25,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте горбушу порционными кусками, посолите частью соли, поперчите и обваляйте в муке. Лук нарежьте полукольцами, морковь натрите на крупной тёрке.",
+                    "uses": [
+                        "pink-salmon-fillet",
+                        "salt",
+                        "black-pepper",
+                        "wheat-flour",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Разогрейте половину масла и обжарьте рыбу по 3 минуты с каждой стороны до золотистого цвета. Переложите на тарелку.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pink-salmon-fillet"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Влейте оставшееся масло и жарьте лук с морковью 6 минут, помешивая, пока они не станут мягкими.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Вмешайте томатную пасту, воду, оставшуюся соль и лавровый лист. Верните рыбу, накройте крышкой и тушите на слабом огне 8 минут. Перед подачей выньте лавровый лист.",
+                    "uses": [
+                        "tomato-paste",
+                        "water",
+                        "salt",
+                        "bay-leaf",
+                        "pink-salmon-fillet"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Горбуша суховата — не жарьте её дольше 3 минут с каждой стороны.",
+                "Блюдо вкусно и холодным, как закуска."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pink-salmon-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Розовые кусочки горбуши, укрытые мягким оранжевым слоем лука и моркови в томатном соусе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "salmon-spinach-cream",
+            "title": "Лосось со шпинатом в сливочном соусе",
+            "summary": "Кусочки лосося в нежном сливочном соусе со шпинатом и чесноком. Красиво, как в ресторане, а готовится за 25 минут.",
+            "aliases": [
+                "Сёмга со шпинатом в сливках",
+                "Лосось в сливочном соусе"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "salmon-fillet",
+                    "name": "Филе лосося",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "spinach",
+                    "name": "Шпинат",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 20%",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте лосось на 4 куска, посолите частью соли и поперчите. Чеснок мелко порубите, шпинат промойте и обсушите.",
+                    "uses": [
+                        "salmon-fillet",
+                        "salt",
+                        "black-pepper",
+                        "garlic",
+                        "spinach"
+                    ]
+                },
+                {
+                    "text": "Растопите масло в сковороде на среднем огне. Обжарьте лосось 3 минуты с одной стороны и 2 минуты с другой и переложите на тарелку.",
+                    "uses": [
+                        "butter",
+                        "salmon-fillet"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "В той же сковороде прогрейте чеснок 30 секунд, добавьте шпинат и готовьте 2 минуты, помешивая, пока он не опадёт.",
+                    "uses": [
+                        "garlic",
+                        "spinach"
+                    ],
+                    "timerSeconds": 120
+                },
+                {
+                    "text": "Влейте сливки, посолите оставшейся солью и доведите до слабого кипения. Верните лосось, накройте и готовьте 4 минуты, пока рыба не станет легко расслаиваться. Сбрызните лимонным соком.",
+                    "uses": [
+                        "cream",
+                        "salt",
+                        "salmon-fillet",
+                        "lemon-juice"
+                    ],
+                    "timerSeconds": 240
+                }
+            ],
+            "tips": [
+                "Замороженный шпинат тоже подойдёт: возьмите 150 г и сначала выпарьте из него воду.",
+                "Подавайте с рисом или пастой — соуса хватит и на гарнир."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "salmon-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "date",
+                "guests"
+            ],
+            "budget": "high",
+            "kids": false,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Розовые кусочки лосося в светлом сливочном соусе с тёмно-зелёным шпинатом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "hot-dog-home",
+            "title": "Хот-дог домашний",
+            "summary": "Тёплая булочка, горячая сосиска, хрустящий жареный лук, огурчики, кетчуп и горчица. Домашний фастфуд за 15 минут.",
+            "aliases": [
+                "Хотдог",
+                "Хот-дог с сосиской"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "hot-dog-bun",
+                    "name": "Булочки для хот-дога",
+                    "amount": 240,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "frankfurters",
+                    "name": "Сосиски",
+                    "amount": 280,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pickled-cucumber",
+                    "name": "Маринованные огурцы",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato-ketchup",
+                    "name": "Кетчуп",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "tomato-paste"
+                    ]
+                },
+                {
+                    "id": "prepared-mustard",
+                    "name": "Горчица",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте огурцы тонкими ломтиками, лук — мелко. Разогрейте масло в сковороде и жарьте лук 5 минут, помешивая, до золотистого цвета. Переложите на тарелку.",
+                    "uses": [
+                        "pickled-cucumber",
+                        "onion",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "В той же сковороде обжарьте сосиски 4–5 минут, перекатывая, пока они не подрумянятся со всех сторон и не прогреются внутри.",
+                    "uses": [
+                        "frankfurters"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Надрежьте булочки вдоль, не прорезая до конца. Положите их на сухую сковороду разрезом вниз и прогрейте 1 минуту.",
+                    "uses": [
+                        "hot-dog-bun"
+                    ]
+                },
+                {
+                    "text": "Вложите в каждую булочку сосиску, огурцы и жареный лук, полейте кетчупом и горчицей и сразу подавайте.",
+                    "uses": [
+                        "hot-dog-bun",
+                        "frankfurters",
+                        "pickled-cucumber",
+                        "onion",
+                        "tomato-ketchup",
+                        "prepared-mustard"
+                    ]
+                }
+            ],
+            "tips": [
+                "Детям вместо горчицы положите тонкий ломтик сыра.",
+                "Сосиски можно не жарить, а отварить 3 минуты."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "frankfurters",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "kids-party",
+                "picnic"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 4,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Сковорода 26 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Румяная сосиска в мягкой булочке с огурчиками, золотистым луком и полосками кетчупа и горчицы."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "hot-dog-french",
+            "title": "Хот-дог по-французски",
+            "summary": "Сосиска внутри хрустящего багета с соусом: в багете делают «тоннель», заливают соус и вставляют сосиску. Удобно есть руками.",
+            "aliases": [
+                "Французский хот-дог",
+                "Хот-дог в багете"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "baguette",
+                    "name": "Багет",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "frankfurters",
+                    "name": "Сосиски",
+                    "amount": 280,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-ketchup",
+                    "name": "Кетчуп",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "tomato-paste"
+                    ]
+                },
+                {
+                    "id": "prepared-mustard",
+                    "name": "Горчица",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "mayonnaise",
+                    "name": "Майонез",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sour-cream",
+                        "plain-yogurt"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для сосисок",
+                    "amount": 1000,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pot",
+                "oven"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 200 °C. Разрежьте багет на 4 части по длине сосиски. Ручкой ложки или тонким ножом сделайте в каждой части глубокое отверстие с одного конца, не протыкая насквозь.",
+                    "uses": [
+                        "baguette"
+                    ]
+                },
+                {
+                    "text": "Вскипятите воду и варите сосиски 3 минуты. Тем временем смешайте кетчуп, горчицу и майонез.",
+                    "uses": [
+                        "water",
+                        "frankfurters",
+                        "tomato-ketchup",
+                        "prepared-mustard",
+                        "mayonnaise"
+                    ],
+                    "timerSeconds": 180
+                },
+                {
+                    "text": "Налейте в каждое отверстие немного соуса и вставьте сосиску. Положите на противень и прогрейте в духовке 5 минут, пока багет не станет хрустящим.",
+                    "uses": [
+                        "baguette",
+                        "frankfurters",
+                        "tomato-ketchup"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Подойдёт и небольшой батон, если нет багета.",
+                "Для детей сделайте соус из кетчупа и майонеза без горчицы."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "frankfurters",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "kids-party",
+                "picnic"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 4,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Духовка",
+                "Кастрюля 1,5 л",
+                "Длинный нож",
+                "Противень"
+            ],
+            "look": "Кусочки хрустящего багета с торчащими концами сосисок и каплей красного соуса."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lavash-chicken-cheese-skillet",
+            "title": "Лаваш с курицей и сыром на сковороде",
+            "summary": "Конвертики из лаваша с курицей, помидором и тянущимся сыром, обжаренные до хруста.",
+            "aliases": [
+                "Конверты из лаваша с курицей",
+                "Лаваш с начинкой на сковороде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "lavash",
+                    "name": "Тонкий лаваш (2 листа)",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "wheat-tortilla"
+                    ]
+                },
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу мелкими кубиками, посолите и поперчите. Разогрейте масло в сковороде и жарьте 7 минут, помешивая, пока мясо не станет белым, без розового.",
+                    "uses": [
+                        "chicken-fillet",
+                        "salt",
+                        "black-pepper",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 420
+                },
+                {
+                    "text": "Смешайте сметану с измельчённым чесноком и рубленым укропом. Сыр натрите, помидор нарежьте тонкими кружками.",
+                    "uses": [
+                        "sour-cream",
+                        "garlic",
+                        "dill",
+                        "hard-cheese",
+                        "tomato"
+                    ]
+                },
+                {
+                    "text": "Разрежьте каждый лист лаваша пополам. Смажьте соусом, в центр положите курицу, помидор и сыр и сверните плотным конвертом.",
+                    "uses": [
+                        "lavash",
+                        "sour-cream",
+                        "chicken-fillet",
+                        "tomato",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Обжарьте конверты на сухой сковороде на среднем огне по 3 минуты с каждой стороны, пока лаваш не станет хрустящим, а сыр внутри не расплавится.",
+                    "uses": [
+                        "lavash",
+                        "hard-cheese"
+                    ],
+                    "timerSeconds": 360
+                }
+            ],
+            "tips": [
+                "Кладите конверты швом вниз — так они не раскроются.",
+                "Остатки курицы от вчерашнего ужина тоже подойдут."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "picnic"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Румяные хрустящие конверты из лаваша, на разрезе видны курица, помидор и тянущийся сыр."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "skillet-pizza-20-min",
+            "title": "Пицца на сковороде за 20 минут",
+            "summary": "Пицца на жидком тесте без дрожжей: основа из яиц, сметаны и муки, сверху ветчина, помидоры и сыр. Печётся под крышкой.",
+            "aliases": [
+                "Быстрая пицца на сковороде",
+                "Пицца без дрожжей на сковороде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "mayonnaise",
+                    "name": "Майонез",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-ketchup",
+                    "name": "Кетчуп",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "tomato-paste"
+                    ]
+                },
+                {
+                    "id": "ham",
+                    "name": "Ветчина",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "boiled-sausage",
+                        "smoked-chicken-breast"
+                    ]
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dried-oregano",
+                    "name": "Орегано",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Взбейте яйца со сметаной, майонезом и солью. Постепенно вмешайте муку до теста, похожего на густую сметану.",
+                    "uses": [
+                        "egg",
+                        "sour-cream",
+                        "mayonnaise",
+                        "salt",
+                        "wheat-flour"
+                    ]
+                },
+                {
+                    "text": "Нарежьте ветчину полосками, помидор — тонкими кружками, сыр натрите на крупной тёрке.",
+                    "uses": [
+                        "ham",
+                        "tomato",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Смажьте холодную сковороду маслом и вылейте тесто. Смажьте кетчупом, разложите ветчину и помидоры, посыпьте сыром и орегано.",
+                    "uses": [
+                        "vegetable-oil",
+                        "tomato-ketchup",
+                        "ham",
+                        "tomato",
+                        "hard-cheese",
+                        "dried-oregano"
+                    ]
+                },
+                {
+                    "text": "Накройте крышкой и готовьте на слабом огне 10–12 минут, пока основа не схватится, а сыр не расплавится. Снимите лопаткой и нарежьте.",
+                    "uses": [
+                        "egg",
+                        "hard-cheese"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Огонь — только слабый, иначе низ подгорит раньше, чем пропечётся середина.",
+                "Вместо ветчины подойдут колбаса, сосиски или курица."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "hard-cheese",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "kids-party"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 26 см с крышкой",
+                "Миска",
+                "Венчик",
+                "Тёрка"
+            ],
+            "look": "Круглая пицца с румяными краями, расплавленным сыром, розовой ветчиной и кружками помидоров."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "burger-beef-patty",
+            "title": "Бургер с котлетой из фарша",
+            "summary": "Домашний бургер с сочной говяжьей котлетой, сыром, овощами и соусом. Вкуснее, чем в кафе, и понятно, из чего.",
+            "aliases": [
+                "Гамбургер домашний",
+                "Чизбургер домашний"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-beef",
+                    "name": "Говяжий фарш",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "burger-bun",
+                    "name": "Булочки для бургеров",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Сыр ломтиками",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pickled-cucumber",
+                    "name": "Маринованные огурцы",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "red-onion",
+                    "name": "Красный лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "onion"
+                    ]
+                },
+                {
+                    "id": "romaine-lettuce",
+                    "name": "Листья салата",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "napa-cabbage"
+                    ]
+                },
+                {
+                    "id": "tomato-ketchup",
+                    "name": "Кетчуп",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "mayonnaise",
+                    "name": "Майонез",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sour-cream",
+                        "plain-yogurt"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Разделите фарш на 4 части и сформуйте плоские котлеты толщиной 1,5 см, чуть шире булочки. Посолите и поперчите с обеих сторон.",
+                    "uses": [
+                        "minced-beef",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Нарежьте помидор и огурцы кружками, лук — тонкими кольцами, листья салата промойте и обсушите. Смешайте кетчуп с майонезом.",
+                    "uses": [
+                        "tomato",
+                        "pickled-cucumber",
+                        "red-onion",
+                        "romaine-lettuce",
+                        "tomato-ketchup",
+                        "mayonnaise"
+                    ]
+                },
+                {
+                    "text": "Разрежьте булочки пополам и подсушите на сухой сковороде разрезом вниз 1 минуту.",
+                    "uses": [
+                        "burger-bun"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло и жарьте котлеты по 4 минуты с каждой стороны. Положите сверху сыр, накройте крышкой на минуту. Сок из котлеты должен быть прозрачным.",
+                    "uses": [
+                        "vegetable-oil",
+                        "minced-beef",
+                        "hard-cheese"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Смажьте булочки соусом и соберите бургеры: салат, котлета с сыром, помидор, огурцы и лук. Накройте верхушкой и подавайте.",
+                    "uses": [
+                        "burger-bun",
+                        "tomato-ketchup",
+                        "romaine-lettuce",
+                        "minced-beef",
+                        "tomato",
+                        "pickled-cucumber",
+                        "red-onion"
+                    ]
+                }
+            ],
+            "tips": [
+                "Сделайте в центре котлеты небольшую ямку пальцем — при жарке она не раздуется шаром.",
+                "Не мните фарш долго: тогда котлета останется сочной."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "picnic",
+                "kids-party"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "yields": {
+                "amount": 4,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Высокий бургер с румяной котлетой, тающим сыром, листом салата, помидором и луком в мягкой булочке."
+        }
+    ]
+}

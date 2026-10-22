@@ -3343,10 +3343,7 @@
                     "name": "Растительное масло",
                     "amount": 20,
                     "unit": "мл",
-                    "optional": false,
-                    "swap": [
-                        "butter"
-                    ]
+                    "optional": false
                 },
                 {
                     "id": "paprika",
@@ -3465,10 +3462,7 @@
                     "name": "Растительное масло",
                     "amount": 15,
                     "unit": "мл",
-                    "optional": false,
-                    "swap": [
-                        "butter"
-                    ]
+                    "optional": false
                 },
                 {
                     "id": "garlic",

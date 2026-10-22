@@ -7539,10 +7539,7 @@
           "name": "Растительное масло",
           "amount": 30,
           "unit": "г",
-          "optional": false,
-          "swap": [
-            "butter"
-          ]
+          "optional": false
         },
         {
           "id": "paprika",
@@ -7688,10 +7685,7 @@
           "name": "Растительное масло",
           "amount": 45,
           "unit": "г",
-          "optional": false,
-          "swap": [
-            "butter"
-          ]
+          "optional": false
         },
         {
           "id": "paprika",
@@ -8093,10 +8087,7 @@
           "name": "Растительное масло",
           "amount": 30,
           "unit": "г",
-          "optional": false,
-          "swap": [
-            "butter"
-          ]
+          "optional": false
         },
         {
           "id": "water",

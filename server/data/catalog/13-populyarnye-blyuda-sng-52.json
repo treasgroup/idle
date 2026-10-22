@@ -519,10 +519,7 @@
           "id": "vegetable-oil",
           "name": "Масло растительное",
           "amount": 25,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "garlic",
@@ -5691,10 +5688,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло для теста и начинки",
           "amount": 45,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "cabbage",

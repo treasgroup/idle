@@ -1,0 +1,1877 @@
+{
+    "batch": "31-multivarka-1",
+    "description": "Мультиварка",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "buckwheat-merchant-style-multicooker",
+            "title": "Гречка с мясом по-купечески в мультиварке",
+            "summary": "Рассыпчатая гречка со свининой, морковью и луком, пропитанная мясным соком. Всё готовится в одной чаше.",
+            "aliases": [
+                "Гречка по-купечески в мультиварке",
+                "Гречка со свининой в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 65,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "buckwheat",
+                    "name": "Гречка",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pork",
+                    "name": "Свинина",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Горячая вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте свинину кусочками по 2 см, лук — мелко, морковь натрите. Гречку переберите и промойте.",
+                    "uses": [
+                        "pork",
+                        "onion",
+                        "carrot",
+                        "buckwheat"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка», налейте масло и обжаривайте свинину 10 минут, помешивая. Добавьте лук и морковь и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pork",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Вмешайте томатную пасту, всыпьте гречку, добавьте соль, перец и лавровый лист. Залейте горячей водой и перемешайте.",
+                    "uses": [
+                        "tomato-paste",
+                        "buckwheat",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и включите режим «Гречка» или «Плов» на 40 минут. После сигнала оставьте на «Подогреве» ещё 10 минут и перемешайте.",
+                    "uses": [
+                        "buckwheat",
+                        "pork"
+                    ],
+                    "timerSeconds": 2400
+                }
+            ],
+            "tips": [
+                "Нет режима «Гречка» — подойдёт «Крупа» или «Тушение» на 40 минут.",
+                "Если нет режима «Жарка», возьмите «Выпечка» с открытой крышкой."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "buckwheat",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Рассыпчатая тёмная гречка с кусочками свинины и оранжевой морковью в чаше мультиварки."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "stewed-cabbage-pork-multicooker",
+            "title": "Тушёная капуста со свининой в мультиварке",
+            "summary": "Мягкая тушёная капуста со свининой и томатом. Мультиварка тушит сама, мешать почти не нужно.",
+            "aliases": [
+                "Капуста со свининой в мультиварке",
+                "Бигус в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 70,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 800,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pork",
+                    "name": "Свинина",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "comfort",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте свинину кусочками, лук — полукольцами, морковь натрите, капусту тонко нашинкуйте.",
+                    "uses": [
+                        "pork",
+                        "onion",
+                        "carrot",
+                        "cabbage"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжаривайте свинину в масле 10 минут, затем добавьте лук и морковь и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pork",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Положите капусту, томатную пасту, соль, перец и лавровый лист, влейте воду и перемешайте. Капуста займёт почти всю чашу, но быстро осядет.",
+                    "uses": [
+                        "cabbage",
+                        "tomato-paste",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 50 минут, один раз перемешав в середине. Капуста должна стать мягкой.",
+                    "uses": [
+                        "cabbage",
+                        "pork"
+                    ],
+                    "timerSeconds": 3000
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "Если капуста кислит, добавьте чайную ложку сахара."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cabbage",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter",
+                "spring",
+                "summer"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Мягкая золотистая капуста с кусочками свинины и морковью в томатном соусе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "potatoes-pork-multicooker",
+            "title": "Картошка с мясом в мультиварке",
+            "summary": "Тушёная картошка со свининой, морковью и луком — сытный ужин, который готовится без присмотра.",
+            "aliases": [
+                "Тушёная картошка с мясом в мультиварке",
+                "Жаркое в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 75,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 800,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pork",
+                    "name": "Свинина",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 300,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "comfort",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте свинину кусочками по 3 см, картофель — крупными кубиками, лук — полукольцами, морковь — кружками.",
+                    "uses": [
+                        "pork",
+                        "potato",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжаривайте свинину в масле 10 минут до румяности. Добавьте лук и морковь и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pork",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Положите картофель, соль, перец и лавровый лист, влейте воду и перемешайте.",
+                    "uses": [
+                        "potato",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и готовьте в режиме «Тушение» 50 минут, пока картофель не станет мягким. Посыпьте укропом.",
+                    "uses": [
+                        "potato",
+                        "pork",
+                        "dill"
+                    ],
+                    "timerSeconds": 3000
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "С говядиной тушите на 20 минут дольше."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "potato",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Крупные кусочки картофеля и свинины в густом бульоне с морковью и укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-potatoes-multicooker",
+            "title": "Курица с картошкой в мультиварке",
+            "summary": "Сочная курица с картошкой в сметанном соусе с чесноком и паприкой. Одна чаша — и ужин готов.",
+            "aliases": [
+                "Картошка с курицей в мультиварке",
+                "Курица с картофелем в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 55,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-thigh-fillet",
+                    "name": "Филе куриного бедра",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 800,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Паприка",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу крупными кусками, натрите паприкой, частью соли и перцем. Картофель нарежьте крупными кубиками, лук — полукольцами, чеснок порубите.",
+                    "uses": [
+                        "chicken-thigh-fillet",
+                        "paprika",
+                        "salt",
+                        "black-pepper",
+                        "potato",
+                        "onion",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте курицу в масле 7 минут до золотистого цвета, добавьте лук и жарьте ещё 3 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-thigh-fillet",
+                        "onion"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Положите картофель и чеснок, посолите. Размешайте сметану с водой и залейте.",
+                    "uses": [
+                        "potato",
+                        "garlic",
+                        "salt",
+                        "sour-cream",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и готовьте в режиме «Тушение» 40 минут, пока картофель не станет мягким. Посыпьте укропом.",
+                    "uses": [
+                        "potato",
+                        "chicken-thigh-fillet",
+                        "dill"
+                    ],
+                    "timerSeconds": 2400
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "С голенями тушите на 10 минут дольше."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-thigh-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Румяные кусочки курицы и картофеля в светлом сметанном соусе, посыпанные укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lazy-cabbage-rolls-multicooker",
+            "title": "Ленивые голубцы в мультиварке",
+            "summary": "Котлетки из фарша, риса и капусты, потушенные в томатно-сметанном соусе. Вкус голубцов без возни с листьями.",
+            "aliases": [
+                "Ленивые голубцы в мультиварке со сметаной",
+                "Голубцы ленивые в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 75,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "rice",
+                    "name": "Рис",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 400,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Капусту мелко нашинкуйте, лук мелко нарежьте, морковь натрите. Рис промойте.",
+                    "uses": [
+                        "cabbage",
+                        "onion",
+                        "carrot",
+                        "rice"
+                    ]
+                },
+                {
+                    "text": "Смешайте фарш с капустой, рисом, половиной лука, яйцом, частью соли и перцем. Влажными руками сформуйте котлетки и обжарьте их в режиме «Жарка» на масле по 3 минуты с каждой стороны.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "cabbage",
+                        "rice",
+                        "onion",
+                        "egg",
+                        "salt",
+                        "black-pepper",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Размешайте томатную пасту со сметаной, водой и оставшейся солью. Положите сверху оставшиеся лук и морковь и залейте соусом.",
+                    "uses": [
+                        "tomato-paste",
+                        "sour-cream",
+                        "water",
+                        "salt",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 50 минут. Рис внутри должен стать мягким.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "rice"
+                    ],
+                    "timerSeconds": 3000
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "Если нет режима «Жарка», возьмите «Выпечка» с открытой крышкой."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки",
+                "Миска"
+            ],
+            "look": "Пухлые котлетки с вкраплениями капусты и риса в розовом томатно-сметанном соусе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "meatballs-tomato-multicooker",
+            "title": "Тефтели в томатном соусе в мультиварке",
+            "summary": "Мягкие тефтели с рисом в густом томатном соусе. Мультиварка тушит их ровно, и они не разваливаются.",
+            "aliases": [
+                "Тефтели с рисом в мультиварке",
+                "Тефтели в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 60,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "rice",
+                    "name": "Рис",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Рис промойте. Половину лука натрите на мелкой тёрке, остальной нарежьте мелко, морковь натрите на крупной.",
+                    "uses": [
+                        "rice",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Смешайте фарш с рисом, тёртым луком, яйцом, частью соли и перцем. Скатайте влажными руками шарики размером с грецкий орех и уложите в чашу.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "rice",
+                        "onion",
+                        "egg",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Размешайте муку с водой, добавьте томатную пасту, сметану и оставшуюся соль. Сверху на тефтели положите лук и морковь, залейте соусом и добавьте лавровый лист.",
+                    "uses": [
+                        "wheat-flour",
+                        "water",
+                        "tomato-paste",
+                        "sour-cream",
+                        "salt",
+                        "onion",
+                        "carrot",
+                        "bay-leaf"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 40 минут. Разрежьте одну тефтелю: мясо внутри серое, рис мягкий.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "rice"
+                    ],
+                    "timerSeconds": 2400
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "Подавайте с картофельным пюре, макаронами или гречкой."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки",
+                "Миска"
+            ],
+            "look": "Круглые тефтели в густом оранжево-красном соусе с морковью."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "beef-goulash-multicooker",
+            "title": "Гуляш из говядины в мультиварке",
+            "summary": "Мягкая говядина в густой подливе с паприкой и томатом. Мультиварка томит мясо полтора часа, и оно тает во рту.",
+            "aliases": [
+                "Гуляш с подливкой в мультиварке",
+                "Говядина с подливой в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 120,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beef",
+                    "name": "Говядина",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Паприка сладкая",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "comfort",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте говядину кубиками по 3 см, лук — полукольцами, морковь натрите, чеснок порубите.",
+                    "uses": [
+                        "beef",
+                        "onion",
+                        "carrot",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжаривайте говядину в масле 10 минут, помешивая. Добавьте лук и морковь и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "beef",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Посыпьте мукой и паприкой, перемешайте и прогрейте минуту. Добавьте томатную пасту, чеснок, соль, перец и лавровый лист, влейте воду и перемешайте.",
+                    "uses": [
+                        "wheat-flour",
+                        "paprika",
+                        "tomato-paste",
+                        "garlic",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 90 минут, пока говядина не станет мягкой и не будет легко разделяться вилкой.",
+                    "uses": [
+                        "beef"
+                    ],
+                    "timerSeconds": 5400
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "Если нет режима «Жарка», возьмите «Выпечка» с открытой крышкой."
+            ],
+            "storageDays": 3,
+            "freezerDays": 90,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Тёмно-красная густая подлива с мягкими кубиками говядины."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-sour-cream-multicooker",
+            "title": "Курица в сметане в мультиварке",
+            "summary": "Нежная курица, потушенная в сметане с луком и чесноком. Подлива получается густой, её хватает на гарнир.",
+            "aliases": [
+                "Курица со сметаной в мультиварке",
+                "Курица тушёная в сметане в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 55,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-thigh-fillet",
+                    "name": "Филе куриного бедра",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 7,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу кусками, посолите частью соли и поперчите. Лук нарежьте полукольцами, чеснок порубите.",
+                    "uses": [
+                        "chicken-thigh-fillet",
+                        "salt",
+                        "black-pepper",
+                        "onion",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжарьте курицу в масле 7 минут, добавьте лук и жарьте ещё 3 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-thigh-fillet",
+                        "onion"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Размешайте сметану с водой, чесноком и оставшейся солью и залейте курицу.",
+                    "uses": [
+                        "sour-cream",
+                        "water",
+                        "garlic",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 35 минут. Посыпьте укропом.",
+                    "uses": [
+                        "chicken-thigh-fillet",
+                        "dill"
+                    ],
+                    "timerSeconds": 2100
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "С куриным филе грудки тушите 25 минут — иначе оно станет сухим."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-thigh-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Кусочки курицы в густом белом сметанном соусе с мягким луком и зелёным укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pork-prunes-multicooker",
+            "title": "Свинина с черносливом в мультиварке",
+            "summary": "Свинина, потушенная с черносливом, луком и морковью. Чернослив даёт подливе сладковатый, чуть дымный вкус.",
+            "aliases": [
+                "Мясо с черносливом в мультиварке",
+                "Свинина тушёная с черносливом"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 85,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pork",
+                    "name": "Свинина",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "prunes",
+                    "name": "Чернослив без косточек",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-apricot",
+                        "raisins"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте свинину кусками по 3 см, лук — полукольцами, морковь — кружками. Чернослив промойте, крупный разрежьте пополам.",
+                    "uses": [
+                        "pork",
+                        "onion",
+                        "carrot",
+                        "prunes"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжаривайте свинину в масле 10 минут до румяности, затем добавьте лук и морковь на 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pork",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Положите чернослив, томатную пасту, соль, перец и лавровый лист, влейте воду и перемешайте.",
+                    "uses": [
+                        "prunes",
+                        "tomato-paste",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 60 минут, пока свинина не станет мягкой.",
+                    "uses": [
+                        "pork"
+                    ],
+                    "timerSeconds": 3600
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "Если чернослив очень сухой, замочите его на 10 минут в тёплой воде."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pork",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "guests"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Тёмные мягкие кусочки свинины с черносливом и морковью в блестящей подливе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "beef-carrot-stew-multicooker",
+            "title": "Говядина тушёная с морковью в мультиварке",
+            "summary": "Мягкая говядина с большим количеством сладкой моркови. Простое, сытное и очень домашнее блюдо.",
+            "aliases": [
+                "Тушёная говядина с морковью",
+                "Говядина с морковью в мультиварке"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 115,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beef",
+                    "name": "Говядина",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 400,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "multicooker"
+            ],
+            "tags": [
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте говядину кубиками по 3 см, морковь — толстыми кружками, лук — полукольцами, чеснок порубите.",
+                    "uses": [
+                        "beef",
+                        "carrot",
+                        "onion",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Включите режим «Жарка» и обжаривайте говядину в масле 10 минут, затем добавьте лук и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "beef",
+                        "onion"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Положите морковь, чеснок, томатную пасту, соль, перец и лавровый лист, влейте воду и перемешайте.",
+                    "uses": [
+                        "carrot",
+                        "garlic",
+                        "tomato-paste",
+                        "salt",
+                        "black-pepper",
+                        "bay-leaf",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Закройте крышку и тушите в режиме «Тушение» 90 минут, пока мясо не станет мягким. Посыпьте петрушкой.",
+                    "uses": [
+                        "beef",
+                        "carrot",
+                        "parsley"
+                    ],
+                    "timerSeconds": 5400
+                }
+            ],
+            "tips": [
+                "Нет режима «Тушение» — подойдёт «Суп» или «Мультиповар» на 100 °C.",
+                "Морковь режьте крупно — тогда она не разварится за полтора часа."
+            ],
+            "storageDays": 3,
+            "freezerDays": 90,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Мультиварка",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка для мультиварки"
+            ],
+            "look": "Мягкие кубики говядины с яркими толстыми кружками моркови в густом соусе, сверху петрушка."
+        }
+    ]
+}

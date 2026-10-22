@@ -1,0 +1,1622 @@
+{
+    "batch": "27-bystrye-uzhiny-2",
+    "description": "Быстрый ужин до 30 минут",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pork-bell-pepper-skillet",
+            "title": "Свинина с болгарским перцем на сковороде",
+            "summary": "Тонкие полоски свинины с перцем и луком в лёгком томатном соусе. Мясо успевает стать мягким за 25 минут.",
+            "aliases": [
+                "Свинина с перцем",
+                "Свинина тушёная с болгарским перцем"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pork",
+                    "name": "Свинина",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "zucchini"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте свинину поперёк волокон тонкими полосками толщиной около 1 см. Перец очистите от семян и нарежьте соломкой, лук — полукольцами, чеснок мелко порубите.",
+                    "uses": [
+                        "pork",
+                        "bell-pepper",
+                        "onion",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в большой сковороде на сильном огне. Выложите свинину одним слоем и жарьте 5 минут, помешивая, пока мясо не подрумянится со всех сторон.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pork"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте лук и перец и жарьте ещё 5 минут, помешивая: перец должен стать мягче, но не развариться. Положите чеснок и томатную пасту и перемешайте.",
+                    "uses": [
+                        "onion",
+                        "bell-pepper",
+                        "garlic",
+                        "tomato-paste"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Влейте воду, посолите и поперчите. Накройте крышкой и тушите на среднем огне 7 минут, пока свинина не станет мягкой, а соус чуть не загустеет. Посыпьте петрушкой.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "black-pepper",
+                        "parsley",
+                        "pork"
+                    ],
+                    "timerSeconds": 420
+                }
+            ],
+            "tips": [
+                "Режьте мясо поперёк волокон — так оно быстрее станет мягким.",
+                "Подойдёт и замороженный перец: кладите его без разморозки на минуту позже."
+            ],
+            "storageDays": 2,
+            "freezerDays": 30,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pork",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Полоски свинины с яркой соломкой красного и жёлтого перца в густом томатном соусе, сверху рубленая петрушка."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pork-chops-cheese-skillet",
+            "title": "Свиные отбивные с сыром на сковороде",
+            "summary": "Сочные отбивные в яйце и муке с расплавленным сыром сверху. Жарятся на обычной сковороде за 20 минут.",
+            "aliases": [
+                "Отбивные под сыром",
+                "Отбивные из свинины с сыром"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pork",
+                    "name": "Свинина (корейка или шея)",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте свинину поперёк волокон на 4 куска толщиной около 1,5 см. Накройте плёнкой и отбейте молотком до толщины 0,7 см. Посолите и поперчите с обеих сторон.",
+                    "uses": [
+                        "pork",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Взбейте яйцо вилкой в глубокой тарелке, муку насыпьте в другую. Сыр натрите на крупной тёрке. Разогрейте масло в сковороде на среднем огне.",
+                    "uses": [
+                        "egg",
+                        "wheat-flour",
+                        "hard-cheese",
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Обваляйте отбивные в муке, окуните в яйцо и выложите в сковороду. Жарьте по 4 минуты с каждой стороны до золотистой корочки.",
+                    "uses": [
+                        "pork",
+                        "wheat-flour",
+                        "egg"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Посыпьте отбивные сыром, убавьте огонь, накройте крышкой и подержите 3 минуты, пока сыр не расплавится, а мясо внутри не станет без розового. Подавайте сразу.",
+                    "uses": [
+                        "hard-cheese",
+                        "pork"
+                    ],
+                    "timerSeconds": 180
+                }
+            ],
+            "tips": [
+                "Не отбивайте мясо тоньше 7 мм — оно пересохнет.",
+                "Плёнка не даёт брызгам разлетаться и мясо не рвётся."
+            ],
+            "storageDays": 2,
+            "freezerDays": 30,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pork",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка",
+                "Кухонный молоток"
+            ],
+            "look": "Четыре золотистые отбивные, покрытые тающим светлым сыром, на белой тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "beef-vegetables-chinese",
+            "title": "Говядина с овощами по-китайски",
+            "summary": "Тонкие ломтики говядины и хрустящие овощи в блестящем соевом соусе. Быстро жарятся на сильном огне.",
+            "aliases": [
+                "Говядина в соевом соусе с овощами",
+                "Говядина по-китайски"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beef",
+                    "name": "Говядина (вырезка или лопатка)",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "ginger",
+                    "name": "Имбирь",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "ginger-ground"
+                    ]
+                },
+                {
+                    "id": "soy-sauce",
+                    "name": "Соевый соус",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "corn-starch",
+                    "name": "Крахмал",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "potato-starch"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "green-onion",
+                    "name": "Зелёный лук",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "leek",
+                        "parsley"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте говядину поперёк волокон очень тонкими полосками. Смешайте с третью соевого соуса и половиной крахмала и оставьте на 10 минут, пока режете овощи.",
+                    "uses": [
+                        "beef",
+                        "soy-sauce",
+                        "corn-starch"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Перец нарежьте соломкой, морковь — тонкими брусочками, лук — перьями. Чеснок и имбирь мелко порубите, зелёный лук нарежьте. Оставшийся соевый соус смешайте с водой, сахаром и крахмалом.",
+                    "uses": [
+                        "bell-pepper",
+                        "carrot",
+                        "onion",
+                        "garlic",
+                        "ginger",
+                        "green-onion",
+                        "soy-sauce",
+                        "water",
+                        "sugar",
+                        "corn-starch"
+                    ]
+                },
+                {
+                    "text": "Разогрейте половину масла в сковороде на сильном огне. Обжарьте говядину в два приёма по 2 минуты, пока она не потемнеет, и переложите на тарелку.",
+                    "uses": [
+                        "vegetable-oil",
+                        "beef"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "В оставшемся масле жарьте морковь, лук и перец 4 минуты, постоянно помешивая: овощи должны остаться хрустящими. Добавьте чеснок и имбирь ещё на 30 секунд.",
+                    "uses": [
+                        "vegetable-oil",
+                        "carrot",
+                        "onion",
+                        "bell-pepper",
+                        "garlic",
+                        "ginger"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Верните мясо, влейте соус и готовьте 1–2 минуты, пока он не загустеет и не покроет всё блеском. Посыпьте зелёным луком и подавайте с рисом.",
+                    "uses": [
+                        "beef",
+                        "soy-sauce",
+                        "green-onion"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Говядину легче тонко нарезать, если подержать её 15 минут в морозилке.",
+                "Жарьте мясо небольшими партиями: в тесноте оно тушится и становится жёстким."
+            ],
+            "storageDays": 2,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Вок или сковорода 28 см",
+                "Нож",
+                "Разделочная доска",
+                "Миска"
+            ],
+            "look": "Тонкие полоски говядины с красным перцем, морковью и луком в глянцевом коричневом соусе, сверху колечки зелёного лука."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "mince-potato-onion-skillet",
+            "title": "Фарш с картошкой и луком на сковороде",
+            "summary": "Жареная картошка с румяным фаршем и луком в одной сковороде — сытный ужин из простых продуктов.",
+            "aliases": [
+                "Картошка с фаршем на сковороде",
+                "Жареная картошка с фаршем"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 40,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 7,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Очистите картофель, нарежьте небольшими брусочками, промойте и обсушите полотенцем. Лук нарежьте полукольцами, укроп порубите.",
+                    "uses": [
+                        "potato",
+                        "onion",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "Разогрейте половину масла в большой сковороде. Выложите фарш и жарьте 6 минут на сильном огне, разбивая комочки лопаткой, пока он не станет серым и рассыпчатым. Переложите в миску.",
+                    "uses": [
+                        "vegetable-oil",
+                        "minced-pork-beef"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "В той же сковороде в оставшемся масле жарьте картофель 10 минут на среднем огне, переворачивая раз в 2–3 минуты. Добавьте лук и жарьте ещё 5 минут.",
+                    "uses": [
+                        "vegetable-oil",
+                        "potato",
+                        "onion"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Верните фарш, посолите и поперчите, перемешайте. Накройте крышкой и подержите на слабом огне 3 минуты, пока картофель не станет мягким. Посыпьте укропом.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "salt",
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 180
+                }
+            ],
+            "tips": [
+                "Обсушенный картофель не прилипает и лучше румянится.",
+                "Солите в конце: от ранней соли картофель пускает сок и тушится."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Лопатка"
+            ],
+            "look": "Золотистые брусочки картофеля вперемешку с румяным фаршем и мягким луком, посыпанные свежим укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "lazy-cabbage-rolls-skillet",
+            "title": "Ленивые голубцы на сковороде",
+            "summary": "Все вкусы голубцов без заворачивания: фарш, капуста и рис в томатно-сметанном соусе в одной сковороде.",
+            "aliases": [
+                "Ленивые голубцы в сковороде",
+                "Голубцы ленивые быстрые"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cooked-rice",
+                    "name": "Готовый рис",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Капусту тонко нашинкуйте, лук мелко нарежьте, морковь натрите на крупной тёрке.",
+                    "uses": [
+                        "cabbage",
+                        "onion",
+                        "carrot"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в глубокой сковороде, обжарьте лук и морковь 3 минуты. Добавьте фарш и жарьте 5 минут, разбивая комочки, пока он не станет серым.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "carrot",
+                        "minced-pork-beef"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Положите капусту, перемешайте и жарьте 5 минут, пока она не осядет. Смешайте томатную пасту со сметаной, водой, солью и перцем и влейте в сковороду.",
+                    "uses": [
+                        "cabbage",
+                        "tomato-paste",
+                        "sour-cream",
+                        "water",
+                        "salt",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте готовый рис и перемешайте. Накройте крышкой и тушите на слабом огне 10 минут, пока капуста не станет мягкой. Если соус выкипает, подлейте немного воды.",
+                    "uses": [
+                        "cooked-rice",
+                        "cabbage"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Рис можно сварить заранее или взять оставшийся от вчерашнего ужина.",
+                "Молодая капуста готовится быстрее — тушите её 6–7 минут."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Глубокая сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Тёрка"
+            ],
+            "look": "Мягкая капуста, рис и фарш в розовом томатно-сметанном соусе, в глубокой сковороде."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pasta-mince-cheese",
+            "title": "Паста с фаршем и сыром",
+            "summary": "Макароны с мясным томатным соусом и тёртым сыром — почти болоньезе, но за 25 минут.",
+            "aliases": [
+                "Макароны с фаршем и сыром",
+                "Паста с мясным соусом"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pasta",
+                    "name": "Макароны",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "canned-tomato",
+                    "name": "Томаты в собственном соку",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "tomato",
+                        "tomato-paste"
+                    ]
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dried-basil",
+                    "name": "Базилик сушёный",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-oregano"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для макарон",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте на огонь кастрюлю с водой для макарон. Лук мелко нарежьте, чеснок порубите, сыр натрите.",
+                    "uses": [
+                        "water",
+                        "onion",
+                        "garlic",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в сковороде и обжарьте лук 3 минуты. Добавьте фарш и жарьте 7 минут, разбивая лопаткой, пока он не станет серым. Положите чеснок и базилик.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "minced-pork-beef",
+                        "garlic",
+                        "dried-basil"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Добавьте томаты, раздавив их ложкой, посолите частью соли и поперчите. Тушите соус без крышки 10 минут, пока он не загустеет. Тем временем посолите кипящую воду и сварите макароны по времени на пачке.",
+                    "uses": [
+                        "canned-tomato",
+                        "salt",
+                        "black-pepper",
+                        "pasta",
+                        "water"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Откиньте макароны на дуршлаг, оставив полстакана воды. Смешайте их с соусом, при необходимости подлейте немного воды. Разложите по тарелкам и посыпьте сыром.",
+                    "uses": [
+                        "pasta",
+                        "hard-cheese"
+                    ]
+                }
+            ],
+            "tips": [
+                "Немного воды от макарон делает соус гладким и помогает ему держаться.",
+                "Вместо консервированных томатов подойдут 4 спелых свежих помидора."
+            ],
+            "storageDays": 2,
+            "freezerDays": 30,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 26 см",
+                "Дуршлаг",
+                "Тёрка"
+            ],
+            "look": "Макароны с густым красным мясным соусом, посыпанные тёртым сыром, в глубокой тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "meatballs-cream-sauce-skillet",
+            "title": "Тефтели в сливочном соусе на сковороде",
+            "summary": "Нежные мясные тефтели, обжаренные до корочки и потушенные в сливочном соусе с чесноком.",
+            "aliases": [
+                "Фрикадельки в сливках",
+                "Тефтели в сливках"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "breadcrumbs",
+                    "name": "Панировочные сухари",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10–20%",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Лук натрите на мелкой тёрке. Смешайте фарш с луком, яйцом, сухарями, половиной соли и перцем. Вымешайте и скатайте влажными руками шарики размером с грецкий орех.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "onion",
+                        "egg",
+                        "breadcrumbs",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в широкой сковороде и обжарьте тефтели 5 минут, осторожно переворачивая, до румяной корочки со всех сторон.",
+                    "uses": [
+                        "vegetable-oil",
+                        "minced-pork-beef"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Размешайте сливки с мукой, оставшейся солью и измельчённым чесноком. Влейте в сковороду, доведите до слабого кипения, накройте крышкой и тушите 12 минут на слабом огне.",
+                    "uses": [
+                        "cream",
+                        "wheat-flour",
+                        "salt",
+                        "garlic"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Разрежьте одну тефтелю: мясо внутри должно быть серым, без розового. Посыпьте укропом и подавайте с макаронами, рисом или картофельным пюре.",
+                    "uses": [
+                        "dill",
+                        "minced-pork-beef"
+                    ]
+                }
+            ],
+            "tips": [
+                "Влажные руки — и фарш не липнет, а тефтели выходят гладкими.",
+                "Если соус слишком густой, добавьте пару ложек воды."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см с крышкой",
+                "Миска",
+                "Тёрка"
+            ],
+            "look": "Румяные круглые тефтели в светлом сливочном соусе, посыпанные мелко рубленым укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pasta-ham-peas-cream",
+            "title": "Макароны с ветчиной и горошком в сливках",
+            "summary": "Макароны в нежном сливочном соусе с ветчиной, зелёным горошком и сыром — ужин за 20 минут.",
+            "aliases": [
+                "Паста с ветчиной и горошком",
+                "Макароны с ветчиной в сливочном соусе"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pasta",
+                    "name": "Макароны",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "ham",
+                    "name": "Ветчина",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "boiled-sausage",
+                        "smoked-chicken-breast"
+                    ]
+                },
+                {
+                    "id": "frozen-peas",
+                    "name": "Зелёный горошек замороженный",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-peas"
+                    ]
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10–20%",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для макарон",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду для макарон. Ветчину нарежьте соломкой, лук мелко нарежьте, чеснок порубите, сыр натрите.",
+                    "uses": [
+                        "water",
+                        "ham",
+                        "onion",
+                        "garlic",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Посолите кипящую воду и варите макароны на минуту меньше, чем написано на пачке. За 3 минуты до конца добавьте в кастрюлю горошек.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "pasta",
+                        "frozen-peas"
+                    ]
+                },
+                {
+                    "text": "Пока варятся макароны, растопите масло в сковороде и обжарьте лук 3 минуты. Добавьте ветчину и чеснок, жарьте ещё 2 минуты, влейте сливки и прогрейте до первых пузырьков.",
+                    "uses": [
+                        "butter",
+                        "onion",
+                        "ham",
+                        "garlic",
+                        "cream"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Откиньте макароны с горошком и переложите в сковороду. Добавьте сыр и перец и перемешивайте на слабом огне минуту, пока соус не станет гладким. Подавайте сразу.",
+                    "uses": [
+                        "pasta",
+                        "frozen-peas",
+                        "hard-cheese",
+                        "black-pepper"
+                    ]
+                }
+            ],
+            "tips": [
+                "Подойдут любые короткие макароны — перья, рожки, бантики.",
+                "Соус густеет, пока стоит: если он загустел, добавьте ложку горячей воды."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pasta",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 26 см",
+                "Дуршлаг",
+                "Тёрка"
+            ],
+            "look": "Короткие макароны в светлом сливочном соусе с розовыми полосками ветчины и ярко-зелёным горошком."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pollock-batter-skillet",
+            "title": "Минтай в кляре на сковороде",
+            "summary": "Кусочки минтая в пышном яичном кляре с золотистой корочкой. Рыба внутри остаётся сочной.",
+            "aliases": [
+                "Рыба в кляре",
+                "Минтай жареный в кляре"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pollock-fillet",
+                    "name": "Филе минтая",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 70,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 60,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 60,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Обсушите филе минтая бумажным полотенцем и нарежьте порционными кусками. Сбрызните лимонным соком, посолите половиной соли и поперчите.",
+                    "uses": [
+                        "pollock-fillet",
+                        "lemon-juice",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Взбейте яйца с молоком и оставшейся солью, постепенно вмешайте муку до гладкого кляра, похожего на густую сметану.",
+                    "uses": [
+                        "egg",
+                        "milk",
+                        "wheat-flour",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в сковороде на среднем огне. Обмакните кусочки рыбы в кляр и выложите в сковороду с промежутками в два пальца.",
+                    "uses": [
+                        "vegetable-oil",
+                        "pollock-fillet"
+                    ]
+                },
+                {
+                    "text": "Жарьте по 4 минуты с каждой стороны до золотистой корочки. Рыба внутри должна быть белой и легко расслаиваться. Выложите на бумажное полотенце, чтобы ушло лишнее масло.",
+                    "uses": [
+                        "pollock-fillet"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Если филе замороженное, разморозьте его в холодильнике и хорошо отожмите — иначе кляр не удержится.",
+                "Масло должно шипеть, когда кладёте рыбу: в холодное кляр впитывает жир."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pollock-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 28 см",
+                "Две глубокие тарелки",
+                "Венчик",
+                "Лопатка"
+            ],
+            "look": "Золотистые пышные кусочки рыбы в кляре на тарелке с долькой лимона."
+        }
+    ]
+}

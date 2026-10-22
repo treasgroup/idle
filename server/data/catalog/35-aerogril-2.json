@@ -1,0 +1,1124 @@
+{
+    "batch": "35-aerogril-2",
+    "description": "Аэрогриль",
+    "ingredients": [
+        {
+            "id": "ready-yeast-dough",
+            "name": "Тесто дрожжевое готовое, замороженное",
+            "aliases": [
+                "готовое дрожжевое тесто",
+                "тесто для пирожков"
+            ],
+            "groups": [
+                "gluten",
+                "eggs",
+                "dairy"
+            ],
+            "per100g": {
+                "kcal": 260,
+                "protein": 7,
+                "fat": 5,
+                "carbs": 46
+            },
+            "aisle": "frozen"
+        }
+    ],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "country-potatoes-airfryer",
+            "title": "Картофель по-деревенски в аэрогриле",
+            "summary": "Румяные картофельные дольки со специями — хрустящие снаружи и мягкие внутри, а масла нужна всего ложка.",
+            "aliases": [
+                "Картошка по-деревенски в аэрогриле",
+                "Картофельные дольки в аэрогриле"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 800,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Паприка",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dried-oregano",
+                    "name": "Орегано сушёный",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-thyme",
+                        "dried-basil"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Вымойте картофель щёткой — кожуру можно не снимать. Нарежьте его дольками, промойте холодной водой и хорошо обсушите полотенцем.",
+                    "uses": [
+                        "potato"
+                    ]
+                },
+                {
+                    "text": "Сложите дольки в миску, добавьте масло, паприку, орегано, измельчённый чеснок, соль и перец и перемешайте руками, чтобы специи легли на каждую дольку.",
+                    "uses": [
+                        "potato",
+                        "vegetable-oil",
+                        "paprika",
+                        "dried-oregano",
+                        "garlic",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Выложите картофель в корзину аэрогриля и готовьте при 200 °C 10 минут.",
+                    "uses": [
+                        "potato"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Встряхните корзину и готовьте ещё 10–12 минут, пока дольки не подрумянятся и не будут легко протыкаться ножом.",
+                    "uses": [
+                        "potato"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Не загружайте корзину больше чем в один-два слоя — иначе овощи потушатся, а не зарумянятся.",
+                "Сухие дольки получаются хрустящими — не ленитесь обсушить картофель."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "potato",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Аэрогриль",
+                "Миска",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Золотистые картофельные дольки с кожурой, посыпанные паприкой и травами."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "zucchini-airfryer",
+            "title": "Кабачки в аэрогриле",
+            "summary": "Кружки кабачков с чесноком и сыром, запечённые в аэрогриле до золотистых краёв. Простая лёгкая закуска или гарнир.",
+            "aliases": [
+                "Кабачки запечённые в аэрогриле",
+                "Кабачки с сыром в аэрогриле"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "zucchini",
+                    "name": "Кабачки",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "dried-basil",
+                    "name": "Базилик сушёный",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-oregano"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "light",
+                "quick",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте кабачки кружками толщиной 1 см. Перемешайте с маслом, измельчённым чесноком, базиликом, солью и перцем. Сыр натрите.",
+                    "uses": [
+                        "zucchini",
+                        "vegetable-oil",
+                        "garlic",
+                        "dried-basil",
+                        "salt",
+                        "black-pepper",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Разложите кружки в корзине аэрогриля в один слой и готовьте при 190 °C 8 минут.",
+                    "uses": [
+                        "zucchini"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Посыпьте кабачки сыром и готовьте ещё 3–4 минуты, пока сыр не расплавится и не зарумянится.",
+                    "uses": [
+                        "hard-cheese",
+                        "zucchini"
+                    ],
+                    "timerSeconds": 240
+                }
+            ],
+            "tips": [
+                "Не загружайте корзину больше чем в один-два слоя — иначе овощи потушатся, а не зарумянятся.",
+                "Готовьте в две партии, если кабачки не помещаются в один слой."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "zucchini",
+            "needsSide": false,
+            "season": [
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Аэрогриль",
+                "Миска",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Кружки кабачков с золотистыми краями под румяной сырной корочкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "garlic-eggplant-airfryer",
+            "title": "Баклажаны с чесноком в аэрогриле",
+            "summary": "Мягкие баклажаны с чесночно-сметанным соусом и зеленью. В аэрогриле они почти не впитывают масла.",
+            "aliases": [
+                "Баклажаны в аэрогриле",
+                "Запечённые баклажаны с чесноком"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "eggplant",
+                    "name": "Баклажаны",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sour-cream",
+                    "name": "Сметана",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "plain-yogurt",
+                        "mayonnaise"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "light",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте баклажаны кружками толщиной 1 см, посолите и оставьте на 10 минут, чтобы ушла горечь. Затем промокните полотенцем.",
+                    "uses": [
+                        "eggplant",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Смажьте кружки маслом с обеих сторон, разложите в корзине в один слой и готовьте при 190 °C 12 минут, перевернув в середине.",
+                    "uses": [
+                        "eggplant",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Смешайте сметану с измельчённым чесноком, рубленым укропом и перцем. Выложите баклажаны на блюдо и полейте соусом.",
+                    "uses": [
+                        "sour-cream",
+                        "garlic",
+                        "dill",
+                        "black-pepper",
+                        "eggplant"
+                    ]
+                }
+            ],
+            "tips": [
+                "Не загружайте корзину больше чем в один-два слоя — иначе овощи потушатся, а не зарумянятся.",
+                "Сметану можно заменить греческим йогуртом — будет легче."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "snack",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "eggplant",
+            "needsSide": false,
+            "season": [
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Аэрогриль",
+                "Миска",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Мягкие румяные кружки баклажанов под белым чесночным соусом с укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "cauliflower-airfryer",
+            "title": "Цветная капуста в аэрогриле",
+            "summary": "Соцветия цветной капусты, запечённые со специями до хрустящих золотистых краёв. Вкусно даже тем, кто не любит капусту.",
+            "aliases": [
+                "Запечённая цветная капуста в аэрогриле",
+                "Цветная капуста со специями"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cauliflower",
+                    "name": "Цветная капуста",
+                    "amount": 700,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Паприка",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "turmeric",
+                    "name": "Куркума",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "light",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Разберите капусту на небольшие соцветия, промойте и хорошо обсушите.",
+                    "uses": [
+                        "cauliflower"
+                    ]
+                },
+                {
+                    "text": "Перемешайте соцветия с маслом, паприкой, куркумой, измельчённым чесноком, солью и перцем.",
+                    "uses": [
+                        "cauliflower",
+                        "vegetable-oil",
+                        "paprika",
+                        "turmeric",
+                        "garlic",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Выложите в корзину и готовьте при 200 °C 15 минут, встряхнув корзину в середине. Края должны подрумяниться, а ножка — легко протыкаться.",
+                    "uses": [
+                        "cauliflower"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Не загружайте корзину больше чем в один-два слоя — иначе овощи потушатся, а не зарумянятся.",
+                "Подавайте с соусом из йогурта с чесноком."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cauliflower",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Аэрогриль",
+                "Миска",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Золотисто-жёлтые соцветия цветной капусты с поджаристыми краями."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "broccoli-airfryer",
+            "title": "Брокколи в аэрогриле",
+            "summary": "Яркая хрустящая брокколи с чесноком и лимоном за 15 минут. Лёгкий гарнир к мясу и рыбе.",
+            "aliases": [
+                "Запечённая брокколи в аэрогриле",
+                "Брокколи с чесноком в аэрогриле"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "broccoli",
+                    "name": "Брокколи",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "light",
+                "quick",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Разберите брокколи на небольшие соцветия одного размера, промойте и хорошо обсушите полотенцем, чтобы на ней не осталось капель.",
+                    "uses": [
+                        "broccoli"
+                    ]
+                },
+                {
+                    "text": "Перемешайте соцветия в миске с маслом, измельчённым чесноком, солью и перцем, чтобы масло покрыло каждое.",
+                    "uses": [
+                        "broccoli",
+                        "vegetable-oil",
+                        "garlic",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Выложите в корзину и готовьте при 190 °C 8 минут, встряхнув в середине: брокколи должна остаться яркой, а края — подрумяниться. Сбрызните лимонным соком и сразу подавайте.",
+                    "uses": [
+                        "broccoli",
+                        "lemon-juice"
+                    ],
+                    "timerSeconds": 480
+                }
+            ],
+            "tips": [
+                "Не загружайте корзину больше чем в один-два слоя — иначе овощи потушатся, а не зарумянятся.",
+                "Замороженную брокколи готовьте без разморозки на 4 минуты дольше."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "broccoli",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Аэрогриль",
+                "Миска",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Ярко-зелёные соцветия брокколи с поджаристыми кончиками и каплями лимонного сока."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "croutons-airfryer",
+            "title": "Гренки в аэрогриле",
+            "summary": "Хрустящие чесночные гренки из батона — к супу, салату или к пиву. Без жарки в масле.",
+            "aliases": [
+                "Сухарики в аэрогриле",
+                "Чесночные гренки в аэрогриле"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "white-bread",
+                    "name": "Батон или белый хлеб",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dried-oregano",
+                    "name": "Орегано или прованские травы",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-thyme",
+                        "dried-basil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте хлеб кубиками по 1,5 см. Смешайте масло с измельчённым чесноком, орегано и солью.",
+                    "uses": [
+                        "white-bread",
+                        "vegetable-oil",
+                        "garlic",
+                        "dried-oregano",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Перемешайте хлеб с чесночным маслом в миске или пакете, чтобы каждый кубик покрылся.",
+                    "uses": [
+                        "white-bread",
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Выложите в корзину и готовьте при 180 °C 6–8 минут, встряхнув в середине, до золотистого цвета. Остудите — гренки станут хрустящими.",
+                    "uses": [
+                        "white-bread"
+                    ],
+                    "timerSeconds": 420
+                }
+            ],
+            "tips": [
+                "Подсохший вчерашний хлеб подходит лучше свежего.",
+                "Храните остывшие гренки в банке с крышкой."
+            ],
+            "storageDays": 5,
+            "cuisine": "russian",
+            "course": "snack",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "white-bread",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Аэрогриль",
+                "Миска",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Золотистые хрустящие кубики хлеба с травами в миске."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "baked-apples-airfryer",
+            "title": "Яблоки печёные в аэрогриле",
+            "summary": "Мягкие печёные яблоки с мёдом, корицей и орехами. Десерт за 20 минут без духовки.",
+            "aliases": [
+                "Печёные яблоки в аэрогриле",
+                "Яблоки с мёдом в аэрогриле"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "apple",
+                    "name": "Яблоки (4 шт.)",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "honey",
+                    "name": "Мёд",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "walnut",
+                    "name": "Грецкие орехи",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "hazelnut",
+                        "almond"
+                    ]
+                },
+                {
+                    "id": "cinnamon",
+                    "name": "Корица",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cardamom-ground"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer"
+            ],
+            "tags": [
+                "sweet",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Вымойте яблоки и вырежьте сердцевину, не прорезая дно, чтобы получилась чашечка. Орехи порубите.",
+                    "uses": [
+                        "apple",
+                        "walnut"
+                    ]
+                },
+                {
+                    "text": "Смешайте мёд с орехами и корицей и разложите по яблокам, сверху положите по кусочку масла.",
+                    "uses": [
+                        "honey",
+                        "walnut",
+                        "cinnamon",
+                        "butter",
+                        "apple"
+                    ]
+                },
+                {
+                    "text": "Поставьте яблоки в корзину и готовьте при 180 °C 15 минут, пока они не станут мягкими. Дайте немного остыть перед подачей.",
+                    "uses": [
+                        "apple"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Плотные кисло-сладкие яблоки держат форму лучше мягких.",
+                "Детям мёд можно заменить сахаром."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "dessert",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "apple",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Аэрогриль",
+                "Нож",
+                "Чайная ложка"
+            ],
+            "look": "Мягкие печёные яблоки с румяной кожицей, внутри мёд с орехами."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "ready-dough-pirozhki-airfryer",
+            "title": "Пирожки из готового теста в аэрогриле",
+            "summary": "Пышные пирожки с картошкой и луком из покупного дрожжевого теста. Аэрогриль печёт их за 12 минут.",
+            "aliases": [
+                "Пирожки в аэрогриле",
+                "Пирожки с картошкой в аэрогриле"
+            ],
+            "servings": 6,
+            "minServings": 3,
+            "maxServings": 8,
+            "totalMinutes": 60,
+            "activeMinutes": 25,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "ready-yeast-dough",
+                    "name": "Готовое дрожжевое тесто",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо для смазки",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для картофеля",
+                    "amount": 1000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука для подсыпки",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "airfryer",
+                "pot"
+            ],
+            "tags": [
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Разморозьте тесто по инструкции на упаковке. Картофель очистите, нарежьте, залейте водой, посолите и варите 15 минут до мягкости.",
+                    "uses": [
+                        "ready-yeast-dough",
+                        "potato",
+                        "water",
+                        "salt"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Лук мелко нарежьте и обжарьте на масле 5 минут до золотистого цвета. Слейте с картофеля воду, разомните его с луком и перцем и остудите.",
+                    "uses": [
+                        "onion",
+                        "vegetable-oil",
+                        "potato",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Разделите тесто на 12 частей, на присыпанном мукой столе раскатайте каждую в кружок, положите начинку и защипните края. Смажьте пирожки взбитым яйцом.",
+                    "uses": [
+                        "ready-yeast-dough",
+                        "wheat-flour",
+                        "potato",
+                        "egg"
+                    ]
+                },
+                {
+                    "text": "Выложите пирожки в корзину швом вниз с промежутками и готовьте при 180 °C 10–12 минут до румяной корочки. Пеките в несколько партий.",
+                    "uses": [
+                        "ready-yeast-dough"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Дайте пирожкам постоять 10 минут перед выпечкой — они будут пышнее.",
+                "Начинка может быть любой: капуста, яйцо с луком, яблоки."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "baking",
+            "meals": [
+                "snack"
+            ],
+            "mainIngredient": "ready-yeast-dough",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 12,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Аэрогриль",
+                "Кастрюля 2 л",
+                "Сковорода",
+                "Толкушка",
+                "Скалка"
+            ],
+            "look": "Румяные блестящие пирожки, на разломе видна картофельная начинка."
+        }
+    ]
+}

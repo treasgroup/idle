@@ -1,0 +1,1598 @@
+{
+    "batch": "39-detskoe-1",
+    "description": "Детское меню (1–3 года)",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "steamed-turkey-cutlets-kids",
+            "title": "Паровые котлеты из индейки",
+            "summary": "Нежные котлетки из индейки на пару — без корочки и масла. Мягкие, легко жуются, нравятся малышам.",
+            "aliases": [
+                "Котлеты на пару из индейки для детей",
+                "Паровые котлеты для ребёнка"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 40,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "turkey-fillet",
+                    "name": "Филе индейки",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "white-bread",
+                    "name": "Белый хлеб без корки",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 60,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пара",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pot"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Замочите хлеб в молоке на 5 минут. Индейку и лук дважды пропустите через мясорубку или измельчите в блендере.",
+                    "uses": [
+                        "white-bread",
+                        "milk",
+                        "turkey-fillet",
+                        "onion"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Смешайте фарш с размоченным хлебом, яйцом и щепоткой соли и хорошо вымешайте. Мокрыми руками сформуйте 10 небольших котлет.",
+                    "uses": [
+                        "turkey-fillet",
+                        "white-bread",
+                        "egg",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Вскипятите воду, поставьте сверху дуршлаг, разложите котлеты, накройте крышкой и готовьте на пару 20 минут. Внутри мясо должно быть белым, без розового.",
+                    "uses": [
+                        "water",
+                        "turkey-fillet"
+                    ],
+                    "timerSeconds": 1200
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше можно чуть подсолить и добавить укроп.",
+                "Котлеты хорошо замораживаются: готовьте из морозилки на 5 минут дольше."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "turkey-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 10,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Кастрюля",
+                "Металлический дуршлаг или пароварка",
+                "Блендер или мясорубка"
+            ],
+            "look": "Светлые мягкие паровые котлетки на детской тарелке с картофельным пюре."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-souffle-kids",
+            "title": "Куриное суфле",
+            "summary": "Воздушное суфле из куриного филе с молоком — как в детском саду. Тает во рту и подходит даже самым маленьким.",
+            "aliases": [
+                "Суфле из курицы",
+                "Куриное суфле как в детском саду"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 50,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло для формы",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 180 °C. Пробейте курицу блендером с молоком, манкой, желтками и щепоткой соли до гладкой пасты.",
+                    "uses": [
+                        "chicken-fillet",
+                        "milk",
+                        "semolina",
+                        "egg",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Взбейте белки миксером до устойчивой пены и осторожно вмешайте в куриную массу лопаткой снизу вверх.",
+                    "uses": [
+                        "egg",
+                        "chicken-fillet"
+                    ]
+                },
+                {
+                    "text": "Смажьте форму маслом, выложите массу и запекайте 30 минут, пока суфле не поднимется и не станет упругим. Дайте постоять 5 минут.",
+                    "uses": [
+                        "butter",
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 1800
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше подавайте с овощами и соусом из сметаны.",
+                "Можно готовить на пару в формочках — 25 минут."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Духовка",
+                "Форма или формочки",
+                "Блендер",
+                "Миксер"
+            ],
+            "look": "Пышное светлое куриное суфле, нарезанное кубиками, на детской тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "kids-meatballs-cream-sauce",
+            "title": "Тефтели в сливочном соусе для детей",
+            "summary": "Мягкие тефтели из говядины с рисом, потушенные в нежном молочно-сливочном соусе без жарки.",
+            "aliases": [
+                "Тефтели для детей",
+                "Тефтели в молочном соусе"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 45,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-beef",
+                    "name": "Говяжий фарш нежирный",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "rice",
+                    "name": "Рис",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10%",
+                    "amount": 150,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream"
+                    ]
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 150,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для риса",
+                    "amount": 500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Отварите рис в воде 10 минут до полуготовности и остудите. Лук натрите на самой мелкой тёрке.",
+                    "uses": [
+                        "rice",
+                        "water",
+                        "onion"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Смешайте фарш с рисом, луком, яйцом и щепоткой соли. Мокрыми руками скатайте небольшие тефтели размером с грецкий орех и уложите в сотейник.",
+                    "uses": [
+                        "minced-beef",
+                        "rice",
+                        "onion",
+                        "egg",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Размешайте муку с молоком и сливками и залейте тефтели. Доведите до слабого кипения, накройте и тушите на самом слабом огне 25 минут. Внутри мясо должно быть серым, без розового.",
+                    "uses": [
+                        "wheat-flour",
+                        "milk",
+                        "cream",
+                        "minced-beef"
+                    ],
+                    "timerSeconds": 1500
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1,5 лет.. Для ребёнка постарше добавьте в соус немного укропа.",
+                "Без обжаривания тефтели остаются мягкими и не дают корочки."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-beef",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода с крышкой или сотейник",
+                "Миска",
+                "Кастрюля"
+            ],
+            "look": "Небольшие мягкие тефтели в белом сливочном соусе в детской тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "steamed-cod-fish-cakes-kids",
+            "title": "Рыбные паровые котлеты из трески",
+            "summary": "Нежные котлетки из трески на пару — без костей и корочки. Хороший способ познакомить малыша с рыбой.",
+            "aliases": [
+                "Рыбные котлеты на пару для детей",
+                "Котлеты из трески на пару"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cod-fillet",
+                    "name": "Филе трески",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "white-bread",
+                    "name": "Белый хлеб без корки",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пара",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pot"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Замочите хлеб в молоке на 5 минут. Тщательно проверьте филе пальцами на мелкие косточки.",
+                    "uses": [
+                        "white-bread",
+                        "milk",
+                        "cod-fillet"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Измельчите треску с луком и хлебом в блендере, добавьте яйцо и щепотку соли и перемешайте. Мокрыми руками сформуйте 10 котлеток.",
+                    "uses": [
+                        "cod-fillet",
+                        "onion",
+                        "white-bread",
+                        "egg",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Вскипятите воду, поставьте дуршлаг, разложите котлеты, накройте и готовьте на пару 15 минут, пока они не станут белыми и упругими.",
+                    "uses": [
+                        "water",
+                        "cod-fillet"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше можно добавить мелко рубленный укроп.",
+                "Подойдёт и минтай или хек — проверяйте на кости особенно внимательно."
+            ],
+            "storageDays": 1,
+            "freezerDays": 30,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cod-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 10,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Кастрюля",
+                "Металлический дуршлаг или пароварка",
+                "Блендер"
+            ],
+            "look": "Белые аккуратные рыбные котлетки на пару рядом с пюре из брокколи."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "meatballs-broth-toddlers",
+            "title": "Фрикадельки в бульоне для малышей",
+            "summary": "Крошечные фрикадельки из телятины или говядины в прозрачном овощном бульоне с морковью и картошкой.",
+            "aliases": [
+                "Суп с фрикадельками для малышей",
+                "Фрикадельки для ребёнка"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-beef",
+                    "name": "Говяжий фарш нежирный",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Половина яйца",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте фарш с яйцом, половиной лука, натёртого на мелкой тёрке, и щепоткой соли. Мокрыми руками скатайте крошечные фрикадельки размером с фундук.",
+                    "uses": [
+                        "minced-beef",
+                        "egg",
+                        "onion",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Вскипятите воду. Картофель и морковь нарежьте мелкими кубиками, опустите в воду вместе с оставшимся луком целиком и варите 10 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "carrot",
+                        "onion"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Опустите фрикадельки по одной, после закипания снимите пену и варите 12 минут на слабом огне. Достаньте лук, добавьте оставшуюся соль и мелко рубленный укроп.",
+                    "uses": [
+                        "minced-beef",
+                        "onion",
+                        "salt",
+                        "dill"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше добавьте горсть мелкой вермишели.",
+                "Для самых маленьких овощи можно размять вилкой прямо в тарелке."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 2 л",
+                "Миска",
+                "Нож"
+            ],
+            "look": "Прозрачный бульон с крошечными фрикадельками, кубиками моркови и картофеля."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-liver-cream-kids",
+            "title": "Печень куриная тушёная в сливках для детей",
+            "summary": "Мягкая куриная печень, потушенная с морковью в сливках. Нежный вкус без горечи, богата железом.",
+            "aliases": [
+                "Печень в сливках для ребёнка",
+                "Куриная печень для детей"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-liver",
+                    "name": "Куриная печень",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10%",
+                    "amount": 150,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Промойте печень, срежьте плёнки и протоки и нарежьте небольшими кусочками. Морковь натрите на мелкой тёрке, лук мелко нарежьте.",
+                    "uses": [
+                        "chicken-liver",
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Растопите масло в сотейнике, влейте воду и потушите лук с морковью 5 минут до мягкости, не обжаривая.",
+                    "uses": [
+                        "butter",
+                        "water",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Положите печень и тушите 5 минут, помешивая. Влейте сливки, добавьте щепотку соли, накройте и тушите на слабом огне 10 минут. Внутри печень должна быть без крови.",
+                    "uses": [
+                        "chicken-liver",
+                        "cream",
+                        "salt"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года — пробейте блендером в паштет.. Для ребёнка постарше подавайте кусочками с гречкой или пюре.",
+                "Замоченная на 20 минут в молоке печень становится ещё нежнее."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-liver",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сотейник с крышкой",
+                "Нож",
+                "Разделочная доска",
+                "Тёрка"
+            ],
+            "look": "Мягкие кусочки печени в светлом сливочном соусе с тёртой морковью."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "steamed-omelet-child",
+            "title": "Омлет на пару для ребёнка",
+            "summary": "Нежный омлет на пару без корочки — главное блюдо детского завтрака. Готовится в маленькой форме над кипящей водой.",
+            "aliases": [
+                "Паровой омлет для малыша",
+                "Омлет на пару для детей"
+            ],
+            "servings": 2,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 5,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пара",
+                    "amount": 1000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 0.5,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pot"
+            ],
+            "tags": [
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Слегка взбейте яйца с молоком и щепоткой соли вилкой — без пены.",
+                    "uses": [
+                        "egg",
+                        "milk",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Смажьте небольшую жаропрочную форму маслом и вылейте в неё яичную смесь.",
+                    "uses": [
+                        "butter",
+                        "egg"
+                    ]
+                },
+                {
+                    "text": "Поставьте форму в кастрюлю с кипящей водой, чтобы вода доходила до середины формы. Накройте крышкой и готовьте на слабом огне 12 минут, пока омлет не схватится.",
+                    "uses": [
+                        "water",
+                        "egg"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше добавьте в смесь тёртый сыр или кусочки помидора.",
+                "Не поднимайте крышку во время готовки — омлет может опасть."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast"
+            ],
+            "mainIngredient": "egg",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля",
+                "Небольшая форма или пиала",
+                "Вилка"
+            ],
+            "look": "Нежный светло-жёлтый омлет в маленькой форме, ровный и без корочки."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fish-potato-casserole-kids",
+            "title": "Запеканка из рыбы с картофелем",
+            "summary": "Слои картофельного пюре и нежной рыбы, запечённые под молочно-яичной заливкой. Рыба без костей — дети едят охотно.",
+            "aliases": [
+                "Рыбная запеканка с пюре для детей",
+                "Запеканка из пюре с рыбой"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 55,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cod-fillet",
+                    "name": "Филе трески или минтая",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 150,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для картофеля",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "oven",
+                "pot"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Отварите очищенный картофель в воде 20 минут до мягкости, слейте воду и разомните с маслом и половиной молока. Включите духовку на 180 °C.",
+                    "uses": [
+                        "potato",
+                        "water",
+                        "butter",
+                        "milk"
+                    ],
+                    "timerSeconds": 1200
+                },
+                {
+                    "text": "Пока варится картофель, проверьте рыбу на кости и нарежьте мелкими кусочками, морковь натрите. Посолите щепоткой соли.",
+                    "uses": [
+                        "cod-fillet",
+                        "carrot",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Выложите в форму половину пюре, сверху рыбу с морковью и закройте оставшимся пюре. Взбейте яйцо с оставшимся молоком и залейте запеканку.",
+                    "uses": [
+                        "potato",
+                        "cod-fillet",
+                        "carrot",
+                        "egg",
+                        "milk"
+                    ]
+                },
+                {
+                    "text": "Запекайте 25 минут, пока заливка не схватится, а верх не станет светло-золотистым. Дайте остыть 10 минут.",
+                    "uses": [
+                        "cod-fillet",
+                        "potato"
+                    ],
+                    "timerSeconds": 1500
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1,5 лет.. Для ребёнка постарше посыпьте верх тёртым сыром.",
+                "Рыбу проверяйте на кости пальцами — это надёжнее, чем глазами."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cod-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Духовка",
+                "Форма для запекания",
+                "Кастрюля",
+                "Толкушка"
+            ],
+            "look": "Квадратный кусок запеканки: слои пюре и белой рыбы с морковью, светлый верх."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "zucchini-cream-soup-kids",
+            "title": "Суп-пюре из кабачка для детей",
+            "summary": "Нежный бархатный суп из кабачка, картофеля и моркови. Без зажарки — только варёные овощи и капля сливок.",
+            "aliases": [
+                "Кабачковый суп-пюре для ребёнка",
+                "Суп из кабачков для малышей"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10%",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Кабачок очистите от кожуры и семян, нарежьте кубиками вместе с картофелем, морковью и луком.",
+                    "uses": [
+                        "zucchini",
+                        "potato",
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Залейте овощи кипятком и варите под крышкой 20 минут, пока они не станут совсем мягкими.",
+                    "uses": [
+                        "water",
+                        "zucchini",
+                        "potato",
+                        "carrot"
+                    ],
+                    "timerSeconds": 1200
+                },
+                {
+                    "text": "Пробейте суп блендером до гладкости, добавьте сливки, масло и щепотку соли и прогрейте, не доводя до кипения.",
+                    "uses": [
+                        "zucchini",
+                        "cream",
+                        "butter",
+                        "salt"
+                    ]
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше подавайте с сухариками из белого хлеба.",
+                "Молодые кабачки можно не чистить."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "zucchini",
+            "needsSide": false,
+            "season": [
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 2 л",
+                "Блендер",
+                "Нож"
+            ],
+            "look": "Нежно-салатовый гладкий суп-пюре в детской тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pumpkin-cream-soup-toddlers",
+            "title": "Тыквенный суп-пюре для малышей",
+            "summary": "Яркий сладковатый суп из тыквы, моркови и картофеля. Нравится малышам за цвет и мягкий вкус.",
+            "aliases": [
+                "Суп из тыквы для детей",
+                "Тыквенный суп для ребёнка"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pumpkin",
+                    "name": "Тыква",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 600,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 100,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Очистите тыкву от кожуры и семян и нарежьте кубиками вместе с картофелем, морковью и луком.",
+                    "uses": [
+                        "pumpkin",
+                        "potato",
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Залейте овощи кипятком и варите под крышкой 25 минут до полной мягкости.",
+                    "uses": [
+                        "water",
+                        "pumpkin",
+                        "potato",
+                        "carrot"
+                    ],
+                    "timerSeconds": 1500
+                },
+                {
+                    "text": "Пробейте блендером до гладкости, влейте молоко, добавьте масло и щепотку соли и прогрейте 2 минуты.",
+                    "uses": [
+                        "pumpkin",
+                        "milk",
+                        "butter",
+                        "salt"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше посыпьте тыквенными семечками или подайте с гренками.",
+                "Мускатная тыква самая сладкая и яркая."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pumpkin",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 2 л",
+                "Блендер",
+                "Нож"
+            ],
+            "look": "Ярко-оранжевый гладкий суп-пюре в тарелке с каплей сливок."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "broccoli-potato-puree-kids",
+            "title": "Овощное пюре из брокколи и картофеля",
+            "summary": "Нежное зелёное пюре из брокколи и картофеля с молоком и маслом. Гарнир к котлетам и рыбе.",
+            "aliases": [
+                "Пюре из брокколи для ребёнка",
+                "Картофельное пюре с брокколи"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "broccoli",
+                    "name": "Брокколи",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1200,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "comfort",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Очистите картофель, нарежьте кусочками, залейте кипятком и варите 10 минут.",
+                    "uses": [
+                        "potato",
+                        "water"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Разберите брокколи на соцветия, добавьте к картофелю и варите вместе ещё 8 минут, пока всё не станет мягким.",
+                    "uses": [
+                        "broccoli",
+                        "potato"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Слейте воду, добавьте горячее молоко, масло и щепотку соли и разомните толкушкой или пробейте блендером до нужной мягкости.",
+                    "uses": [
+                        "milk",
+                        "butter",
+                        "salt",
+                        "potato",
+                        "broccoli"
+                    ]
+                }
+            ],
+            "tips": [
+                "Подходит детям с 1 года.. Для ребёнка постарше оставьте пюре с кусочками.",
+                "Замороженная брокколи тоже подойдёт."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "side",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "broccoli",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля",
+                "Толкушка или блендер"
+            ],
+            "look": "Нежно-зелёное мягкое пюре с кусочком масла в детской тарелке."
+        }
+    ]
+}

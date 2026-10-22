@@ -1195,11 +1195,7 @@
                     "id": "pasta",
                     "name": "Макароны с варкой до 10 минут",
                     "amount": 180,
-                    "unit": "г",
-                    "swap": [
-                        "wheat-noodle",
-                        "egg-noodles"
-                    ]
+                    "unit": "г"
                 },
                 {
                     "id": "spinach",
@@ -1211,10 +1207,7 @@
                     "id": "garlic",
                     "name": "Чеснок",
                     "amount": 2,
-                    "unit": "зубчика",
-                    "swap": [
-                        "wild-garlic"
-                    ]
+                    "unit": "зубчика"
                 },
                 {
                     "id": "lemon-juice",
@@ -1222,18 +1215,14 @@
                     "amount": 15,
                     "unit": "мл",
                     "swap": [
-                        "lime-juice",
-                        "lemon"
+                        "lime-juice"
                     ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 25,
-                    "unit": "мл",
-                    "swap": [
-                        "butter"
-                    ]
+                    "unit": "мл"
                 },
                 {
                     "id": "salt",
@@ -1780,7 +1769,6 @@
                     "unit": "г",
                     "swap": [
                         "canned-tomato",
-                        "tomato",
                         "tomato-ketchup"
                     ]
                 },
@@ -1788,10 +1776,7 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 15,
-                    "unit": "мл",
-                    "swap": [
-                        "butter"
-                    ]
+                    "unit": "мл"
                 },
                 {
                     "id": "salt",
@@ -2761,10 +2746,7 @@
                     "id": "mushroom",
                     "name": "Шампиньоны",
                     "amount": 250,
-                    "unit": "г",
-                    "swap": [
-                        "dried-porcini"
-                    ]
+                    "unit": "г"
                 },
                 {
                     "id": "onion",
@@ -2780,10 +2762,7 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 30,
-                    "unit": "мл",
-                    "swap": [
-                        "butter"
-                    ]
+                    "unit": "мл"
                 },
                 {
                     "id": "salt",

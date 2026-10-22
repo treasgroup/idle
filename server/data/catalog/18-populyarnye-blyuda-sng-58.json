@@ -632,10 +632,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 40,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "garlic",

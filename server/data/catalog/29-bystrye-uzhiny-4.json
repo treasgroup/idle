@@ -1,0 +1,1694 @@
+{
+    "batch": "29-bystrye-uzhiny-4",
+    "description": "Быстрый ужин до 30 минут",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "penne-frankfurters-tomato",
+            "title": "Пенне с сосисками в томатном соусе",
+            "summary": "Перья с кружочками сосисок в густом томатном соусе с сыром. Детям нравится, взрослые тоже не откажутся.",
+            "aliases": [
+                "Макароны с сосисками в томатном соусе",
+                "Паста с сосисками"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pasta",
+                    "name": "Пенне (перья)",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "frankfurters",
+                    "name": "Сосиски",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "boiled-sausage"
+                    ]
+                },
+                {
+                    "id": "canned-tomato",
+                    "name": "Томаты в собственном соку",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "tomato",
+                        "tomato-paste"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для макарон",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду для макарон. Сосиски нарежьте кружочками, лук мелко нарежьте, чеснок порубите, сыр натрите.",
+                    "uses": [
+                        "water",
+                        "frankfurters",
+                        "onion",
+                        "garlic",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в сковороде и жарьте лук 3 минуты. Добавьте сосиски и жарьте ещё 3 минуты, пока они не подрумянятся.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "frankfurters"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Добавьте чеснок и томаты, раздавите их ложкой, положите сахар, часть соли и перец. Тушите соус 10 минут без крышки, пока он не загустеет. Тем временем посолите кипящую воду и сварите пенне по времени на пачке.",
+                    "uses": [
+                        "garlic",
+                        "canned-tomato",
+                        "sugar",
+                        "salt",
+                        "black-pepper",
+                        "pasta",
+                        "water"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Откиньте пенне на дуршлаг и смешайте с соусом прямо в сковороде. Разложите по тарелкам и посыпьте сыром.",
+                    "uses": [
+                        "pasta",
+                        "hard-cheese"
+                    ]
+                }
+            ],
+            "tips": [
+                "Щепотка сахара убирает лишнюю кислинку томатов.",
+                "Возьмите сосиски получше — от них зависит весь вкус."
+            ],
+            "storageDays": 2,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pasta",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 28 см",
+                "Дуршлаг",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Перья в ярко-красном соусе с румяными кружочками сосисок, сверху тёртый сыр."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "fried-rice-chicken-egg",
+            "title": "Жареный рис с курицей и яйцом",
+            "summary": "Рис, обжаренный на сильном огне с курицей, яйцом, горошком и соевым соусом. Лучший способ использовать вчерашний рис.",
+            "aliases": [
+                "Рис жареный с курицей",
+                "Жареный рис по-китайски с курицей"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cooked-rice",
+                    "name": "Готовый рис (вчерашний)",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "turkey-fillet",
+                        "chicken-thigh-fillet"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 165,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "frozen-peas",
+                    "name": "Зелёный горошек замороженный",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-peas"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "green-onion",
+                    "name": "Зелёный лук",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "leek",
+                        "parsley"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "soy-sauce",
+                    "name": "Соевый соус",
+                    "amount": 40,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу мелкими кубиками, морковь — мелким кубиком, зелёный лук колечками, чеснок порубите. Яйца взбейте с солью.",
+                    "uses": [
+                        "chicken-fillet",
+                        "carrot",
+                        "green-onion",
+                        "garlic",
+                        "egg",
+                        "salt"
+                    ]
+                },
+                {
+                    "text": "Разогрейте треть масла на сильном огне, вылейте яйца и помешивайте 1 минуту до мягких хлопьев. Переложите на тарелку.",
+                    "uses": [
+                        "vegetable-oil",
+                        "egg"
+                    ]
+                },
+                {
+                    "text": "Влейте оставшееся масло и жарьте курицу с морковью 6 минут, помешивая, пока мясо не станет белым. Добавьте горошек и чеснок и жарьте ещё 2 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-fillet",
+                        "carrot",
+                        "frozen-peas",
+                        "garlic"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Добавьте рис и жарьте 4 минуты, постоянно перемешивая и разбивая комочки. Влейте соевый соус, верните яйца, посыпьте зелёным луком и перемешайте.",
+                    "uses": [
+                        "cooked-rice",
+                        "soy-sauce",
+                        "egg",
+                        "green-onion"
+                    ],
+                    "timerSeconds": 240
+                }
+            ],
+            "tips": [
+                "Свежесваренный рис слипнется — нужен остывший, лучше вчерашний.",
+                "Огонь держите сильным, а рис постоянно мешайте."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cooked-rice",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Вок или сковорода 28 см",
+                "Нож",
+                "Разделочная доска",
+                "Миска"
+            ],
+            "look": "Рассыпчатый золотистый рис с кусочками курицы, яичными хлопьями, зелёным горошком и колечками лука."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "bulgur-chicken-vegetables-skillet",
+            "title": "Булгур с курицей и овощами на сковороде",
+            "summary": "Сытное блюдо в одной сковороде: булгур впитывает сок курицы и овощей и получается рассыпчатым.",
+            "aliases": [
+                "Булгур с курицей",
+                "Булгур с мясом и овощами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "bulgur",
+                    "name": "Булгур",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "chicken-thigh-fillet",
+                    "name": "Филе куриного бедра",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "chicken-fillet"
+                    ]
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "eggplant"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "paprika",
+                    "name": "Молотая паприка",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу кусочками по 2 см. Лук и перец нарежьте кубиками, морковь натрите, кабачок нарежьте кубиком.",
+                    "uses": [
+                        "chicken-thigh-fillet",
+                        "onion",
+                        "bell-pepper",
+                        "carrot",
+                        "zucchini"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в глубокой сковороде и обжарьте курицу 5 минут до румяности. Добавьте лук и морковь и жарьте ещё 3 минуты.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-thigh-fillet",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Положите перец, кабачок, томатную пасту и паприку, перемешайте. Всыпьте булгур, влейте воду, посолите и поперчите.",
+                    "uses": [
+                        "bell-pepper",
+                        "zucchini",
+                        "tomato-paste",
+                        "paprika",
+                        "bulgur",
+                        "water",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Доведите до кипения, накройте крышкой и готовьте на слабом огне 15 минут, пока булгур не впитает воду и не станет мягким. Перемешайте и дайте постоять 2 минуты.",
+                    "uses": [
+                        "bulgur"
+                    ],
+                    "timerSeconds": 900
+                }
+            ],
+            "tips": [
+                "Не мешайте булгур во время варки — так он будет рассыпчатым.",
+                "Филе бедра сочнее грудки и не пересыхает."
+            ],
+            "storageDays": 2,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "bulgur",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Глубокая сковорода 28 см с крышкой",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Рассыпчатый золотистый булгур с кусочками курицы, перцем и кабачком в глубокой сковороде."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "soba-chicken-vegetables",
+            "title": "Гречневая лапша с курицей и овощами",
+            "summary": "Гречневая лапша соба с курицей и хрустящими овощами в соевом соусе. Быстро, ярко и сытно.",
+            "aliases": [
+                "Соба с курицей",
+                "Лапша соба с курицей и овощами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "soba-noodles",
+                    "name": "Гречневая лапша соба",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 350,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "turkey-fillet",
+                        "chicken-thigh-fillet"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "zucchini"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "ginger",
+                    "name": "Имбирь",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "ginger-ground"
+                    ]
+                },
+                {
+                    "id": "soy-sauce",
+                    "name": "Соевый соус",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "sugar",
+                    "name": "Сахар",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "sesame-seed",
+                    "name": "Кунжут",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для лапши",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду. Курицу нарежьте тонкими полосками, морковь и перец — соломкой, лук — перьями, чеснок и имбирь мелко порубите.",
+                    "uses": [
+                        "water",
+                        "chicken-fillet",
+                        "carrot",
+                        "bell-pepper",
+                        "onion",
+                        "garlic",
+                        "ginger"
+                    ]
+                },
+                {
+                    "text": "Сварите лапшу по времени на пачке, откиньте и промойте холодной водой, чтобы она не слиплась.",
+                    "uses": [
+                        "soba-noodles",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло на сильном огне и жарьте курицу 5 минут, пока она не станет белой. Добавьте овощи, чеснок и имбирь и жарьте ещё 4 минуты, помешивая: овощи должны остаться хрустящими.",
+                    "uses": [
+                        "vegetable-oil",
+                        "chicken-fillet",
+                        "carrot",
+                        "bell-pepper",
+                        "onion",
+                        "garlic",
+                        "ginger"
+                    ],
+                    "timerSeconds": 540
+                },
+                {
+                    "text": "Добавьте лапшу, соевый соус и сахар и перемешивайте 1–2 минуты, пока лапша не прогреется. Посыпьте кунжутом.",
+                    "uses": [
+                        "soba-noodles",
+                        "soy-sauce",
+                        "sugar",
+                        "sesame-seed"
+                    ]
+                }
+            ],
+            "tips": [
+                "Промывание холодной водой смывает лишний крахмал — лапша не склеится в ком.",
+                "Соевый соус солёный, поэтому соль не нужна."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "soba-noodles",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Вок или сковорода 28 см",
+                "Дуршлаг",
+                "Нож"
+            ],
+            "look": "Тёмная гречневая лапша с полосками курицы, морковью и красным перцем, посыпанная кунжутом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "pasta-chicken-mushrooms-cream",
+            "title": "Паста с курицей и грибами в сливках",
+            "summary": "Макароны в сливочном соусе с курицей, шампиньонами и сыром. Сытно и нежно, готово за 30 минут.",
+            "aliases": [
+                "Макароны с курицей и грибами",
+                "Паста с курицей и шампиньонами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "pasta",
+                    "name": "Макароны",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 350,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "turkey-fillet",
+                        "chicken-thigh-fillet"
+                    ]
+                },
+                {
+                    "id": "mushroom",
+                    "name": "Шампиньоны",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 20%",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для макарон",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду для макарон. Курицу нарежьте кубиками, грибы — пластинками, лук мелко нарежьте, чеснок порубите, сыр натрите.",
+                    "uses": [
+                        "water",
+                        "chicken-fillet",
+                        "mushroom",
+                        "onion",
+                        "garlic",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "text": "Растопите масло в сковороде и жарьте курицу 5 минут до белого цвета. Добавьте лук и грибы и жарьте ещё 7 минут, пока грибной сок не испарится.",
+                    "uses": [
+                        "butter",
+                        "chicken-fillet",
+                        "onion",
+                        "mushroom"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Посолите кипящую воду и сварите макароны по времени на пачке. Тем временем добавьте в сковороду чеснок, влейте сливки, посолите и поперчите и прогрейте 3 минуты на слабом огне.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "pasta",
+                        "garlic",
+                        "cream",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 180
+                },
+                {
+                    "text": "Откиньте макароны и переложите в соус. Добавьте сыр и перемешивайте минуту, пока соус не станет гладким. Подавайте сразу.",
+                    "uses": [
+                        "pasta",
+                        "hard-cheese"
+                    ]
+                }
+            ],
+            "tips": [
+                "Грибы солите в конце, иначе они дадут много воды и не обжарятся.",
+                "Если соус загустел, добавьте ложку воды от макарон."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "pasta",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 28 см",
+                "Дуршлаг",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Макароны в кремовом соусе с кусочками курицы и ломтиками шампиньонов, посыпанные сыром."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "frittata-vegetables-cheese",
+            "title": "Фриттата с овощами и сыром",
+            "summary": "Толстый итальянский омлет с кабачком, перцем, помидором и сыром. Готовится на сковороде под крышкой, без духовки.",
+            "aliases": [
+                "Омлет с овощами по-итальянски",
+                "Фриттата овощная"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца (8 шт.)",
+                    "amount": 440,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 80,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "eggplant"
+                    ]
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте кабачок, перец и лук небольшими кубиками, помидор — кружками. Сыр натрите, петрушку порубите.",
+                    "uses": [
+                        "zucchini",
+                        "bell-pepper",
+                        "onion",
+                        "tomato",
+                        "hard-cheese",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло в сковороде и жарьте лук, кабачок и перец 6 минут, помешивая, пока они не станут мягкими.",
+                    "uses": [
+                        "vegetable-oil",
+                        "onion",
+                        "zucchini",
+                        "bell-pepper"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Взбейте яйца с молоком, солью, перцем, половиной сыра и петрушкой. Залейте овощи, сверху разложите помидоры и посыпьте оставшимся сыром.",
+                    "uses": [
+                        "egg",
+                        "milk",
+                        "salt",
+                        "black-pepper",
+                        "hard-cheese",
+                        "parsley",
+                        "tomato"
+                    ]
+                },
+                {
+                    "text": "Накройте крышкой и готовьте на слабом огне 10 минут, пока середина не перестанет дрожать. Дайте постоять минуту и разрежьте на части.",
+                    "uses": [
+                        "egg"
+                    ],
+                    "timerSeconds": 600
+                }
+            ],
+            "tips": [
+                "Огонь — слабый: тогда низ не подгорит, а верх успеет схватиться.",
+                "Годятся любые остатки овощей из холодильника."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "breakfast",
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "egg",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода 26 см с крышкой",
+                "Миска",
+                "Венчик"
+            ],
+            "look": "Толстый золотистый омлет с кусочками перца и кабачка, сверху кружки помидора и расплавленный сыр."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "potato-gnocchi-cheese-butter",
+            "title": "Картофельные ньокки с сыром и маслом",
+            "summary": "Мягкие картофельные клёцки ньокки в растопленном сливочном масле с тёртым сыром. Простое и очень уютное блюдо.",
+            "aliases": [
+                "Ньокки с маслом и сыром",
+                "Картофельные клёцки ньокки"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для варки",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Очистите картофель, нарежьте небольшими кусками, залейте частью воды, посолите и варите 12 минут до мягкости. Слейте воду и разомните в гладкое пюре.",
+                    "uses": [
+                        "potato",
+                        "water",
+                        "salt"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Пока пюре тёплое, вмешайте яйцо и почти всю муку и быстро замесите мягкое тесто. Скатайте колбаски толщиной в палец и нарежьте кусочками по 2 см, подсыпая оставшуюся муку.",
+                    "uses": [
+                        "egg",
+                        "wheat-flour",
+                        "potato"
+                    ]
+                },
+                {
+                    "text": "Вскипятите оставшуюся воду, посолите и опустите ньокки. Когда они всплывут, варите ещё 1 минуту и вынимайте шумовкой.",
+                    "uses": [
+                        "water",
+                        "salt"
+                    ],
+                    "timerSeconds": 60
+                },
+                {
+                    "text": "Растопите масло в сковороде, переложите туда ньокки и прогрейте 2 минуты, осторожно перемешивая. Посыпьте тёртым сыром и перцем и подавайте.",
+                    "uses": [
+                        "butter",
+                        "hard-cheese",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Не добавляйте лишней муки: ньокки станут жёсткими.",
+                "Лишние ньокки можно заморозить сырыми на доске и потом варить без разморозки."
+            ],
+            "storageDays": 1,
+            "freezerDays": 30,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "potato",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Толкушка",
+                "Сковорода 26 см",
+                "Шумовка"
+            ],
+            "look": "Небольшие мягкие клёцки в блестящем сливочном масле, посыпанные тёртым сыром и чёрным перцем."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "egg-noodles-beef-pepper",
+            "title": "Яичная лапша с говядиной и перцем",
+            "summary": "Яичная лапша с тонкими ломтиками говядины и сладким перцем в соевом соусе — как в китайском кафе.",
+            "aliases": [
+                "Лапша с говядиной",
+                "Лапша с говядиной по-азиатски"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg-noodles",
+                    "name": "Яичная лапша",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "beef",
+                    "name": "Говядина",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "soy-sauce",
+                    "name": "Соевый соус",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "oyster-sauce",
+                    "name": "Устричный соус",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dark-soy-sauce"
+                    ]
+                },
+                {
+                    "id": "corn-starch",
+                    "name": "Крахмал",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "potato-starch"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 30,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "green-onion",
+                    "name": "Зелёный лук",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "leek",
+                        "parsley"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для лапши",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду. Говядину нарежьте поперёк волокон тонкими полосками и смешайте с крахмалом и ложкой соевого соуса. Перец нарежьте соломкой, лук — перьями, чеснок порубите.",
+                    "uses": [
+                        "water",
+                        "beef",
+                        "corn-starch",
+                        "soy-sauce",
+                        "bell-pepper",
+                        "onion",
+                        "garlic"
+                    ]
+                },
+                {
+                    "text": "Сварите лапшу по времени на пачке, откиньте на дуршлаг и сбрызните каплей масла, чтобы она не слиплась, пока жарятся мясо и овощи.",
+                    "uses": [
+                        "egg-noodles",
+                        "water",
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "text": "Разогрейте масло на сильном огне и жарьте говядину 3 минуты, пока она не потемнеет. Добавьте лук и перец и жарьте ещё 3 минуты, помешивая, затем чеснок на 30 секунд.",
+                    "uses": [
+                        "vegetable-oil",
+                        "beef",
+                        "onion",
+                        "bell-pepper",
+                        "garlic"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Положите лапшу, оставшийся соевый соус и устричный соус и перемешивайте 2 минуты, пока лапша не прогреется и не покроется соусом. Посыпьте зелёным луком.",
+                    "uses": [
+                        "egg-noodles",
+                        "soy-sauce",
+                        "oyster-sauce",
+                        "green-onion"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Нет устричного соуса — добавьте ещё ложку соевого и щепотку сахара.",
+                "Мясо режьте как можно тоньше: тогда оно будет мягким."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "egg-noodles",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Вок или сковорода 28 см",
+                "Дуршлаг",
+                "Нож"
+            ],
+            "look": "Золотистая лапша с тёмными ломтиками говядины и полосками красного перца в блестящем соусе."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "shrimp-garlic-cream-pasta",
+            "title": "Креветки в чесночно-сливочном соусе с пастой",
+            "summary": "Спагетти с креветками в сливочном соусе с чесноком и лимоном. Праздничное блюдо, а готовится за 25 минут.",
+            "aliases": [
+                "Паста с креветками в сливочном соусе",
+                "Спагетти с креветками"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "shrimp",
+                    "name": "Креветки очищенные",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "pasta",
+                    "name": "Спагетти",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 20%",
+                    "amount": 250,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "hard-cheese",
+                    "name": "Твёрдый сыр",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пасты",
+                    "amount": 3000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Поставьте кипятить воду. Креветки разморозьте, если нужно, и обсушите. Чеснок мелко порубите, сыр натрите, петрушку нарежьте.",
+                    "uses": [
+                        "water",
+                        "shrimp",
+                        "garlic",
+                        "hard-cheese",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Посолите кипящую воду и сварите спагетти по времени на пачке. Тем временем растопите масло в сковороде и жарьте креветки по 1 минуте с каждой стороны, пока они не порозовеют. Переложите на тарелку.",
+                    "uses": [
+                        "water",
+                        "salt",
+                        "pasta",
+                        "butter",
+                        "shrimp"
+                    ],
+                    "timerSeconds": 120
+                },
+                {
+                    "text": "В той же сковороде прогрейте чеснок 30 секунд, влейте сливки, поперчите и варите 3 минуты на слабом огне, пока соус не загустеет. Добавьте сыр и лимонный сок.",
+                    "uses": [
+                        "garlic",
+                        "cream",
+                        "black-pepper",
+                        "hard-cheese",
+                        "lemon-juice"
+                    ],
+                    "timerSeconds": 180
+                },
+                {
+                    "text": "Откиньте спагетти, переложите в соус, верните креветки и перемешайте. Посыпьте петрушкой и сразу подавайте.",
+                    "uses": [
+                        "pasta",
+                        "shrimp",
+                        "parsley"
+                    ]
+                }
+            ],
+            "tips": [
+                "Не передержите креветки: от долгой жарки они становятся резиновыми.",
+                "Подойдут и варёно-мороженые креветки — их только прогрейте в соусе."
+            ],
+            "storageDays": 1,
+            "cuisine": "international",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "shrimp",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday",
+                "date",
+                "guests"
+            ],
+            "budget": "high",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 28 см",
+                "Дуршлаг",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Спагетти в кремовом соусе с розовыми креветками, рубленой петрушкой и тёртым сыром."
+        }
+    ]
+}

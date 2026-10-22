@@ -1,0 +1,1888 @@
+{
+    "batch": "30-bystrye-supy-2",
+    "description": "Быстрые супы до 30 минут",
+    "ingredients": [
+        {
+            "id": "semi-smoked-sausage",
+            "name": "Колбаса полукопчёная",
+            "aliases": [
+                "полукопчёная колбаса",
+                "копчёная колбаса",
+                "краковская колбаса"
+            ],
+            "groups": [
+                "meat"
+            ],
+            "per100g": {
+                "kcal": 380,
+                "protein": 16,
+                "fat": 34,
+                "carbs": 1
+            },
+            "aisle": "meat"
+        }
+    ],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "meatball-soup-ready-mince-30",
+            "title": "Суп с фрикадельками из готового фарша за 30 минут",
+            "summary": "Лёгкий суп с картошкой, морковью и нежными фрикадельками из покупного фарша. Готов за полчаса.",
+            "aliases": [
+                "Суп с фрикадельками быстрый",
+                "Суп с фрикадельками и картошкой"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "minced-pork-beef",
+                    "name": "Фарш свино-говяжий",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду в кастрюле. Картофель нарежьте кубиками, морковь натрите, лук мелко нарежьте.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Посолите фарш частью соли, поперчите, добавьте столовую ложку воды и вымешайте. Влажными руками скатайте шарики размером с вишню.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "salt",
+                        "black-pepper",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Опустите картофель в кипящую воду и варите 5 минут. Тем временем обжарьте лук с морковью на масле 5 минут.",
+                    "uses": [
+                        "potato",
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Опустите фрикадельки по одной, добавьте зажарку, лавровый лист и оставшуюся соль. После закипания снимите пену и варите 12 минут, пока картофель не станет мягким, а фрикадельки не всплывут. Посыпьте укропом.",
+                    "uses": [
+                        "minced-pork-beef",
+                        "onion",
+                        "carrot",
+                        "bay-leaf",
+                        "salt",
+                        "potato",
+                        "dill"
+                    ],
+                    "timerSeconds": 720
+                }
+            ],
+            "tips": [
+                "Чтобы фрикадельки были нежнее, добавьте в фарш ложку холодной воды.",
+                "Детям лавровый лист можно не класть."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "minced-pork-beef",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Прозрачный бульон с кубиками картофеля, оранжевой морковью и маленькими фрикадельками, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "canned-fish-rice-soup",
+            "title": "Суп с консервированной рыбой и рисом",
+            "summary": "Простой рыбный суп из консервов: картошка, рис, морковь и горбуша. Выручает, когда в холодильнике почти пусто.",
+            "aliases": [
+                "Рыбный суп из консервов",
+                "Суп из консервов с рисом"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "canned-pink-salmon",
+                    "name": "Горбуша консервированная",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "rice",
+                    "name": "Рис",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "short-grain-rice"
+                    ]
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Рис промойте, картофель нарежьте кубиками, морковь натрите, лук мелко нарежьте.",
+                    "uses": [
+                        "water",
+                        "rice",
+                        "potato",
+                        "carrot",
+                        "onion"
+                    ]
+                },
+                {
+                    "text": "Опустите в кипящую воду рис и картофель и варите 10 минут. Тем временем обжарьте лук с морковью на масле 5 минут.",
+                    "uses": [
+                        "rice",
+                        "potato",
+                        "vegetable-oil",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Рыбу разомните вилкой вместе с соком из банки, крупные кости удалите. Положите в суп вместе с зажаркой, лавровым листом, солью и перцем.",
+                    "uses": [
+                        "canned-pink-salmon",
+                        "onion",
+                        "carrot",
+                        "bay-leaf",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Варите ещё 7 минут, пока рис и картофель не станут мягкими. Выключите огонь, посыпьте укропом и дайте постоять 5 минут под крышкой.",
+                    "uses": [
+                        "rice",
+                        "potato",
+                        "dill"
+                    ],
+                    "timerSeconds": 420
+                }
+            ],
+            "tips": [
+                "Подойдут любые рыбные консервы в собственном соку: сайра, тунец, скумбрия.",
+                "Солите в конце — консервы уже солёные."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "canned-pink-salmon",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Золотистый бульон с кусочками розовой рыбы, рисом и кубиками картофеля, сверху укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "egg-soup-greens",
+            "title": "Яичный суп с зеленью",
+            "summary": "Лёгкий суп на курином бульоне с яичными хлопьями, картошкой и большим количеством зелени.",
+            "aliases": [
+                "Суп с яйцом и зеленью",
+                "Суп с яичными хлопьями"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 165,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "green-onion",
+                    "name": "Зелёный лук",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cilantro"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте мелкими кубиками, морковь натрите, лук мелко нарежьте. Зелень порубите.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "carrot",
+                        "onion",
+                        "green-onion",
+                        "dill",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Опустите картофель в кипящую воду, посолите и варите 10 минут. Тем временем обжарьте лук с морковью на сливочном масле 5 минут.",
+                    "uses": [
+                        "potato",
+                        "salt",
+                        "butter",
+                        "onion",
+                        "carrot"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Добавьте зажарку в суп и варите ещё 5 минут. Взбейте яйца вилкой с перцем.",
+                    "uses": [
+                        "onion",
+                        "carrot",
+                        "egg",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Тонкой струйкой влейте яйца в кипящий суп, помешивая вилкой — получатся нежные хлопья. Через минуту добавьте всю зелень и выключите огонь.",
+                    "uses": [
+                        "egg",
+                        "green-onion",
+                        "dill",
+                        "parsley"
+                    ]
+                }
+            ],
+            "tips": [
+                "На курином бульоне суп будет вкуснее — просто замените им воду.",
+                "Мешайте медленно, чтобы хлопья получились крупными."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "egg",
+            "needsSide": false,
+            "season": [
+                "spring",
+                "summer",
+                "autumn",
+                "winter"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Светлый суп с яичными хлопьями, кубиками картофеля и большим количеством зелени."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "processed-cheese-chicken-soup",
+            "title": "Суп из плавленого сыра с курицей",
+            "summary": "Нежный сырный суп с курицей и картошкой: плавленый сыр делает бульон кремовым и сливочным.",
+            "aliases": [
+                "Сырный суп с курицей",
+                "Суп с плавленым сыром и курицей"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "processed-cheese",
+                    "name": "Плавленый сыр",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cream-cheese",
+                        "hard-cheese"
+                    ]
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу маленькими кубиками, положите в кастрюлю, залейте водой и доведите до кипения. Снимите пену.",
+                    "uses": [
+                        "chicken-fillet",
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Картофель нарежьте кубиками и опустите в бульон, посолите и варите 12 минут. Тем временем натрите морковь, мелко нарежьте лук и обжарьте их на масле 5 минут.",
+                    "uses": [
+                        "potato",
+                        "salt",
+                        "carrot",
+                        "onion",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Добавьте зажарку в суп. Плавленый сыр нарежьте кусочками и положите в суп, помешивая, пока он полностью не растворится.",
+                    "uses": [
+                        "carrot",
+                        "onion",
+                        "processed-cheese"
+                    ]
+                },
+                {
+                    "text": "Варите ещё 3 минуты на слабом огне, поперчите и посыпьте укропом.",
+                    "uses": [
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 180
+                }
+            ],
+            "tips": [
+                "Плавленый сыр легче нарезать, если подержать его 15 минут в морозилке.",
+                "Берите сыр без добавок — он растворяется лучше всего."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Кремовый светлый суп с кусочками курицы и картофеля, сверху рубленый укроп."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "quick-galushki-soup",
+            "title": "Суп с галушками на скорую руку",
+            "summary": "Картофельный суп с мягкими галушками из теста на яйце. Галушки делаются ложкой прямо над кастрюлей.",
+            "aliases": [
+                "Суп с клёцками из теста",
+                "Суп с галушками быстрый"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко",
+                    "amount": 60,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте кубиками, опустите в воду, посолите и варите 8 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Морковь натрите, лук мелко нарежьте и обжарьте на масле 5 минут. Для галушек смешайте яйцо с молоком и щепоткой соли, вмешайте муку до густого теста, которое тянется с ложки.",
+                    "uses": [
+                        "carrot",
+                        "onion",
+                        "vegetable-oil",
+                        "egg",
+                        "milk",
+                        "salt",
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Добавьте зажарку в суп. Набирайте тесто чайной ложкой, смоченной в бульоне, и опускайте в кипящий суп небольшими галушками.",
+                    "uses": [
+                        "carrot",
+                        "onion",
+                        "wheat-flour"
+                    ]
+                },
+                {
+                    "text": "Когда все галушки всплывут, варите ещё 5 минут на среднем огне. Поперчите и посыпьте укропом.",
+                    "uses": [
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Окунайте ложку в бульон перед каждой галушкой — тесто не прилипнет.",
+                "Сделайте тесто погуще, если галушки расползаются."
+            ],
+            "storageDays": 2,
+            "cuisine": "ukrainian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "wheat-flour",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска",
+                "Миска",
+                "Чайная ложка"
+            ],
+            "look": "Золотистый суп с пухлыми мягкими галушками, кубиками картофеля и укропом."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "frankfurter-potato-soup",
+            "title": "Суп с сосисками и картошкой",
+            "summary": "Сытный суп из того, что почти всегда есть дома: картошка, сосиски, морковь и лук. Детский любимец.",
+            "aliases": [
+                "Суп с сосисками",
+                "Картофельный суп с сосисками"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "frankfurters",
+                    "name": "Сосиски",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 7,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте кубиками, опустите в воду, посолите и варите 10 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Морковь натрите, лук мелко нарежьте, сосиски — кружочками. Обжарьте лук с морковью на масле 4 минуты, добавьте сосиски и жарьте ещё 2 минуты.",
+                    "uses": [
+                        "carrot",
+                        "onion",
+                        "frankfurters",
+                        "vegetable-oil"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Переложите зажарку с сосисками в суп, добавьте лавровый лист и перец. Варите 5 минут, пока картофель не станет совсем мягким. Посыпьте укропом.",
+                    "uses": [
+                        "onion",
+                        "carrot",
+                        "frankfurters",
+                        "bay-leaf",
+                        "black-pepper",
+                        "dill"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Подрумяненные сосиски дают супу вкус копчёности.",
+                "Добавьте горсть вермишели вместе с сосисками — суп станет ещё сытнее."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "frankfurters",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Золотистый суп с кружочками сосисок, кубиками картофеля и морковью."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-dumpling-soup-30",
+            "title": "Суп с клёцками и курицей за 30 минут",
+            "summary": "Куриный суп с картошкой и мягкими манно-мучными клёцками. Быстрый, лёгкий и очень домашний.",
+            "aliases": [
+                "Суп с клёцками",
+                "Куриный суп с клёцками"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "wheat-flour",
+                    "name": "Мука",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу кубиками, залейте водой, доведите до кипения и снимите пену. Добавьте нарезанный кубиками картофель, посолите и варите 10 минут.",
+                    "uses": [
+                        "chicken-fillet",
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Морковь натрите, лук мелко нарежьте и обжарьте на половине масла 4 минуты. Для клёцек растопите оставшееся масло, смешайте с яйцом, щепоткой соли, манкой и мукой до мягкого теста.",
+                    "uses": [
+                        "carrot",
+                        "onion",
+                        "butter",
+                        "egg",
+                        "salt",
+                        "semolina",
+                        "wheat-flour"
+                    ],
+                    "timerSeconds": 240
+                },
+                {
+                    "text": "Добавьте зажарку в суп. Набирайте тесто чайной ложкой, смоченной в бульоне, и опускайте в суп.",
+                    "uses": [
+                        "carrot",
+                        "onion",
+                        "wheat-flour"
+                    ]
+                },
+                {
+                    "text": "После того как клёцки всплывут, варите 6 минут на слабом огне. Поперчите и посыпьте петрушкой.",
+                    "uses": [
+                        "black-pepper",
+                        "parsley"
+                    ],
+                    "timerSeconds": 360
+                }
+            ],
+            "tips": [
+                "Манка делает клёцки пышными и нежными.",
+                "Варите на слабом огне — при бурном кипении клёцки могут развалиться."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска",
+                "Миска"
+            ],
+            "look": "Прозрачный куриный суп с пухлыми клёцками, кусочками курицы и петрушкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "champignon-cream-soup",
+            "title": "Грибной суп из шампиньонов со сливками",
+            "summary": "Ароматный суп с обжаренными шампиньонами, картошкой и сливками. Не пюре — грибы остаются кусочками.",
+            "aliases": [
+                "Грибной суп со сливками",
+                "Суп из шампиньонов со сливками"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "mushroom",
+                    "name": "Шампиньоны",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 350,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "cream",
+                    "name": "Сливки 10–20%",
+                    "amount": 200,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "heavy-cream",
+                        "milk"
+                    ]
+                },
+                {
+                    "id": "butter",
+                    "name": "Сливочное масло",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "vegetable-oil"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 8,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "cozy",
+                "comfort"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте кубиками, опустите в воду, посолите и варите 12 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 720
+                },
+                {
+                    "text": "Пока варится картофель, нарежьте грибы пластинками, лук мелко, чеснок порубите. Растопите масло в сковороде и жарьте лук с грибами 8 минут, пока грибной сок не испарится и грибы не подрумянятся.",
+                    "uses": [
+                        "mushroom",
+                        "onion",
+                        "garlic",
+                        "butter"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Добавьте чеснок к грибам на последнюю минуту, затем переложите всё в суп и варите 5 минут.",
+                    "uses": [
+                        "garlic",
+                        "mushroom",
+                        "onion"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Влейте сливки, поперчите и прогрейте до первых пузырьков, не доводя до бурного кипения. Посыпьте петрушкой.",
+                    "uses": [
+                        "cream",
+                        "black-pepper",
+                        "parsley"
+                    ]
+                }
+            ],
+            "tips": [
+                "Грибы жарьте без крышки, иначе они потушатся и не дадут аромата.",
+                "Половину супа можно пробить блендером — получится гуще."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "mushroom",
+            "needsSide": false,
+            "season": [
+                "autumn",
+                "winter",
+                "spring",
+                "summer"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Светлый кремовый суп с золотистыми ломтиками шампиньонов и кубиками картофеля, сверху петрушка."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "bean-sausage-soup",
+            "title": "Суп с фасолью и колбасой",
+            "summary": "Густой томатный суп с консервированной фасолью и полукопчёной колбасой. Сытный и готов за 25 минут.",
+            "aliases": [
+                "Фасолевый суп с колбасой",
+                "Суп из консервированной фасоли"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "canned-beans",
+                    "name": "Фасоль консервированная",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "semi-smoked-sausage",
+                    "name": "Полукопчёная колбаса",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato-paste",
+                    "name": "Томатная паста",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "hearty",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Вскипятите воду. Картофель нарежьте кубиками, опустите в воду, посолите и варите 10 минут.",
+                    "uses": [
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Колбасу нарежьте соломкой, лук мелко, морковь натрите. Обжарьте лук, морковь и колбасу на масле 5 минут, затем вмешайте томатную пасту и прогрейте минуту.",
+                    "uses": [
+                        "semi-smoked-sausage",
+                        "onion",
+                        "carrot",
+                        "vegetable-oil",
+                        "tomato-paste"
+                    ],
+                    "timerSeconds": 360
+                },
+                {
+                    "text": "Слейте с фасоли жидкость и положите фасоль в суп вместе с зажаркой. Поперчите и варите 7 минут. Посыпьте петрушкой.",
+                    "uses": [
+                        "canned-beans",
+                        "onion",
+                        "carrot",
+                        "semi-smoked-sausage",
+                        "tomato-paste",
+                        "black-pepper",
+                        "parsley"
+                    ],
+                    "timerSeconds": 420
+                }
+            ],
+            "tips": [
+                "Колбаса солёная — досаливайте суп только в конце, если нужно.",
+                "Белая и красная фасоль одинаково хороши."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "canned-beans",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Густой красноватый суп с фасолью, кубиками картофеля и полосками колбасы, сверху петрушка."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "quick-cabbage-chicken-soup",
+            "title": "Суп с капустой и курицей быстрый",
+            "summary": "Лёгкий суп с молодой капустой, курицей, картошкой и томатом — почти щи, но готов за полчаса.",
+            "aliases": [
+                "Капустный суп с курицей",
+                "Щи быстрые с курицей"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cabbage",
+                    "name": "Белокочанная капуста",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "potato",
+                    "name": "Картофель",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 2000,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "bay-leaf",
+                    "name": "Лавровый лист",
+                    "amount": 0.2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 9,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "quick",
+                "light",
+                "cozy"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте курицу кубиками, залейте водой, доведите до кипения и снимите пену. Добавьте картофель кубиками, посолите и варите 8 минут.",
+                    "uses": [
+                        "chicken-fillet",
+                        "water",
+                        "potato",
+                        "salt"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Капусту тонко нашинкуйте, положите в суп и варите ещё 7 минут. Тем временем обжарьте на масле мелко нарезанный лук и тёртую морковь 4 минуты, добавьте помидор кубиками и прогрейте 2 минуты.",
+                    "uses": [
+                        "cabbage",
+                        "onion",
+                        "carrot",
+                        "vegetable-oil",
+                        "tomato"
+                    ],
+                    "timerSeconds": 420
+                },
+                {
+                    "text": "Переложите зажарку в суп, добавьте лавровый лист и перец и варите 5 минут, пока капуста не станет мягкой. Посыпьте укропом.",
+                    "uses": [
+                        "onion",
+                        "carrot",
+                        "tomato",
+                        "bay-leaf",
+                        "black-pepper",
+                        "dill",
+                        "cabbage"
+                    ],
+                    "timerSeconds": 300
+                }
+            ],
+            "tips": [
+                "Молодая капуста варится быстрее — 5 минут достаточно.",
+                "Подавайте со сметаной и чёрным хлебом."
+            ],
+            "storageDays": 3,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "soup",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Сковорода 22 см",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Прозрачный суп с полосками капусты, кубиками картофеля, курицей и укропом."
+        }
+    ]
+}

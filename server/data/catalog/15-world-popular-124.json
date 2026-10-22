@@ -3332,10 +3332,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 50,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "dried-thyme",
@@ -8147,10 +8144,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 50,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "rice-vinegar",
@@ -12711,10 +12705,7 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 50,
-          "unit": "г",
-          "swap": [
-            "butter"
-          ]
+          "unit": "г"
         },
         {
           "id": "cumin",

@@ -1,0 +1,1606 @@
+{
+    "batch": "37-lyogkoe-2",
+    "description": "Лёгкое и ПП",
+    "ingredients": [],
+    "recipes": [
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-breast-dry-pan",
+            "title": "Куриная грудка на сковороде без масла",
+            "summary": "Сочная куриная грудка на сухой сковороде с антипригарным покрытием. Секрет — отбить мясо и не пересушить.",
+            "aliases": [
+                "Грудка без масла",
+                "Куриное филе на сухой сковороде"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "paprika",
+                    "name": "Паприка",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "water",
+                    "name": "Вода",
+                    "amount": 50,
+                    "unit": "мл",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Разрежьте каждое филе вдоль на два тонких пласта. Накройте плёнкой и слегка отбейте до толщины 1,5 см.",
+                    "uses": [
+                        "chicken-fillet"
+                    ]
+                },
+                {
+                    "text": "Натрите мясо лимонным соком, паприкой, измельчённым чесноком, солью и перцем и оставьте на 5 минут.",
+                    "uses": [
+                        "chicken-fillet",
+                        "lemon-juice",
+                        "paprika",
+                        "garlic",
+                        "salt",
+                        "black-pepper"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Разогрейте сухую сковороду на среднем огне. Выложите филе и жарьте по 4 минуты с каждой стороны до золотистого цвета.",
+                    "uses": [
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 480
+                },
+                {
+                    "text": "Влейте воду, накройте крышкой и подержите 2 минуты на слабом огне. Разрежьте самый толстый кусок: мясо внутри белое, сок прозрачный.",
+                    "uses": [
+                        "water",
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 120
+                }
+            ],
+            "tips": [
+                "Отбитое мясо ровной толщины прожаривается одновременно и не сохнет по краям.",
+                "Дайте грудке полежать 3 минуты перед нарезкой — сок останется внутри."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Сковорода с антипригарным покрытием и крышкой",
+                "Кухонный молоток",
+                "Плёнка"
+            ],
+            "look": "Золотистые куски куриной грудки на разделочной доске, один разрезан — внутри сочное белое мясо."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "chicken-zucchini-cutlets",
+            "title": "Куриные котлеты с кабачком",
+            "summary": "Нежные котлеты из куриного филе с кабачком. Кабачок делает их сочными и лёгкими, а запекаются они в духовке.",
+            "aliases": [
+                "Котлеты из курицы с кабачком",
+                "Котлеты куриные с овощами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 45,
+            "activeMinutes": 20,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "chicken-fillet",
+                    "name": "Куриное филе",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "eggplant"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Лук",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйцо",
+                    "amount": 55,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "oat-flakes",
+                    "name": "Овсяные хлопья",
+                    "amount": 30,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 200 °C. Кабачок натрите на мелкой тёрке, посолите щепоткой соли и через 5 минут хорошо отожмите сок.",
+                    "uses": [
+                        "zucchini",
+                        "salt"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Измельчите курицу с луком в блендере или мясорубке. Смешайте с кабачком, яйцом, хлопьями, укропом, оставшейся солью и перцем.",
+                    "uses": [
+                        "chicken-fillet",
+                        "onion",
+                        "zucchini",
+                        "egg",
+                        "oat-flakes",
+                        "dill",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Мокрыми руками сформуйте 12 котлет и выложите на противень с пергаментом.",
+                    "uses": [
+                        "chicken-fillet"
+                    ]
+                },
+                {
+                    "text": "Запекайте 25 минут до румяного цвета. Разрежьте одну котлету: внутри мясо белое, без розового.",
+                    "uses": [
+                        "chicken-fillet"
+                    ],
+                    "timerSeconds": 1500
+                }
+            ],
+            "tips": [
+                "Отжимайте кабачок как следует, иначе котлеты расплывутся.",
+                "Хлопья можно заменить ложкой манки."
+            ],
+            "storageDays": 2,
+            "freezerDays": 60,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "chicken-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "yields": {
+                "amount": 12,
+                "unit": "шт."
+            },
+            "cookware": [
+                "Духовка",
+                "Противень",
+                "Пергамент",
+                "Блендер или мясорубка",
+                "Тёрка"
+            ],
+            "look": "Румяные овальные котлеты с зелёными крапинками кабачка и укропа на пергаменте."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "turkey-baked-vegetables",
+            "title": "Индейка, запечённая с овощами",
+            "summary": "Филе индейки с кабачком, перцем, морковью и помидорами в духовке. Мясо и гарнир готовятся вместе.",
+            "aliases": [
+                "Индейка с овощами в духовке",
+                "Запечённая индейка с овощами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 50,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "turkey-fillet",
+                    "name": "Филе индейки",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "zucchini",
+                    "name": "Кабачок",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "eggplant"
+                    ]
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "carrot",
+                    "name": "Морковь",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры черри или обычные",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "onion",
+                    "name": "Красный лук",
+                    "amount": 80,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dried-oregano",
+                    "name": "Орегано",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-thyme",
+                        "dried-basil"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 6,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "light",
+                "hearty"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 200 °C. Нарежьте индейку кубиками по 3 см, кабачок и перец — крупно, морковь — тонкими кружками, лук — дольками, помидоры разрежьте пополам.",
+                    "uses": [
+                        "turkey-fillet",
+                        "zucchini",
+                        "bell-pepper",
+                        "carrot",
+                        "onion",
+                        "tomato"
+                    ]
+                },
+                {
+                    "text": "Сложите всё в форму, добавьте масло, орегано, измельчённый чеснок, соль и перец и перемешайте руками.",
+                    "uses": [
+                        "turkey-fillet",
+                        "zucchini",
+                        "bell-pepper",
+                        "carrot",
+                        "onion",
+                        "tomato",
+                        "vegetable-oil",
+                        "dried-oregano",
+                        "garlic",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Запекайте 30 минут, один раз перемешав в середине. Разрежьте кусочек индейки: мясо внутри белое, без розового.",
+                    "uses": [
+                        "turkey-fillet"
+                    ],
+                    "timerSeconds": 1800
+                }
+            ],
+            "tips": [
+                "Морковь режьте тоньше остальных овощей — она запекается дольше.",
+                "Филе бедра индейки сочнее грудки."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "turkey-fillet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Духовка",
+                "Форма для запекания",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Румяные кусочки индейки вперемешку с яркими овощами в форме для запекания."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "steamed-fish-lemon",
+            "title": "Рыба на пару с лимоном",
+            "summary": "Филе трески на пару с лимоном и укропом. Без пароварки — в кастрюле с дуршлагом. Нежно и совсем без масла.",
+            "aliases": [
+                "Треска на пару",
+                "Рыба на пару без пароварки"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 25,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cod-fillet",
+                    "name": "Филе трески",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon",
+                    "name": "Лимон",
+                    "amount": 60,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "lemon-juice",
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для пара",
+                    "amount": 1500,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pot"
+            ],
+            "tags": [
+                "light",
+                "quick"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте треску порционными кусками, посолите и поперчите. Половину лимона нарежьте тонкими кружками, из второй половины выжмите сок.",
+                    "uses": [
+                        "cod-fillet",
+                        "salt",
+                        "black-pepper",
+                        "lemon"
+                    ]
+                },
+                {
+                    "text": "Налейте воду в кастрюлю и доведите до кипения. Поставьте сверху дуршлаг так, чтобы он не касался воды.",
+                    "uses": [
+                        "water"
+                    ]
+                },
+                {
+                    "text": "Положите в дуршлаг веточки укропа, сверху рыбу и кружки лимона. Накройте крышкой и готовьте на пару 10 минут, пока рыба не станет белой и не будет легко расслаиваться.",
+                    "uses": [
+                        "dill",
+                        "cod-fillet",
+                        "lemon"
+                    ],
+                    "timerSeconds": 600
+                },
+                {
+                    "text": "Переложите рыбу на тарелки, сбрызните лимонным соком и посыпьте оставшимся рубленым укропом.",
+                    "uses": [
+                        "cod-fillet",
+                        "lemon",
+                        "dill"
+                    ]
+                }
+            ],
+            "tips": [
+                "Подойдёт любая белая рыба: минтай, хек, судак.",
+                "На пару отлично готовятся и овощи — положите их под рыбу."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cod-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Кастрюля 3 л",
+                "Металлический дуршлаг",
+                "Крышка",
+                "Нож"
+            ],
+            "look": "Белые кусочки трески с кружками лимона и укропом на тарелке."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "cod-baked-tomatoes",
+            "title": "Треска, запечённая с помидорами",
+            "summary": "Треска под ломтиками помидоров с чесноком и базиликом, запечённая в духовке. Сочно, ярко и легко.",
+            "aliases": [
+                "Треска с помидорами в духовке",
+                "Запечённая рыба с помидорами"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 30,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cod-fillet",
+                    "name": "Филе трески",
+                    "amount": 600,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры",
+                    "amount": 300,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "dried-basil",
+                    "name": "Базилик сушёный",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dried-oregano"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 190 °C. Смажьте форму маслом, выложите рыбу, сбрызните лимонным соком, посолите и поперчите.",
+                    "uses": [
+                        "vegetable-oil",
+                        "cod-fillet",
+                        "lemon-juice",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Нарежьте помидоры кружками и выложите на рыбу внахлёст. Посыпьте измельчённым чесноком и базиликом.",
+                    "uses": [
+                        "tomato",
+                        "garlic",
+                        "dried-basil"
+                    ]
+                },
+                {
+                    "text": "Запекайте 20 минут, пока рыба не станет белой и не будет легко расслаиваться. Посыпьте петрушкой.",
+                    "uses": [
+                        "cod-fillet",
+                        "parsley"
+                    ],
+                    "timerSeconds": 1200
+                }
+            ],
+            "tips": [
+                "Помидоры дают сок, поэтому рыба не пересыхает.",
+                "Летом добавьте свежий базилик вместо сушёного."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "main",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "cod-fillet",
+            "needsSide": true,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "medium",
+            "kids": true,
+            "cookware": [
+                "Духовка",
+                "Форма для запекания",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Белое филе трески под красными кружками помидоров с зеленью в форме."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "oven-vegetable-omelet",
+            "title": "Омлет с овощами в духовке",
+            "summary": "Высокий омлет с брокколи, перцем и помидорами, запечённый в духовке. Белковый завтрак или лёгкий ужин.",
+            "aliases": [
+                "Запечённый омлет с овощами",
+                "Омлет в духовке с брокколи"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 35,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "egg",
+                    "name": "Яйца (8 шт.)",
+                    "amount": 440,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "milk",
+                    "name": "Молоко 1,5–2,5%",
+                    "amount": 150,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "cream"
+                    ]
+                },
+                {
+                    "id": "broccoli",
+                    "name": "Брокколи",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "cauliflower"
+                    ]
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидор",
+                    "amount": 120,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "canned-tomato"
+                    ]
+                },
+                {
+                    "id": "green-onion",
+                    "name": "Зелёный лук",
+                    "amount": 20,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "leek",
+                        "parsley"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 5,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 4,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "light"
+            ],
+            "steps": [
+                {
+                    "text": "Включите духовку на 180 °C. Брокколи разберите на мелкие соцветия, перец и помидор нарежьте кубиками, лук — колечками.",
+                    "uses": [
+                        "broccoli",
+                        "bell-pepper",
+                        "tomato",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "text": "Смажьте форму маслом и разложите овощи. Взбейте яйца с молоком, солью и перцем и залейте овощи.",
+                    "uses": [
+                        "vegetable-oil",
+                        "broccoli",
+                        "bell-pepper",
+                        "tomato",
+                        "green-onion",
+                        "egg",
+                        "milk",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Запекайте 25 минут, пока омлет не поднимется и середина не перестанет дрожать. Дайте постоять 3 минуты и нарежьте.",
+                    "uses": [
+                        "egg"
+                    ],
+                    "timerSeconds": 1500
+                }
+            ],
+            "tips": [
+                "Замороженные овощи тоже подойдут — разморозьте и отожмите их.",
+                "Яйца не взбивайте миксером, достаточно вилки."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast",
+                "dinner"
+            ],
+            "mainIngredient": "egg",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Духовка",
+                "Форма 20×25 см",
+                "Миска",
+                "Венчик"
+            ],
+            "look": "Высокий омлет с яркими кусочками брокколи, перца и помидоров, нарезанный квадратами."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "sugar-free-cottage-cheese-casserole",
+            "title": "Творожная запеканка без сахара",
+            "summary": "Нежная творожная запеканка, сладкая от банана, без сахара и муки. Полезный завтрак для всей семьи.",
+            "aliases": [
+                "Запеканка из творога без сахара",
+                "ПП творожная запеканка"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 50,
+            "activeMinutes": 10,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "cottage-cheese",
+                    "name": "Творог 5%",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 110,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "banana",
+                    "name": "Спелый банан",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "semolina",
+                    "name": "Манка",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "plain-yogurt",
+                    "name": "Натуральный йогурт",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sour-cream",
+                        "matsun"
+                    ]
+                },
+                {
+                    "id": "vanilla-sugar",
+                    "name": "Ванилин или ванильный сахар",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": true,
+                    "swap": [
+                        "sugar"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Масло для формы",
+                    "amount": 5,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "butter"
+                    ]
+                }
+            ],
+            "appliances": [
+                "oven"
+            ],
+            "tags": [
+                "light",
+                "sweet"
+            ],
+            "steps": [
+                {
+                    "text": "Смешайте йогурт с манкой и оставьте на 15 минут, чтобы манка набухла. Включите духовку на 180 °C.",
+                    "uses": [
+                        "plain-yogurt",
+                        "semolina"
+                    ],
+                    "timerSeconds": 900
+                },
+                {
+                    "text": "Разомните банан вилкой в пюре. Добавьте творог, яйца, ванилин и набухшую манку и перемешайте до однородности.",
+                    "uses": [
+                        "banana",
+                        "cottage-cheese",
+                        "egg",
+                        "vanilla-sugar",
+                        "semolina",
+                        "plain-yogurt"
+                    ]
+                },
+                {
+                    "text": "Смажьте форму маслом, выложите массу и разровняйте. Запекайте 30 минут до золотистого верха. Дайте остыть 10 минут перед нарезкой.",
+                    "uses": [
+                        "vegetable-oil",
+                        "cottage-cheese"
+                    ],
+                    "timerSeconds": 1800
+                }
+            ],
+            "tips": [
+                "Чем спелее банан, тем слаще запеканка.",
+                "Подавайте с ягодами или ложкой йогурта."
+            ],
+            "storageDays": 3,
+            "cuisine": "russian",
+            "course": "breakfast",
+            "meals": [
+                "breakfast",
+                "snack"
+            ],
+            "mainIngredient": "cottage-cheese",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": true,
+            "cookware": [
+                "Духовка",
+                "Форма 20 см",
+                "Миска",
+                "Вилка"
+            ],
+            "look": "Золотистая творожная запеканка, нарезанная квадратами, с ягодами сверху."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "tuna-egg-salad-no-mayo",
+            "title": "Салат с тунцом и яйцом без майонеза",
+            "summary": "Сытный салат из тунца, яиц, огурца и листьев с лёгкой заправкой из йогурта и горчицы.",
+            "aliases": [
+                "Салат с тунцом без майонеза",
+                "Лёгкий салат с тунцом"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 20,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "canned-tuna",
+                    "name": "Тунец в собственном соку",
+                    "amount": 250,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "egg",
+                    "name": "Яйца",
+                    "amount": 165,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cucumber",
+                    "name": "Огурец",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "romaine-lettuce",
+                    "name": "Листья салата",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "napa-cabbage"
+                    ]
+                },
+                {
+                    "id": "red-onion",
+                    "name": "Красный лук",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "onion"
+                    ]
+                },
+                {
+                    "id": "plain-yogurt",
+                    "name": "Натуральный йогурт",
+                    "amount": 100,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sour-cream",
+                        "matsun"
+                    ]
+                },
+                {
+                    "id": "prepared-mustard",
+                    "name": "Горчица",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 10,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "water",
+                    "name": "Вода для яиц",
+                    "amount": 800,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 2,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "fresh"
+            ],
+            "steps": [
+                {
+                    "text": "Положите яйца в холодную воду, доведите до кипения и варите 9 минут. Остудите в холодной воде и очистите.",
+                    "uses": [
+                        "egg",
+                        "water"
+                    ],
+                    "timerSeconds": 540
+                },
+                {
+                    "text": "Пока варятся яйца, нарежьте огурец полукружьями, лук — тонкими полукольцами, листья салата порвите руками. Смешайте йогурт с горчицей, лимонным соком, солью и перцем.",
+                    "uses": [
+                        "cucumber",
+                        "red-onion",
+                        "romaine-lettuce",
+                        "plain-yogurt",
+                        "prepared-mustard",
+                        "lemon-juice",
+                        "salt",
+                        "black-pepper"
+                    ]
+                },
+                {
+                    "text": "Слейте с тунца жидкость и разберите его вилкой на кусочки. Яйца нарежьте дольками. Выложите листья, огурец, лук, тунец и яйца, полейте заправкой.",
+                    "uses": [
+                        "canned-tuna",
+                        "egg",
+                        "romaine-lettuce",
+                        "cucumber",
+                        "red-onion",
+                        "plain-yogurt"
+                    ]
+                }
+            ],
+            "tips": [
+                "Заправляйте перед подачей, чтобы листья не обмякли.",
+                "Тунец в собственном соку легче, чем в масле."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "salad",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "canned-tuna",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Ковш",
+                "Салатник",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Зелёные листья с огурцом, кусочками тунца и дольками яиц под белой заправкой."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "bean-vegetable-salad",
+            "title": "Салат с фасолью и овощами",
+            "summary": "Яркий салат из красной фасоли, помидоров, огурцов, перца и зелени с лимонной заправкой. Сытный, но лёгкий.",
+            "aliases": [
+                "Фасолевый салат с овощами",
+                "Салат из фасоли без майонеза"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "canned-beans",
+                    "name": "Красная фасоль консервированная",
+                    "amount": 400,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "tomato",
+                    "name": "Помидоры",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "cucumber",
+                    "name": "Огурцы",
+                    "amount": 200,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "bell-pepper",
+                    "name": "Болгарский перец",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "red-onion",
+                    "name": "Красный лук",
+                    "amount": 50,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "onion"
+                    ]
+                },
+                {
+                    "id": "parsley",
+                    "name": "Петрушка",
+                    "amount": 15,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
+                },
+                {
+                    "id": "lemon-juice",
+                    "name": "Лимонный сок",
+                    "amount": 20,
+                    "unit": "мл",
+                    "optional": false,
+                    "swap": [
+                        "lime-juice"
+                    ]
+                },
+                {
+                    "id": "vegetable-oil",
+                    "name": "Растительное масло",
+                    "amount": 15,
+                    "unit": "мл",
+                    "optional": false
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "fresh",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Нарежьте лук тонкими полукольцами и залейте лимонным соком на 5 минут — он станет мягче и перестанет горчить.",
+                    "uses": [
+                        "red-onion",
+                        "lemon-juice"
+                    ],
+                    "timerSeconds": 300
+                },
+                {
+                    "text": "Откиньте фасоль на сито, промойте холодной водой и дайте стечь. Нарежьте помидоры, огурцы и перец кубиками, петрушку порубите.",
+                    "uses": [
+                        "canned-beans",
+                        "tomato",
+                        "cucumber",
+                        "bell-pepper",
+                        "parsley"
+                    ]
+                },
+                {
+                    "text": "Соедините фасоль с овощами и луком вместе с лимонным соком. Добавьте масло, соль и перец и перемешайте.",
+                    "uses": [
+                        "canned-beans",
+                        "tomato",
+                        "cucumber",
+                        "bell-pepper",
+                        "parsley",
+                        "red-onion",
+                        "lemon-juice",
+                        "vegetable-oil",
+                        "salt",
+                        "black-pepper"
+                    ]
+                }
+            ],
+            "tips": [
+                "Промытая фасоль не даёт салату мутного вкуса.",
+                "Салат можно оставить на 15 минут — фасоль пропитается заправкой."
+            ],
+            "storageDays": 1,
+            "cuisine": "russian",
+            "course": "salad",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "canned-beans",
+            "needsSide": false,
+            "season": [
+                "summer",
+                "autumn",
+                "spring"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Салатник",
+                "Нож",
+                "Разделочная доска"
+            ],
+            "look": "Красная фасоль с кубиками помидоров, огурцов и жёлтого перца с петрушкой в салатнике."
+        },
+        {
+            "schema": 2,
+            "editorialStatus": "draft",
+            "id": "beet-salad-yogurt",
+            "title": "Свекольный салат с йогуртом",
+            "summary": "Варёная свёкла с чесноком, грецкими орехами и заправкой из йогурта вместо майонеза.",
+            "aliases": [
+                "Салат из свёклы с йогуртом",
+                "Свёкла с чесноком и йогуртом"
+            ],
+            "servings": 4,
+            "minServings": 1,
+            "maxServings": 8,
+            "totalMinutes": 15,
+            "activeMinutes": 15,
+            "difficulty": "easy",
+            "ingredients": [
+                {
+                    "id": "beet",
+                    "name": "Варёная свёкла",
+                    "amount": 500,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "plain-yogurt",
+                    "name": "Натуральный йогурт",
+                    "amount": 150,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "sour-cream",
+                        "matsun"
+                    ]
+                },
+                {
+                    "id": "walnut",
+                    "name": "Грецкие орехи",
+                    "amount": 40,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "hazelnut",
+                        "almond"
+                    ]
+                },
+                {
+                    "id": "garlic",
+                    "name": "Чеснок",
+                    "amount": 5,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "dill",
+                    "name": "Укроп",
+                    "amount": 10,
+                    "unit": "г",
+                    "optional": false,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
+                },
+                {
+                    "id": "salt",
+                    "name": "Соль",
+                    "amount": 3,
+                    "unit": "г",
+                    "optional": false
+                },
+                {
+                    "id": "black-pepper",
+                    "name": "Чёрный перец",
+                    "amount": 1,
+                    "unit": "г",
+                    "optional": false
+                }
+            ],
+            "appliances": [
+                "pan"
+            ],
+            "tags": [
+                "light",
+                "vegetarian"
+            ],
+            "steps": [
+                {
+                    "text": "Прогрейте орехи на сухой сковороде 2 минуты, помешивая, пока они не запахнут, и крупно порубите.",
+                    "uses": [
+                        "walnut"
+                    ],
+                    "timerSeconds": 120
+                },
+                {
+                    "text": "Очистите варёную свёклу и натрите на крупной тёрке. Чеснок измельчите, укроп порубите.",
+                    "uses": [
+                        "beet",
+                        "garlic",
+                        "dill"
+                    ]
+                },
+                {
+                    "text": "Смешайте свёклу с йогуртом, чесноком, солью и перцем. Выложите в салатник и посыпьте орехами и укропом.",
+                    "uses": [
+                        "beet",
+                        "plain-yogurt",
+                        "garlic",
+                        "salt",
+                        "black-pepper",
+                        "walnut",
+                        "dill"
+                    ]
+                }
+            ],
+            "tips": [
+                "Свёклу удобно запечь в фольге в духовке при 200 °C около часа — она будет слаще.",
+                "Добавьте горсть чернослива, если любите сладковатый вкус."
+            ],
+            "storageDays": 2,
+            "cuisine": "russian",
+            "course": "salad",
+            "meals": [
+                "lunch",
+                "dinner"
+            ],
+            "mainIngredient": "beet",
+            "needsSide": false,
+            "season": [
+                "winter",
+                "spring",
+                "summer",
+                "autumn"
+            ],
+            "occasions": [
+                "everyday"
+            ],
+            "budget": "low",
+            "kids": false,
+            "cookware": [
+                "Салатник",
+                "Тёрка"
+            ],
+            "look": "Тёмно-рубиновая тёртая свёкла с белыми прожилками йогурта, орехами и укропом."
+        }
+    ]
+}
