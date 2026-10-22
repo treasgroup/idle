@@ -287,10 +287,13 @@ function ThemeCard({ c, cover, drawn, wide, span, onOpen }: { c: Collection; cov
   return (
     <button onClick={onOpen} className={cx("relative overflow-hidden rounded-card text-left transition-transform active:scale-[.98]",
       span ? "col-span-2 aspect-[2/1] sm:col-span-3 lg:aspect-[3/1]" : "aspect-[4/5] lg:aspect-[3/2]")}>
-      {drawn && own
+      {/* A season has only the wide cover (admin «Подборки»): the full-row card shows it on every screen. */}
+      {span && wide && own
+        ? <img src={coverUrl(c.key, wide, true)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
+        : drawn && own
         ? (
           <picture>
-            {wide && <source media={span ? "(min-width: 0px)" : "(min-width: 1024px)"} srcSet={coverUrl(c.key, wide, true)} />}
+            {wide && <source media="(min-width: 1024px)" srcSet={coverUrl(c.key, wide, true)} />}
             <img src={coverUrl(c.key, drawn)} alt="" loading="lazy" decoding="async" onError={() => setOwn(false)} className="absolute inset-0 h-full w-full bg-sunken object-cover" />
           </picture>
         )

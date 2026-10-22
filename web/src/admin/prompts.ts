@@ -33,9 +33,10 @@ const SCENES: Record<string, string> = {
 };
 
 /** The prompt for a collection's cover of the given shape; an own collection gets one from its title and line. */
-export function coverPrompt(key: string, title: string, hint: string, shape: CoverShape = "tall"): string {
+export function coverPrompt(key: string, title: string, hint: string, shape: CoverShape = "tall", band = false): string {
   const scene = SCENES[key] ?? `One dish that says «${title}»${hint ? " (" + hint + ")" : ""} at a glance, served simply on a plate.`;
-  return scene + " " + STYLE + " " + SHAPE[shape];
+  // A season's cover is also shown as a strip across the whole row (3:1 on a computer): the dish must survive the crop.
+  return scene + " " + STYLE + " " + SHAPE[shape] + (band ? " Keep the dish within the middle third of the height: the picture is also shown as a wide strip, top and bottom cut off." : "");
 }
 
 // Школа готовки: one flat illustration per lesson card, all in one style — the same set of colours as the app,

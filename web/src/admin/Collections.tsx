@@ -143,7 +143,8 @@ function Editor({ e, x, rule, final, all, photos, onSave, onDelete, onCustoms }:
   const add = x.add ?? [], removed = x.remove ?? [];
   const ruleIds = useMemo(() => new Set(rule.map((r) => r.id)), [rule]);
   const byId = useMemo(() => new Map(all.map((r) => [r.id, r])), [all]);
-  const showCover = e.kind === "theme" || e.kind === "own";
+  // Seasons: one wide cover for the full-row card near a holiday. Holidays are only ever a shelf: no cover is shown.
+  const showCover = e.kind === "theme" || e.kind === "own" || e.kind === "season";
 
   const run = async (f: () => Promise<unknown>, ok: string) => {
     setStatus({});
@@ -224,6 +225,11 @@ function confirmDelete(title: string): boolean {
 /** Two covers: tall 4:5 for phones and wide 3:2 for computers. Without the wide one, computers cut the tall one. */
 function Cover({ e, x, first, photos, title, hint, onCustoms }: { e: Entry; x: Custom; first?: Recipe; photos: Record<string, number>; title: string; hint: string; onCustoms: (c: Customs) => void }) {
   const fallback = first ? photo(first.id, photos) : null;
+  if (e.kind === "season") return (
+    <div className="cx-covers">
+      <CoverSlot e={e} shape="wide" version={x.coverWide} fallback={fallback} title={title} hint={hint} onCustoms={onCustoms} season />
+    </div>
+  );
   return (
     <div className="cx-covers">
       <CoverSlot e={e} shape="tall" version={x.cover} fallback={fallback} title={title} hint={hint} onCustoms={onCustoms} />
@@ -237,13 +243,16 @@ const SHAPES: Record<CoverShape, { label: string; none: string; cut: string }> =
   wide: { label: "Для компьютера · горизонтальная 3:2", none: "пока обрезается вертикальная", cut: "Картинка сама обрежется до 3:2." },
 };
 
-function CoverSlot({ e, shape, version, fallback, title, hint, onCustoms }: { e: Entry; shape: CoverShape; version?: number; fallback: string | null; title: string; hint: string; onCustoms: (c: Customs) => void }) {
+// A season is a card on the whole row of «Подборки» while a holiday's shelf is up; the rest of the time it is a shelf.
+const SEASON_SHAPE = { label: "Широкая карточка · 3:2", none: "пока стоит фото первого блюда", cut: "Видна в «Подборках» на всю ширину, когда рядом праздник. Картинка обрежется до 3:2, на сайте — полосой: блюдо держите в середине." };
+
+function CoverSlot({ e, shape, version, fallback, title, hint, onCustoms, season }: { e: Entry; shape: CoverShape; version?: number; fallback: string | null; title: string; hint: string; onCustoms: (c: Customs) => void; season?: boolean }) {
   const file = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
-  const prompt = coverPrompt(e.c.key, title, hint, shape);
+  const prompt = coverPrompt(e.c.key, title, hint, shape, season);
   const own = version ? "../collections/" + e.c.key + (shape === "wide" ? "-wide" : "") + ".jpg?v=" + version : null;
-  const s = SHAPES[shape];
+  const s = season ? SEASON_SHAPE : SHAPES[shape];
   const send = async (f: File) => {
     setBusy(true); setMsg({});
     try {
