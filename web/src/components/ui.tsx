@@ -251,8 +251,10 @@ export function ScrollRow({ children, label }: { children: ReactNode; label: str
   return (
     <div className="group relative -mx-4 sm:mx-0" role="region" aria-label={label}>
       <div ref={(el) => { ref.current = el; fadeRef(el); }} className={cx("scroller px-4 pb-1 sm:px-0", fade)}>{children}</div>
-      <button className="icon-btn absolute left-1 top-1/2 hidden -translate-y-1/2 bg-card shadow-e2 [@media(pointer:fine)]:group-hover:inline-grid" onClick={() => by(-1)} aria-label="Назад"><ChevronLeft size={20} /></button>
-      <button className="icon-btn absolute right-1 top-1/2 hidden -translate-y-1/2 bg-card shadow-e2 [@media(pointer:fine)]:group-hover:inline-grid" onClick={() => by(1)} aria-label="Дальше"><ChevronRight size={20} /></button>
+      {/* Mouse arrows on hover, like the fade only on a side where cards are hidden: none at the start on the left (it
+          covered the first card), none at the end, none when everything fits. */}
+      {(fade === "fade-l" || fade === "fade-x") && <button className="icon-btn absolute left-1 top-1/2 hidden -translate-y-1/2 bg-card shadow-e2 [@media(pointer:fine)]:group-hover:inline-grid" onClick={() => by(-1)} aria-label="Назад"><ChevronLeft size={20} /></button>}
+      {(fade === "fade-r" || fade === "fade-x") && <button className="icon-btn absolute right-1 top-1/2 hidden -translate-y-1/2 bg-card shadow-e2 [@media(pointer:fine)]:group-hover:inline-grid" onClick={() => by(1)} aria-label="Дальше"><ChevronRight size={20} /></button>}
     </div>
   );
 }
