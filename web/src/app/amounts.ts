@@ -49,6 +49,7 @@ const SPOONS: [RegExp, number | null, number, number | null][] = [
   [/^(sour-cream|mayonnaise|tomato-ketchup)$/, 10, 25, null],
   [/^tomato-paste$/, 10, 30, null],
   [/^honey$|condensed-milk$/, 12, 30, null],
+  [/^butter$/, 5, 17, null],
   [/starch$/, 10, 30, null],
   [/^cocoa-powder$/, 7, 20, null],
   [/^prepared-mustard$/, 7, 20, null],
@@ -95,6 +96,17 @@ const EXACT = /дрожж|разрыхл|сода|ванил|желатин|аг
 
 const grams = (unit: string) => unit.trim() === "г";
 
+/** Grams and ml as a cook reads them: no «3,3 г» or «53 г» after scaling a recipe to the number of eaters. Whole under
+ * 10, by 5 under 100, by 10 above (a round 125 stays). Leavening, gelatin and vanilla keep their half grams. */
+function shown(amount: number, unit: string, exact: boolean): string {
+  const u = unit.trim();
+  if ((u !== "г" && u !== "мл") || !(amount >= 1)) return formatAmount(amount, unit);
+  const n = amount < 10 ? (exact ? roundTo(amount, 0.5) : Math.round(amount))
+    : amount < 100 ? roundTo(amount, 5)
+      : Math.round(amount) % 5 === 0 ? Math.round(amount) : roundTo(amount, 10);
+  return formatAmount(n, unit);
+}
+
 export function homeQuantity(i: Item): HomeAmount {
   const id = i.id;
   if (grams(i.unit) && i.amount > 0) {
@@ -111,20 +123,23 @@ export function homeQuantity(i: Item): HomeAmount {
       const n = Math.max(1, Math.round(i.amount / per![unit]));
       return { amount: n, unit, text: formatAmount(n, unit), toTaste: false };
     }
-    // Vegetables and fruit in medium pieces, to the half: «½ шт.», «1,5 шт.»; a little of one (20 г of onion) stays in grams.
+    // Vegetables and fruit in medium pieces: «½ шт.», «1,5 шт.», but whole from two on («3 шт.», not «3,5»); the grams
+    // under them stay exact enough. A little of one (20 г of onion) stays in grams.
     const medium = MEDIUM[id];
     if (medium && i.amount >= medium * 0.3) {
       // To the half, a quarter goes down: 150 г of potato (1¼) is «1 шт.», not «1,5».
-      const n = Math.max(0.5, Math.ceil((i.amount / medium) * 2 - 0.5) / 2);
-      return { amount: n, unit: "шт.", text: frac(n) + " шт.", toTaste: false, grams: formatAmount(i.amount, i.unit) };
+      const half = Math.max(0.5, Math.ceil((i.amount / medium) * 2 - 0.5) / 2);
+      const n = half >= 2 ? Math.max(2, Math.round(i.amount / medium)) : half;
+      return { amount: n, unit: "шт.", text: frac(n) + " шт.", toTaste: false, grams: shown(i.amount, i.unit, false) };
     }
-    if (HERB.test(id)) return { amount: i.amount, unit: i.unit, text: sprigs(id, i.amount), toTaste: false, grams: formatAmount(i.amount, i.unit) };
+    if (HERB.test(id)) return { amount: i.amount, unit: i.unit, text: sprigs(id, i.amount), toTaste: false, grams: shown(i.amount, i.unit, false) };
     // Salt, pepper, ground spices under 5 g: nobody weighs them at home.
     const name = (ingredient(id)?.name ?? i.name).toLowerCase();
     if (i.amount < 5 && !EXACT.test(name) && aisleOf({ ingredientId: id, name: i.name }) === "spices")
       return { amount: i.amount, unit: i.unit, text: "по вкусу", toTaste: true };
   }
-  return { amount: i.amount, unit: i.unit, text: formatAmount(i.amount, i.unit), toTaste: false, hint: spoonHint(id, i.amount, i.unit) };
+  const exact = EXACT.test((ingredient(id)?.name ?? i.name).toLowerCase());
+  return { amount: i.amount, unit: i.unit, text: shown(i.amount, i.unit, exact), toTaste: false, hint: spoonHint(id, i.amount, i.unit) };
 }
 
 /** «2 шт.», «150 г · 6 ст. л.», «по вкусу» — the amount as it is shown on a recipe. */

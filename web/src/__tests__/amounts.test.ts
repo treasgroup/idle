@@ -17,6 +17,21 @@ describe("amounts as people count them at home", () => {
     expect(homeQuantity(ing("cabbage", 125)).text).toBe("125 г");
     expect(homeAmount(ing("beet", 125))).toBe("½ шт. · 125 г");
   });
+  it("counts whole pieces from two on, halves only below", () => {
+    expect(homeAmount(ing("potato", 400))).toBe("3 шт. · 400 г");
+    expect(homeQuantity(ing("potato", 900)).text).toBe("8 шт.");
+    expect(homeQuantity(ing("tomato", 300)).text).toBe("3 шт.");
+    expect(homeQuantity(ing("apple", 220)).text).toBe("1,5 шт.");
+  });
+  it("rounds grams after scaling: whole under 10, by 5 under 100, by 10 above", () => {
+    expect(homeAmount(ing("butter", 10 / 3))).toBe("3 г · ½ ч. л.");
+    expect(homeAmount(ing("sugar", 5.33))).toBe("5 г · ½ ч. л.");
+    expect(homeQuantity(ing("olives", 53)).text).toBe("55 г");
+    expect(homeQuantity(ing("pork", 333.3)).text).toBe("330 г");
+    expect(homeQuantity(ing("milk", 7.5, "мл")).text).toBe("8 мл");
+    // Leavening keeps its half grams.
+    expect(homeQuantity({ id: "dry-yeast", name: "Дрожжи сухие", amount: 3.3, unit: "г" }).text).toBe("3,5 г");
+  });
   it("shows herbs in sprigs and bunches", () => {
     expect(homeQuantity(ing("dill", 6))).toMatchObject({ text: "2–3 веточки", grams: "6 г" });
     expect(homeQuantity(ing("parsley", 2)).text).toBe("1–2 веточки");
