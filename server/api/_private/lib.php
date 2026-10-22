@@ -140,6 +140,11 @@ function db(): PDO {
     // Views of the plain recipe pages (recipe.php) by people, counted per day and source; no visitor ids.
     $pdo->exec('CREATE TABLE IF NOT EXISTS page_views (day TEXT NOT NULL, recipe_id TEXT NOT NULL, ref TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (day, recipe_id, ref))');
     $pdo->exec('CREATE TABLE IF NOT EXISTS admin_sessions (token_hash TEXT PRIMARY KEY, created_at INTEGER NOT NULL, expires_at INTEGER NOT NULL)');
+    // Where each admin login came from (shown in «Настройки → Безопасность»); added in 2026-10.
+    $cols = $pdo->query('PRAGMA table_info(admin_sessions)')->fetchAll(PDO::FETCH_COLUMN, 1);
+    if (!in_array('ip', $cols, true)) $pdo->exec('ALTER TABLE admin_sessions ADD COLUMN ip TEXT');
+    if (!in_array('ua', $cols, true)) $pdo->exec('ALTER TABLE admin_sessions ADD COLUMN ua TEXT');
+    $pdo->exec('CREATE TABLE IF NOT EXISTS admin_logins (id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL, ip TEXT NOT NULL, ua TEXT NOT NULL, ok INTEGER NOT NULL)');
     $pdo->exec('CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
     return $pdo;
 }

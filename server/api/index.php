@@ -201,6 +201,9 @@ try {
     elseif ($route === 'admin.status' && $method === 'GET') admin_status();
     elseif ($route === 'admin.login' && $method === 'POST') admin_login(read_json_body(2000));
     elseif ($route === 'admin.logout' && $method === 'POST') admin_logout();
+    elseif ($route === 'admin.security' && $method === 'GET') { require_admin(); admin_security(); }
+    elseif ($route === 'admin.logout.others' && $method === 'POST') { require_admin(true); admin_logout_others(); }
+    elseif ($route === 'admin.photo.queue' && $method === 'GET') { require_admin(); admin_photo_queue(); }
     elseif ($route === 'admin.hash' && $method === 'POST') admin_hash(read_json_body(2000));
     elseif ($route === 'admin.stats' && $method === 'GET') { require_admin(); admin_stats((int)($_GET['days'] ?? 30)); }
     elseif ($route === 'admin.opens' && $method === 'GET') { require_admin(); admin_opens((int)($_GET['days'] ?? 30)); }

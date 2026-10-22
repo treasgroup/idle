@@ -104,11 +104,12 @@ function admin_login(array $b): void {
     if (!admin_configured()) throw new ApiError(403, 'admin_not_configured', 'Пароль администратора ещё не задан в config.php.');
     login_limit();
     $password = (string)($b['password'] ?? '');
-    if ($password === '' || strlen($password) > 200 || !admin_password_ok($password)) { usleep(400000); throw new ApiError(403, 'admin_password', 'Неверный пароль.'); }
+    if ($password === '' || strlen($password) > 200 || !admin_password_ok($password)) { login_log(false); usleep(400000); throw new ApiError(403, 'admin_password', 'Неверный пароль.'); }
     $token = bin2hex(random_bytes(32));
     $now = now_ms();
     db()->prepare('DELETE FROM admin_sessions WHERE expires_at < ?')->execute([$now]);
-    db()->prepare('INSERT INTO admin_sessions (token_hash, created_at, expires_at) VALUES (?, ?, ?)')->execute([session_key($token), $now, $now + 7 * 86400000]);
+    db()->prepare('INSERT INTO admin_sessions (token_hash, created_at, expires_at, ip, ua) VALUES (?, ?, ?, ?, ?)')->execute([session_key($token), $now, $now + 7 * 86400000, client_ip(), login_ua()]);
+    login_log(true);
     setcookie('cook_admin', $token, ['expires' => time() + 7 * 86400, 'path' => cookie_path(), 'secure' => is_https(), 'httponly' => true, 'samesite' => 'Strict']);
     send_json(['loggedIn' => true]);
 }
@@ -119,6 +120,52 @@ function admin_logout(): void {
     setcookie('cook_admin', '', ['expires' => time() - 3600, 'path' => cookie_path(), 'secure' => is_https(), 'httponly' => true, 'samesite' => 'Strict']);
     send_json(['loggedIn' => false]);
 }
+// ---------- Безопасность: who logged in, from where; closing the other logins ----------
+// Every attempt, right or wrong, is kept 90 days; the page shows the address half hidden (95.24.xx.xx).
+function login_ua(): string { return substr((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 300); }
+function login_log(bool $ok): void {
+    try {
+        $now = now_ms();
+        db()->prepare('DELETE FROM admin_logins WHERE at < ?')->execute([$now - 90 * 86400000]);
+        db()->prepare('INSERT INTO admin_logins (at, ip, ua, ok) VALUES (?, ?, ?, ?)')->execute([$now, client_ip(), login_ua(), $ok ? 1 : 0]);
+    } catch (Throwable $e) { /* the login itself matters more than its record */ }
+}
+function mask_ip(?string $ip): string {
+    $ip = (string)$ip;
+    if (preg_match('/^(\d+)\.(\d+)\.\d+\.\d+$/', $ip, $m)) return $m[1] . '.' . $m[2] . '.xx.xx';
+    if (strpos($ip, ':') !== false) { $p = explode(':', $ip); return $p[0] . ':' . ($p[1] ?? '') . ':…'; }
+    return $ip === '' ? '?' : $ip;
+}
+function admin_security(): void {
+    $now = now_ms();
+    $mine = session_key((string)admin_token());
+    $st = db()->prepare('SELECT token_hash, created_at, expires_at, ip, ua FROM admin_sessions WHERE expires_at > ? ORDER BY created_at DESC');
+    $st->execute([$now]);
+    $sessions = array_map(fn($r) => ['current' => hash_equals($mine, (string)$r['token_hash']), 'at' => (int)$r['created_at'], 'until' => (int)$r['expires_at'], 'ip' => mask_ip($r['ip']), 'ua' => (string)($r['ua'] ?? '')], $st->fetchAll(PDO::FETCH_ASSOC));
+    $st = db()->prepare('SELECT at, ip, ua, ok FROM admin_logins WHERE at > ? ORDER BY at DESC LIMIT 200');
+    $st->execute([$now - 90 * 86400000]);
+    $logins = array_map(fn($r) => ['at' => (int)$r['at'], 'ip' => mask_ip($r['ip']), 'ua' => (string)$r['ua'], 'ok' => (bool)$r['ok']], $st->fetchAll(PDO::FETCH_ASSOC));
+    send_json(['sessions' => $sessions, 'logins' => $logins]);
+}
+function admin_logout_others(): void {
+    $st = db()->prepare('DELETE FROM admin_sessions WHERE token_hash <> ?');
+    $st->execute([session_key((string)admin_token())]);
+    send_json(['closed' => $st->rowCount()]);
+}
+// «Рецепты → Фото»: how often each recipe was opened in 30 days (in the app and on its plain page), so the recipes
+// people look at most get their photo first.
+function admin_photo_queue(): void {
+    $since = date('Y-m-d', time() - 30 * 86400);
+    $n = [];
+    $st = db()->prepare("SELECT recipe_id, COUNT(*) AS c FROM events WHERE day >= ? AND type = 'open' AND recipe_id IS NOT NULL GROUP BY recipe_id");
+    $st->execute([$since]);
+    foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) $n[$r['recipe_id']] = (int)$r['c'];
+    $st = db()->prepare('SELECT recipe_id, SUM(n) AS c FROM page_views WHERE day >= ? GROUP BY recipe_id');
+    $st->execute([$since]);
+    foreach ($st->fetchAll(PDO::FETCH_ASSOC) as $r) $n[$r['recipe_id']] = ($n[$r['recipe_id']] ?? 0) + (int)$r['c'];
+    send_json(['opens' => (object)$n]);
+}
+
 // Before a password exists: turn a chosen password into a hash line for config.php (nothing is stored).
 function admin_hash(array $b): void {
     require_same_origin();
