@@ -426,9 +426,11 @@ var ku = (e) =>
     t.startsWith(e) ||
     dm(t).startsWith(dm(e)) ||
     (e.length >= 4 && (Fa(e, t) || Fa(dm(e), dm(t))));
+// Two-letter words that only join others («суп с курицей», «оладьи на кефире»); «щи», «ям» (том ям) count.
+var SHORT_JOIN = new Set(["со", "во", "на", "из", "по", "до", "от", "за", "ко", "об", "не", "ни", "же", "ли", "бы", "да", "но", "то"]);
 function nO(e, t, n = new Set()) {
   let a = ku(t),
-    i = a.filter((f) => f.length >= 3),
+    i = a.filter((f) => f.length >= 3 || (f.length === 2 && !SHORT_JOIN.has(f))),
     s = i.length ? i : a.filter((f) => f.length >= 2);
   if (!s.length) return 0;
   let r = ku([e.title, ...(e.aliases || [])].join(" ")),
@@ -439,10 +441,14 @@ function nO(e, t, n = new Set()) {
     ti = ku(e.title),
     u = 0;
   for (let f of s)
-    if (r.some((p) => l(f, p))) u += 2 + (ti[0] && l(f, ti[0]) ? 1.5 : ti.some((p) => l(f, p)) ? 1 : 0);
+    if (r.some((p) => l(f, p))) u += 2 + (ti[0] && l(f, ti[0]) ? 1.5 : ti.some((p) => l(f, p)) ? 1 : 0) + (ti.includes(f) ? 0.5 : 0);
     else if (o.some((p) => p.startsWith(f))) u += 1;
     else return 0;
-  return u;
+  // «том ям»: the dish whose title has the words just so, one after another, before «Томатный суп».
+  // The little joining words do not count on either side («паста с томатами» is «Паста с томатами и чесноком»).
+  let words = s.join(" "),
+    tw = ti.filter((p) => p.length >= 3 || (p.length === 2 && !SHORT_JOIN.has(p))).join(" ");
+  return u + (s.length > 1 && (" " + tw + " ").includes(" " + words + " ") ? 2 : 0);
 }
 function qC(e) {
   let t = new Map(Za().map((i) => [i.id, i])),
