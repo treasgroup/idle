@@ -10,9 +10,11 @@ import { watchTaps } from "./app/taps";
 import { watchPicks } from "./app/picks";
 import { watchAppLinks } from "./app/appLinks";
 import { installFormShim } from "./app/formShim";
+import { watchOpenFrom } from "./app/openFrom";
 
 // Review photos go as JSON: the hosting blocks forms with files (app/formShim).
 installFormShim();
+watchOpenFrom();
 
 // Before the first paint, so a dark device never flashes the wrong theme.
 applyTheme(loadProfile().theme);

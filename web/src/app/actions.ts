@@ -10,6 +10,7 @@ import { takePick } from "./picks";
 import { openLayer, close, routeHash, parseRoute } from "./router";
 import { stopTimersFor } from "./timers";
 import { cue } from "./feedback";
+import { openedFrom } from "./openFrom";
 import { withPhotoTransition } from "./transition";
 
 /** Ingredient ids the person has: the conditions they named plus the home pantry and staples. */
@@ -30,7 +31,8 @@ export function useActions() {
     const recipe = recipeById(id);
     // Until the full catalog has arrived, the recipe page waits for it (a shared link to a newer recipe).
     if (!recipe && catalog.source === "server") return toast("Этот рецепт больше не в каталоге.");
-    track({ type: "open", recipeId: id });
+    const route0 = parseRoute(location.hash);
+    track({ type: "open", recipeId: id, source: openedFrom(route0.tab) });
     const pick = takePick(id);
     if (pick) track({ type: "pick", recipeId: id, count: pick.pos, source: pick.list });
     signal(recipe, "open");

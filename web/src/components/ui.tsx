@@ -244,12 +244,13 @@ export function useEdgeFade(): [(el: HTMLElement | null) => void, string] {
   return [setEl, fade];
 }
 
-export function ScrollRow({ children, label }: { children: ReactNode; label: string }) {
+/** `from`: the place's name for «Откуда открывают» in the admin (app/openFrom). */
+export function ScrollRow({ children, label, from }: { children: ReactNode; label: string; from?: string }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [fadeRef, fade] = useEdgeFade();
   const by = (d: number) => ref.current?.scrollBy({ left: d * (ref.current.clientWidth * 0.8), behavior: "smooth" });
   return (
-    <div className="group relative -mx-4 sm:mx-0" role="region" aria-label={label}>
+    <div className="group relative -mx-4 sm:mx-0" role="region" aria-label={label} data-from={from}>
       <div ref={(el) => { ref.current = el; fadeRef(el); }} className={cx("scroller px-4 pb-1 sm:px-0", fade)}>{children}</div>
       {/* Mouse arrows on hover, like the fade only on a side where cards are hidden: none at the start on the left (it
           covered the first card), none at the end, none when everything fits. */}

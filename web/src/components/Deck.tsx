@@ -27,8 +27,10 @@ function shuffleTop(list: Recipe[], top = 48): Recipe[] {
   return list.slice(0, top).map((r, i) => ({ r, k: i + Math.random() * 16 })).sort((a, b) => a.k - b.k).map((x) => x.r);
 }
 
-export function Deck({ title, pool, askTime, startList, onClose }: {
+export function Deck({ title, pool, askTime, startList, onClose, from }: {
   title: string; pool: Recipe[];
+  /** For «Откуда открывают» in the admin: «pick» (Выбрать за меня), «collections», «holiday», «season». */
+  from?: string;
   /** «Выбрать за меня»: one question about time before the cards. */
   askTime?: boolean;
   /** Opened from «Все» of a shelf: the list first. */
@@ -65,7 +67,7 @@ export function Deck({ title, pool, askTime, startList, onClose }: {
   // On the page itself, not inside the screen that opened it (its fade-in would make the deck see-through).
   return createPortal(
     <Layer title={title} onClose={onClose} closeIcon="close" label={title} actions={header} width="max-w-lg">
-      <div className="px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-2">
+      <div className="px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-2" data-from={from}>
         {list ? (
           <div className="grid grid-cols-2 gap-3">
             {pool.slice(0, 60).map((x) => <RecipeTile key={x.id} recipe={x} onOpen={() => openRecipe(x)} />)}

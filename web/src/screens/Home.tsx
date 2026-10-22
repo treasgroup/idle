@@ -95,7 +95,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const a = useAssistant();
   const [feast, setFeast] = useState(false);
   // The deck: «Выбрать за меня» (with the time question), a collection (cards), or «Все» of a shelf (the list).
-  const [deck, setDeck] = useState<{ title: string; pool: Recipe[]; askTime?: boolean; list?: boolean } | null>(null);
+  const [deck, setDeck] = useState<{ title: string; pool: Recipe[]; askTime?: boolean; list?: boolean; from: string } | null>(null);
   const all = useSuitable();
   const ranked = useRanked();
   const meal = mealNow();
@@ -143,7 +143,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
         <div className="grid content-start gap-3 lg:flex lg:flex-col lg:[&>*]:flex-1">
           <RepeatCard />
-          <button onClick={() => setDeck({ title: "Выбрать за меня", pool: all, askTime: true })} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
+          <button onClick={() => setDeck({ title: "Выбрать за меня", pool: all, askTime: true, from: "pick" })} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Shuffle size={20} /></span>
             <span className="min-w-0 flex-1">
               <span className="block text-body font-medium">Выбрать за меня</span>
@@ -168,26 +168,26 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <Rescue />
 
       {/* The holiday shelf only while a holiday is near; the season's shelf always; then the themes as cards. */}
-      {holidayShelf && <Shelf c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true })}
+      {holidayShelf && <Shelf from="holiday" c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true, from: "holiday" })}
         extra={holiday.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
           : FESTIVE.includes(holiday.key) ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => setFeast(true)}><PartyPopper size={18} className="text-ink-soft" aria-hidden />{holiday.key === "newyear" ? "Собрать новогодний стол" : "Собрать праздничный стол"}</button> : undefined} />}
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       {/* One live shelf at a time: near a holiday its shelf is up there, and the season steps into «Подборки» as the
           first, wide card — two look-alike carousels in a row read as one long one. */}
-      {season && seasonDishes.length >= 4 && !holidayShelf && <Shelf c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
+      {season && seasonDishes.length >= 4 && !holidayShelf && <Shelf from="season" c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true, from: "season" })} />}
       {(themes.length > 0 || seasonCard) && (
         <Section title="Подборки">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-4">
             {seasonCard && season && <ThemeCard c={season} cover={seasonDishes[0]} drawn={custom[season.key]?.cover} wide={custom[season.key]?.coverWide} span
-              onOpen={() => setDeck({ title: season.title, pool: seasonDishes, list: true })} />}
-            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} drawn={custom[t.key]?.cover} wide={custom[t.key]?.coverWide} onOpen={() => setDeck({ title: t.title, pool: list })} />)}
+              onOpen={() => setDeck({ title: season.title, pool: seasonDishes, list: true, from: "season" })} />}
+            {themes.map(({ t, list }) => <ThemeCard key={t.key} c={t} cover={list[0]} drawn={custom[t.key]?.cover} wide={custom[t.key]?.coverWide} onOpen={() => setDeck({ title: t.title, pool: list , from: "collections" })} />)}
           </div>
         </Section>
       )}
 
       <BackupCard />
       <Saved />
-      {deck && <Deck title={deck.title} pool={deck.pool} askTime={deck.askTime} startList={deck.list} onClose={() => setDeck(null)} />}
+      {deck && <Deck title={deck.title} pool={deck.pool} askTime={deck.askTime} startList={deck.list} from={deck.from} onClose={() => setDeck(null)} />}
     </div>
   );
 }
@@ -197,7 +197,7 @@ function TodayCard({ r, badge, onOpen }: { r: Recipe; badge: string; onOpen: () 
   const { profile } = useStore();
   return (
     // Phones: photo on top. Wide screens: photo on the left, so the card is not a screen-high block.
-    <article className="overflow-hidden rounded-card border border-line bg-card lg:flex">
+    <article className="overflow-hidden rounded-card border border-line bg-card lg:flex" data-from="hero">
       <button className="relative block w-full text-left lg:w-[46%] lg:shrink-0" onClick={onOpen} aria-label={badge + ": " + r.title}>
         <RecipeImage recipe={r} full className="aspect-[16/10] w-full lg:aspect-auto lg:h-full lg:min-h-[260px]" rounded="rounded-none" eager />
         <span className="absolute left-3 top-3 rounded-full bg-card/95 px-3 py-1 text-small font-medium">{badge}</span>
@@ -264,13 +264,13 @@ function RepeatCard() {
 }
 
 /** A collection that scrolls sideways, like a shelf in a streaming app; «Все» opens all of it as a list. */
-function Shelf({ c, list, all, extra }: { c: Collection; list: Recipe[]; all: () => void; extra?: ReactNode }) {
+function Shelf({ c, list, all, extra, from }: { c: Collection; list: Recipe[]; all: () => void; extra?: ReactNode; from: string }) {
   const { openRecipe } = useActions();
   if (!list.length) return null;
   return (
     <Section title={c.emoji + " " + c.title} action="Все" onAction={all}>
       <p className="-mt-1 mb-3 text-small text-ink-soft">{c.hint}</p>
-      <ScrollRow label={c.title}>
+      <ScrollRow label={c.title} from={from}>
         {list.slice(0, 10).map((r) => <RecipeTile key={r.id} recipe={r} onOpen={() => openRecipe(r)} className="w-[168px] shrink-0 snap-start sm:w-[200px]" />)}
       </ScrollRow>
       {extra}
@@ -385,7 +385,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
           <span>Завтра «{thaw.title}»: если {thaw.what} в морозилке — переложите сегодня в холодильник.</span>
         </p>
       )}
-      <ScrollRow label="На сегодня">
+      <ScrollRow label="На сегодня" from="today">
         {dayDish && <RecipeTile recipe={dayDish} badge="Рецепт дня" onOpen={() => openRecipe(dayDish)} className={tile} />}
         {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? "Приготовлено вчера" : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
         {left.length > 0 && action(<Refrigerator size={22} />, "Осталось: " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(", "),
@@ -475,7 +475,7 @@ function Saved() {
   if (!list.length) return null;
   return (
     <Section title={s.favorites.length ? "Сохранённое" : "Недавно смотрели"} action={s.favorites.length ? "Все" : undefined} onAction={() => openRecipesView("saved")}>
-      <ScrollRow label={s.favorites.length ? "Сохранённое" : "Недавно смотрели"}>
+      <ScrollRow label={s.favorites.length ? "Сохранённое" : "Недавно смотрели"} from="recent">
         {list.map((r) => { const fresh = recipeById(r.id) ?? r; return <RecipeTile key={r.id} recipe={fresh} onOpen={() => openRecipe(fresh)} className="w-[200px] shrink-0 snap-start" />; })}
       </ScrollRow>
     </Section>

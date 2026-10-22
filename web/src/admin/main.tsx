@@ -9,6 +9,7 @@ import { Improve } from "./Improve";
 import { Messages, Vk } from "./Legacy";
 import { NewRecipes } from "./NewRecipes";
 import { School } from "./School";
+import { Opens } from "./Opens";
 import { CSS } from "./ui";
 import { installFormShim } from "../app/formShim";
 
@@ -16,11 +17,11 @@ import { installFormShim } from "../app/formShim";
 installFormShim();
 
 /** The new pages; the other addresses are the old panel's. */
-const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": Vk };
+const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": Vk, "#opens": Opens };
 
 interface Section { label: string; tabs: [hash: string, label: string][] }
 const SECTIONS: Section[] = [
-  { label: "Статистика", tabs: [["#stats", "Статистика"]] },
+  { label: "Статистика", tabs: [["#stats", "Статистика"], ["#opens", "Откуда открывают"]] },
   { label: "Люди", tabs: [["#messages", "Сообщения"], ["#reviews", "Отзывы"]] },
   { label: "Рецепты", tabs: [["#recipes", "Все рецепты"], ["#collections", "Подборки"], ["#new", "Новые рецепты"], ["#improve", "Доработка"], ["#school", "Школа"], ["#files", "Файлы каталога"]] },
   { label: "Шеф", tabs: [["#teach", "Обучение Шефа"]] },

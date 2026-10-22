@@ -200,6 +200,7 @@ try {
     elseif ($route === 'admin.logout' && $method === 'POST') admin_logout();
     elseif ($route === 'admin.hash' && $method === 'POST') admin_hash(read_json_body(2000));
     elseif ($route === 'admin.stats' && $method === 'GET') { require_admin(); admin_stats((int)($_GET['days'] ?? 30)); }
+    elseif ($route === 'admin.opens' && $method === 'GET') { require_admin(); admin_opens((int)($_GET['days'] ?? 30)); }
     // Forget one query in the statistics ("абвгд", a test, a query already answered by a new recipe).
     elseif ($route === 'admin.stats.forget' && $method === 'POST') { require_admin(true); $b = read_json_body(2000); $text = $b['text'] ?? null;
         if (!is_string($text) || $text === '' || strlen($text) > 600) throw new ApiError(400, 'validation', 'Нет текста запроса.');

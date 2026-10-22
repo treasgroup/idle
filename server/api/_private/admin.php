@@ -4,6 +4,8 @@
 
 const EVENT_TYPES = ['visit', 'query', 'open', 'cart', 'favorite', 'cook_start', 'cook_done', 'wrong', 'share', 'rate', 'trouble', 'pick'];
 const EVENT_SOURCES = ['chat', 'voice', 'search', 'filters', 'option', 'mobile', 'desktop', 'pwa', 'app', 'home', ''];
+// Where a recipe was opened (app/openFrom.ts): a place on Главная or the screen. For «Откуда открывают» in the admin.
+const OPEN_SOURCES = ['hero', 'today', 'holiday', 'season', 'collections', 'pick', 'recent', 'home', 'chat', 'recipes', 'favorites', 'menu', 'shopping', 'pantry', 'learn', 'profile', 'cook', 'dinner'];
 const ENTRY_KINDS = ['home', 'recipe-link', 'recipe-page', 'poll', 'family', 'login', 'tab', 'app'];
 const CATALOG_NAME = '/^[0-9A-Za-z][0-9A-Za-z._-]{0,60}\.json$/';
 const RECIPE_ID = '/^[a-z0-9]+(-[a-z0-9]+)*$/';
@@ -59,7 +61,7 @@ function record_events(array $body): void {
             if ($e['type'] === 'trouble' && $text !== null) $text = cut($text, 60); // a chosen reason, not a story
             if ($e['type'] === 'query' && ($text === null || $text === '')) continue;
             $value = isset($e['count']) && is_int($e['count']) ? max(-1, min(9999, $e['count'])) : null; // -1 = the request was not understood
-            $source = in_array($e['source'] ?? '', EVENT_SOURCES, true) ? (string)($e['source'] ?? '') : '';
+            $source = in_array($e['source'] ?? '', $e['type'] === 'open' ? OPEN_SOURCES : EVENT_SOURCES, true) ? (string)($e['source'] ?? '') : '';
             // A visit says where it came from and what it opened first (short keys, checked here).
             $ref = $e['type'] === 'visit' && isset($e['ref']) && is_string($e['ref']) && preg_match('/^[a-z0-9.-]{1,60}$/', $e['ref']) ? $e['ref'] : null;
             $entry = $e['type'] === 'visit' && in_array($e['entry'] ?? '', ENTRY_KINDS, true) ? $e['entry'] : null;
@@ -149,6 +151,15 @@ function admin_status(): void {
 }
 
 // ---------- Statistics ----------
+/** «Откуда открывают»: recipe opens by place (app/openFrom.ts) — opens and different people, for the last days. */
+function admin_opens(int $days): void {
+    $days = max(1, min(400, $days));
+    $from = date('Y-m-d', time() - ($days - 1) * 86400);
+    $st = db()->prepare("SELECT COALESCE(NULLIF(source, ''), '-') AS source, COUNT(*) AS opens, COUNT(DISTINCT visitor) AS people FROM events WHERE type = 'open' AND day >= ? GROUP BY COALESCE(NULLIF(source, ''), '-') ORDER BY opens DESC");
+    $st->execute([$from]);
+    $rows = array_map(function ($r) { return ['source' => (string)$r['source'], 'opens' => (int)$r['opens'], 'people' => (int)$r['people']]; }, $st->fetchAll());
+    send_json(['days' => $days, 'rows' => $rows]);
+}
 function admin_stats(int $days): void {
     $days = max(1, min(400, $days));
     $from = date('Y-m-d', time() - ($days - 1) * 86400);
