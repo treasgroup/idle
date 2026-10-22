@@ -24,3 +24,8 @@ test("joining words still do not narrow the search", () => {
   expect(first("суп из тыквы")).toMatch(/тыкв/i);
   expect(first("борщ")).toMatch(/^Борщ/);
 });
+
+test("a typo in the last letter of a short word («борш», «плоф»)", () => {
+  expect(first("борш")).toMatch(/^Борщ/);
+  expect(first("плоф")).toMatch(/^Плов/);
+});

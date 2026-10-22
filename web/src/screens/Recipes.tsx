@@ -3,7 +3,7 @@ import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState
 import { ArrowUpRight, BookOpen, Heart, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
 import { useRatings } from "../app/ratings";
 import {
-  CATALOG_SECTIONS, freshConditions, isLenten, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, searchRecipes,
+  CATALOG_SECTIONS, courseOf, freshConditions, isLenten, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, searchRecipes,
   type Recipe,
 } from "../engine";
 import { photoFirst } from "../app/photoFirst";
@@ -14,6 +14,7 @@ import { goChat } from "../app/chatNav";
 import { replace, routeHash, takeRecipesView } from "../app/router";
 import { SECTIONS } from "./Home";
 import { plainWords } from "../app/colloquial";
+import { readQuery } from "../app/searchWords";
 import { RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { ChefAvatar, Chip, Empty, Sheet, cx } from "../components/ui";
 import { mealNow } from "./Home";
@@ -58,6 +59,7 @@ const GROUPS: { title: string; items: Filter[] }[] = [
   ] },
 ];
 const ALL = GROUPS.flatMap((g) => g.items);
+const CORE: Record<string, string[]> = { sweet: ["dessert", "baking"], breakfast: ["breakfast"], baking: ["baking"] };
 const NONE: Filters = { time: null, on: [] };
 
 function applyFilters(list: Recipe[], f: Filters, dish: string | null): Recipe[] {
@@ -138,7 +140,28 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
 
   const base = view === "saved" ? saved : view === "book" ? book : ranked;
   // Search goes over the whole catalog in «Все», and inside the list in the other views.
-  const found = useMemo(() => (query ? (view === "all" ? searchRecipes(query) : searchRecipes(query, base)) : base), [query, view, base]);
+  // Equal matches keep the default order (the meal now, the best rated), the rest of the catalog after them.
+  const ordered = useMemo(() => { const seen = new Set(ranked.map((r) => r.id)); return [...ranked, ...recipes().filter((r) => !seen.has(r.id))]; },
+    [ranked, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  // «суп без мяса», «десерт», «быстро», «пп»: the filter words work as filters (app/searchWords), the rest as text;
+  // when that leaves nothing, the query is searched as typed.
+  const { found, said } = useMemo(() => {
+    if (!query) return { found: base, said: [] as string[] };
+    const pool = view === "all" ? ordered : base;
+    const plain = searchRecipes(query, pool);
+    const read = readQuery(query);
+    if (read.text === query.trim()) return { found: plain, said: [] };
+    const tagged = (list: Recipe[]) => (read.tag ? list.filter((r) => r.tags.includes(read.tag!)) : list);
+    // «десерт», «на завтрак»: the desserts and breakfasts themselves before the pies and pancakes also eaten so.
+    const core = read.dish ? CORE[read.dish] ?? [] : [];
+    const narrowed = tagged(applyFilters(read.text ? searchRecipes(read.text, pool) : pool, { time: read.time, on: read.on }, read.dish))
+      .map((r, i) => ({ r, i, k: core.length && !core.includes(courseOf(r)) ? 1 : 0 })).sort((a, b) => a.k - b.k || a.i - b.i).map((x) => x.r);
+    // A title with every word of the query is what was meant («огурцы быстрые» is «Огурцы малосольные быстрые»): first.
+    const words = query.toLowerCase().replace(/ё/g, "е").split(/[^a-zа-я0-9]+/).filter((w) => w.length >= 3).map((w) => w.slice(0, Math.max(3, w.length - 2)));
+    const named = plain.filter((r) => { const t = r.title.toLowerCase().replace(/ё/g, "е"); return words.length > 0 && words.every((w) => t.includes(w)); });
+    const both = [...named, ...narrowed.filter((r) => !named.includes(r))];
+    return narrowed.length ? { found: both, said: read.said } : { found: plain, said: [] };
+  }, [query, view, base, ordered]);
   const list = useMemo(() => applyFilters(found, f, dish), [found, f, dish]);
   // Device chips appear only when the catalog has dishes for them.
   const devices = useMemo(() => new Set(ALL.filter((x) => x.device && ranked.some(x.test)).map((x) => x.id)), [ranked]);
@@ -177,7 +200,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   // Until something is chosen, the big section tiles are the way in; the same dishes as chips would repeat them.
   const sections = mode === "search" && !query && !dish && !active.length;
   const countLine = query
-    ? "Нашлось: " + list.length + " " + recipesWord(list.length)
+    ? "Нашлось: " + list.length + " " + recipesWord(list.length) + (said.length ? " · " + said.join(", ") : "")
     : view === "saved" ? "Сохранено: " + list.length + " " + recipesWord(list.length)
       : view === "book" ? "Приготовлено: " + list.length + " " + recipesWord(list.length)
         : sections ? (browseAll ? "Все рецепты" : "Популярное") : list.length + " " + recipesWord(list.length);

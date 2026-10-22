@@ -3021,7 +3021,8 @@ function sD(e, t, n = 2) {
   }
   return a[e.length][t.length];
 }
-var RS = new Set("аеиоуыэюя".split("")),
+var SOUND_PAIR = new Set(["шщ", "щш", "жш", "шж", "зс", "сз", "дт", "тд", "бп", "пб", "вф", "фв", "гк", "кг"]),
+  RS = new Set("аеиоуыэюя".split("")),
   rD = new Set([
     "пост",
     "гост",
@@ -3104,7 +3105,8 @@ function Fa(e, t) {
     let a = 0;
     for (let i = 0; i < 4; i++)
       if (e[i] !== t[i]) {
-        if (!RS.has(e[i]) || !RS.has(t[i])) return !1;
+        // A vowel for a vowel, or letters that sound alike («борш» — борщ, «плоф» — плов).
+        if (!(RS.has(e[i]) && RS.has(t[i])) && !SOUND_PAIR.has(e[i] + t[i])) return !1;
         a++;
       }
     return a === 1;
@@ -4103,9 +4105,22 @@ function Qe(e, t, n, a = 3, i = {}) {
         ],
         b = t.mood && p.tags.includes(t.mood),
         g = t.mood === "sweet" && ["baking", "dessert"].includes(Ne(p)) ? 4 : 0,
+        // What was not asked for goes lower: a side, a sauce or a drink is not a dinner by itself («блюда без мяса» is
+        // not «Кускус с маслом»); a dish asked by name comes as it usually is — «хочу борщ» is not first the lenten,
+        // the children's or the multicooker one.
+        askedKind = t.desired.some((R) => Hp(R) && nt(p, R)),
+        byName = t.desired.some((R) => R.startsWith("dish:") && !/^dish:(multicooker|airfryer|microwave|oven|freezer)$/.test(R)),
+        course = Ne(p),
+        device = /в (мультиварке|аэрогриле|микроволновке)/i.exec(p.title),
+        aside =
+          (askedKind ? 0 : ["side", "sauce", "drink"].includes(course) ? 4 : course === "snack" ? 2 : 0) +
+          (device && !t.desired.includes("dish:" + { мультиварке: "multicooker", аэрогриле: "airfryer", микроволновке: "microwave" }[device[1].toLowerCase()]) ? 1 : 0) +
+          (/для (детей|малышей|ребёнка|ребенка)/i.test(p.title) && t.occasion !== "kids" ? 1.5 : 0) +
+          (byName && !t.vegetarian && /постн/i.test(p.title) ? 1.5 : 0),
         x =
           (b ? 8 : 0) +
-          g +
+          g -
+          aside +
           y.length * 4 -
           S.length * 3 -
           (t.available.length ? v.length : 0) +
@@ -8051,8 +8066,11 @@ function em(e, t, n, a, i) {
       t,
       1 / 0,
     ),
+    // «на завтрак»: breakfast dishes themselves first (porridge, omelette, syrniki), not bread, a smoothie or a pie
+    // that is also eaten in the morning; those only when too few are left.
+    q = n === "breakfast" ? s.filter((f) => Ne(f.recipe) === "breakfast") : [],
     r = n ? s.filter((f) => r_[n](f.recipe)) : s,
-    o = r.length >= 3 ? r : s,
+    o = q.length >= 3 ? q : r.length >= 3 ? r : s,
     l = i >>> 0 || 1,
     u = () => (
       (l ^= l << 13),
@@ -8642,10 +8660,14 @@ function Er(e) {
   }
   let g = r ? Wp(i) : [],
     x = o.getHours(),
+    // «ужин до 400 ккал» at midnight is still a dinner: the meal said in words comes before the clock.
+    said = /(^|[^а-яё])(ужин|поужинать)/i.test(t) ? "dinner" : /(^|[^а-яё])(обед|пообедать)/i.test(t) ? "lunch" : /(^|[^а-яё])(завтрак|позавтракать)/i.test(t) ? "breakfast" : void 0,
     N =
       w.desired.some((k) => k.startsWith("dish:")) || w.mood === "sweet"
         ? void 0
-        : x >= 5 && x < 11
+        : said
+          ? said
+          : x >= 5 && x < 11
           ? "breakfast"
           : x >= 11 && x < 16
             ? "lunch"

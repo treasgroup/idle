@@ -523,7 +523,8 @@ var GC = [
       key: "sweet",
       label: "Сладкое",
       group: "dish",
-      test: (e) => e.tags.includes("sweet"),
+      // Not a main dish in a sweet-and-sour sauce or a salad with fruit: what is eaten as a sweet.
+      test: (e) => e.tags.includes("sweet") && !["main", "soup", "salad", "side", "sauce"].includes(Ne(e)),
     },
     {
       key: "quick",
