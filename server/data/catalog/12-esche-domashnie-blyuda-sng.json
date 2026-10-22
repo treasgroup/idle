@@ -55,13 +55,21 @@
           "id": "onion",
           "name": "Лук репчатый очищенный",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "cream",
           "name": "Сливки 10 %",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream",
+            "milk"
+          ]
         },
         {
           "id": "water",
@@ -73,7 +81,10 @@
           "id": "vegetable-oil",
           "name": "Масло растительное для лука и всех партий грибов",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "salt",
@@ -92,7 +103,11 @@
           "name": "Укроп для подачи",
           "amount": 10,
           "unit": "г",
-          "optional": true
+          "optional": true,
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         }
       ],
       "steps": [
@@ -245,7 +260,10 @@
           "id": "butter",
           "name": "Масло сливочное",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "salt",
@@ -372,7 +390,11 @@
           "id": "onion",
           "name": "Лук репчатый очищенный",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "white-bread",
@@ -384,7 +406,10 @@
           "id": "butter",
           "name": "Масло сливочное",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "water",
@@ -527,7 +552,11 @@
           "id": "onion",
           "name": "Лук репчатый очищенный",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "carrot",
@@ -545,7 +574,11 @@
           "id": "mayonnaise",
           "name": "Майонез «Провансаль» 67 %",
           "amount": 90,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -726,13 +759,20 @@
           "id": "minced-pork-beef",
           "name": "Свино-говяжий фарш, сырой",
           "amount": 450,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "minced-beef"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук очищенный",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "tomato",
@@ -744,7 +784,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -762,7 +805,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -933,7 +980,11 @@
           "id": "chicken-fillet",
           "name": "Куриное филе, сырое",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "turkey-fillet",
+            "chicken-thigh-fillet"
+          ]
         },
         {
           "id": "mushroom",
@@ -945,13 +996,21 @@
           "id": "onion",
           "name": "Репчатый лук очищенный",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "sour-cream",
           "name": "Сметана 15–20 %",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "plain-yogurt",
+            "cream"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -975,7 +1034,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "water",
@@ -1306,7 +1369,11 @@
           "id": "onion",
           "name": "Репчатый лук очищенный",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -1452,7 +1519,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "egg",
@@ -1488,7 +1558,11 @@
           "id": "onion",
           "name": "Репчатый лук очищенный",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "black-pepper",
@@ -1640,7 +1714,10 @@
           "id": "milk",
           "name": "Молоко для теста",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "water",
@@ -1694,7 +1771,11 @@
           "id": "onion",
           "name": "Репчатый лук очищенный",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "black-pepper",
@@ -1851,7 +1932,11 @@
           "id": "sour-cream",
           "name": "Сметана 15–20%",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "plain-yogurt",
+            "kefir"
+          ]
         },
         {
           "id": "egg",
@@ -2007,7 +2092,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "sugar",
@@ -2025,7 +2113,10 @@
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         }
       ],
       "appliances": [

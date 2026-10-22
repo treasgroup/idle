@@ -145,13 +145,20 @@
                     "id": "onion",
                     "name": "Репчатый лук, масса после очистки",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 25,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "water",
@@ -278,7 +285,10 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -296,7 +306,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для сковороды",
                     "amount": 10,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -415,13 +428,20 @@
                     "id": "onion",
                     "name": "Репчатый лук, масса после очистки",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "water",
@@ -546,13 +566,20 @@
                     "id": "onion",
                     "name": "Репчатый лук, масса после очистки",
                     "amount": 80,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -672,7 +699,10 @@
                     "id": "lavash",
                     "name": "Лаваш тонкий пшеничный",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "wheat-tortilla"
+                    ]
                 },
                 {
                     "id": "cucumber",
@@ -684,19 +714,29 @@
                     "id": "tomato",
                     "name": "Помидор свежий",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato"
+                    ]
                 },
                 {
                     "id": "mayonnaise",
                     "name": "Майонез 67 %",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt"
+                    ]
                 },
                 {
                     "id": "sour-cream",
                     "name": "Сметана 15–20 %",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -891,7 +931,10 @@
                     "id": "honey",
                     "name": "Мёд жидкий",
                     "amount": 12,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "sugar"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -1103,7 +1146,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для всех партий жарки",
                     "amount": 60,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1296,19 +1342,30 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 80,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "green-onion",
                     "name": "Зелёный лук",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "leek",
+                        "parsley"
+                    ]
                 },
                 {
                     "id": "butter",
                     "name": "Сливочное масло",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "vegetable-oil"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1453,19 +1510,29 @@
                     "id": "frankfurters",
                     "name": "Сосиски молочные без оболочки",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "boiled-sausage"
+                    ]
                 },
                 {
                     "id": "hard-cheese",
                     "name": "Твёрдый сыр",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
                 },
                 {
                     "id": "butter",
                     "name": "Сливочное масло",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "vegetable-oil"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -1477,7 +1544,10 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "water",
@@ -1621,13 +1691,20 @@
                     "id": "hard-cheese",
                     "name": "Твёрдый сыр",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло для жарки",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1753,25 +1830,39 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 60,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "ham",
                     "name": "Ветчина свиная варёная, готовая",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "boiled-sausage",
+                        "smoked-chicken-breast"
+                    ]
                 },
                 {
                     "id": "hard-cheese",
                     "name": "Твёрдый сыр",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "mozzarella",
+                        "pecorino-romano"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 10,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",

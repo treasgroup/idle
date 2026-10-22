@@ -242,7 +242,10 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 500,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -284,7 +287,11 @@
                     "id": "sour-cream",
                     "name": "Сметана 15–20 %",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
                 }
             ],
             "appliances": [
@@ -413,7 +420,11 @@
                     "id": "kefir",
                     "name": "Кефир 2,5 %",
                     "amount": 260,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "matsun"
+                    ]
                 },
                 {
                     "id": "wheat-flour",
@@ -566,7 +577,11 @@
                     "id": "kefir",
                     "name": "Кефир 2,5 %",
                     "amount": 260,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "matsun"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -743,7 +758,11 @@
                     "id": "raisins",
                     "name": "Изюм без косточек",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "dried-apricot",
+                        "prunes"
+                    ]
                 },
                 {
                     "id": "vanilla-sugar",
@@ -910,7 +929,11 @@
                     "id": "sour-cream",
                     "name": "Сметана 15–20 %",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "kefir"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -1084,7 +1107,11 @@
                     "id": "raisins",
                     "name": "Изюм без косточек",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "dried-apricot",
+                        "prunes"
+                    ]
                 },
                 {
                     "id": "sugar",
@@ -1108,7 +1135,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для жарки",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "water",
@@ -1241,7 +1271,11 @@
                     "id": "onion",
                     "name": "Репчатый лук",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "wheat-flour",
@@ -1253,7 +1287,11 @@
                     "id": "kefir",
                     "name": "Кефир 2,5 %",
                     "amount": 210,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "matsun"
+                    ]
                 },
                 {
                     "id": "baking-soda",
@@ -1462,7 +1500,10 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 190,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "instant-yeast",
@@ -1690,7 +1731,10 @@
                     "id": "cinnamon",
                     "name": "Корица молотая",
                     "amount": 2,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cardamom-ground"
+                    ]
                 }
             ],
             "appliances": [
@@ -1808,7 +1852,11 @@
                     "id": "sour-cream",
                     "name": "Сметана 20 %",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "kefir"
+                    ]
                 },
                 {
                     "id": "cocoa-powder",
@@ -1977,7 +2025,11 @@
                     "id": "sour-cream",
                     "name": "Сметана 20 %, густая",
                     "amount": 700,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "kefir"
+                    ]
                 }
             ],
             "appliances": [

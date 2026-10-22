@@ -1132,7 +1132,11 @@
           "id": "bacon",
           "name": "Бекон сырой солёно-копчёный",
           "amount": 175,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "smoked-pork",
+            "ham"
+          ]
         },
         {
           "id": "egg",
@@ -1150,7 +1154,11 @@
           "id": "hard-cheese",
           "name": "Пармезан или другой выдержанный твёрдый сыр",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "black-pepper",
@@ -1329,13 +1337,19 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 800,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -1347,7 +1361,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 750,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "butter",
@@ -1371,7 +1388,10 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "pecorino-romano"
+          ]
         },
         {
           "id": "dried-oregano",
@@ -1549,19 +1569,31 @@
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil",
+            "parsley"
+          ]
         },
         {
           "id": "walnut",
           "name": "Грецкий орех без скорлупы",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "hazelnut",
+            "almond"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "garlic",
@@ -1721,13 +1753,20 @@
           "id": "capers",
           "name": "Каперсы без рассола",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "pickled-cucumber"
+          ]
         },
         {
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 700,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato",
+            "tomato-paste"
+          ]
         },
         {
           "id": "garlic",
@@ -1751,13 +1790,21 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "salt",
@@ -1897,7 +1944,10 @@
           "id": "minced-beef",
           "name": "Фарш говяжий, сырой, 10 % жира",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "minced-pork-beef"
+          ]
         },
         {
           "id": "white-bread",
@@ -1927,13 +1977,21 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 800,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato",
+            "tomato-paste"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -1951,7 +2009,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "salt",
@@ -2148,7 +2210,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -2172,13 +2238,21 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 70,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "salt",
@@ -2327,7 +2401,10 @@
           "id": "chicken-thigh-fillet",
           "name": "Филе куриного бедра без кожи и кости, сырое",
           "amount": 450,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "chicken-fillet"
+          ]
         },
         {
           "id": "onion",
@@ -2357,19 +2434,30 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -2535,7 +2623,11 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 700,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato",
+            "tomato-paste"
+          ]
         },
         {
           "id": "garlic",
@@ -2547,19 +2639,30 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil",
+            "parsley"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "salt",
@@ -2730,7 +2833,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "water",
@@ -2742,7 +2848,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -2766,13 +2876,20 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 70,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "dried-thyme",
           "name": "Тимьян сушёный",
           "amount": 0.7,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-oregano"
+          ]
         },
         {
           "id": "salt",
@@ -2955,13 +3072,19 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "spinach",
@@ -2991,13 +3114,21 @@
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil",
+            "parsley"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "salt",
@@ -3163,7 +3294,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -3175,7 +3310,11 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato",
+            "tomato-paste"
+          ]
         },
         {
           "id": "cabbage",
@@ -3193,13 +3332,19 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "dried-thyme",
           "name": "Тимьян сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-oregano"
+          ]
         },
         {
           "id": "salt",
@@ -3370,7 +3515,10 @@
           "id": "dried-oregano",
           "name": "Орегано сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil"
+          ]
         },
         {
           "id": "dried-thyme",
@@ -3661,7 +3809,11 @@
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "arugula",
+            "parsley"
+          ]
         },
         {
           "id": "garlic",
@@ -3805,7 +3957,11 @@
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "arugula",
+            "parsley"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -3928,13 +4084,19 @@
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 70,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "capers",
           "name": "Каперсы без рассола",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "pickled-cucumber"
+          ]
         },
         {
           "id": "black-olive",
@@ -3946,7 +4108,11 @@
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "arugula",
+            "parsley"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -3958,7 +4124,11 @@
           "id": "rice-vinegar",
           "name": "Рисовый уксус несладкий 4,5 %",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -4089,7 +4259,11 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 700,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato",
+            "tomato-paste"
+          ]
         },
         {
           "id": "onion",
@@ -4107,7 +4281,11 @@
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil",
+            "parsley"
+          ]
         },
         {
           "id": "mozzarella",
@@ -4119,7 +4297,10 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 90,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "pecorino-romano"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -4131,7 +4312,11 @@
           "id": "dried-oregano",
           "name": "Орегано сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-thyme",
+            "dried-basil"
+          ]
         },
         {
           "id": "salt",
@@ -4304,7 +4489,10 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "pecorino-romano"
+          ]
         },
         {
           "id": "mozzarella",
@@ -4316,7 +4504,11 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato",
+            "tomato-paste"
+          ]
         },
         {
           "id": "garlic",
@@ -4334,13 +4526,21 @@
           "id": "dried-oregano",
           "name": "Орегано сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-thyme",
+            "dried-basil"
+          ]
         },
         {
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil",
+            "parsley"
+          ]
         },
         {
           "id": "salt",
@@ -4510,13 +4710,20 @@
           "id": "tomato",
           "name": "Свежие помидоры",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -4534,13 +4741,20 @@
           "id": "dried-thyme",
           "name": "Тимьян сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-oregano"
+          ]
         },
         {
           "id": "fresh-basil",
           "name": "Свежие листья базилика",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-basil",
+            "parsley"
+          ]
         },
         {
           "id": "salt",
@@ -4695,7 +4909,11 @@
           "id": "bacon",
           "name": "Бекон сырой солёно-копчёный",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "smoked-pork",
+            "ham"
+          ]
         },
         {
           "id": "egg",
@@ -4707,7 +4925,10 @@
           "id": "cream",
           "name": "Сливки 10%",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream"
+          ]
         },
         {
           "id": "milk",
@@ -4719,7 +4940,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "ground-nutmeg",
@@ -4906,13 +5131,21 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "feta-cheese",
           "name": "Сыр фета без рассола",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "brynza",
+            "adyghe-cheese"
+          ]
         },
         {
           "id": "egg",
@@ -4924,7 +5157,10 @@
           "id": "cream",
           "name": "Сливки 10%",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream"
+          ]
         },
         {
           "id": "milk",
@@ -4942,7 +5178,11 @@
           "id": "dill",
           "name": "Укроп",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "ground-nutmeg",
@@ -5125,7 +5365,10 @@
           "id": "beef-stock",
           "name": "Говяжий бульон жидкий готовый без соли",
           "amount": 1500,
-          "unit": "мл"
+          "unit": "мл",
+          "swap": [
+            "water"
+          ]
         },
         {
           "id": "garlic",
@@ -5137,7 +5380,10 @@
           "id": "dried-thyme",
           "name": "Тимьян сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-oregano"
+          ]
         },
         {
           "id": "bay-leaf",
@@ -5155,7 +5401,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 160,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "salt",
@@ -5299,25 +5549,39 @@
           "id": "ham",
           "name": "Ветчина свиная варёная без молочных и соевых добавок",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "boiled-sausage",
+            "smoked-chicken-breast"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "pecorino-romano",
+            "processed-cheese"
+          ]
         },
         {
           "id": "milk",
           "name": "Молоко",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -5489,13 +5753,20 @@
           "id": "dill",
           "name": "Укроп",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -5646,13 +5917,20 @@
           "id": "frozen-peas",
           "name": "Замороженный зелёный горошек",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-peas"
+          ]
         },
         {
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato",
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "beef-stock",
@@ -5670,7 +5948,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "butter",
@@ -5688,7 +5969,10 @@
           "id": "dried-thyme",
           "name": "Тимьян сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-oregano"
+          ]
         },
         {
           "id": "salt",
@@ -5862,7 +6146,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "baking-powder",
@@ -5898,7 +6185,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         }
       ],
       "appliances": [
@@ -6062,7 +6352,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -6203,13 +6496,21 @@
           "id": "ham",
           "name": "Ветчина свиная варёная без молочных и соевых добавок",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "boiled-sausage",
+            "smoked-chicken-breast"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "egg",
@@ -6233,7 +6534,10 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "salt",
@@ -6368,19 +6672,29 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 220,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "bell-pepper",
           "name": "Болгарский перец",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "zucchini"
+          ]
         },
         {
           "id": "tomato",
           "name": "Свежие помидоры",
           "amount": 350,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato"
+          ]
         },
         {
           "id": "carrot",
@@ -6440,7 +6754,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "salt",
@@ -6590,7 +6908,11 @@
           "id": "feta-cheese",
           "name": "Сыр фета без рассола",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "brynza",
+            "adyghe-cheese"
+          ]
         },
         {
           "id": "egg",
@@ -6602,19 +6924,30 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "dill",
           "name": "Укроп",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley"
+          ]
         },
         {
           "id": "butter",
@@ -6813,7 +7146,10 @@
           "id": "minced-beef",
           "name": "Фарш говяжий, сырой, 10 % жира",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "minced-pork-beef"
+          ]
         },
         {
           "id": "onion",
@@ -6831,7 +7167,10 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
@@ -6843,7 +7182,10 @@
           "id": "beef-stock",
           "name": "Говяжий бульон жидкий готовый без соли",
           "amount": 200,
-          "unit": "мл"
+          "unit": "мл",
+          "swap": [
+            "water"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -6873,7 +7215,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 90,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "egg",
@@ -7057,7 +7403,10 @@
           "id": "minced-beef",
           "name": "Фарш говяжий, сырой, 10 % жира",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "minced-pork-beef"
+          ]
         },
         {
           "id": "onion",
@@ -7075,7 +7424,10 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
@@ -7117,13 +7469,21 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "feta-cheese",
           "name": "Сыр фета без рассола",
           "amount": 90,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "brynza",
+            "adyghe-cheese"
+          ]
         },
         {
           "id": "egg-white",
@@ -7306,7 +7666,10 @@
           "id": "rice",
           "name": "Длиннозёрный рис",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "short-grain-rice"
+          ]
         },
         {
           "id": "carrot",
@@ -7324,7 +7687,10 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -7342,7 +7708,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -7354,7 +7723,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "salt",
@@ -7509,7 +7882,10 @@
           "id": "chicken-thigh-fillet",
           "name": "Филе куриного бедра без кожи и кости, сырое",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "chicken-fillet"
+          ]
         },
         {
           "id": "shrimp",
@@ -7545,7 +7921,10 @@
           "id": "frozen-peas",
           "name": "Замороженный зелёный горошек",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-peas"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -7569,13 +7948,20 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -7737,13 +8123,19 @@
           "id": "bell-pepper",
           "name": "Болгарский перец",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "zucchini"
+          ]
         },
         {
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 70,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "garlic",
@@ -7755,13 +8147,20 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "rice-vinegar",
           "name": "Рисовый уксус несладкий 4,5 %",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -7892,7 +8291,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "egg",
@@ -7934,13 +8337,19 @@
           "id": "beef-stock",
           "name": "Говяжий бульон жидкий готовый без соли",
           "amount": 450,
-          "unit": "мл"
+          "unit": "мл",
+          "swap": [
+            "water"
+          ]
         },
         {
           "id": "cream",
           "name": "Сливки 10%",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream"
+          ]
         },
         {
           "id": "ground-nutmeg",
@@ -7952,7 +8361,11 @@
           "id": "dill",
           "name": "Укроп",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "salt",
@@ -8122,7 +8535,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "carrot",
@@ -8134,19 +8551,30 @@
           "id": "cream",
           "name": "Сливки 10%",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream",
+            "milk"
+          ]
         },
         {
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "dill",
           "name": "Укроп",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "bay-leaf",
@@ -8290,19 +8718,30 @@
           "id": "bacon",
           "name": "Бекон сырой солёно-копчёный",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "smoked-pork",
+            "ham"
+          ]
         },
         {
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "rice-vinegar",
           "name": "Рисовый уксус несладкий 4,5 %",
           "amount": 55,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -8320,7 +8759,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "salt",
@@ -8468,19 +8911,30 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Сыр эмменталь, грюйер или другой хорошо плавящийся",
           "amount": 220,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 350,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "butter",
@@ -8516,7 +8970,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "water",
@@ -8675,7 +9133,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "egg",
@@ -8877,7 +9338,10 @@
           "id": "minced-beef",
           "name": "Фарш говяжий, сырой, 10 % жира",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "minced-pork-beef"
+          ]
         },
         {
           "id": "bell-pepper",
@@ -8907,13 +9371,21 @@
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato",
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "paprika",
@@ -8937,7 +9409,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -9090,13 +9565,20 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "tomato",
           "name": "Свежие помидоры",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato"
+          ]
         },
         {
           "id": "bell-pepper",
@@ -9120,7 +9602,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "cinnamon",
@@ -9138,7 +9624,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "salt",
@@ -9293,7 +9782,11 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 130,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "matsun"
+          ]
         },
         {
           "id": "onion",
@@ -9311,7 +9804,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "canned-tomato",
@@ -9323,7 +9819,11 @@
           "id": "cream",
           "name": "Сливки 10%",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream",
+            "milk"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -9341,7 +9841,10 @@
           "id": "garam-masala",
           "name": "Гарам масала, сухая смесь пряностей",
           "amount": 6,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "curry-powder"
+          ]
         },
         {
           "id": "cumin",
@@ -9546,7 +10049,11 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "matsun"
+          ]
         },
         {
           "id": "milk",
@@ -9558,7 +10065,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -9576,7 +10086,10 @@
           "id": "garam-masala",
           "name": "Гарам масала, сухая смесь пряностей",
           "amount": 4,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "curry-powder"
+          ]
         },
         {
           "id": "coriander",
@@ -9612,7 +10125,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -9754,7 +10271,11 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "matsun"
+          ]
         },
         {
           "id": "onion",
@@ -9772,13 +10293,19 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garam-masala",
           "name": "Гарам масала, сухая смесь пряностей",
           "amount": 5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "curry-powder"
+          ]
         },
         {
           "id": "coriander",
@@ -9832,7 +10359,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "salt",
@@ -10004,7 +10535,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -10016,7 +10550,10 @@
           "id": "garam-masala",
           "name": "Гарам масала, сухая смесь пряностей",
           "amount": 4,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "curry-powder"
+          ]
         },
         {
           "id": "coriander",
@@ -10052,13 +10589,20 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "water",
@@ -10227,7 +10771,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -10251,7 +10798,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.4,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -10263,13 +10814,20 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -10400,7 +10958,11 @@
           "id": "adyghe-cheese",
           "name": "Сыр адыгейский",
           "amount": 350,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "brynza",
+            "feta-cheese"
+          ]
         },
         {
           "id": "spinach",
@@ -10412,7 +10974,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -10424,13 +10990,20 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "cream",
           "name": "Сливки 10%",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream",
+            "milk"
+          ]
         },
         {
           "id": "butter",
@@ -10625,7 +11198,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -10655,13 +11231,20 @@
           "id": "garam-masala",
           "name": "Гарам масала, сухая смесь пряностей",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "curry-powder"
+          ]
         },
         {
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.4,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -10679,7 +11262,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -10811,7 +11398,11 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "kefir",
+            "sour-cream"
+          ]
         },
         {
           "id": "instant-yeast",
@@ -10984,7 +11575,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "cumin",
@@ -10996,7 +11590,10 @@
           "id": "garam-masala",
           "name": "Гарам масала, сухая смесь пряностей",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "curry-powder"
+          ]
         },
         {
           "id": "coriander",
@@ -11020,13 +11617,20 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -11183,19 +11787,28 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill"
+          ]
         },
         {
           "id": "garlic",
@@ -11383,7 +11996,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "garlic",
@@ -11425,7 +12041,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 8,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         }
       ],
       "appliances": [
@@ -11544,7 +12164,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 45,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "garlic",
@@ -11574,7 +12197,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         }
       ],
       "appliances": [
@@ -11708,13 +12335,19 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -11839,7 +12472,10 @@
           "id": "lavash",
           "name": "Лаваш тонкий пшеничный",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "wheat-tortilla"
+          ]
         },
         {
           "id": "romaine-lettuce",
@@ -11869,13 +12505,20 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "fresh-mint",
@@ -11887,7 +12530,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 45,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "garlic",
@@ -12055,13 +12701,20 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "cumin",
@@ -12207,13 +12860,20 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "matsun"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -12231,7 +12891,11 @@
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato",
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "paprika",
@@ -12249,7 +12913,11 @@
           "id": "dried-oregano",
           "name": "Орегано сушёный",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-thyme",
+            "dried-basil"
+          ]
         },
         {
           "id": "salt",
@@ -12375,7 +13043,10 @@
           "id": "bell-pepper",
           "name": "Болгарский перец",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "zucchini"
+          ]
         },
         {
           "id": "paprika",
@@ -12387,7 +13058,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 1.5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -12405,7 +13080,10 @@
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         }
       ],
       "appliances": [
@@ -12516,19 +13194,28 @@
           "id": "tomato",
           "name": "Свежие помидоры",
           "amount": 450,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato"
+          ]
         },
         {
           "id": "bell-pepper",
           "name": "Болгарский перец",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "zucchini"
+          ]
         },
         {
           "id": "vegetable-oil",
           "name": "Растительное масло",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "butter"
+          ]
         },
         {
           "id": "paprika",
@@ -12655,19 +13342,31 @@
           "id": "feta-cheese",
           "name": "Сыр фета без рассола",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "brynza",
+            "adyghe-cheese"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "parsley",
           "name": "Петрушка",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "egg",
@@ -12679,7 +13378,11 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "kefir",
+            "sour-cream"
+          ]
         },
         {
           "id": "milk",
@@ -12865,7 +13568,10 @@
           "id": "tomato-ketchup",
           "name": "Кетчуп томатный классический",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-paste"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -12883,7 +13589,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         }
       ],
       "appliances": [
@@ -13025,7 +13735,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -13043,13 +13757,21 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "water",
@@ -13181,7 +13903,10 @@
           "id": "chicken-thigh-fillet",
           "name": "Филе куриного бедра без кожи и кости, сырое",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "chicken-fillet"
+          ]
         },
         {
           "id": "onion",
@@ -13199,7 +13924,10 @@
           "id": "frozen-peas",
           "name": "Замороженный зелёный горошек",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-peas"
+          ]
         },
         {
           "id": "egg",
@@ -13211,13 +13939,19 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "tomato-ketchup",
           "name": "Кетчуп томатный классический",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-paste"
+          ]
         },
         {
           "id": "butter",
@@ -13408,7 +14142,11 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "apple",
@@ -13426,7 +14164,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "butter",
@@ -13462,7 +14203,10 @@
           "id": "honey",
           "name": "Мёд натуральный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sugar"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -13616,13 +14360,20 @@
           "id": "canned-tuna",
           "name": "Консервированный тунец в собственном соку без жидкости",
           "amount": 160,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-pink-salmon"
+          ]
         },
         {
           "id": "mayonnaise",
           "name": "Майонез «Провансаль» 67 % с яйцом и сухим молоком",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -13782,7 +14533,11 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -13924,13 +14679,20 @@
           "id": "romaine-lettuce",
           "name": "Салат романо (ромен), свежий",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "napa-cabbage"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -14101,7 +14863,10 @@
           "id": "chicken-thigh-fillet",
           "name": "Филе куриного бедра без кожи и кости, сырое",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "chicken-fillet"
+          ]
         },
         {
           "id": "ramen-noodles",
@@ -14131,7 +14896,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -14143,7 +14911,11 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -14319,13 +15091,20 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -14343,7 +15122,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "toasted-sesame-oil",
@@ -14361,7 +15144,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "salt",
@@ -14549,13 +15335,20 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -14567,7 +15360,10 @@
           "id": "oyster-sauce",
           "name": "Соус устричный готовый",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dark-soy-sauce"
+          ]
         },
         {
           "id": "sugar",
@@ -14752,19 +15548,29 @@
           "id": "peanut",
           "name": "Арахис сырой очищенный",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "walnut"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -14788,7 +15594,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "sugar",
@@ -14981,7 +15791,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -14999,7 +15812,10 @@
           "id": "oyster-sauce",
           "name": "Соус устричный готовый",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dark-soy-sauce"
+          ]
         },
         {
           "id": "tomato-ketchup",
@@ -15011,7 +15827,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "sugar",
@@ -15023,7 +15843,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "baking-soda",
@@ -15187,7 +16010,10 @@
           "id": "broccoli",
           "name": "Брокколи, сырая",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cauliflower"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -15199,7 +16025,10 @@
           "id": "oyster-sauce",
           "name": "Соус устричный готовый",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dark-soy-sauce"
+          ]
         },
         {
           "id": "sugar",
@@ -15211,7 +16040,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -15229,7 +16061,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -15377,7 +16212,11 @@
           "id": "chicken-fillet",
           "name": "Куриное филе",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "turkey-fillet",
+            "chicken-thigh-fillet"
+          ]
         },
         {
           "id": "egg",
@@ -15401,7 +16240,10 @@
           "id": "frozen-peas",
           "name": "Замороженный зелёный горошек",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-peas"
+          ]
         },
         {
           "id": "onion",
@@ -15443,13 +16285,20 @@
           "id": "curry-powder",
           "name": "Карри, сухая смесь пряностей с острым перцем",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "garam-masala"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "water",
@@ -15642,7 +16491,10 @@
           "id": "peanut",
           "name": "Арахис сырой очищенный",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "walnut"
+          ]
         },
         {
           "id": "tamarind-paste",
@@ -15654,7 +16506,10 @@
           "id": "fish-sauce",
           "name": "Соус рыбный без сои и пшеницы",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "soy-sauce"
+          ]
         },
         {
           "id": "sugar",
@@ -15666,7 +16521,11 @@
           "id": "oyster-sauce",
           "name": "Соус устричный готовый",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dark-soy-sauce",
+            "soy-sauce"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -15678,7 +16537,10 @@
           "id": "lime-juice",
           "name": "Сок лайма готовый 100%, без сахара",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "water",
@@ -15847,7 +16709,10 @@
           "id": "chicken-thigh-fillet",
           "name": "Филе куриного бедра без кожи и кости, сырое",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "chicken-fillet"
+          ]
         },
         {
           "id": "egg",
@@ -15859,7 +16724,10 @@
           "id": "broccoli",
           "name": "Брокколи, сырая",
           "amount": 350,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cauliflower"
+          ]
         },
         {
           "id": "spinach",
@@ -15895,7 +16763,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "sugar",
@@ -16071,7 +16943,11 @@
           "id": "canned-coconut-milk",
           "name": "Кокосовое молоко консервированное без сахара",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "heavy-cream",
+            "cream"
+          ]
         },
         {
           "id": "ginger",
@@ -16089,13 +16965,19 @@
           "id": "fish-sauce",
           "name": "Соус рыбный без сои и пшеницы",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "soy-sauce"
+          ]
         },
         {
           "id": "lime-juice",
           "name": "Сок лайма готовый 100%, без сахара",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "sugar",
@@ -16107,7 +16989,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "chili",
@@ -16257,7 +17143,10 @@
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "star-anise",
@@ -16275,7 +17164,10 @@
           "id": "fish-sauce",
           "name": "Соус рыбный без сои и пшеницы",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "soy-sauce"
+          ]
         },
         {
           "id": "sugar",
@@ -16293,7 +17185,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "green-onion",
@@ -16305,7 +17201,10 @@
           "id": "lime-juice",
           "name": "Сок лайма готовый 100%, без сахара",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "water",
@@ -16479,7 +17378,10 @@
           "id": "romaine-lettuce",
           "name": "Салат романо (ромен), свежий",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "napa-cabbage"
+          ]
         },
         {
           "id": "fresh-mint",
@@ -16491,19 +17393,29 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "fish-sauce",
           "name": "Соус рыбный без сои и пшеницы",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "soy-sauce"
+          ]
         },
         {
           "id": "lime-juice",
           "name": "Сок лайма готовый 100%, без сахара",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "sugar",
@@ -16704,7 +17616,10 @@
           "id": "zucchini",
           "name": "Кабачок",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "eggplant"
+          ]
         },
         {
           "id": "mushroom",
@@ -16950,13 +17865,21 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "soy-sauce",
@@ -17157,7 +18080,11 @@
           "id": "dried-apricot",
           "name": "Курага без косточек",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "raisins",
+            "prunes"
+          ]
         },
         {
           "id": "onion",
@@ -17175,13 +18102,19 @@
           "id": "canned-chickpea",
           "name": "Консервированный нут без жидкости",
           "amount": 240,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-beans"
+          ]
         },
         {
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "garlic",
@@ -17241,7 +18174,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "fresh-mint",
@@ -17381,7 +18318,10 @@
           "id": "chicken-thigh-fillet",
           "name": "Филе куриного бедра без кожи и кости, сырое",
           "amount": 600,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "chicken-fillet"
+          ]
         },
         {
           "id": "carrot",
@@ -17411,13 +18351,19 @@
           "id": "canned-chickpea",
           "name": "Консервированный нут без жидкости",
           "amount": 240,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-beans"
+          ]
         },
         {
           "id": "ginger",
           "name": "Имбирь свежий очищенный",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ginger-ground"
+          ]
         },
         {
           "id": "turmeric",
@@ -17459,7 +18405,11 @@
           "id": "parsley",
           "name": "Петрушка",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dill",
+            "cilantro"
+          ]
         },
         {
           "id": "water",
@@ -17615,19 +18565,29 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "tomato",
           "name": "Свежие помидоры",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato"
+          ]
         },
         {
           "id": "romaine-lettuce",
           "name": "Салат романо (ромен), свежий",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "napa-cabbage"
+          ]
         },
         {
           "id": "pickled-cucumber",
@@ -17639,7 +18599,11 @@
           "id": "mayonnaise",
           "name": "Майонез «Провансаль» 67 % с яйцом и сухим молоком",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -17810,19 +18774,29 @@
           "id": "mayonnaise",
           "name": "Майонез «Провансаль» 67 % с яйцом и сухим молоком",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "romaine-lettuce",
           "name": "Салат романо (ромен), свежий",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "napa-cabbage"
+          ]
         },
         {
           "id": "pickled-cucumber",
@@ -17991,7 +18965,11 @@
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato",
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "sugar",
@@ -18003,7 +18981,10 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "water",
@@ -18051,13 +19032,20 @@
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "matsun"
+          ]
         },
         {
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         }
       ],
       "appliances": [
@@ -18214,13 +19202,19 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "sugar",
@@ -18232,7 +19226,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "prepared-mustard",
@@ -18244,7 +19242,10 @@
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "salt",
@@ -18420,13 +19421,21 @@
           "id": "cream-cheese",
           "name": "Сливочный творожный сыр 30–35%",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mascarpone",
+            "ricotta"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -18456,7 +19465,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -18474,7 +19487,11 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         }
       ],
       "appliances": [
@@ -18599,7 +19616,10 @@
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "garlic",
@@ -18611,7 +19631,10 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
@@ -18629,7 +19652,11 @@
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "paprika",
@@ -18647,7 +19674,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "water",
@@ -18786,13 +19817,20 @@
           "id": "canned-beans",
           "name": "Консервированная фасоль без жидкости",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-chickpea",
+            "canned-black-beans"
+          ]
         },
         {
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 800,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "water",
@@ -18822,7 +19860,10 @@
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -18852,7 +19893,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 2,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "sugar",
@@ -18994,7 +20039,10 @@
           "id": "corn-tortilla",
           "name": "Тортильи кукурузные, готовые",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "wheat-tortilla"
+          ]
         },
         {
           "id": "tomato",
@@ -19006,7 +20054,10 @@
           "id": "romaine-lettuce",
           "name": "Салат романо (ромен), свежий",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "napa-cabbage"
+          ]
         },
         {
           "id": "hard-cheese",
@@ -19048,13 +20099,20 @@
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "paprika",
@@ -19224,7 +20282,10 @@
           "id": "corn-tortilla",
           "name": "Тортильи кукурузные, готовые",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "wheat-tortilla"
+          ]
         },
         {
           "id": "avocado",
@@ -19254,13 +20315,20 @@
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -19308,7 +20376,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -19450,7 +20522,11 @@
           "id": "chicken-fillet",
           "name": "Куриное филе",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "turkey-fillet",
+            "chicken-thigh-fillet"
+          ]
         },
         {
           "id": "rice",
@@ -19474,13 +20550,20 @@
           "id": "canned-corn",
           "name": "Кукуруза консервированная без жидкости",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-peas"
+          ]
         },
         {
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "onion",
@@ -19534,7 +20617,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -19675,7 +20762,10 @@
           "id": "canned-black-beans",
           "name": "Фасоль чёрная консервированная, без жидкости",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-beans"
+          ]
         },
         {
           "id": "canned-corn",
@@ -19687,19 +20777,30 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "paprika",
@@ -19845,7 +20946,10 @@
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "orange-juice",
@@ -19893,19 +20997,30 @@
           "id": "wheat-tortilla",
           "name": "Тортильи пшеничные, готовые",
           "amount": 240,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lavash"
+          ]
         },
         {
           "id": "sour-cream",
           "name": "Сметана 15–20%",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "plain-yogurt",
+            "cream"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -20034,7 +21149,11 @@
           "id": "chicken-fillet",
           "name": "Куриное филе",
           "amount": 450,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "turkey-fillet",
+            "chicken-thigh-fillet"
+          ]
         },
         {
           "id": "canned-beans",
@@ -20082,7 +21201,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "paprika",
@@ -20106,7 +21229,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 1,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -20118,7 +21245,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         }
       ],
       "appliances": [
@@ -20271,7 +21402,10 @@
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "tomato",
@@ -20283,19 +21417,30 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -20404,25 +21549,39 @@
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.4,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "salt",
@@ -20586,7 +21745,11 @@
           "id": "hard-cheese",
           "name": "Твёрдый сыр",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mozzarella",
+            "pecorino-romano"
+          ]
         },
         {
           "id": "tomato",
@@ -20604,19 +21767,30 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "sour-cream",
           "name": "Сметана 15–20%",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "plain-yogurt",
+            "cream"
+          ]
         }
       ],
       "appliances": [
@@ -20762,13 +21936,19 @@
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "lime-juice",
           "name": "Сок лайма без сахара",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice"
+          ]
         },
         {
           "id": "orange-juice",
@@ -20786,7 +21966,11 @@
           "id": "cilantro",
           "name": "Кинза свежая",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "dill"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -20954,19 +22138,29 @@
           "id": "minced-beef",
           "name": "Фарш говяжий, сырой, 10 % жира",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "minced-pork-beef"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "black-olive",
@@ -20996,7 +22190,10 @@
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "egg",
@@ -21133,25 +22330,38 @@
           "id": "smoked-pork",
           "name": "Свинина варёно-копчёная без кости, нежирный окорок",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ham"
+          ]
         },
         {
           "id": "bacon",
           "name": "Бекон сырой солёно-копчёный",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ham"
+          ]
         },
         {
           "id": "canned-black-beans",
           "name": "Фасоль чёрная консервированная, без жидкости",
           "amount": 800,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-beans"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "garlic",
@@ -21466,7 +22676,11 @@
           "id": "sour-cream",
           "name": "Сметана 15–20%",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "plain-yogurt",
+            "kefir"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -21478,7 +22692,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vanilla-sugar",
@@ -21922,13 +23139,19 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "cinnamon",
           "name": "Молотая корица",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cardamom-ground"
+          ]
         },
         {
           "id": "salt",
@@ -22072,13 +23295,19 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 25,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "cinnamon",
           "name": "Молотая корица",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cardamom-ground"
+          ]
         },
         {
           "id": "ground-nutmeg",
@@ -22239,7 +23468,11 @@
           "id": "cream-cheese",
           "name": "Сливочный творожный сыр 30–35%",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mascarpone",
+            "ricotta"
+          ]
         },
         {
           "id": "butter",
@@ -22251,13 +23484,21 @@
           "id": "walnut",
           "name": "Грецкий орех без скорлупы",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "hazelnut",
+            "almond"
+          ]
         },
         {
           "id": "plain-yogurt",
           "name": "Натуральный йогурт без сахара",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "kefir",
+            "sour-cream"
+          ]
         },
         {
           "id": "baking-powder",
@@ -22275,7 +23516,10 @@
           "id": "cinnamon",
           "name": "Молотая корица",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cardamom-ground"
+          ]
         },
         {
           "id": "vanilla-sugar",
@@ -22466,13 +23710,21 @@
           "id": "kefir",
           "name": "Кефир 2,5 %",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "plain-yogurt",
+            "matsun"
+          ]
         },
         {
           "id": "rice-vinegar",
           "name": "Уксус рисовый несладкий 4,5%",
           "amount": 5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lemon-juice",
+            "lime-juice"
+          ]
         },
         {
           "id": "vanilla-sugar",
@@ -22484,7 +23736,11 @@
           "id": "cream-cheese",
           "name": "Сливочный творожный сыр 30–35%",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "mascarpone",
+            "ricotta"
+          ]
         },
         {
           "id": "red-food-colouring",
@@ -22630,7 +23886,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 50,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "mascarpone",
@@ -22798,7 +24057,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "gelatin",
@@ -22921,7 +24183,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "egg-yolk",
@@ -23092,7 +24357,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "vanilla-sugar",
@@ -23261,7 +24529,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 500,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "egg-yolk",
@@ -23279,7 +24550,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "vanilla-sugar",
@@ -23425,7 +24699,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "egg",
@@ -23437,7 +24714,10 @@
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 35,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "sugar",
@@ -23573,7 +24853,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -23585,7 +24868,10 @@
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "sugar",
@@ -23609,7 +24895,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 15,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         }
       ],
       "appliances": [
@@ -23723,7 +25012,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 200,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "wheat-flour",
@@ -23747,7 +25039,11 @@
           "id": "raisins",
           "name": "Изюм без косточек",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "dried-apricot",
+            "prunes"
+          ]
         },
         {
           "id": "water",
@@ -23759,7 +25055,10 @@
           "id": "butter",
           "name": "Сливочное масло",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "vegetable-oil"
+          ]
         },
         {
           "id": "salt",
@@ -24042,7 +25341,10 @@
           "id": "cinnamon",
           "name": "Молотая корица",
           "amount": 3,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cardamom-ground"
+          ]
         }
       ],
       "appliances": [
@@ -24299,7 +25601,10 @@
           "id": "milk",
           "name": "Молоко",
           "amount": 400,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "cream"
+          ]
         },
         {
           "id": "heavy-cream",
@@ -24329,7 +25634,10 @@
           "id": "potato-starch",
           "name": "Крахмал картофельный",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "corn-starch"
+          ]
         },
         {
           "id": "water",
@@ -24470,7 +25778,11 @@
           "id": "smoked-pork",
           "name": "Свинина варёно-копчёная без кости, нежирный окорок",
           "amount": 180,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "ham",
+            "bacon"
+          ]
         },
         {
           "id": "rice",
@@ -24488,7 +25800,10 @@
           "id": "canned-tomato",
           "name": "Томаты в собственном соку",
           "amount": 300,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "tomato"
+          ]
         },
         {
           "id": "tomato-paste",
@@ -24542,7 +25857,11 @@
           "id": "chili",
           "name": "Молотый перец чили",
           "amount": 0.5,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "fresh-chili",
+            "hot-pepper-sauce"
+          ]
         },
         {
           "id": "black-pepper",
@@ -24560,7 +25879,11 @@
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         }
       ],
       "appliances": [

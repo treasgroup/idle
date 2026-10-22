@@ -201,19 +201,31 @@
           "id": "canned-peas",
           "name": "Горошек консервированный без жидкости",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "frozen-peas",
+            "canned-corn"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 80,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "salt",
@@ -371,19 +383,30 @@
           "id": "canned-peas",
           "name": "Горошек консервированный без жидкости",
           "amount": 150,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "frozen-peas",
+            "canned-corn"
+          ]
         },
         {
           "id": "red-onion",
           "name": "Красный лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "onion"
+          ]
         },
         {
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 90,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "salt",
@@ -548,13 +571,21 @@
           "id": "canned-peas",
           "name": "Горошек консервированный без жидкости",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "frozen-peas",
+            "canned-corn"
+          ]
         },
         {
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 40,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -714,13 +745,21 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 120,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "water",
@@ -868,19 +907,30 @@
           "id": "canned-corn",
           "name": "Кукуруза консервированная без жидкости",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-peas"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 70,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "salt",
@@ -1022,7 +1072,11 @@
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "salt",
@@ -1156,13 +1210,21 @@
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 100,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "green-onion",
           "name": "Зелёный лук",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "leek",
+            "parsley"
+          ]
         },
         {
           "id": "salt",
@@ -1321,7 +1383,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -1440,7 +1505,11 @@
           "id": "mayonnaise",
           "name": "Майонез 67 %",
           "amount": 60,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "sour-cream",
+            "plain-yogurt"
+          ]
         },
         {
           "id": "salt",
@@ -1453,7 +1522,11 @@
           "name": "Укроп",
           "amount": 10,
           "unit": "г",
-          "optional": true
+          "optional": true,
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "water",
@@ -1587,7 +1660,10 @@
           "id": "lemon-juice",
           "name": "Лимонный сок",
           "amount": 30,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "lime-juice"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -1722,13 +1798,21 @@
           "id": "onion",
           "name": "Репчатый лук",
           "amount": 250,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "red-onion",
+            "leek"
+          ]
         },
         {
           "id": "tomato-paste",
           "name": "Томатная паста",
           "amount": 75,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "canned-tomato",
+            "tomato-ketchup"
+          ]
         },
         {
           "id": "garlic",
@@ -1881,7 +1965,11 @@
           "id": "dill",
           "name": "Укроп",
           "amount": 10,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "vegetable-oil",
@@ -2001,7 +2089,11 @@
           "id": "dill",
           "name": "Укроп",
           "amount": 20,
-          "unit": "г"
+          "unit": "г",
+          "swap": [
+            "parsley",
+            "green-onion"
+          ]
         },
         {
           "id": "garlic",

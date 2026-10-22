@@ -59,7 +59,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -71,19 +75,30 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "sour-cream",
                     "name": "Сметана 15–20 %",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло для овощей",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -341,7 +356,10 @@
                     "id": "minced-pork-beef",
                     "name": "Фарш свино-говяжий, сырой",
                     "amount": 600,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "minced-beef"
+                    ]
                 },
                 {
                     "id": "rice",
@@ -353,7 +371,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -365,13 +387,19 @@
                     "id": "tomato",
                     "name": "Помидоры свежие",
                     "amount": 350,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -621,7 +649,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 180,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -633,13 +665,20 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 60,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло для всех партий обжарки",
                     "amount": 35,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -799,7 +838,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 180,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -811,7 +854,11 @@
                     "id": "sour-cream",
                     "name": "Сметана 15–20 %",
                     "amount": 300,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
                 },
                 {
                     "id": "wheat-flour",
@@ -823,7 +870,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для тефтелей и лука",
                     "amount": 35,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1088,7 +1138,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 250,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -1351,7 +1405,10 @@
                     "id": "zucchini",
                     "name": "Кабачок, мякоть без грубых семян",
                     "amount": 450,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "eggplant"
+                    ]
                 },
                 {
                     "id": "bell-pepper",
@@ -1369,13 +1426,20 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 180,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "tomato",
                     "name": "Помидоры свежие",
                     "amount": 250,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -1387,7 +1451,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для мяса и овощей",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1560,25 +1627,38 @@
                     "id": "canned-tomato",
                     "name": "Томаты в собственном соку вместе с соком",
                     "amount": 700,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "tomato"
+                    ]
                 },
                 {
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 180,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -1819,7 +1899,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -1982,7 +2066,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -1994,7 +2082,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для теста и овощей",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "water",
@@ -2024,7 +2115,11 @@
                     "id": "dill",
                     "name": "Укроп",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 }
             ],
             "appliances": [
@@ -2173,19 +2268,29 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "bell-pepper",
                     "name": "Сладкий перец без семян",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "zucchini"
+                    ]
                 },
                 {
                     "id": "tomato",
                     "name": "Помидоры без плодоножек",
                     "amount": 400,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -2197,7 +2302,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 35,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "water",
@@ -2347,7 +2455,10 @@
                     "id": "tomato",
                     "name": "Мякоть спелых помидоров без кожицы",
                     "amount": 900,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato"
+                    ]
                 },
                 {
                     "id": "onion",
@@ -2359,7 +2470,11 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 25,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -2371,13 +2486,19 @@
                     "id": "cilantro",
                     "name": "Кинза",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "dill"
+                    ]
                 },
                 {
                     "id": "parsley",
                     "name": "Петрушка",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "dill"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -2533,7 +2654,10 @@
                     "id": "pasta",
                     "name": "Длинная пшеничная лапша или спагетти, сухие",
                     "amount": 360,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "wheat-noodle"
+                    ]
                 },
                 {
                     "id": "potato",
@@ -2551,7 +2675,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "bell-pepper",
@@ -2569,7 +2697,11 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -2581,7 +2713,11 @@
                     "id": "cilantro",
                     "name": "Кинза",
                     "amount": 20,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley",
+                        "dill"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",

@@ -84,7 +84,11 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -96,7 +100,10 @@
                     "id": "lemon-juice",
                     "name": "Лимонный сок",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "lime-juice"
+                    ]
                 },
                 {
                     "id": "sugar",
@@ -132,14 +139,21 @@
                     "id": "dill",
                     "name": "Укроп",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 },
                 {
                     "id": "sour-cream",
                     "name": "Сметана 15–20 % для подачи",
                     "amount": 90,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "plain-yogurt"
+                    ]
                 }
             ],
             "steps": [
@@ -322,7 +336,11 @@
                     "id": "onion",
                     "name": "Лук репчатый очищенный",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -334,7 +352,11 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 45,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -346,7 +368,10 @@
                     "id": "lemon-juice",
                     "name": "Лимонный сок",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "lime-juice"
+                    ]
                 },
                 {
                     "id": "sugar",
@@ -382,7 +407,11 @@
                     "id": "dill",
                     "name": "Укроп",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 }
             ],
             "steps": [
@@ -550,7 +579,11 @@
                     "id": "onion",
                     "name": "Лук репчатый очищенный",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -562,7 +595,10 @@
                     "id": "vegetable-oil",
                     "name": "Масло растительное",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -592,14 +628,21 @@
                     "id": "dill",
                     "name": "Укроп",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 },
                 {
                     "id": "sour-cream",
                     "name": "Сметана 15–20 % для подачи",
                     "amount": 90,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "plain-yogurt"
+                    ]
                 }
             ],
             "steps": [
@@ -772,7 +815,11 @@
                     "id": "onion",
                     "name": "Лук репчатый очищенный",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -784,7 +831,11 @@
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -796,7 +847,10 @@
                     "id": "lemon-juice",
                     "name": "Лимонный сок",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "lime-juice"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -820,7 +874,11 @@
                     "id": "parsley",
                     "name": "Петрушка",
                     "amount": 15,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
                 }
             ],
             "steps": [
@@ -961,7 +1019,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -973,7 +1035,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло",
                     "amount": 60,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "water",
@@ -1154,13 +1219,20 @@
                     "id": "milk",
                     "name": "Молоко",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "cream"
+                    ]
                 },
                 {
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "egg",
@@ -1178,7 +1250,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для всех партий жарки",
                     "amount": 50,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1351,7 +1426,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "garlic",
@@ -1382,7 +1461,11 @@
                     "name": "Петрушка для подачи",
                     "amount": 10,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "dill",
+                        "cilantro"
+                    ]
                 }
             ],
             "appliances": [
@@ -1519,7 +1602,10 @@
                     "id": "rice",
                     "name": "Длиннозёрный рис, сухой",
                     "amount": 100,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "short-grain-rice"
+                    ]
                 },
                 {
                     "id": "potato",
@@ -1537,7 +1623,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "water",
@@ -1568,7 +1658,11 @@
                     "name": "Укроп",
                     "amount": 10,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 }
             ],
             "appliances": [
@@ -1742,7 +1836,10 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для теста и всей жарки",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 }
             ],
             "appliances": [
@@ -1890,13 +1987,20 @@
                     "id": "dill",
                     "name": "Укроп",
                     "amount": 10,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "parsley",
+                        "green-onion"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло для всех партий жарки",
                     "amount": 45,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -1915,7 +2019,11 @@
                     "name": "Сметана 15–20 % для подачи",
                     "amount": 100,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "plain-yogurt",
+                        "mayonnaise"
+                    ]
                 }
             ],
             "appliances": [
@@ -2064,7 +2172,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный",
                     "amount": 120,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
@@ -2269,7 +2381,11 @@
                     "id": "onion",
                     "name": "Репчатый лук очищенный, для начинки и подливы",
                     "amount": 200,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "red-onion",
+                        "leek"
+                    ]
                 },
                 {
                     "id": "carrot",
@@ -2281,19 +2397,30 @@
                     "id": "sour-cream",
                     "name": "Сметана 15–20 %",
                     "amount": 150,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "plain-yogurt",
+                        "cream"
+                    ]
                 },
                 {
                     "id": "tomato-paste",
                     "name": "Томатная паста",
                     "amount": 40,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "canned-tomato",
+                        "tomato-ketchup"
+                    ]
                 },
                 {
                     "id": "vegetable-oil",
                     "name": "Растительное масло для овощной основы",
                     "amount": 25,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "salt",
@@ -2473,14 +2600,21 @@
                     "id": "vegetable-oil",
                     "name": "Растительное масло для всех партий жарки",
                     "amount": 30,
-                    "unit": "г"
+                    "unit": "г",
+                    "swap": [
+                        "butter"
+                    ]
                 },
                 {
                     "id": "sour-cream",
                     "name": "Сметана для подачи",
                     "amount": 100,
                     "unit": "г",
-                    "optional": true
+                    "optional": true,
+                    "swap": [
+                        "plain-yogurt",
+                        "mayonnaise"
+                    ]
                 }
             ],
             "appliances": [
