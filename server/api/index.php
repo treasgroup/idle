@@ -111,17 +111,18 @@ try {
         // Visitors get each file compact, without what the site never shows (catalog_site_json); the owner's admin
         // gets the files as written. Either way {} stays an object; the app validates every entry.
         $site = !(function_exists('is_admin') && is_admin());
+        $light = $site && ($_GET['light'] ?? '') === '1';
         $parts = [];
         foreach (catalog_files() as $f) $parts[] = isset($f['error'])
             ? json_encode(['name' => $f['name'], 'error' => $f['error']], JSON_UNESCAPED_UNICODE)
-            : '{"name":' . json_encode($f['name'], JSON_UNESCAPED_UNICODE) . ',"data":' . ($site ? catalog_site_json($f) : $f['raw']) . '}';
+            : '{"name":' . json_encode($f['name'], JSON_UNESCAPED_UNICODE) . ',"data":' . ($site ? catalog_site_json($f, $light) : $f['raw']) . '}';
         http_response_code(200);
         header('Content-Type: application/json; charset=utf-8');
         header('Cache-Control: no-cache');
         // Recipes hidden by the owner and photo versions (so a replaced photo is not taken from the browser cache).
         $hidden = []; $taught = []; try { $hidden = setting('hidden', []); $taught = setting('taught', []); } catch (Throwable $e) {}
         $photos = photo_versions();
-        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . '}';
+        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . ($light ? ',"light":true' : '') . '}';
     }
     elseif ($route === 'message.send' && $method === 'POST') message_send(read_json_body(8000));
     elseif ($route === 'weather' && $method === 'GET') weather_now();

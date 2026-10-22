@@ -10,13 +10,14 @@
     if (p.simple) root.classList.add("simple-mode");
   } catch (e) { /* private mode: defaults */ }
 })();
-// First visit: the recipe list (the biggest download) starts together with the page instead of after the scripts.
+// First visit: the recipe list (the biggest download; its light part, without steps) starts together with the page
+// instead of after the scripts.
 // Later visits keep a saved copy and only ask whether it changed, so nothing is fetched here.
 (function () {
   try {
     if (window.CookNative || localStorage.getItem("cook-catalog-saved")) return;
     var l = document.createElement("link");
-    l.rel = "preload"; l.as = "fetch"; l.crossOrigin = "anonymous"; l.href = "./api/index.php?r=catalog";
+    l.rel = "preload"; l.as = "fetch"; l.crossOrigin = "anonymous"; l.href = "./api/index.php?r=catalog&light=1";
     document.head.appendChild(l);
   } catch (e) { /* private mode: the page fetches it as before */ }
 })();

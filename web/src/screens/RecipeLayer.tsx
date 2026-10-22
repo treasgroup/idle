@@ -9,6 +9,7 @@ import {
   LABELS, basics, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
   recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide,
   type Recipe, type RecipeIngredient,
+  catalogIsLight,
 } from "../engine";
 import { useStore } from "../app/store";
 import { signal } from "../app/personal";
@@ -273,7 +274,12 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
     if (id) window.setTimeout(() => sideRows.current?.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "nearest" }), 60);
   };
   const ask = (text?: string) => { setAskReq(text ? { text, key: Date.now() } : null); setAskOpen(true); };
-  const cook = () => (cookingThis ? openLayer(routeHash({ cook: true })) : startCooking(recipe, servings));
+  // A first visit in its first seconds: the steps are still on their way — «Начать готовить» starts once they are here.
+  const light = catalogIsLight();
+  const [cookSoon, setCookSoon] = useState(false);
+  const cook = () => (cookingThis ? openLayer(routeHash({ cook: true })) : light ? setCookSoon(true) : startCooking(recipe, servings));
+  useEffect(() => { if (cookSoon && !light) { setCookSoon(false); startCooking(recipe, servings); } }, [cookSoon, light, recipe, servings, startCooking]);
+  const cookLabel = cookSoon && light ? "Загружаю шаги…" : "Начать готовить";
 
   // How long it keeps: shown with the tips (the top of the page stays short).
   const keeps = [
@@ -349,7 +355,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
               </p>
               {nutrition.kcal > 0 && kcalOpen && <Nutrition recipe={base} n={nutrition} side={!!side} />}
               <div className="mt-6 hidden gap-3 lg:flex">
-                <button className="btn-primary btn-bar flex-1" onClick={cook}><ChefHat size={20} />{cookingThis ? "Продолжить готовить" : "Начать готовить"}</button>
+                <button className="btn-primary btn-bar flex-1" onClick={cook}><ChefHat size={20} />{cookingThis ? "Продолжить готовить" : cookLabel}</button>
                 <button className="btn-outline btn-bar" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В план</button>
               </div>
             </div>
@@ -397,10 +403,16 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
               <AskCard ask={ask} />
 
               <Section id="recipe-steps" className={UNDER_HEADER} title="Шаги"
-                action={<span className="text-small text-ink-soft">{recipe.steps.length} {plural(recipe.steps.length, "шаг", "шага", "шагов")} · {timeShort(recipe)}</span>}>
+                action={<span className="text-small text-ink-soft">{light ? "" : recipe.steps.length + " " + plural(recipe.steps.length, "шаг", "шага", "шагов") + " · "}{timeShort(recipe)}</span>}>
                 <TimerStrip only={base.id} onJump={(t) => goStep(t.step)} className="mb-4" />
                 {/* One column, one rhythm: a big number, the text, and under it at most a quiet tip and the timer. */}
-                <ol className="card divide-y divide-line overflow-hidden">
+                {light && (
+                  <div className="card space-y-3 px-4 py-5 sm:px-5" role="status">
+                    <p className="text-body-sm text-ink-soft">Загружаю шаги…</p>
+                    {[92, 78, 85].map((w) => <div key={w} aria-hidden className="skeleton h-4 rounded" style={{ width: w + "%" }} />)}
+                  </div>
+                )}
+                <ol className={cx("card divide-y divide-line overflow-hidden", light && "hidden")}>
                   {recipe.steps.map((st, n) => {
                     const part = splitSide(st.text);
                     return (
@@ -421,7 +433,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   })}
                 </ol>
                 {/* The helpers people use now and then: one row of small buttons instead of a line each. */}
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className={cx("mt-4 flex flex-wrap gap-2", light && "hidden")}>
                   {sides.length > 0 && !side && !sideOpen && <button className="chip h-11" onClick={() => setSideOpen(true)}><Soup size={18} className="text-ink-soft" aria-hidden />Добавить гарнир</button>}
                   <button className="chip h-11" onClick={() => setServeOpen(true)}><Clock size={18} className="text-ink-soft" aria-hidden />Подать к сроку</button>
                   {!noteOpen && <button className="chip h-11" onClick={() => setNoteOpen(true)}><PenLine size={18} className="text-ink-soft" aria-hidden />Заметка для себя</button>}
@@ -472,7 +484,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
           <button className="btn-outline btn-bar px-4" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В план</button>
           <button className="btn-primary btn-bar flex-1 px-4" onClick={cook}>
             <ChefHat size={20} className="max-[359px]:hidden" />
-            {cookingThis ? <><span className="max-[359px]:hidden">Продолжить готовить</span><span className="min-[360px]:hidden">Продолжить</span></> : "Начать готовить"}
+            {cookingThis ? <><span className="max-[359px]:hidden">Продолжить готовить</span><span className="min-[360px]:hidden">Продолжить</span></> : cookLabel}
           </button>
         </div>
       </div>

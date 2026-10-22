@@ -8,7 +8,7 @@ import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, loadIntentModel, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
-  dishLabel, formatMinutes, matchesDish, nutritionOf, plural, relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
+  catalogVersion, dishLabel, formatMinutes, matchesDish, nutritionOf, plural, relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
 } from "../engine";
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
@@ -17,10 +17,10 @@ import { fixBySound, plainWords, soundBook } from "./colloquial";
 import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
 
 // The recipe titles by sound («хочопури» → «хачапури»), made again when the catalog changes.
-let sounds: { n: number; book: ReturnType<typeof soundBook> } | null = null;
+let sounds: { n: number; v: number; book: ReturnType<typeof soundBook> } | null = null;
 function titleSounds() {
   const list = recipes();
-  if (!sounds || sounds.n !== list.length) sounds = { n: list.length, book: soundBook(list.map((r) => r.title), list.flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text), ...(r.tips ?? [])])) };
+  if (!sounds || sounds.n !== list.length || sounds.v !== catalogVersion()) sounds = { n: list.length, v: catalogVersion(), book: soundBook(list.map((r) => r.title), list.flatMap((r) => [r.summary ?? "", ...r.steps.map((x) => x.text), ...(r.tips ?? [])])) };
   return sounds.book;
 }
 

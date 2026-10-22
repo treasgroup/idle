@@ -861,16 +861,52 @@ async function dO(e) {
         if (a.source === "server") return a;
       } catch {}
   }
-  let t = await fetch(wt("catalog"), { signal: e });
+  // No saved copy (a first visit): the catalog without steps and tips first — a third of the size, enough for every
+  // list — and the whole one right after it, in the background. Only the whole one is saved, so later visits and
+  // cooking without the internet stay as they were.
+  let t = await fetch(wt("catalog") + "&light=1", { signal: e });
   if (!t.ok) throw new Error("сервер ответил " + t.status);
   let n = await t.json(),
     a = aA(n, "server");
-  return a.source === "server" && cO(n, v), a;
+  return a.source === "server" && (n.light ? fullLater(v) : cO(n, v)), a;
+}
+// The catalog in memory came without steps and tips; the whole one is on its way.
+var lightNow = !1;
+function catalogLight() {
+  return lightNow;
+}
+function fullLater(v, tries = 0) {
+  (async () => {
+    try {
+      let t = await fetch(wt("catalog"));
+      if (!t.ok) throw new Error(String(t.status));
+      let n = await t.json(),
+        b = aA(n, "server");
+      if (b.source !== "server") throw new Error("bad");
+      cO(n, v), window.dispatchEvent(new Event(ym));
+    } catch {
+      // No connection for a moment: again in a few seconds, or as soon as it is back.
+      if (tries >= 20) return;
+      let again = () => (window.removeEventListener("online", again), clearTimeout(k), fullLater(v, tries + 1)),
+        k = setTimeout(again, Math.min(30e3, 3e3 * (tries + 1)));
+      window.addEventListener("online", again);
+    }
+  })();
 }
 function aA(e, t) {
   if (!Array.isArray(e.files) || !e.files.length)
     throw new Error("на сервере нет файлов в папке data/catalog");
-  let n = Vb(e.files),
+  let light = e.light === !0,
+    STAND_IN = [{ text: "Шаг загружается." }, { text: "Шаг загружается." }],
+    n = Vb(
+      light
+        ? e.files.map((f) =>
+            f?.data && Array.isArray(f.data.recipes)
+              ? { ...f, data: { ...f.data, recipes: f.data.recipes.map((r) => (r && typeof r == "object" ? { ...r, steps: STAND_IN, tips: [] } : r)) } }
+              : f,
+          )
+        : e.files,
+    ),
     a = new Set(
       Array.isArray(e.hidden)
         ? e.hidden.filter((i) => typeof i == "string")
@@ -898,8 +934,9 @@ function aA(e, t) {
           Object.entries(e.photos).filter(([, i]) => typeof i == "number"),
         ),
       ),
+    light && (n.recipes = n.recipes.map((r) => ({ ...r, steps: [], tips: [] }))),
     n.recipes.length
-      ? (Gb(n), { built: n, source: t })
+      ? (Gb(n), (lightNow = light), { built: n, source: t })
       : {
           built: n,
           source: "bundled",
@@ -3987,4 +4024,5 @@ export {
   unusual,
   inSeason,
   italian,
+  catalogLight,
 };

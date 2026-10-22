@@ -173,3 +173,4 @@ export declare const P0: any;
 export declare const unusual: any;
 export declare const inSeason: any;
 export declare const italian: any;
+export declare const catalogLight: () => boolean;

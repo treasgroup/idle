@@ -26,6 +26,8 @@ export const loadCatalog = (timeoutMs = 5000, keepWaiting = false): Promise<{ bu
   svc.bm(timeoutMs, keepWaiting);
 /** Window event fired when a late server catalog replaced the one in use. */
 export const CATALOG_EVENT: string = svc.ym;
+/** A first visit: the catalog in memory has no steps and tips yet; the whole one comes a moment later (CATALOG_EVENT). */
+export const catalogIsLight = (): boolean => svc.catalogLight();
 export const photoUrl = (recipeId: string): string | null => svc.pm(recipeId);
 /** A smaller copy for cards and thumbnails (the full photo stays for the recipe page). */
 export const photoSmallUrl = (recipeId: string): string | null => svc.pmSmall(recipeId);
