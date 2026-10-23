@@ -99,6 +99,11 @@ function seo_recipes(): array {
             if (!is_array($r) || !isset($r['id'], $r['title']) || !is_string($r['id']) || !preg_match(RECIPE_ID, $r['id']) || strlen($r['id']) > 60) continue;
             if (isset($out[$r['id']]) || isset($hidden[$r['id']])) continue;
             if (!is_array($r['ingredients'] ?? null) || !is_array($r['steps'] ?? null) || !$r['ingredients'] || count($r['steps']) < 2) continue;
+            // The quick way to thaw or soak, and the time that counts it — as the site shows the recipe (lib.php).
+            if ($q = quick_prep($r)) {
+                $r['totalMinutes'] = $q['total'];
+                foreach ($q['steps'] as $k => $s) { $r['steps'][$k]['text'] = $s['text']; $r['steps'][$k]['timerSeconds'] = $s['timer']; }
+            }
             $r['_mtime'] = $mtime;
             $r['_course'] = seo_course($r);
             $out[$r['id']] = $r;

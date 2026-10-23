@@ -285,20 +285,97 @@ function catalog_files(): array {
 // the file changes, so the 8 MB are repacked once, not on every visit. Objects stay objects ({} is still {}).
 // $light: without steps and tips — what a first visit needs to show the lists (a third of the size); the page takes
 // the whole catalog right after it and keeps only that one.
+// Changes when what the site does to the files changes (quick_prep), so kept copies and the apps' saved catalogs renew.
+const SITE_RULES = 'quick-prep-1';
 function catalog_site_json(array $f, bool $light = false): string {
     $dir = __DIR__ . '/storage/site-catalog';
     $base = preg_replace('/[^A-Za-z0-9_.-]/', '_', (string)$f['name']) . ($light ? '.light' : '');
-    $path = $dir . '/' . $base . '-' . substr(sha1((string)$f['raw']), 0, 12) . '.json';
+    $path = $dir . '/' . $base . '-' . substr(sha1((string)$f['raw'] . SITE_RULES), 0, 12) . '.json';
     if (is_file($path)) { $kept = file_get_contents($path); if (is_string($kept) && $kept !== '') return $kept; }
     $data = json_decode((string)$f['raw']);
     if (!is_object($data)) return (string)$f['raw'];
-    foreach ((isset($data->recipes) && is_array($data->recipes) ? $data->recipes : []) as $r) if (is_object($r)) { unset($r->sources, $r->look); if ($light) unset($r->steps, $r->tips); }
+    foreach ((isset($data->recipes) && is_array($data->recipes) ? $data->recipes : []) as $r) if (is_object($r)) {
+        $q = isset($r->steps) && is_array($r->steps) ? quick_prep(json_decode(json_encode($r), true)) : null;
+        if ($q) {
+            $r->totalMinutes = $q['total'];
+            foreach ($q['steps'] as $k => $s) if (isset($r->steps[$k]) && is_object($r->steps[$k])) {
+                $r->steps[$k]->text = $s['text'];
+                if ($s['timer']) $r->steps[$k]->timerSeconds = $s['timer']; else unset($r->steps[$k]->timerSeconds);
+            }
+        }
+        unset($r->sources, $r->look);
+        if ($light) unset($r->steps, $r->tips);
+    }
     $out = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRESERVE_ZERO_FRACTION);
     if (!is_string($out)) return (string)$f['raw'];
     if (!is_dir($dir)) @mkdir($dir, 0775, true);
     foreach (glob($dir . '/' . $base . '-*.json') ?: [] as $old) @unlink($old);
     if (@file_put_contents($path . '.tmp', $out) !== false) @rename($path . '.tmp', $path);
     return $out;
+}
+
+// ---------- Thawing and soaking: the quick way ----------
+// The same rule as quickStep in web/src/engine/tidy.ts (keep the two alike): «разморозьте креветки 12 часов в
+// холодильнике», «замочите нут на 8 часов» — the step also says the quick way and the dish's time counts it, for the
+// site, the apps and the search pages. The app's tidy leaves alone a step that already says it.
+const QUICK_PREP = [
+    'smoothie' => ['Можно не размораживать: смузи выйдет гуще и холоднее.', 0],
+    'phyllo' => ['Забыли разморозить? Около 2 часов при комнатной температуре, не открывая упаковку.', 120],
+    'dough' => ['Забыли разморозить? Около часа при комнатной температуре, не открывая упаковку.', 60],
+    'berries' => ['Забыли разморозить? Около часа при комнатной температуре в сите над миской.', 60],
+    'seafood' => ['Забыли разморозить? Положите в закрытом пакете в миску с холодной водой на 20–30 минут, воду поменяйте раз-другой.', 30],
+    'fish' => ['Забыли разморозить? Положите рыбу в закрытом пакете в миску с холодной водой на 40–60 минут, воду поменяйте раз-другой.', 60],
+    'soak' => ['Быстрее: залейте водой, доведите до кипения, выключите и оставьте под крышкой на час, затем слейте воду.', 60],
+];
+function quick_sentences(string $t): array { return preg_split('/(?<=[.!?])\s+/u', $t) ?: [$t]; }
+/** The longest wait said in hours (a range's upper end), in minutes. */
+function quick_hours(string $t): float {
+    $max = 0.0;
+    if (preg_match_all('/(\d+(?:[,.]\d+)?)(?:\s*[–-]\s*(\d+(?:[,.]\d+)?))?\s*(?:час(?:а|ов)?|ч\.?)(?![а-яё])/iu', $t, $m, PREG_SET_ORDER))
+        foreach ($m as $x) $max = max($max, (float)str_replace(',', '.', ($x[2] ?? '') !== '' ? $x[2] : $x[1]) * 60);
+    return $max;
+}
+function quick_thaw_of(string $t): ?string {
+    if (preg_match('/фило/iu', $t)) return 'phyllo';
+    if (preg_match('/тест/iu', $t)) return 'dough';
+    if (preg_match('/вишн|клубник|ягод|малин|черник|смородин/iu', $t)) return 'berries';
+    if (preg_match('/кревет|кальмар|миди|морепродукт|икр/iu', $t)) return 'seafood';
+    if (preg_match('/рыб|скумбри|мойв|кильк|минта|треск|хек|филе|лосос|горбуш/iu', $t)) return 'fish';
+    return null;
+}
+function quick_kind(string $text, array $r, array $uses): ?string {
+    $title = (string)($r['title'] ?? '');
+    if (preg_match('/размор[оа]|оттай|оттаив|из мороз\S* в холодильник|заморож\S*[^.]{0,80}(?:холодильник|нижн\S* полк)/iu', $text)) {
+        if (preg_match('/смузи/iu', $title)) return 'smoothie';
+        $said = '';
+        foreach (quick_sentences($text) as $p) if (quick_hours($p) >= 240) { $said = $p; break; }
+        return quick_thaw_of($said) ?? quick_thaw_of($text) ?? quick_thaw_of($title);
+    }
+    // Falafel needs chickpeas soaked raw: boiled ones fall apart in the oil.
+    $names = '';
+    foreach ((array)($r['ingredients'] ?? []) as $i) if (in_array($i['id'] ?? '', $uses, true)) $names .= ' ' . ($i['name'] ?? '');
+    return preg_match('/замоч|замачив|холодильник|на ночь|комнатной/iu', $text) && preg_match('/(?:^|[\s(])нут|горох/iu', $text . ' ' . $names)
+        && !preg_match('/фалафел/iu', $title) ? 'soak' : null;
+}
+/** ['total' => minutes, 'steps' => [index => ['text' => …, 'timer' => seconds|null]]], or null when nothing changes. */
+function quick_prep(array $r): ?array {
+    $saved = 0; $steps = [];
+    foreach ((array)($r['steps'] ?? []) as $k => $s) {
+        $text = (string)($s['text'] ?? '');
+        foreach (QUICK_PREP as [$say]) if (strpos($text, $say) !== false) continue 2;
+        $kind = quick_kind($text, $r, (array)($s['uses'] ?? []));
+        $wait = quick_hours($text);
+        if (!$kind || $wait < 240) continue;
+        [$say, $min] = QUICK_PREP[$kind];
+        $parts = quick_sentences($text);
+        foreach ($parts as $at => $p) if (quick_hours($p) >= 240) break;
+        array_splice($parts, $at + 1, 0, [$say]);
+        $timer = (int)($s['timerSeconds'] ?? 0);
+        $steps[$k] = ['text' => implode(' ', $parts), 'timer' => $timer && $timer < 4 * 3600 ? $timer : ($min ? $min * 60 : null)];
+        $saved += $wait - $min;
+    }
+    if (!$steps) return null;
+    return ['total' => (int)max((int)($r['activeMinutes'] ?? 0), (int)($r['totalMinutes'] ?? 0) - $saved), 'steps' => $steps];
 }
 function catalog_recipes(): array { $out = []; foreach (catalog_files() as $f) foreach (($f['data']['recipes'] ?? []) as $r) if (is_array($r) && isset($r['id'])) $out[(string)$r['id']] = $r; return array_values($out); }
 function catalog_ingredients(): array { $out = []; foreach (catalog_files() as $f) foreach (($f['data']['ingredients'] ?? []) as $i) if (is_array($i) && isset($i['id'], $i['name'])) $out[(string)$i['id']] = $i; return $out; }

@@ -24,6 +24,27 @@ describe("tidyRecipe", () => {
     expect(r.steps[1].text).not.toMatch(/°C/);
     expect(r.steps[1].text).toMatch(/без розового/);
   });
+  it("says the quick way to thaw and counts it instead of the night in the fridge", () => {
+    const squid = base({ title: "Кальмары жареные с луком", totalMinutes: 755, activeMinutes: 30, steps: [{ text: "Накануне разморозьте кальмаров 12 часов в холодильнике в закрытой миске. Слейте жидкость, обсушите." }, { text: "Жарьте 3 минуты." }] });
+    const r = tidyRecipe(squid);
+    expect(r.totalMinutes).toBe(65);
+    expect(r.steps[0].text).toBe("Накануне разморозьте кальмаров 12 часов в холодильнике в закрытой миске. Забыли разморозить? Положите в закрытом пакете в миску с холодной водой на 20–30 минут, воду поменяйте раз-другой. Слейте жидкость, обсушите.");
+    expect(r.steps[0].timerSeconds).toBe(30 * 60);
+    // Tidied again (the server already did it for visitors): nothing more.
+    expect(tidyRecipe(r)).toMatchObject({ totalMinutes: 65, steps: [{ text: r.steps[0].text }, {}] });
+    // What thaws is in the sentence with the hours, not in «теста» later on.
+    const galette = tidyRecipe(base({ title: "Галета с вишней", totalMinutes: 500, activeMinutes: 45, steps: [{ text: "Разморозьте вишню в сите около 6 часов. Последний час используйте для теста." }, { text: "Пеките." }] }));
+    expect(galette.steps[0].text).toMatch(/в сите над миской/);
+    expect(galette.totalMinutes).toBe(200);
+  });
+  it("soaks chickpeas and peas the quick way, but not for falafel", () => {
+    const peas = { id: "split-peas", name: "Горох колотый", amount: 300, unit: "г" as const, optional: false };
+    const soup = base({ title: "Гороховый суп", totalMinutes: 640, activeMinutes: 40, ingredients: [peas], steps: [{ text: "Залейте горох частью воды и поставьте в холодильник на 8 часов.", uses: ["split-peas"] }, { text: "Варите 1,5 часа." }] });
+    expect(tidyRecipe(soup).totalMinutes).toBe(220);
+    expect(tidyRecipe(soup).steps[0].text).toMatch(/Быстрее: залейте водой, доведите до кипения/);
+    const falafel = { ...soup, title: "Фалафель из сухого нута" };
+    expect(tidyRecipe(falafel).totalMinutes).toBe(640);
+  });
   it("takes «с температурой» away with the degrees", () => {
     const r = tidyRecipe(base({ title: "Суп с фрикадельками", steps: [{ text: "Нарежьте." }, { text: "Варите ещё 5 минут. Фрикадельки должны стать полностью готовыми, с температурой в центре не ниже 72 °C." }] }));
     expect(r.steps[1].text).toBe("Варите ещё 5 минут. Фрикадельки должны стать полностью готовыми, пока внутри не исчезнет розовый цвет.");

@@ -189,5 +189,6 @@ function catalog_version(): string {
     try { $parts[] = json_encode(setting('hidden', [])); $parts[] = json_encode(setting('taught', [])); } catch (Throwable $e) {}
     $parts[] = json_encode(photo_versions());
     $parts[] = json_encode(real_photos());
+    $parts[] = SITE_RULES;
     return substr(sha1(implode('|', $parts)), 0, 16);
 }
