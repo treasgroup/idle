@@ -30,6 +30,7 @@ import type { Pwa } from "./Profile";
 import { FeastSheet } from "../components/Feast";
 import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 import { thawTomorrow } from "../app/reminders";
+import { KIND_ICON, comingSoon, daysUntil, eventPhrase, nextDate, whenText, type FamilyDate } from "../app/familyCalendar";
 import { BackupCard } from "../components/BackupCard";
 import { Bone } from "../components/Skeleton";
 import { timeShort } from "../app/recipeTime";
@@ -396,7 +397,10 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const soon = expiringSoon(s.fridge);
   const nextLesson = LESSONS.find((l) => !profile.lessonsDone.includes(l.id));
   const lessonNo = nextLesson ? LESSONS.indexOf(nextLesson) + 1 : 0;
-  if (!menu.length && !toBuy && !timers && !thaw && !dayDish && profile.simple) return null;
+  // «Семейный календарь»: from three days before — the table for that day.
+  const family = comingSoon(profile.familyDates);
+  const [feastFor, setFeastFor] = useState<FamilyDate | null>(null);
+  if (!menu.length && !toBuy && !timers && !thaw && !dayDish && !family.length && profile.simple) return null;
   // 150 px on phones: the third tile peeks out at the edge, so it is clear the row scrolls.
   const tile = "w-[150px] shrink-0 snap-start sm:w-[200px]";
   const action = (icon: ReactNode, title: string, line: string, onClick: () => void, school?: boolean) => (
@@ -416,6 +420,9 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         </p>
       )}
       <ScrollRow label="На сегодня" from="today">
+        {family.map((d) => <span key={d.id} className="contents">{action(<span className="text-[22px] leading-none">{KIND_ICON[d.kind]}</span>,
+          d.who + " — " + whenText(daysUntil(d)).toLowerCase() + (daysUntil(d) === 0 ? " 🎉" : ""),
+          "Собрать стол: блюда, покупки и когда что начинать", () => setFeastFor(d))}</span>)}
         {dayDish && <RecipeTile recipe={dayDish} badge="Рецепт дня" onOpen={() => openRecipe(dayDish)} className={tile} />}
         {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? "Приготовлено вчера" : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
         {left.length > 0 && action(<Refrigerator size={22} />, "Осталось: " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(", "),
@@ -431,6 +438,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
         {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
       </ScrollRow>
+      {feastFor && <FeastSheet open occasion={{ date: nextDate(feastFor), what: eventPhrase(feastFor) }} onClose={() => setFeastFor(null)} />}
     </Section>
   );
 }

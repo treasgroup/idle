@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -16,6 +16,8 @@ import { ShareOptions } from "../components/ShareOptions";
 import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
+import { FamilyCalendarSheet } from "../components/FamilyCalendar";
+import { byNext, dayMonth, daysUntil, whenText, AHEAD } from "../app/familyCalendar";
 import { Tour, tourWanted } from "../components/Tour";
 import { VoiceSheet } from "../components/VoiceSheet";
 import { WriteUs } from "../components/WriteUs";
@@ -47,6 +49,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [voice, setVoice] = useState(false);
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
+  const [calendar, setCalendar] = useState(false);
+  const nextDate = byNext(profile.familyDates)[0];
   const [writeUs, setWriteUs] = useState(false);
   const [tasteOpen, setTasteOpen] = useState(false);
   const understoodNow = useUnderstood();
@@ -82,6 +86,9 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         {!profile.simple && <Row icon={<CalendarDays size={18} />} title="План на неделю" hint="Ужины без повторов и список покупок" onClick={() => openLayer(routeHash({ tab: "menu" }))} />}
         <Row icon={<BookHeart size={18} />} title="Семейная книга" hint={s.myRecipes?.length ? "Рецептов: " + s.myRecipes.length : "Бабушкины и свои рецепты — и с фото тетради"} onClick={() => openRecipesView("mine")} />
         <Row icon={<PartyPopper size={18} />} title="Праздничный стол" hint="Гости, блюда, покупки и когда что начинать" onClick={() => setFeast(true)} />
+        <Row icon={<CalendarHeart size={18} />} title="Семейный календарь"
+          hint={nextDate ? nextDate.who + " · " + (daysUntil(nextDate) <= AHEAD ? whenText(daysUntil(nextDate)).toLowerCase() : dayMonth(nextDate)) : "Дни рождения — напомню и помогу собрать стол"}
+          onClick={() => setCalendar(true)} />
         {!profile.simple && <Row icon={<Refrigerator size={18} />} title="Мои продукты" hint={s.fridge.length ? s.fridge.length + " " + plural(s.fridge.length, "продукт", "продукта", "продуктов") + " дома" : "Что есть дома — подскажу, что приготовить"} onClick={() => openLayer(routeHash({ tab: "pantry" }))} />}
         {profile.simple && <Row icon={<ShoppingCart size={18} />} title="Список покупок" hint={s.shopping.filter((i) => !i.checked).length ? "Купить: " + s.shopping.filter((i) => !i.checked).length : "Пока пуст"} onClick={() => openLayer(routeHash({ tab: "shopping" }))} />}
         <Row icon={<BookOpenCheck size={18} />} title="Я готовил(а)" hint={bookCount ? bookCount + " " + plural(bookCount, "блюдо", "блюда", "блюд") : "Здесь будет всё, что вы приготовили"} onClick={() => openRecipesView("book")} />
@@ -218,6 +225,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       </Sheet>
 
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
+      <FamilyCalendarSheet open={calendar} onClose={() => setCalendar(false)} onReminders={() => { setCalendar(false); setSheet("reminders"); }} />
       <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
       <TasteSheet open={tasteOpen} onClose={() => setTasteOpen(false)} />
       <WeatherSheet open={weatherOpen} onClose={() => setWeatherOpen(false)} />

@@ -14,6 +14,7 @@ import { RecipeImage } from "./RecipeCard";
 import { Chip, Sheet, Stepper } from "./ui";
 import { Mascot } from "./Mascot";
 import { timeShort } from "../app/recipeTime";
+import { MONTHS } from "../app/familyCalendar";
 
 const SLOTS: { key: string; label: string; courses: string[] }[] = [
   { key: "salad1", label: "Салат", courses: ["salad"] },
@@ -34,13 +35,15 @@ const STYLES = [
 type Style = (typeof STYLES)[number]["key"];
 const isNewYear = (d = new Date()) => d.getMonth() === 11;
 
-export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+/** occasion: a date from «Семейный календарь» — the table is for that day («27 октября — день рождения мамы»). */
+export function FeastSheet({ open, onClose, occasion }: { open: boolean; onClose: () => void; occasion?: { date: Date; what: string } }) {
   const { s, update, toast } = useStore();
   const { openRecipe } = useActions();
-  const ny = isNewYear();
+  const ny = !occasion && isNewYear();
+  const later = !!occasion && occasion.date.toDateString() !== new Date().toDateString();
   const [step, setStep] = useState(0);
   const [guests, setGuests] = useState(6);
-  const [hour, setHour] = useState(() => (ny ? 21 : Math.min(20, Math.max(new Date().getHours() + 3, 15))));
+  const [hour, setHour] = useState(() => (ny ? 21 : later ? 17 : Math.min(20, Math.max(new Date().getHours() + 3, 15))));
   const [style, setStyle] = useState<Style>("classic");
   const [pick, setPick] = useState<Record<string, number>>({});
   const [off, setOff] = useState<string[]>([]);
@@ -70,8 +73,9 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
   const dishes = SLOTS.filter((sl) => !off.includes(sl.key) && pools[sl.key]?.length)
     .map((sl) => ({ slot: sl, r: pools[sl.key][(pick[sl.key] ?? 0) % pools[sl.key].length] }));
 
-  const serve = ny ? new Date(new Date().getFullYear(), 11, 31, hour) : new Date(); if (!ny) serve.setHours(hour, 0, 0, 0);
-  const onTheDay = !ny || new Date().getDate() === 31;
+  const serve = ny ? new Date(new Date().getFullYear(), 11, 31, hour) : new Date(occasion?.date ?? Date.now()); if (!ny) serve.setHours(hour, 0, 0, 0);
+  const onTheDay = ny ? new Date().getDate() === 31 : !later;
+  const onDay = later ? occasion!.date.getDate() + " " + MONTHS[occasion!.date.getMonth()] + " " : "";
   const plan = dishes.map((d) => ({ ...d, start: new Date(serve.getTime() - d.r.totalMinutes * 60e3) }))
     .sort((a, b) => a.start.getTime() - b.start.getTime());
   const first = plan[0]?.start;
@@ -117,7 +121,7 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
         <div>
           <div className="flex items-center gap-4">
             <Mascot size={104} mood="feast" className="shrink-0" />
-            <p className="text-body-sm text-ink-soft">{ny ? "Соберу стол на новогоднюю ночь: салаты, закуску, горячее и сладкое — и скажу, что сделать накануне." : "Соберу стол на всех: салаты, закуску, горячее и сладкое."}</p>
+            <p className="text-body-sm text-ink-soft">{ny ? "Соберу стол на новогоднюю ночь: салаты, закуску, горячее и сладкое — и скажу, что сделать накануне." : occasion ? (later ? onDay.trim() : "Сегодня") + " — " + occasion.what + ". Соберу стол на всех: салаты, закуску, горячее и сладкое." : "Соберу стол на всех: салаты, закуску, горячее и сладкое."}</p>
           </div>
           {ny && (
             <>
@@ -168,11 +172,11 @@ export function FeastSheet({ open, onClose }: { open: boolean; onClose: () => vo
       )}
       {step === 2 && (
         <div>
-          <p className="text-body-sm text-ink-soft">{guests} {plural(guests, "человек", "человека", "человек")} · подать {ny ? "31 декабря " : ""}в {hour}:00. Начинайте с того, что готовится дольше:</p>
+          <p className="text-body-sm text-ink-soft">{guests} {plural(guests, "человек", "человека", "человек")} · подать {ny ? "31 декабря " : onDay}в {hour}:00. Начинайте с того, что готовится дольше:</p>
           <ol className="mt-4 grid gap-2">
             {plan.map(({ slot, r, start }) => {
               // In December the plan is for the 31st: long dishes (холодец, торт, буженина) — on the 30th.
-              const early = ny ? r.totalMinutes > 240 : start.getTime() < Date.now() || r.totalMinutes > 240;
+              const early = ny || later ? r.totalMinutes > 240 : start.getTime() < Date.now() || r.totalMinutes > 240;
               return (
                 <li key={slot.key}>
                   {/* Opens the recipe; the plan stays as it is when the sheet is opened again. */}

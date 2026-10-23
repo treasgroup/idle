@@ -1,6 +1,7 @@
 // What the person told us about themselves: who they cook for, how confident they are, what they aim for.
 // Kept on the device next to the engine state (the engine's own state schema stays untouched for sync).
 import type { Conditions } from "../engine";
+import { normalizeDates, type FamilyDate } from "./familyCalendar";
 
 export type Level = "beginner" | "confident" | "pro";
 export type Goal = "tasty" | "quick" | "budget" | "light" | "protein" | "family";
@@ -31,6 +32,8 @@ export interface Profile {
   /** Reading steps aloud: the voice (id of a phone or browser voice; none — the best one) and the speed. */
   voice?: string;
   voiceRate: number;
+  /** «Семейный календарь»: birthdays and the family's own dates (app/familyCalendar). */
+  familyDates: FamilyDate[];
 }
 
 export interface Member { name: string; excluded: string[] }
@@ -50,6 +53,7 @@ export const DEFAULT_PROFILE: Profile = {
   members: [],
   sounds: true,
   voiceRate: 1.1,
+  familyDates: [],
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
@@ -102,6 +106,7 @@ export function normalizeProfile(raw: unknown): Profile {
   if (Array.isArray(r.members)) p.members = r.members
     .filter((m): m is Member => !!m && typeof m === "object" && typeof (m as Member).name === "string" && Array.isArray((m as Member).excluded))
     .slice(0, 10).map((m) => ({ name: m.name.slice(0, 30), excluded: m.excluded.filter((x): x is string => typeof x === "string").slice(0, 40) }));
+  p.familyDates = normalizeDates(r.familyDates);
   return p;
 }
 

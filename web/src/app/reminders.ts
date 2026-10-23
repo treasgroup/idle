@@ -6,6 +6,7 @@ import { apiUrl, dateKey, displayName, expiringSoon, ingredient, isNativeApp, re
 import * as core from "../engine/core.js";
 import { useStore } from "./store";
 import { timeShort } from "./recipeTime";
+import { reminderText, type FamilyDate } from "./familyCalendar";
 
 const GENERIC = [
   "Не знаете, что приготовить? Идея дня уже ждёт.",
@@ -39,8 +40,9 @@ export function thawTomorrow(s: EngineState, day: Date): { title: string; what: 
   return null;
 }
 
-/** What each of the next 8 days' reminder says: the menu, or food that has to be used, or a general idea. */
-export function reminderPlan(s: EngineState, now = new Date()): { date: string; body: string }[] {
+/** What each of the next 8 days' reminder says: a family date three days before and on the day («Семейный календарь»),
+ * the menu, or food that has to be used, or a general idea. */
+export function reminderPlan(s: EngineState, now = new Date(), family: FamilyDate[] = []): { date: string; body: string }[] {
   const out: { date: string; body: string }[] = [];
   for (let d = 0; d < 8; d++) {
     const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d);
@@ -53,6 +55,8 @@ export function reminderPlan(s: EngineState, now = new Date()): { date: string; 
       .map((f) => shortName(f.id).toLowerCase());
     const thaw = thawTomorrow(s, day);
     const thawText = thaw ? " Завтра «" + thaw.title + "»: если " + thaw.what + " в морозилке — переложите в холодильник." : "";
+    const fam = reminderText(family, day);
+    if (fam) { out.push({ date, body: (fam + (titles.length ? " По плану сегодня: «" + titles[0] + "»." : "")).slice(0, 200) }); continue; }
     out.push({
       date,
       body: (titles.length
@@ -89,14 +93,15 @@ async function subscription(create: boolean): Promise<PushSubscription | null> {
 }
 
 export function useReminders() {
-  const { s, update, ready } = useStore();
+  const { s, update, ready, profile } = useStore();
+  const family = profile.familyDates;
   const native = isNativeApp();
   const supported = native || (typeof window !== "undefined" && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window);
 
   const send = useCallback(async (daily: string | null, weekly: boolean, state: EngineState, ask: boolean) => {
     if (native) {
       if (!daily && !weekly) return void (await core.EC());
-      return void (await core.k0({ daily, weekly }, reminderPlan(state), ask));
+      return void (await core.k0({ daily, weekly }, reminderPlan(state, new Date(), family), ask));
     }
     if (!daily && !weekly) {
       const sub = await subscription(false);
@@ -109,8 +114,8 @@ export function useReminders() {
     }
     const sub = await subscription(true);
     if (!sub) return;
-    await post("push.subscribe", { endpoint: sub.endpoint, daily, weekly, tz: -new Date().getTimezoneOffset(), plan: reminderPlan(state) });
-  }, [native]);
+    await post("push.subscribe", { endpoint: sub.endpoint, daily, weekly, tz: -new Date().getTimezoneOffset(), plan: reminderPlan(state, new Date(), family) });
+  }, [native, family]);
 
   const enable = useCallback(async (daily: string | null, weekly: boolean) => {
     await send(daily, weekly, s, true);
@@ -126,7 +131,7 @@ export function useReminders() {
 
   // The plan (menu, expiring food) changes: resend it once a day per visit, so the texts stay current.
   const on = !!(s.reminders.daily || s.reminders.weekly);
-  const planKey = JSON.stringify(reminderPlan(s).map((p) => p.body));
+  const planKey = JSON.stringify(reminderPlan(s, new Date(), family).map((p) => p.body));
   useEffect(() => {
     if (!ready || !on || !supported) return;
     if (!native && Notification.permission !== "granted") return;
