@@ -338,7 +338,9 @@ function seo_css(): string {
         . '.pic{position:relative;aspect-ratio:4/3;background:var(--sunken)}.pic img{width:100%;height:100%;object-fit:cover}.pic .art{position:absolute;inset:0;display:grid;place-items:center;font-size:46px;background:radial-gradient(120% 120% at 30% 15%,#fbeee6 0%,#f3e2d3 100%)}'
         . '.pic .art:before{content:"";position:absolute;width:62%;aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.8);box-shadow:0 4px 14px rgba(60,30,10,.1)}.pic .art span{position:relative}'
         . '.pic .score{position:absolute;right:8px;top:8px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.95);border-radius:999px;padding:2px 9px;font-size:13px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}.pic .score i{color:var(--warn);font-style:normal}'
-        . '.card b{display:block;padding:10px 12px 0;font-weight:600;font-size:16px;line-height:1.3;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.card small{display:block;padding:4px 12px 12px;color:var(--muted);font-size:14px;margin-top:auto}'
+        . '.card b{display:block;padding:10px 12px 0;font-weight:600;font-size:16px;line-height:1.3;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.card small{display:block;padding:4px 12px 12px;color:var(--muted);font-size:14px;margin-top:auto}'
+        // Phones: the sections in one row scrolled sideways, so the dishes start on the first screen.
+        . '@media(max-width:640px){.cats.row{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.cats.row::-webkit-scrollbar{display:none}.cats.row li{flex:none}.cats.row a{white-space:nowrap}}'
         . '@media(max-width:560px){.grid{gap:10px}.card b{font-size:15px;padding:8px 10px 0}.card small{padding:3px 10px 10px;font-size:13px}}'
         . '.more{margin:14px 0 0}.more a{font-weight:600;text-decoration:none}'
         // Chips to choose a section; «Спросить Шефа» as a quiet card.
@@ -519,6 +521,19 @@ function seo_thumb(string $id): ?string {
     $v = filemtime($file);
     return seo_path() . (is_file(photos_dir() . '/s/' . $id . '-' . $v . '.jpg') ? 'photos/s/' . $id . '-' . $v . '.jpg' : 'photos/' . $id . '.jpg?v=' . $v);
 }
+/** A list's order without visitors' data: with a photo first, then home cooking, then simple, then quick. */
+function seo_familiar_first(array $list): array {
+    $home = ['russian' => 1, 'ukrainian' => 1, 'belarusian' => 1];
+    $keys = [];
+    foreach ($list as $r) $keys[$r['id']] = [seo_thumb($r['id']) ? 0 : 1, isset($home[$r['cuisine'] ?? '']) ? 0 : 1, ($r['difficulty'] ?? '') === 'easy' ? 0 : 1, (int)($r['totalMinutes'] ?? 0)];
+    usort($list, fn($a, $b) => $keys[$a['id']] <=> $keys[$b['id']] ?: strcmp($a['title'], $b['title']));
+    return $list;
+}
+/** The cards with «Спросить Шефа» after the first four: on a phone the dishes come first. */
+function seo_grid_with_cta(array $list, string $cta): string {
+    $grid = fn(array $part) => '<ul class="grid">' . implode('', array_map('seo_card', $part)) . "</ul>\n";
+    return $grid(array_slice($list, 0, 4)) . $cta . (count($list) > 4 ? $grid(array_slice($list, 4)) : '');
+}
 function seo_card(array $x, bool $withPhoto = true): string {
     $src = seo_thumb($x['id']);
     $pic = $src ? '<img src="' . h($src) . '" alt="" loading="lazy" decoding="async" width="400" height="300">'
@@ -548,7 +563,9 @@ function seo_kind_page(string $k): void {
     // Written for this list first («…для детей»), then with a photo; a long list shows its best 150 (every recipe
     // is linked from its kind's page anyway), so the page stays light.
     $own = fn($r) => $k === 'detyam' && preg_match('/для (детей|малышей|ребёнка|ребенка)|детск/ui', (string)$r['title']) ? 1 : 0;
-    usort($list, fn($a, $b) => $own($b) <=> $own($a) ?: (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0) ?: strcmp(mb_strtolower($a['title'], 'UTF-8'), mb_strtolower($b['title'], 'UTF-8')));
+    $list = seo_familiar_first($list);
+    $rank = array_flip(array_column($list, 'id'));
+    usort($list, fn($a, $b) => $own($b) <=> $own($a) ?: $rank[$a['id']] <=> $rank[$b['id']]);
     $more = max(0, $n - 150);
     $list = array_slice($list, 0, 150);
     $ld = ['@context' => 'https://schema.org', '@type' => 'ItemList', 'name' => $heading, 'numberOfItems' => $n,
@@ -559,16 +576,13 @@ function seo_kind_page(string $k): void {
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_list_path()) . "\">Рецепты</a></nav>\n";
     echo '<h1>' . h($heading) . '</h1><p class="lead">' . h($desc) . "</p>\n";
     echo seo_kind_chips($k);
-    echo '<div class="cta"><p>Скажите, что есть дома, — Шеф подберёт блюдо из этого списка и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
-    echo '<ul class="grid">';
-    foreach ($list as $r) echo seo_card($r);
-    echo "</ul>\n";
+    echo seo_grid_with_cta($list, '<div class="cta"><p>Скажите, что есть дома, — Шеф подберёт блюдо из этого списка и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n");
     if ($more) echo '<p class="more">И ещё ' . $more . ' ' . seo_plural($more, 'рецепт', 'рецепта', 'рецептов') . ' — в <a href="' . h(seo_path()) . '">приложении</a> и в разделах <a href="' . h(seo_list_path()) . "\">по видам блюд</a>.</p>\n";
     echo seo_footer();
 }
 /** The lists as a row of links (on the catalog and on each list). */
 function seo_kind_chips(?string $on = null): string {
-    $out = '<ul class="cats">';
+    $out = '<ul class="cats row">';
     foreach (SEO_KINDS as $k => $names) { $n = count(seo_kind_list($k)); if ($n) $out .= '<li><a href="' . h(seo_list_path($k)) . '"' . ($on === $k ? ' class="on"' : '') . '>' . h($names[0]) . '<small>' . $n . '</small></a></li>'; }
     return $out . "</ul>\n";
 }
@@ -598,21 +612,18 @@ function seo_list_page(?string $course): void {
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
     if ($course) echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_list_path()) . "\">Рецепты</a></nav>\n";
     echo '<h1>' . h($course ? SEO_COURSES[$course][0] : 'Все рецепты') . '</h1><p class="lead">' . h($desc) . "</p>\n";
-    echo '<ul class="cats"><li><a href="' . h(seo_list_path()) . '"' . ($course ? '' : ' class="on"') . '>Все<small>' . $count . '</small></a></li>';
+    echo '<ul class="cats row"><li><a href="' . h(seo_list_path()) . '"' . ($course ? '' : ' class="on"') . '>Все<small>' . $count . '</small></a></li>';
     foreach (SEO_COURSES as $c => $names) if (!empty($by[$c])) echo '<li><a href="' . h(seo_list_path($c)) . '"' . ($course === $c ? ' class="on"' : '') . '>' . h($names[0]) . '<small>' . count($by[$c]) . '</small></a></li>';
     echo "</ul>\n";
     if (!$course) echo seo_kind_chips();
-    echo '<div class="cta"><p>Не знаете, что выбрать? Назовите продукты, время или настроение — Шеф подберёт рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
-    // Dishes with a photo first, then by name.
-    $photoFirst = function (array $list): array { usort($list, fn($a, $b) => (seo_thumb($b['id']) ? 1 : 0) <=> (seo_thumb($a['id']) ? 1 : 0) ?: strcmp(mb_strtolower($a['title'], 'UTF-8'), mb_strtolower($b['title'], 'UTF-8'))); return $list; };
+    $cta = '<div class="cta"><p>Не знаете, что выбрать? Назовите продукты, время или настроение — Шеф подберёт рецепт.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
+    if (!$course) echo $cta;
     foreach (SEO_COURSES as $c => $names) {
         if (empty($by[$c]) || ($course && $course !== $c)) continue;
-        // All recipes: eight of each kind and the way to the rest; a kind's page: every recipe of it.
-        $list = $photoFirst($by[$c]);
+        // All recipes: eight of each kind and the way to the rest; a kind's page: every recipe of it, «Шеф» after four.
+        $list = seo_familiar_first($by[$c]);
         if (!$course) echo '<h2><a href="' . h(seo_list_path($c)) . '">' . h($names[0]) . '</a></h2>';
-        echo '<ul class="grid">';
-        foreach ($course ? $list : array_slice($list, 0, 8) as $r) echo seo_card($r);
-        echo "</ul>\n";
+        echo $course ? seo_grid_with_cta($list, $cta) : '<ul class="grid">' . implode('', array_map('seo_card', array_slice($list, 0, 8))) . "</ul>\n";
         if (!$course && count($list) > 8) echo '<p class="more"><a href="' . h(seo_list_path($c)) . '">Все ' . h(mb_strtolower($names[0], 'UTF-8')) . ' · ' . count($list) . " →</a></p>\n";
     }
     if (!$all) echo '<p>Рецепты скоро появятся.</p>';
@@ -752,7 +763,14 @@ function seo_combo_page(string $a, ?string $b): void {
     $ids = $b ? array_values(array_intersect($idx[$a], $idx[$b])) : $idx[$a];
     if (count($ids) < SEO_COMBO_MIN) { seo_not_found(); return; }
     $list = array_map(fn($id) => $all[$id], $ids);
-    usort($list, fn($x, $y) => ((int)$x['totalMinutes'] <=> (int)$y['totalMinutes']) ?: strcmp($x['title'], $y['title']));
+    // The product in the dish's name first («Суп-пюре из тыквы» before «Гречка с тушёными овощами»), then with a photo, then quick.
+    $stems = array_map(fn($x) => mb_substr(mb_strtolower(seo_ing_name($x), 'UTF-8'), 0, max(3, mb_strlen(seo_ing_name($x), 'UTF-8') - 1), 'UTF-8'), array_filter([$a, $b]));
+    $keys = [];
+    foreach ($list as $r) {
+        $t = mb_strtolower((string)$r['title'], 'UTF-8');
+        $keys[$r['id']] = [-count(array_filter($stems, fn($s) => mb_strpos($t, $s) !== false)), seo_thumb($r['id']) ? 0 : 1, (int)$r['totalMinutes']];
+    }
+    usort($list, fn($x, $y) => $keys[$x['id']] <=> $keys[$y['id']] ?: strcmp($x['title'], $y['title']));
     $n = count($list);
     $names = $b ? seo_ing_name($a) . ' и ' . seo_ing_name($b) : seo_ing_name($a);
     $quick = count(array_filter($list, fn($r) => (int)$r['totalMinutes'] <= 30));
@@ -770,10 +788,7 @@ function seo_combo_page(string $a, ?string $b): void {
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_combo_path('')) . '">Что приготовить из продуктов</a>' . ($b ? ' › <a href="' . h(seo_combo_path($a)) . '">' . h(seo_ucfirst(seo_ing_name($a))) . '</a>' : '') . "</nav>\n";
     echo '<h1>' . h($heading) . '</h1><p class="lead">' . h($desc) . "</p>\n";
-    echo '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — Шеф подберёт блюдо и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n";
-    echo '<ul class="grid">';
-    foreach ($list as $r) echo seo_card($r, true);
-    echo "</ul>\n";
+    echo seo_grid_with_cta($list, '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — Шеф подберёт блюдо и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n");
     // Neighbours: other products that go with this one.
     $with = [];
     foreach ($idx as $other => $rs) {
