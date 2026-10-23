@@ -8,4 +8,5 @@ require __DIR__ . '/api/_private/reviews.php';
 require __DIR__ . '/api/_private/seo.php';
 require __DIR__ . '/api/_private/collections.php';
 require __DIR__ . '/api/_private/school_seo.php';
+require __DIR__ . '/api/_private/skolko_seo.php';
 seo_run(function () { seo_sitemap(); });

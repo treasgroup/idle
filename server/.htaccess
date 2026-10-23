@@ -45,6 +45,8 @@ AddType text/javascript .js
   RewriteRule ^podborka/([a-z-]+)/?$ podborka.php?k=$1 [L,QSA]
   RewriteRule ^shkola/?$ shkola.php [L,QSA]
   RewriteRule ^shkola/([a-z-]+)/?$ shkola.php?id=$1 [L,QSA]
+  RewriteRule ^skolko/?$ skolko.php [L,QSA]
+  RewriteRule ^skolko/([a-z-]+)/?$ skolko.php?k=$1 [L,QSA]
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
 </IfModule>
 

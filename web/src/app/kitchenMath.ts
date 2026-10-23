@@ -3,7 +3,7 @@
 
 // ——— Cups and spoons ———
 // Grams in a glass (гранёный, 200 мл), a tablespoon and a teaspoon — the usual home tables.
-const DENSITY: [RegExp, string, number, number, number][] = [
+export const DENSITY: [RegExp, string, number, number, number][] = [
   [/^мук/, "мука", 130, 25, 8],
   [/^сахарн\S* пудр|^пудр/, "сахарная пудра", 140, 25, 8],
   [/^сахар/, "сахар", 180, 25, 8],

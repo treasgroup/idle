@@ -272,7 +272,7 @@ function seo_head(array $o): string {
     if (!empty($o['imageAlt'])) $out .= '<meta property="og:image:alt" content="' . h($o['imageAlt']) . "\">\n";
     $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
     foreach (($o['ld'] ?? []) as $ld) $out .= "<script type=\"application/ld+json\">\n" . seo_json($ld) . "\n</script>\n";
-    return $out . '<style>' . seo_css() . "</style>\n</head>\n<body" . (!empty($o['bodyClass']) ? ' class="' . h($o['bodyClass']) . '"' : '') . ">\n" . seo_header();
+    return $out . '<style>' . seo_css() . ($o['css'] ?? '') . "</style>\n</head>\n<body" . (!empty($o['bodyClass']) ? ' class="' . h($o['bodyClass']) . '"' : '') . ">\n" . seo_header();
 }
 function seo_header(): string {
     $p = h(seo_path());
@@ -287,7 +287,7 @@ function seo_footer(): string {
     $p = h(seo_path());
     return "</main>\n<footer class=\"foot\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"28\" height=\"28\" loading=\"lazy\"><span>" . h(SEO_SITE) . "</span></a>"
         . "<p>Подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, бесплатно и без регистрации.</p>"
-        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
+        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'skolko/' : 'skolko.php')) . "\">Сколько варить и запекать</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
 }
 /** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
@@ -650,6 +650,7 @@ function seo_sitemap(): void {
         foreach (seo_collection_list() as $k => $_) $url(seo_abs(seo_collection_path($k)), $newest);
     }
     if (function_exists('school_sitemap')) school_sitemap($url);
+    if (function_exists('skolko_sitemap')) skolko_sitemap($url);
     $url(seo_abs(seo_combo_path('')), $newest);
     foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
     foreach (seo_combo_pairs() as [$a, $b]) $url(seo_abs(seo_combo_path($a, $b)), $newest);
