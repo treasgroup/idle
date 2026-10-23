@@ -119,14 +119,22 @@ const FRIDGE = [
 // «огне2 минуты», «при200 °C20 минут», «до3×4»: a lost space between a word and a number (321 in the catalog), put back.
 const spaced = (t: string): string => t.replace(/([а-яё])(?=[\d≤≥])/gi, "$1 ").replace(/(°\s?C)(?=\d)/g, "$1 ");
 
+// Every rule below needs degrees, «≤»/«≥» or a thermometer: a text without them skips the heavy part (most of the
+// catalog — it made building the catalog three times slower on a phone).
+const HOT = /[°≤≥]|термометр/i;
+
 function plain(raw: string, r: Recipe): string {
   const text = spaced(raw);
-  let said = "";
-  let t = text.split(/(?<=[.!?])\s+/).map((s) => { const out = plainSentence(s, r, said); said += " " + s; return out; }).filter(Boolean).join(" ");
-  for (const [re, to] of FRIDGE) t = t.replace(re, to);
-  // Hot oil and warm milk: the number stays, with what it looks like.
-  t = t.replace(/(масл\S*[^.]{0,30}?до\s+1[5-9]\d\s*°\s?C)(?!\s*\()/gi, "$1 (кусочек хлеба в нём сразу шипит и румянится)");
-  t = t.replace(/((?:молок|вод|сливк|кефир)\S*[^.]{0,30}?до\s+(?:3[5-9]|4[0-2])(?:\s*[–-]\s*\d{2})?\s*°\s?C)(?!\s*\()/gi, "$1 (чуть тёплое, как парное молоко)");
+  let t: string;
+  if (!HOT.test(text)) t = text.replace(/(?<=[.!?])\s+/g, " ");
+  else {
+    let said = "";
+    t = text.split(/(?<=[.!?])\s+/).map((s) => { const out = plainSentence(s, r, said); said += " " + s; return out; }).filter(Boolean).join(" ");
+    for (const [re, to] of FRIDGE) t = t.replace(re, to);
+    // Hot oil and warm milk: the number stays, with what it looks like.
+    t = t.replace(/(масл\S*[^.]{0,30}?до\s+1[5-9]\d\s*°\s?C)(?!\s*\()/gi, "$1 (кусочек хлеба в нём сразу шипит и румянится)");
+    t = t.replace(/((?:молок|вод|сливк|кефир)\S*[^.]{0,30}?до\s+(?:3[5-9]|4[0-2])(?:\s*[–-]\s*\d{2})?\s*°\s?C)(?!\s*\()/gi, "$1 (чуть тёплое, как парное молоко)");
+  }
   return t.replace(/(холодильник\S*)\s+в холодильнике/gi, "$1").replace(/холодильнике\s+в холодильнике/gi, "холодильнике")
     .replace(/Если температура ниже,/g, "Если нет,").replace(/\s+,/g, ",").replace(/\s{2,}/g, " ").trim();
 }
@@ -191,10 +199,11 @@ const hoursIn = (text: string): number =>
 
 /** The step with the quick way said after the slow one, and the minutes it saves; null when there is none. */
 function quickStep(text: string, r: Recipe, uses: string[]): { text: string; quick: Quick; saved: number } | null {
-  if (Object.values(QUICK).some((q) => text.includes(q.say))) return null;
-  const quick = quickOf(text, r, uses);
+  // Most steps wait minutes, not hours: they are let go first.
   const wait = hoursIn(text);
-  if (!quick || wait < 4 * 60) return null;
+  if (wait < 4 * 60 || Object.values(QUICK).some((q) => text.includes(q.say))) return null;
+  const quick = quickOf(text, r, uses);
+  if (!quick) return null;
   const parts = text.split(/(?<=[.!?])\s+/);
   const at = parts.findIndex((p) => hoursIn(p) >= 4 * 60);
   parts.splice(at + 1, 0, quick.say);
