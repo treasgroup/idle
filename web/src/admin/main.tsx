@@ -14,6 +14,7 @@ import { VkPosts } from "./VkPosts";
 import { Photos } from "./Photos";
 import { Security } from "./Security";
 import { Searches } from "./Searches";
+import { prepareSearchTexts } from "./searchTexts";
 import { CSS } from "./ui";
 import { installFormShim } from "../app/formShim";
 
@@ -47,6 +48,8 @@ function countMessages(): void {
   fetch("../api/index.php?r=admin.insights&days=90", { credentials: "same-origin" }).then((r) => (r.ok ? r.json() : null)).then((d: { messages?: { seen?: number | string }[] } | null) => {
     unread = (d?.messages ?? []).filter((m) => !+(m.seen ?? 0)).length;
     drawMenu(true);
+    // Logged in: the search pages' texts are brought up to date in the background.
+    if (d) prepareSearchTexts();
   }).catch(() => { counted = false; });
 }
 

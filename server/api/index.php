@@ -128,6 +128,9 @@ try {
     elseif ($route === 'weather' && $method === 'GET') weather_now();
     elseif ($route === 'weather.city' && $method === 'GET') weather_city();
     elseif ($route === 'collections' && $method === 'GET') collections_public();
+    // The search pages in the app's words: the panel works the texts out and keeps them here (seo.php).
+    elseif ($route === 'admin.seo.texts' && $method === 'GET') { require_admin(); require_once __DIR__ . '/_private/seo.php'; admin_seo_texts_state(); }
+    elseif ($route === 'admin.seo.texts' && $method === 'POST') { require_admin(true); require_once __DIR__ . '/_private/seo.php'; admin_seo_texts_save(read_json_body(2000000)); }
     elseif ($route === 'admin.recipes.patch' && $method === 'POST') { require_admin(true); admin_recipes_patch(read_json_body(400000)); }
     elseif ($route === 'admin.collection.save' && $method === 'POST') { require_admin(true); admin_collection_save(read_json_body(40000)); }
     elseif ($route === 'admin.collection.cover' && $method === 'POST') { require_admin(true); admin_collection_cover(); }

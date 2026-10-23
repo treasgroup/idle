@@ -99,6 +99,7 @@ function seo_recipes(): array {
             if (!is_array($r) || !isset($r['id'], $r['title']) || !is_string($r['id']) || !preg_match(RECIPE_ID, $r['id']) || strlen($r['id']) > 60) continue;
             if (isset($out[$r['id']]) || isset($hidden[$r['id']])) continue;
             if (!is_array($r['ingredients'] ?? null) || !is_array($r['steps'] ?? null) || !$r['ingredients'] || count($r['steps']) < 2) continue;
+            $r['_raw'] = seo_raw_key($r);
             // The quick way to thaw or soak, and the time that counts it — as the site shows the recipe (lib.php).
             if ($q = quick_prep($r)) {
                 $r['totalMinutes'] = $q['total'];
@@ -111,6 +112,61 @@ function seo_recipes(): array {
     }
     return $out;
 }
+// ---------- The recipe in the app's words ----------
+// Products in pieces and spoons («4 зубчика», «2,1 л»), «110 мл воды» instead of «одной двадцатой воды», plain checks
+// instead of degrees. The rules live in the app; the admin panel works the texts out in the owner's browser
+// (web/src/admin/searchTexts.ts) and keeps them here, one file per recipe. A recipe changed since then shows its own
+// words until the panel is opened again.
+function seo_texts_dir(): string { return __DIR__ . '/storage/seo-texts'; }
+/** What the recipe was when its texts were made: they are used only while it stays the same. */
+function seo_raw_key(array $r): string { return substr(sha1((string)json_encode($r, JSON_UNESCAPED_UNICODE)), 0, 12); }
+function seo_texts_index(): array {
+    $j = @file_get_contents(seo_texts_dir() . '/_index.json');
+    $a = is_string($j) ? json_decode($j, true) : null;
+    return is_array($a) ? $a : [];
+}
+function seo_texts_for(array $r): ?array {
+    $j = @file_get_contents(seo_texts_dir() . '/' . $r['id'] . '.json');
+    $t = is_string($j) ? json_decode($j, true) : null;
+    return is_array($t) && ($t['raw'] ?? '') === ($r['_raw'] ?? '') ? $t : null;
+}
+/** The panel asks which recipes already have up-to-date texts (by the texts' own short hash). */
+function admin_seo_texts_state(): void {
+    $index = seo_texts_index(); $have = [];
+    foreach (seo_recipes() as $id => $r) if (($index[$id][0] ?? '') === $r['_raw']) $have[$id] = $index[$id][1];
+    send_json(['have' => $have]);
+}
+function admin_seo_texts_save(array $in): void {
+    $all = seo_recipes(); $index = seo_texts_index(); $saved = 0;
+    $str = fn($s, int $max): string => is_string($s) ? mb_substr(trim($s), 0, $max, 'UTF-8') : '';
+    $dir = seo_texts_dir();
+    if (!is_dir($dir)) @mkdir($dir, 0775, true);
+    foreach (array_slice((array)($in['items'] ?? []), 0, 150) as $x) {
+        $id = is_array($x) ? (string)($x['id'] ?? '') : '';
+        if (!isset($all[$id]) || !preg_match('/^[0-9a-z]{1,16}$/', (string)($x['hash'] ?? ''))) continue;
+        $t = ['raw' => $all[$id]['_raw'], 'hash' => (string)$x['hash'], 'time' => $str($x['time'] ?? '', 80), 'summary' => $str($x['summary'] ?? '', 1000), 'ing' => [], 'steps' => [], 'tips' => []];
+        foreach (array_slice((array)($x['ing'] ?? []), 0, 60) as $i) if (is_array($i))
+            $t['ing'][] = ['id' => $str($i['id'] ?? '', 60), 'name' => $str($i['name'] ?? '', 120), 'opt' => !empty($i['opt']), 'text' => $str($i['text'] ?? '', 40), 'more' => $str($i['more'] ?? '', 40)];
+        foreach (array_slice((array)($x['steps'] ?? []), 0, 60) as $s) if (is_array($s))
+            $t['steps'][] = ['text' => $str($s['text'] ?? '', 3000), 'timer' => max(0, min(86400, (int)($s['timer'] ?? 0)))];
+        foreach (array_slice((array)($x['tips'] ?? []), 0, 20) as $s) if (($s = $str($s, 1500)) !== '') $t['tips'][] = $s;
+        if (!$t['ing'] || count($t['steps']) < 2) continue;
+        $path = $dir . '/' . $id . '.json';
+        if (@file_put_contents($path . '.tmp', json_encode($t, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)) === false || !@rename($path . '.tmp', $path)) continue;
+        $index[$id] = [$t['raw'], $t['hash']];
+        $saved++;
+    }
+    if ($saved) { @file_put_contents($dir . '/_index.json.tmp', json_encode($index, JSON_UNESCAPED_SLASHES)); @rename($dir . '/_index.json.tmp', $dir . '/_index.json'); }
+    send_json(['saved' => $saved]);
+}
+/** «35 мин у плиты, потом ждать 2 ч» when most of the time is waiting; otherwise the whole time (app/recipeTime.ts). */
+function seo_time_line(array $r): string {
+    $total = (int)($r['totalMinutes'] ?? 0); $active = (int)($r['activeMinutes'] ?? 0); $wait = $total - $active;
+    if (!($active > 0 && $wait >= 60 && $wait >= $active)) return seo_minutes($total);
+    $words = $wait < 90 ? seo_minutes($wait) : ($wait < 18 * 60 ? (int)round($wait / 60) . ' ч' : ($wait < 36 * 60 ? 'сутки' : (int)round($wait / 1440) . ' сут.'));
+    return seo_minutes($active) . ' у плиты, потом ждать ' . $words;
+}
+
 function seo_course(array $r): string {
     $c = (string)($r['course'] ?? '');
     if (isset(SEO_COURSES[$c])) return $c;
@@ -268,7 +324,9 @@ function seo_css(): string {
         . '.go{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}.go p{margin:0;font-size:14px;color:var(--muted);flex:1 1 220px}'
         . '.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;padding:13px 22px;border-radius:999px;min-height:48px}.btn:hover{filter:brightness(1.06)}'
         . '.cols{display:grid;gap:8px 40px}@media(min-width:900px){.cols{grid-template-columns:340px minmax(0,1fr)}.cols aside{position:sticky;top:88px;align-self:start}}'
-        . '.ing{list-style:none;padding:0;margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}.ing li{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid var(--line)}.ing li:first-child{border-top:0}.ing b{white-space:nowrap;font-weight:600}.ing small{color:var(--muted)}'
+        . '.ing{list-style:none;padding:0;margin:0;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden}.ing li{display:flex;justify-content:space-between;gap:12px;padding:11px 16px;border-top:1px solid var(--line)}.ing li:first-child{border-top:0}.ing b{white-space:nowrap;font-weight:600;text-align:right}.ing small{color:var(--muted)}.ing b small{display:block;font-weight:400;font-size:13px}'
+        . '.time{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:17px}.time svg{width:18px;height:18px;color:var(--muted);flex:none}.facts{color:var(--muted);margin:0 0 18px}'
+        . '.steps .tm{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 10px}.steps .tm svg{width:14px;height:14px}'
         . '.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:10px}.steps li{counter-increment:s;position:relative;padding:14px 16px 14px 60px;background:var(--card);border:1px solid var(--line);border-radius:18px}.steps li:before{content:counter(s);position:absolute;left:14px;top:12px;width:32px;height:32px;border-radius:50%;background:var(--soft);color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:15px}'
         . '.tips{background:var(--soft);border-radius:20px;padding:6px 18px}.tips p{margin:12px 0}'
         . '.faq details{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:0 0 8px;padding:0 16px}.faq summary{cursor:pointer;font-weight:600;padding:13px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}.faq summary::-webkit-details-marker{display:none}.faq summary:after{content:"+";color:var(--muted);font-weight:400;font-size:22px;line-height:1}.faq details[open] summary:after{content:"–"}.faq details p{margin:0 0 14px;color:var(--muted)}'
@@ -299,7 +357,7 @@ function seo_css(): string {
 
 // ---------- recipe.php ----------
 /** Questions people ask about a dish, answered from the recipe itself: time, keeping, freezing, swaps, calories. */
-function seo_recipe_faq(array $r, ?array $kcal, int $servings): array {
+function seo_recipe_faq(array $r, ?array $kcal, int $servings, ?array $t = null): array {
     $name = '«' . (string)$r['title'] . '»';
     $out = [];
     $total = (int)($r['totalMinutes'] ?? 0); $active = (int)($r['activeMinutes'] ?? 0);
@@ -312,8 +370,9 @@ function seo_recipe_faq(array $r, ?array $kcal, int $servings): array {
         if (!is_array($i) || empty($i['swap']) || $swaps >= 2) continue;
         $alt = array_values(array_filter(array_map(fn($x) => mb_strtolower(seo_ing_name((string)$x), 'UTF-8'), (array)$i['swap']), fn($n) => $n !== '' && !preg_match('/^[a-z0-9-]+$/', $n)));
         if (!$alt) continue;
-        $what = mb_strtolower((string)($i['name'] ?? ''), 'UTF-8');
-        $out[] = ['Чем заменить ' . $what . '?', 'Подойдёт ' . implode(' или ', array_slice($alt, 0, 3)) . '.'];
+        // «Сметана — чем заменить?»: the name stays as it is, no case to get wrong («Чем заменить сметана»).
+        $named = $t ? array_values(array_filter($t['ing'], fn($x) => $x['id'] === ($i['id'] ?? null)))[0]['name'] ?? null : null;
+        $out[] = [seo_ucfirst((string)($named ?? $i['name'] ?? '')) . ' — чем заменить?', 'Подойдёт ' . implode(' или ', array_slice($alt, 0, 3)) . '.'];
         $swaps++;
     }
     if ($kcal) $out[] = ['Сколько калорий в одной порции?', 'Около ' . $kcal['kcal'] . ' ккал: белки ' . $kcal['protein'] . ' г, жиры ' . $kcal['fat'] . ' г, углеводы ' . $kcal['carbs'] . ' г.'];
@@ -331,6 +390,13 @@ function seo_recipe_page(string $id): void {
     $r = $all[$id] ?? null;
     if (!$r) { seo_not_found(); return; }
     seo_count_view($id);
+    // The app's words when the admin panel has worked them out for this very recipe; the file's own otherwise.
+    $t = seo_texts_for($r);
+    $summary = (string)($t['summary'] ?? $r['summary'] ?? '');
+    $ingLines = $t ? array_map(fn($i) => $i['name'] . ' — ' . $i['text'] . ($i['more'] !== '' ? ' (' . $i['more'] . ')' : ''), $t['ing'])
+        : array_values(array_map('seo_ingredient_line', array_filter($r['ingredients'], 'is_array')));
+    $steps = $t ? $t['steps'] : array_values(array_map(fn($s) => ['text' => (string)($s['text'] ?? ''), 'timer' => (int)($s['timerSeconds'] ?? 0)], array_filter($r['steps'], 'is_array')));
+    $tips = $t ? $t['tips'] : array_values(array_filter((array)($r['tips'] ?? []), 'is_string'));
     $photo = seo_photo($id, true);
     $kcal = seo_nutrition($r);
     $rev = seo_reviews($id);
@@ -341,11 +407,11 @@ function seo_recipe_page(string $id): void {
     $servings = max(1, (int)($r['servings'] ?? 1));
     $image = $photo ? seo_abs($photo['path']) : null;
 
-    $ld = ['@context' => 'https://schema.org', '@type' => 'Recipe', 'name' => (string)$r['title'], 'description' => (string)($r['summary'] ?? ''), 'url' => $canonical,
+    $ld = ['@context' => 'https://schema.org', '@type' => 'Recipe', 'name' => (string)$r['title'], 'description' => $summary, 'url' => $canonical,
         'recipeCategory' => SEO_COURSES[$course][1], 'recipeYield' => $servings . ' ' . seo_plural($servings, 'порция', 'порции', 'порций'),
         'totalTime' => seo_iso_minutes((int)($r['totalMinutes'] ?? 0)),
-        'recipeIngredient' => array_values(array_map('seo_ingredient_line', array_filter($r['ingredients'], 'is_array'))),
-        'recipeInstructions' => array_values(array_map(function ($s, $k) use ($canonical) { return ['@type' => 'HowToStep', 'position' => $k + 1, 'text' => (string)($s['text'] ?? ''), 'url' => $canonical . '#step-' . ($k + 1)]; }, array_values(array_filter($r['steps'], 'is_array')), array_keys(array_values(array_filter($r['steps'], 'is_array'))))),
+        'recipeIngredient' => $ingLines,
+        'recipeInstructions' => array_map(fn($s, $k) => ['@type' => 'HowToStep', 'position' => $k + 1, 'text' => $s['text'], 'url' => $canonical . '#step-' . ($k + 1)], $steps, array_keys($steps)),
         'author' => ['@type' => 'Organization', 'name' => SEO_SITE, 'url' => seo_abs(seo_path())], 'inLanguage' => 'ru',
         'datePublished' => date('Y-m-d', (int)$r['_mtime'])];
     if (!empty($r['activeMinutes'])) $ld['prepTime'] = seo_iso_minutes((int)$r['activeMinutes']);
@@ -371,22 +437,18 @@ function seo_recipe_page(string $id): void {
     header('Last-Modified: ' . gmdate('D, d M Y H:i:s', max((int)$r['_mtime'], $photo['mtime'] ?? 0)) . ' GMT');
     echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'ogTitle' => (string)$r['title'], 'description' => $desc, 'canonical' => $canonical, 'ogType' => 'article', 'bodyClass' => 'has-dock',
         'image' => $image, 'imageW' => $photo['w'] ?? null, 'imageH' => $photo['h'] ?? null, 'imageAlt' => $photo ? (string)$r['title'] : null,
-        'ld' => array_merge([$ld, $crumbs], ($faqLd = seo_faq_ld(seo_recipe_faq($r, $kcal, $servings))) ? [$faqLd] : [])]);
+        'ld' => array_merge([$ld, $crumbs], ($faqLd = seo_faq_ld(seo_recipe_faq($r, $kcal, $servings, $t))) ? [$faqLd] : [])]);
 
     $app = h(seo_app_path($id));
     $icon = [
         'clock' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
-        'hand' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h20"/><path d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"/><path d="m4 8 16-4"/><path d="m8.86 6.78-.45-1.81a2 2 0 0 1 1.45-2.43l1.94-.48a2 2 0 0 1 2.43 1.46l.45 1.8"/></svg>',
-        'users' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-        'level' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20v-4M10 20v-8M16 20V8M22 20V4"/></svg>',
-        'flame' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
     ];
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_list_path()) . '">Рецепты</a> › <a href="' . h(seo_list_path($course)) . '">' . h(SEO_COURSES[$course][0]) . "</a></nav>\n";
-    $meta = [[$icon['clock'], 'Всего ' . seo_minutes((int)($r['totalMinutes'] ?? 0))]];
-    if (!empty($r['activeMinutes']) && (int)$r['activeMinutes'] < (int)$r['totalMinutes']) $meta[] = [$icon['hand'], 'у плиты ' . seo_minutes((int)$r['activeMinutes'])];
-    $meta[] = [$icon['users'], $servings . ' ' . seo_plural($servings, 'порция', 'порции', 'порций')];
-    if (isset(SEO_DIFFICULTY[$r['difficulty'] ?? ''])) $meta[] = [$icon['level'], SEO_DIFFICULTY[$r['difficulty']]];
-    if ($kcal) $meta[] = [$icon['flame'], $kcal['kcal'] . ' ккал на порцию'];
+    // The time in one line, as the app says it; the rest of the facts quietly under it.
+    $facts = [];
+    if (isset(SEO_DIFFICULTY[$r['difficulty'] ?? ''])) $facts[] = SEO_DIFFICULTY[$r['difficulty']];
+    $facts[] = $servings . ' ' . seo_plural($servings, 'порция', 'порции', 'порций');
+    if ($kcal) $facts[] = $kcal['kcal'] . ' ккал на порцию';
     // Top: the photo and, beside it on a wide screen, the name, the mark, what the dish is, the facts and «Готовить по шагам».
     echo '<article><div class="hero">';
     if ($photo) echo '<figure><img src="' . h($photo['path']) . '" alt="' . h($r['title']) . '"' . ($photo['w'] ? ' width="' . (int)$photo['w'] . '" height="' . (int)$photo['h'] . '"' : '') . ' fetchpriority="high">' . ($photo['real'] ? '' : '<figcaption>Иллюстрация создана нейросетью по описанию рецепта и показывает примерную подачу.</figcaption>') . "</figure>\n";
@@ -395,22 +457,22 @@ function seo_recipe_page(string $id): void {
         $avg = (float)$rev['summary']['avg'];
         echo '<p class="rating"><span class="stars" aria-hidden="true">' . str_repeat('★', (int)round($avg)) . str_repeat('☆', 5 - (int)round($avg)) . '</span><b>' . h(str_replace('.', ',', (string)$avg)) . '</b> · <a href="#reviews">' . $rev['summary']['count'] . ' ' . seo_plural((int)$rev['summary']['count'], 'отзыв', 'отзыва', 'отзывов') . "</a></p>\n";
     }
-    if (!empty($r['summary'])) echo '<p class="lead">' . h($r['summary']) . "</p>\n";
-    echo '<ul class="meta">' . implode('', array_map(function ($m) { return '<li>' . $m[0] . h($m[1]) . '</li>'; }, $meta)) . "</ul>\n";
+    if ($summary !== '') echo '<p class="lead">' . h($summary) . "</p>\n";
+    echo '<p class="time">' . $icon['clock'] . h(seo_time_line($r)) . '</p><p class="facts">' . h(implode(' · ', $facts)) . "</p>\n";
     echo '<div class="go"><a class="btn" href="' . $app . '">Готовить по шагам</a><p>Таймеры на шагах, пересчёт на любое число порций и список покупок — бесплатно.</p></div>';
     echo "</div></div>\n";
 
     // Ingredients beside the steps on a wide screen (they stay in view while reading the steps).
     echo '<div class="cols"><aside><h2>Ингредиенты</h2><p class="note">На ' . $servings . ' ' . seo_plural($servings, 'порцию', 'порции', 'порций') . "</p>\n<ul class=\"ing\">";
-    foreach ($r['ingredients'] as $i) if (is_array($i)) echo '<li><span>' . h($i['name'] ?? '') . (!empty($i['optional']) ? ' <small>по желанию</small>' : '') . '</span><b>' . h(seo_amount($i['amount'] ?? 0) . ' ' . ($i['unit'] ?? '')) . '</b></li>';
+    if ($t) foreach ($t['ing'] as $i) echo '<li><span>' . h($i['name']) . ($i['opt'] ? ' <small>· по желанию</small>' : '') . '</span><b>' . h($i['text']) . ($i['more'] !== '' ? '<small>' . h($i['more']) . '</small>' : '') . '</b></li>';
+    else foreach ($r['ingredients'] as $i) if (is_array($i)) echo '<li><span>' . h($i['name'] ?? '') . (!empty($i['optional']) ? ' <small>по желанию</small>' : '') . '</span><b>' . h(seo_amount($i['amount'] ?? 0) . ' ' . ($i['unit'] ?? '')) . '</b></li>';
     echo "</ul></aside>\n<div><h2>Как приготовить</h2>\n<ol class=\"steps\">";
-    $k = 0; foreach ($r['steps'] as $s) if (is_array($s)) { $k++; echo '<li id="step-' . $k . '">' . h($s['text'] ?? '') . '</li>'; }
+    foreach ($steps as $k => $s) echo '<li id="step-' . ($k + 1) . '">' . h($s['text']) . ($s['timer'] >= 60 ? '<br><span class="tm">' . $icon['clock'] . h(seo_minutes((int)round($s['timer'] / 60))) . '</span>' : '') . '</li>';
     echo "</ol>\n";
-    $tips = array_values(array_filter((array)($r['tips'] ?? []), 'is_string'));
     if ($tips) echo '<h2>Советы</h2><div class="tips">' . implode('', array_map(function ($t) { return '<p>' . h($t) . '</p>'; }, $tips)) . "</div>\n";
     if ($kcal) echo '<h2>Калорийность и БЖУ</h2><p class="note">На одну порцию' . ($kcal['complete'] ? '' : ', без продуктов, для которых нет данных') . '</p><table><tbody><tr><td>Калории</td><td class="n">' . $kcal['kcal'] . ' ккал</td></tr><tr><td>Белки</td><td class="n">' . $kcal['protein'] . ' г</td></tr><tr><td>Жиры</td><td class="n">' . $kcal['fat'] . ' г</td></tr><tr><td>Углеводы</td><td class="n">' . $kcal['carbs'] . " г</td></tr></tbody></table>\n";
     // Частые вопросы: the answers are in the recipe already; folded here (the text is on the page, marked up for search engines).
-    $faq = seo_recipe_faq($r, $kcal, $servings);
+    $faq = seo_recipe_faq($r, $kcal, $servings, $t);
     if ($faq) {
         echo '<h2>Частые вопросы</h2><div class="faq">';
         foreach ($faq as [$q, $a]) echo '<details><summary>' . h($q) . '</summary><p>' . h($a) . '</p></details>';
