@@ -33,6 +33,8 @@ import { stepTips } from "../app/stepTips";
 import { ChefSecret } from "../components/ChefSecret";
 import { timeShort } from "../app/recipeTime";
 import { withAmounts } from "../app/stepAmounts";
+import { REMEMBERED, addFix, kitchenHints, troubleChips, type FixId } from "../app/kitchenFit";
+import { KitchenHint, KitchenLine } from "../components/KitchenHint";
 
 type Key = "main" | "second";
 /** A dish on the stove: the one from the recipe (main) or the one cooked alongside (second, kept in the profile). */
@@ -255,6 +257,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   // «две пятых масла» with the amount for the servings being cooked.
   const lines = r.ingredients.map((i) => scaleIngredient(i, r, dish.servings));
   const curText = withAmounts(cur.text, lines);
+  const fit = kitchenHints(r, profile.kitchen, lines);
   const nextText = next ? withAmounts(next.text, lines) : "";
   const both = live.length === 2 && !!c && !!second;
   const offset = both ? c.recipe.totalMinutes - second.totalMinutes : 0;
@@ -301,6 +304,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
                 «‹» and a swipe change it; underlined kitchen words still open their hint. */}
             <p className="mt-5 text-step md:text-step-lg lg:mt-8">{terms.render(curText)}</p>
             <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
+            {fit.steps[dish.step] && <KitchenHint key={r.id + dish.step + fit.steps[dish.step].fix} hint={fit.steps[dish.step]} className="mt-5" />}
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
             )}
@@ -578,11 +582,14 @@ function TimerPanel({ onJump }: { onJump: (t: CookTimer) => void }) {
 
 /** The dish's products with check-off; the ones this step needs are marked. */
 function Ingredients({ dish, checked, onToggle, compact }: { dish: Dish; checked: string[]; onToggle: (key: string) => void; compact?: boolean }) {
+  const { profile } = useStore();
   const r = dish.recipe;
   const now = new Set(r.steps[dish.step]?.uses ?? []);
+  const rows = mergeSame(r.ingredients.map((i) => scaleIngredient(i, r, dish.servings)));
+  const fit = kitchenHints(r, profile.kitchen, rows).products;
   return (
     <ul className="divide-y divide-line">
-      {mergeSame(r.ingredients.map((i) => scaleIngredient(i, r, dish.servings))).map((i) => {
+      {rows.map((i) => {
         const key = i.id + "|" + i.unit;
         const on = checked.includes(key);
         return (
@@ -598,6 +605,7 @@ function Ingredients({ dish, checked, onToggle, compact }: { dish: Dish; checked
               </span>
               <span className={cx("shrink-0 whitespace-nowrap text-body-sm font-semibold", on ? "text-ink-faint" : "text-ink")}>{homeAmount(i)}</span>
             </button>
+            {fit[i.id] && !on && <KitchenLine text={fit[i.id].text} className="-mt-1 pb-2 pl-9" />}
           </li>
         );
       })}
@@ -830,31 +838,52 @@ function StoreAsk({ onDone }: { onDone: () => void }) {
   );
 }
 
-const TROUBLES = ["Непонятный шаг", "Пригорело или не пропеклось", "Не хватило времени", "Не понравился вкус", "Слишком сложно", "Другое"];
-const AT_STEP = new Set(TROUBLES.slice(0, 3));
-
-/** After «Так себе»: what went wrong and, if it was a step, which one — so the owner knows what to rewrite. */
+/**
+ * After «Так себе»: what went wrong. The kitchen answers (the oven, the salt, the water for grains) are remembered for
+ * similar dishes (app/kitchenFit); every answer also tells the owner what to rewrite, and «Непонятный шаг» asks which step.
+ */
 function Trouble({ recipe }: { recipe: Recipe }) {
-  const [reason, setReason] = useState<string | null>(null);
-  const [sent, setSent] = useState(false);
-  const send = (why: string, step: number) => { track({ type: "trouble", recipeId: recipe.id, text: why, count: step }); setSent(true); };
-  const pick = (why: string) => { cue("tap"); setReason(why); if (!AT_STEP.has(why)) send(why, 0); };
-  if (sent) return <p className="anim-rise mt-3 text-body-sm text-ink-soft" role="status">Спасибо! Поправлю рецепт, а вам в следующий раз предложу что-нибудь другое.</p>;
+  const { profile, setProfile } = useStore();
+  const chips = useMemo(() => troubleChips(recipe), [recipe]);
+  const [on, setOn] = useState<string[]>([]);
+  const [stepFor, setStepFor] = useState<string | null>(null);
+  // The marks as they were before this screen: picking and unpicking a chip never loses an older one.
+  const before = useRef(profile.kitchen);
+  const send = (why: string, step: number) => track({ type: "trouble", recipeId: recipe.id, text: why, count: step });
+  // One mark per kind: «Верх подгорел» with «Внутри сыровато» is still a hot oven (the top bakes before the middle).
+  const marks = (labels: string[]): FixId[] => {
+    const fixes = chips.filter((c) => c.fix && labels.includes(c.label)).map((c) => c.fix!);
+    return (["oven-", "water-", "salt-"] as const).map((k) => fixes.find((f) => f.startsWith(k))).filter((f): f is FixId => !!f);
+  };
+  const pick = (c: (typeof chips)[number]) => {
+    cue("tap");
+    const next = on.includes(c.label) ? on.filter((x) => x !== c.label) : [...on, c.label];
+    setOn(next);
+    if (c.fix) { const add = marks(next); setProfile((p) => ({ ...p, kitchen: add.reduce((k, f) => addFix(k, f), before.current) })); }
+    if (next.includes(c.label)) { if (c.atStep) setStepFor(c.label); else send(c.label, 0); }
+    else if (stepFor === c.label) setStepFor(null);
+  };
+  const kept = marks(on);
+  const told = on.some((l) => !chips.find((c) => c.label === l)?.fix && l !== "Просто не наше");
   return (
     <div className="anim-rise mt-4 text-left">
-      {!reason ? (
-        <>
-          <p className="text-body-sm font-semibold">Что не получилось?</p>
-          <div className="mt-2 flex flex-wrap gap-2">{TROUBLES.map((t) => <Chip key={t} onClick={() => pick(t)}>{t}</Chip>)}</div>
-        </>
-      ) : (
-        <>
-          <p className="text-body-sm font-semibold">На каком шаге?</p>
+      <p className="label mb-2">Что не так? Учту в следующий раз</p>
+      <div className="flex flex-wrap gap-2">{chips.map((c) => <Chip key={c.label} on={on.includes(c.label)} onClick={() => pick(c)}>{c.label}</Chip>)}</div>
+      {stepFor && (
+        <div className="mt-4">
+          <p className="text-body-sm font-semibold">{stepFor === "Непонятный шаг" ? "Какой шаг?" : "На каком шаге?"}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            {recipe.steps.map((_, n) => <Chip key={n} onClick={() => send(reason, n + 1)} label={"Шаг " + (n + 1)}>{n + 1}</Chip>)}
-            <Chip onClick={() => send(reason, 0)}>Не помню</Chip>
+            {recipe.steps.map((_, n) => <Chip key={n} onClick={() => { send(stepFor, n + 1); setStepFor(null); }} label={"Шаг " + (n + 1)}>{n + 1}</Chip>)}
+            <Chip onClick={() => { send(stepFor, 0); setStepFor(null); }}>Не помню</Chip>
           </div>
-        </>
+        </div>
+      )}
+      {(kept.length > 0 || on.length > 0) && (
+        <div className="mt-4 space-y-1 rounded-input bg-herb-soft px-3.5 py-3 text-body-sm" role="status">
+          {kept.map((f) => <p key={f}>✓ Запомнил: {REMEMBERED[f]}</p>)}
+          {on.includes("Просто не наше") && <p>Понял — похожее буду предлагать реже.</p>}
+          {told && <p>Спасибо — поправлю рецепт.</p>}
+        </div>
       )}
     </div>
   );

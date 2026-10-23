@@ -21,6 +21,8 @@ import { printPage } from "../app/print";
 import { useHint } from "../app/hints";
 import { PAN_CHOICES, area, panOf, panText, type Pan } from "../app/pan";
 import { stepTips } from "../app/stepTips";
+import { kitchenHints } from "../app/kitchenFit";
+import { KitchenHint, KitchenLine } from "../components/KitchenHint";
 import { catalogSides } from "../app/pairing";
 import { goChat } from "../app/chatNav";
 import { openLayer, replace, routeHash } from "../app/router";
@@ -239,6 +241,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   }
   // All products for the chosen servings: the steps' «две пятых масла» get their amount from these.
   const lines = groups.flatMap((g) => g.rows);
+  // «Под вашу кухню»: last time's oven, salt or water, as hints (app/kitchenFit); the recipe itself stays.
+  const fit = kitchenHints(recipe, profile.kitchen, lines);
   const hasIt = (id: string) => have.some((h) => ingredientMatches(id, h));
   const needed = [...new Set(recipe.ingredients.filter((i) => !i.optional && i.id !== "water").map((i) => i.id))];
   const owned = needed.filter(hasIt).length;
@@ -379,7 +383,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                     <div key={g.key} ref={g.added ? sideRows : undefined}>
                       {g.title && <h3 className="label mb-1.5 px-1">{g.title}</h3>}
                       <ul className="card px-1">
-                        {g.rows.map((i, k) => <Row key={g.key + i.id + i.unit} i={i} own={hasIt(i.id)} flash={g.added} first={k === 0} onToggle={() => { toggleHave(i.id); haveSeen(); setMarked(true); }} />)}
+                        {g.rows.map((i, k) => <Row key={g.key + i.id + i.unit} i={i} fit={fit.products[i.id]?.text} own={hasIt(i.id)} flash={g.added} first={k === 0} onToggle={() => { toggleHave(i.id); haveSeen(); setMarked(true); }} />)}
                       </ul>
                     </div>
                   ))}
@@ -428,6 +432,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                               <Lightbulb size={16} className="mt-[3px] shrink-0 text-herb" aria-hidden /><span><span className="font-semibold text-herb">Совет: </span>{tips[n]}</span>
                             </p>
                           )}
+                          {fit.steps[n] && <KitchenHint key={fit.steps[n].fix} hint={fit.steps[n]} className="mt-3" />}
                           {!!st.timerSeconds && <TimerChip recipe={base} step={n} text={st.text} seconds={st.timerSeconds} />}
                         </div>
                       </li>
@@ -647,7 +652,7 @@ function ProductHelp({ open, onClose, rows, canSwap, onSwap }: { open: boolean; 
 }
 
 /** One product: tap marks «есть дома». */
-function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boolean; flash?: boolean; first: boolean; onToggle: () => void }) {
+function Row({ i, own, flash, first, onToggle, fit }: { i: RecipeIngredient; own: boolean; flash?: boolean; first: boolean; onToggle: () => void; fit?: string }) {
   const q = homeQuantity(i);
   return (
     <li className={cx(!first && "border-t border-line")}>
@@ -669,6 +674,7 @@ function Row({ i, own, flash, first, onToggle }: { i: RecipeIngredient; own: boo
             : q.hint && <span className="block whitespace-nowrap text-caption text-ink-faint">≈ {q.hint}</span>}
         </span>
       </button>
+      {fit && <KitchenLine text={fit} className="-mt-1 pb-2.5 pl-11 pr-3" />}
     </li>
   );
 }

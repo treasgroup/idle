@@ -2,6 +2,7 @@
 // Kept on the device next to the engine state (the engine's own state schema stays untouched for sync).
 import type { Conditions } from "../engine";
 import { normalizeDates, type FamilyDate } from "./familyCalendar";
+import { normalizeFixes, type KitchenFix } from "./kitchenFit";
 
 export type Level = "beginner" | "confident" | "pro";
 export type Goal = "tasty" | "quick" | "budget" | "light" | "protein" | "family";
@@ -34,6 +35,8 @@ export interface Profile {
   voiceRate: number;
   /** «Семейный календарь»: birthdays and the family's own dates (app/familyCalendar). */
   familyDates: FamilyDate[];
+  /** «Под вашу кухню»: the oven, the salt, the water for grains, from what went wrong before (app/kitchenFit). */
+  kitchen: KitchenFix[];
 }
 
 export interface Member { name: string; excluded: string[] }
@@ -54,6 +57,7 @@ export const DEFAULT_PROFILE: Profile = {
   sounds: true,
   voiceRate: 1.1,
   familyDates: [],
+  kitchen: [],
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
@@ -107,6 +111,7 @@ export function normalizeProfile(raw: unknown): Profile {
     .filter((m): m is Member => !!m && typeof m === "object" && typeof (m as Member).name === "string" && Array.isArray((m as Member).excluded))
     .slice(0, 10).map((m) => ({ name: m.name.slice(0, 30), excluded: m.excluded.filter((x): x is string => typeof x === "string").slice(0, 40) }));
   p.familyDates = normalizeDates(r.familyDates);
+  p.kitchen = normalizeFixes(r.kitchen);
   return p;
 }
 

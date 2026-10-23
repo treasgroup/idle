@@ -17,6 +17,7 @@ import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
 import { FamilyCalendarSheet } from "../components/FamilyCalendar";
+import { FIX_INFO } from "../app/kitchenFit";
 import { byNext, dayMonth, daysUntil, whenText, AHEAD } from "../app/familyCalendar";
 import { Tour, tourWanted } from "../components/Tour";
 import { VoiceSheet } from "../components/VoiceSheet";
@@ -125,7 +126,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
                 hint={profile.eaters + " " + plural(profile.eaters, "человек", "человека", "человек") + " · " + profile.goals.map((g) => GOALS.find((x) => x.id === g)?.label).join(", ") + " · " + LEVELS.find((l) => l.id === profile.level)?.label}
                 onClick={() => setSheet("goals")} />
               <Row icon={<Sparkles size={18} />} title="Что я про вас понял"
-                hint={understoodNow.likes.length ? "Чаще: " + understoodNow.likes.slice(0, 3).map((x) => x.label).join(", ") : "Пока присматриваюсь к вашим вкусам"}
+                hint={understoodNow.likes.length ? "Чаще: " + understoodNow.likes.slice(0, 3).map((x) => x.label).join(", ") : profile.kitchen.length ? FIX_INFO[profile.kitchen[0].id].title : "Пока присматриваюсь к вашим вкусам"}
                 onClick={() => setTasteOpen(true)} />
               <Row icon={<CloudSun size={18} />} title="Погода за окном"
                 hint={place ? place.name + (weather ? " · " + degrees(weather.t) : "") + " — учитываю при подборе" : "Выключено. В холод — супы, в жару — лёгкое"}
