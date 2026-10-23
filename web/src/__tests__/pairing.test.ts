@@ -20,12 +20,15 @@ test("catalog sides suit the dish", () => {
 test("Шеф: «гарнир к котлетам», «что выпить»", () => {
   const a = sideAnswer("гарнир к котлетам")!;
   console.log(a.text, a.results.map((m) => m.recipe.title));
-  expect(a.text).toMatch(/Котлет/);
+  // The person's own words, not «К «Котлеты домашние» и похожим блюдам».
+  expect(a.text).toBe("К котлетам подойдут:");
+  expect(sideAnswer("какой гарнир к жареной курице на ужин")!.text).toBe("К жареной курице подойдут:");
   expect(a.results.length).toBe(3);
   expect(a.results.every((m) => courseOf(m.recipe) === "side")).toBe(true);
   const b = sideAnswer("с чем подать рыбу")!;
   console.log(b.text, b.results.map((m) => m.recipe.title));
   expect(b.results.length).toBeGreaterThan(0);
+  expect(b.text).toBe("К рыбе подойдут:");
   expect(sideAnswer("какой гарнир сделать")!.results.length).toBe(3);
   expect(sideAnswer("хочу курицу с картошкой")).toBeNull();
   const w = drinkAnswer("что выпить", new Date(2026, 10, 5))!;

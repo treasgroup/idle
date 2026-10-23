@@ -30,6 +30,21 @@ export function catalogSides(main: Recipe, exclude: string[] = [], n = 2): Recip
 const match = (recipe: Recipe, reason: string): Match => ({ recipe, available: [], missing: [], unknown: [], toBuy: [], reason });
 
 const SIDE_ASK = /(гарнир|что подать|с чем (?:подать|есть|съесть|подавать)|чем дополнить)/;
+/** «гарнир к жареной курице на ужин» → «жареной курице»: what the person put after «к», up to four words; null without it. */
+// «с чем подать рыбу»: the word as «к …» needs it.
+const DATIVE: Record<string, string> = {
+  рыбу: "рыбе", курицу: "курице", мясо: "мясу", котлеты: "котлетам", говядину: "говядине", свинину: "свинине", индейку: "индейке",
+  печень: "печени", пельмени: "пельменям", сосиски: "сосискам", утку: "утке", баранину: "баранине", тефтели: "тефтелям", стейк: "стейку",
+};
+function toWhat(text: string): string | null {
+  const t = text.toLowerCase().replace(/[?!.,]/g, " ").trim();
+  const said = /с чем (?:подать|есть|съесть|подавать)\s+([а-яё]+)$/.exec(t);
+  if (said && DATIVE[said[1]]) return DATIVE[said[1]];
+  const m = /(?:^|\s)ко?\s+([а-яё -]+)/i.exec(t);
+  if (!m) return null;
+  const words = m[1].replace(/\s+(на ужин|на обед|на завтрак|подойдет|подойдёт|подойдут|лучше|сделать|приготовить)(?=\s|$).*$/, "").trim();
+  return words && words.split(/\s+/).length <= 4 ? words : null;
+}
 /** «гарнир к котлетам», «с чем подать рыбу», «что подать к курице»: the dish found by its name, its sides. */
 export function sideAnswer(text: string): { text: string; results: Match[] } | null {
   const t = text.toLowerCase().replace(/ё/g, "е");
@@ -43,8 +58,8 @@ export function sideAnswer(text: string): { text: string; results: Match[] } | n
   const list = [...new Map([...classic.slice(0, 1), ...catalogSides(base, [], 3)].map((r) => [r.id, r])).values()].slice(0, 3);
   if (!list.length) return null;
   return {
-    // «гарнир к рыбе» names a kind of dish, not one recipe: «… и похожим блюдам».
-    text: main ? "К «" + main.title + "»" + (rest.split(" ").length === 1 ? " и похожим блюдам" : "") + " подойдут:" : "Гарниры, которые подходят почти ко всему:",
+    // In the person's own words («К котлетам подойдут:»); without «к …» the dish's name stays in quotes after «блюду».
+    text: main ? (toWhat(text) ? "К " + toWhat(text) : "К блюду «" + main.title + "»") + " подойдут:" : "Гарниры, которые подходят почти ко всему:",
     results: list.map((r) => match(r, r.summary)),
   };
 }

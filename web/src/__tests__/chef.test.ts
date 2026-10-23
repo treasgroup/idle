@@ -42,6 +42,12 @@ test("phrases without products or dishes", () => {
   expect(turn("нечего есть").results.every((m) => ["main", "soup"].includes(courseOf(m.recipe)))).toBe(true);
   expect(turn("блюда с белком").results.every((m) => nutritionOf(m.recipe).perServing.protein >= 25)).toBe(true);
   expect(turn("что взять на работу пообедать").kind).toBe("found");
+  // «You choose» in a word: dishes, not «Не понял».
+  for (const q of ["не знаю", "что-нибудь", "без разницы", "Всё равно!"]) {
+    const t = turn(q);
+    expect(t.kind, q).toBe("found");
+    expect(t.results.every((m) => ["main", "soup"].includes(courseOf(m.recipe))), q).toBe(true);
+  }
 });
 
 test("what the person does not eat, and the meal said in words", () => {
