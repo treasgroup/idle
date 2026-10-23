@@ -116,7 +116,7 @@ export function RecipeRow({ recipe, note, onOpen, favorite }: { recipe: Recipe; 
   );
 }
 
-/** A tile for grids and carousels: 4:3 photo, two-line title, facts. `badge`: a word on the photo («Рецепт дня», «По плану»). */
+/** A tile for grids and carousels: 4:3 photo, title up to three lines, facts. `badge`: a word on the photo («Рецепт дня», «По плану»). */
 export function RecipeTile({ recipe, note, badge, onOpen, className }: { recipe: Recipe; note?: string; badge?: string; onOpen: () => void; className?: string }) {
   const { s } = useStore();
   const cooked = s.book.some((b) => b.recipeId === recipe.id);
@@ -128,9 +128,10 @@ export function RecipeTile({ recipe, note, badge, onOpen, className }: { recipe:
         : cooked && <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-card/95 px-2 py-0.5 text-caption text-ink shadow-e1"><Check size={12} className="text-herb" aria-hidden />Вы готовили</span>}
       <RatingBadge id={recipe.id} className="right-2 top-2" />
       <span className="flex flex-1 flex-col p-3">
-        <span className="line-clamp-2 min-h-[3rem] text-title leading-snug">{recipe.title}</span>
-        {/* Narrow tile: one short line, no icons (time first, calories quietly after it). */}
-        <span className="mt-1 truncate text-caption text-ink-soft">{timeShort(recipe)}{nutritionOf(recipe).perServing.kcal > 0 && " · " + nutritionOf(recipe).perServing.kcal + " ккал"}</span>
+        {/* Three lines: on a phone two cut half the names («Паста с томатами и…»). */}
+        <span className="line-clamp-3 min-h-[3rem] text-title leading-snug">{recipe.title}</span>
+        {/* Narrow tile: one short line, no icons (time first, calories quietly after it); level across a row. */}
+        <span className="mt-auto truncate pt-1 text-caption text-ink-soft">{timeShort(recipe)}{nutritionOf(recipe).perServing.kcal > 0 && " · " + nutritionOf(recipe).perServing.kcal + " ккал"}</span>
         {note && <span className="mt-1 line-clamp-2 text-caption text-ink-soft">{note}</span>}
       </span>
     </button>

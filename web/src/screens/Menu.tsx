@@ -4,12 +4,13 @@ import {
   CalendarDays, ChevronDown, Clock, MoreHorizontal, Package, Pencil, ArrowRightLeft, Eraser, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, CalendarPlus, Repeat2, Bookmark, X,
 } from "lucide-react";
 import {
-  MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuShopping, menuText, nutritionOf, plural,
+  MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuText, nutritionOf, plural,
   rankRecipes, recipeById, recipes, regenerateDay, removeMenuItem, replaceMenuItem, sharedPerishables, siteBase, weekDays,
   type MenuDay, type MenuPlan, type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
-import { useActions, haveIds } from "../app/actions";
+import { useActions } from "../app/actions";
+import { withWeek } from "../app/planShopping";
 import { weekLeftovers, amountText } from "../app/nowaste";
 import { replace, routeHash } from "../app/router";
 import { DinnerSetup } from "../components/DinnerPlan";
@@ -37,11 +38,6 @@ function goalFilter(p: Profile): ((r: Recipe) => boolean) | undefined {
   return tests.length ? (r) => tests.every((t) => t(r)) : undefined;
 }
 
-// Shopping rows the last «В покупки» created, so pressing it again rebuilds them instead of adding twice.
-const MENU_ROWS = "cook-menu-shopping-v1";
-const loadRows = (): string[] => { try { const v = JSON.parse(localStorage.getItem(MENU_ROWS) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
-const saveRows = (keys: string[]) => { try { localStorage.setItem(MENU_ROWS, JSON.stringify(keys)); } catch { /* ignore */ } };
-
 export function Menu() {
   const { s, update, profile, setProfile, toast } = useStore();
   const { openRecipe } = useActions();
@@ -55,7 +51,7 @@ export function Menu() {
   const [poll, setPoll] = useState<{ token: string; date: string } | null>(null);
   const [noWaste, setNoWaste] = useState(false);
   const [again, setAgain] = useState(false);
-  // «+ Добавить в этот день», «⋯ Ещё», «Заполню сам» (an empty week to fill by hand), moving a dish to another day.
+  // «+» beside a day, «⋯ Ещё», «Заполню сам» (an empty week to fill by hand), moving a dish to another day.
   const [addDay, setAddDay] = useState<string | null>(null);
   const [more, setMore] = useState(false);
   const [manual, setManual] = useState(false);
@@ -112,14 +108,7 @@ export function Menu() {
   const clearDay = (date: string) => { save(days.map((d) => (d.date === date ? { ...d, items: [] } : d))); withUndo("День очищен"); };
 
   const toShopping = (week: MenuDay[] = days, text = "Продукты на неделю — в списке покупок") => {
-    const prev = loadRows();
-    const kept = s.shopping.filter((x) => x.checked || !prev.includes(x.key));
-    const fresh = menuShopping(week, [], haveIds(s)).filter((f) => !kept.some((k) => k.key === f.key));
-    saveRows(fresh.map((f) => f.key));
-    update((st) => {
-      const rest = st.shopping.filter((x) => x.checked || !prev.includes(x.key));
-      return { ...st, shopping: [...rest, ...fresh.filter((f) => !rest.some((k) => k.key === f.key))] };
-    });
+    update((st) => ({ ...st, shopping: withWeek(st, week) }));
     toast(text, { label: "Открыть", run: () => replace(routeHash({ tab: "shopping" })) });
   };
   // The week's dinners from a VK menu, one a day from today; other meals of those days stay.
@@ -195,7 +184,15 @@ export function Menu() {
           <div className="mt-6 grid gap-5">
             {days.map((d) => (
               <section key={d.date} aria-label={dayLabel(d.date)}>
-                <h3 className={cx("mb-2 px-1 text-body font-semibold", d.date === today && "text-brand")}>{dayLabel(d.date)}</h3>
+                {/* «+» beside the day instead of a «Добавить в этот день» row under every day (seven of them on a phone). */}
+                <div className="mb-1 flex items-center justify-between gap-2 px-1">
+                  <h3 className={cx("text-body font-semibold", d.date === today && "text-brand")}>{dayLabel(d.date)}</h3>
+                  {d.items.length > 0 && (
+                    <button className="-my-1.5 inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-small text-brand hover:bg-brand-soft" onClick={() => setAddDay(d.date)} aria-label={"Добавить блюдо: " + dayLabel(d.date)}>
+                      <span className="grid h-7 w-7 place-items-center rounded-full border border-line-strong"><Plus size={16} aria-hidden /></span><span className="hidden sm:inline">Добавить</span>
+                    </button>
+                  )}
+                </div>
                 {d.items.length === 0 ? (
                   <div className="card flex flex-wrap gap-2 p-3">
                     <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
@@ -224,9 +221,6 @@ export function Menu() {
                         </div>
                       );
                     })}
-                    <button className="flex min-h-[44px] w-full items-center gap-2 px-3 text-left text-body-sm text-brand hover:bg-brand-soft" onClick={() => setAddDay(d.date)}>
-                      <Plus size={18} aria-hidden />Добавить в этот день
-                    </button>
                     {d.date >= today && dinnerDishes(d.date).length >= 2 && (
                       <button className="flex min-h-[48px] w-full items-center gap-2 px-3 text-left text-body-sm font-semibold text-brand hover:bg-brand-soft" onClick={() => setDinnerDay(d.date)}>
                         <Clock size={18} aria-hidden />Ужин к сроку — все блюда к одному времени

@@ -5,8 +5,9 @@ import { hintDone } from "../app/hints";
 import { BookOpen, Check, ChevronDown, ChevronRight, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients, shoppingText,
-  shortName, useVoiceInput, type ShoppingItem,
+  shortName, useVoiceInput, weekDays, type ShoppingItem,
 } from "../engine";
+import { withWeek } from "../app/planShopping";
 import { useStore } from "../app/store";
 import { shopLine } from "../app/amounts";
 import { dishesInList, removeDish, type ListDish } from "../app/shoppingDishes";
@@ -23,8 +24,6 @@ interface Partner { id: string; label: string; note?: string }
 /** Spices and other pinches: most homes have them, so they are checked at home rather than bought. */
 const isPinch = (i: ShoppingItem) => (i.unit === "г" || i.unit === "мл") && i.amount > 0 && i.amount < 5;
 const products = (n: number) => n + " " + plural(n, "продукт", "продукта", "продуктов");
-/** Dishes named in «Для блюд» before «Ещё N». */
-const SHOWN = 3;
 
 export function Shopping() {
   const { s, update, toast, online, clearToast, catalog } = useStore();
@@ -54,6 +53,10 @@ export function Shopping() {
   // Recomputed when the catalog arrives: on a fresh start the list is there before the recipes are.
   const dishes = useMemo(() => dishesInList(s.shopping), [s.shopping, catalog.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const bought = s.shopping.filter((i) => i.checked);
+  // The plan's days from today with at least one dish.
+  const week = weekDays(s.menu);
+  const planned = week.some((d) => d.items.length > 0);
+  const fromPlan = () => { update((st) => ({ ...st, shopping: withWeek(st, week) })); toast("Продукты на неделю — в списке покупок"); };
   const set = (fn: (l: ShoppingItem[]) => ShoppingItem[]) => update((st) => ({ ...st, shopping: fn(st.shopping) }));
   const toggle = (key: string) => {
     const item = s.shopping.find((x) => x.key === key);
@@ -136,30 +139,26 @@ export function Shopping() {
           <ShoppingBasket size={20} className="text-brand" />Я в магазине — крупный список
         </button>
       )}
+      {/* «Для блюд» in one line: a week plan brings 7–14 dishes, and the list itself must start on the first screen. */}
       {dishes.length > 0 && (
-        <div className="mt-4">
-          <p className="label mb-2">Для блюд</p>
-          <div className="flex flex-wrap gap-2">
-            {/* Three at most: a week plan brings 7–14 dishes, and the list itself must stay near the top. */}
-            {dishes.slice(0, SHOWN).map((d) => (
-              <button key={d.id} className="chip h-9 max-w-full" onClick={() => setDish(d)}>
-                <span className="truncate">{d.title}</span><ChevronRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
-              </button>
-            ))}
-            {dishes.length > SHOWN && (
-              <button className="chip h-9 font-semibold" onClick={() => setAllDishes(true)}>
-                Ещё {dishes.length - SHOWN}<ChevronRight size={16} className="shrink-0 text-ink-soft" aria-hidden />
-              </button>
-            )}
-          </div>
-        </div>
+        <button className="card mt-4 flex min-h-[48px] w-full items-center gap-2 px-3 py-2 text-left" onClick={() => (dishes.length === 1 ? setDish(dishes[0]) : setAllDishes(true))}>
+          <span className="min-w-0 flex-1 truncate text-body-sm">
+            <span className="text-ink-soft">{dishes.length === 1 ? "Для блюда: " : "Для " + dishes.length + " " + plural(dishes.length, "блюда", "блюд", "блюд") + ": "}</span>
+            {dishes.map((d, i) => (i ? d.title.charAt(0).toLowerCase() + d.title.slice(1) : d.title)).join(", ")}
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
+        </button>
       )}
       {store && <StoreMode items={s.shopping} onToggle={toggle} onToPantry={toPantry} onClose={() => setStore(false)} />}
 
       {s.shopping.length === 0 ? (
         <div className="mt-6">
           <Empty icon={<ShoppingBag size={48} />} title="Список покупок пуст" mood="shopping"
-            actions={<>
+            actions={planned ? <>
+              {/* A plan is there already: its products in one tap, not a trip to the plan for its «В покупки». */}
+              <button className="btn-primary" onClick={fromPlan}><CalendarDays size={18} />Взять продукты из плана</button>
+              <button className="btn-outline" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукт</button>
+            </> : <>
               <button className="btn-primary" onClick={() => setAdding(true)}><Plus size={18} />Добавить продукт</button>
               <button className="btn-outline" onClick={() => replace(routeHash({ tab: "menu" }))}><CalendarDays size={18} />Составить план</button>
             </>}>
