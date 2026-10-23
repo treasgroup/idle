@@ -17,3 +17,4 @@ server/collections/
 
 # Pictures for Школа готовки cards, uploaded in the admin panel, live on the hosting
 server/school/
+server/avtor/

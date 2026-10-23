@@ -2,10 +2,10 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart,
 } from "lucide-react";
 import {
-  LABELS, LEGAL_TITLES, ingredientOptions, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
+  LABELS, LEGAL_TITLES, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
 } from "../engine";
 import { useStore } from "../app/store";
 import { useReminders } from "../app/reminders";
@@ -18,6 +18,7 @@ import { cue } from "../app/feedback";
 import { FeastSheet } from "../components/Feast";
 import { FamilyCalendarSheet } from "../components/FamilyCalendar";
 import { FIX_INFO } from "../app/kitchenFit";
+import { supportUrl } from "../components/SupportButton";
 import { byNext, dayMonth, daysUntil, whenText, AHEAD } from "../app/familyCalendar";
 import { Tour, tourWanted } from "../components/Tour";
 import { VoiceSheet } from "../components/VoiceSheet";
@@ -94,6 +95,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         {profile.simple && <Row icon={<ShoppingCart size={18} />} title="Список покупок" hint={s.shopping.filter((i) => !i.checked).length ? "Купить: " + s.shopping.filter((i) => !i.checked).length : "Пока пуст"} onClick={() => openLayer(routeHash({ tab: "shopping" }))} />}
         <Row icon={<BookOpenCheck size={18} />} title="Я готовил(а)" hint={bookCount ? bookCount + " " + plural(bookCount, "блюдо", "блюда", "блюд") : "Здесь будет всё, что вы приготовили"} onClick={() => openRecipesView("book")} />
         <Row icon={<GraduationCap size={18} />} title="Школа готовки" hint={profile.lessonsDone.length ? "Пройдено уроков: " + profile.lessonsDone.length : "Короткие уроки: от ножа до духовки"} onClick={() => openLayer(routeHash({ tab: "learn" }))} />
+        {/* Only on the site: the RuStore app has no payment links (SupportButton). */}
+        {!isNativeApp() && <Row icon={<Heart size={18} className="fill-brand text-brand" />} title="Поддержать автора" hint="Сервис делает один человек" onClick={() => { location.href = supportUrl(); }} />}
       </div>
 
       <div className="card mt-3 overflow-hidden">

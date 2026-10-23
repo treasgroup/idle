@@ -272,10 +272,14 @@ function seo_head(array $o): string {
     if (!empty($o['imageAlt'])) $out .= '<meta property="og:image:alt" content="' . h($o['imageAlt']) . "\">\n";
     $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
     foreach (($o['ld'] ?? []) as $ld) $out .= "<script type=\"application/ld+json\">\n" . seo_json($ld) . "\n</script>\n";
-    return $out . '<style>' . seo_css() . ($o['css'] ?? '') . "</style>\n</head>\n<body" . (!empty($o['bodyClass']) ? ' class="' . h($o['bodyClass']) . '"' : '') . ">\n" . seo_header();
+    return $out . '<style>' . seo_css() . ($o['css'] ?? '') . "</style>\n</head>\n<body" . (!empty($o['bodyClass']) ? ' class="' . h($o['bodyClass']) . '"' : '') . ">\n" . seo_header(!empty($o['back']));
 }
-function seo_header(): string {
+/** back: «← Назад» instead of «Открыть приложение» (the support page, opened from the app): back where the person came
+ * from on this site, or to the app when the page was opened from a link. */
+function seo_header(bool $back = false): string {
     $p = h(seo_path());
+    if ($back) return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"34\" height=\"34\"><span>" . h(SEO_SITE) . "</span></a>"
+        . "<nav aria-label=\"Разделы\"><a class=\"pill back\" href=\"$p\" onclick=\"if(document.referrer&amp;&amp;new URL(document.referrer).host===location.host&amp;&amp;history.length&gt;1){history.back();return false}\">← Назад</a></nav></div></header>\n<main class=\"wrap\">\n";
     // Phones: the name and «Открыть приложение»; the other links are in the footer and the breadcrumbs.
     return "<header class=\"top\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"34\" height=\"34\"><span>" . h(SEO_SITE) . "</span></a>"
         . "<nav aria-label=\"Разделы\"><a class=\"wide\" href=\"" . h(seo_list_path()) . "\">Рецепты</a><a class=\"wide\" href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a class=\"wide\" href=\"" . h(seo_combo_path('')) . "\">По продуктам</a><a class=\"wide\" href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа</a>"
@@ -287,7 +291,7 @@ function seo_footer(): string {
     $p = h(seo_path());
     return "</main>\n<footer class=\"foot\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"28\" height=\"28\" loading=\"lazy\"><span>" . h(SEO_SITE) . "</span></a>"
         . "<p>Подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, бесплатно и без регистрации.</p>"
-        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'skolko/' : 'skolko.php')) . "\">Сколько варить и запекать</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
+        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'skolko/' : 'skolko.php')) . "\">Сколько варить и запекать</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'avtor' : 'avtor.php')) . "\">Поддержать автора</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
 }
 /** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
@@ -308,7 +312,7 @@ function seo_css(): string {
         . '.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:64px}'
         . '.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:18px;color:var(--ink);text-decoration:none;white-space:nowrap}'
         . '.top nav{display:flex;gap:4px;align-items:center;font-size:15px;white-space:nowrap}.top nav a{color:var(--ink);text-decoration:none;padding:8px 12px;border-radius:999px}.top nav a.wide:hover{background:var(--sunken)}'
-        . '.pill,.top nav a.pill{background:var(--accent);color:var(--accent-ink);padding:9px 18px;border-radius:999px;text-decoration:none;font-weight:600;margin-left:6px}'
+        . '.pill,.top nav a.pill{background:var(--accent);color:var(--accent-ink);padding:9px 18px;border-radius:999px;text-decoration:none;font-weight:600;margin-left:6px}.top nav a.pill.back{background:var(--card);color:var(--ink);border:1px solid var(--line)}'
         . '@media(max-width:820px){.top nav a.wide,.pill .wide{display:none}.top .wrap{min-height:58px}.brand{font-size:17px}.pill,.top nav a.pill{padding:8px 14px;font-size:14px}}'
         . '@media(max-width:360px){.brand span{display:none}}'
         // Text.
@@ -651,6 +655,7 @@ function seo_sitemap(): void {
     }
     if (function_exists('school_sitemap')) school_sitemap($url);
     if (function_exists('skolko_sitemap')) skolko_sitemap($url);
+    $url(seo_abs(seo_path() . (seo_pretty() ? 'avtor' : 'avtor.php')), $newest);
     $url(seo_abs(seo_combo_path('')), $newest);
     foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
     foreach (seo_combo_pairs() as [$a, $b]) $url(seo_abs(seo_combo_path($a, $b)), $newest);

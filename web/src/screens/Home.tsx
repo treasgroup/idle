@@ -25,6 +25,7 @@ import { RatingBadge, RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { photoFirst } from "../app/photoFirst";
 import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
 import { ProfileButton } from "../app/App";
+import { SupportButton } from "../components/SupportButton";
 import { LESSONS } from "./learn-data";
 import type { Pwa } from "./Profile";
 import { FeastSheet } from "../components/Feast";
@@ -164,7 +165,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
           <h1 className="mt-1 text-h1 sm:text-display">Что приготовим {MEAL_WORD[meal]}?</h1>
           {weather && <p className="mt-1.5 text-body-sm text-ink-soft">{weather}</p>}
         </div>
-        <ProfileButton className="-mr-1.5 lg:hidden" />
+        <div className="flex shrink-0 items-center"><SupportButton /><ProfileButton className="-mr-1.5 lg:hidden" /></div>
       </div>
 
       <ContinueCard />
@@ -348,7 +349,7 @@ function SimpleHome({ today }: { today: Recipe | null }) {
     <div className="pb-4">
       <div className="flex items-start justify-between gap-3 pt-3">
         <h1 className="text-display">{greeting()}!</h1>
-        <ProfileButton className="-mr-1.5 lg:hidden" />
+        <div className="flex shrink-0 items-center"><SupportButton /><ProfileButton className="-mr-1.5 lg:hidden" /></div>
       </div>
       <button onClick={() => { a.newChat(); goChat(true); }} className="mt-5 flex w-full items-center gap-4 rounded-card bg-brand-soft p-4 text-left">
         <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-brand-fill text-white" aria-hidden><Mic size={30} /></span>

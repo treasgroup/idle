@@ -14,6 +14,7 @@ import { VkPosts } from "./VkPosts";
 import { Photos } from "./Photos";
 import { Security } from "./Security";
 import { Searches } from "./Searches";
+import { SupportPage } from "./Support";
 import { prepareSearchTexts } from "./searchTexts";
 import { CSS } from "./ui";
 import { installFormShim } from "../app/formShim";
@@ -24,7 +25,7 @@ installFormShim();
 /** The new pages; the other addresses are the old panel's. */
 // «ВКонтакте»: the old page (the dish of the day, posts for the week) and under it the ready posts.
 const VkPage = () => <><Vk /><VkPosts /></>;
-const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": VkPage, "#opens": Opens, "#photos": Photos, "#security": Security, "#searches": Searches };
+const PAGES: Record<string, ComponentType> = { "#messages": Messages, "#collections": Collections, "#improve": Improve, "#new": NewRecipes, "#school": School, "#vk": VkPage, "#opens": Opens, "#photos": Photos, "#security": Security, "#searches": Searches, "#support": SupportPage };
 
 interface Section { label: string; tabs: [hash: string, label: string][] }
 const SECTIONS: Section[] = [
@@ -32,7 +33,7 @@ const SECTIONS: Section[] = [
   { label: "Люди", tabs: [["#messages", "Сообщения"], ["#reviews", "Отзывы"]] },
   { label: "Рецепты", tabs: [["#recipes", "Все рецепты"], ["#photos", "Фото"], ["#collections", "Подборки"], ["#new", "Новые рецепты"], ["#improve", "Доработка"], ["#school", "Школа"], ["#files", "Файлы каталога"]] },
   { label: "Шеф", tabs: [["#teach", "Обучение Шефа"]] },
-  { label: "Продвижение", tabs: [["#vk", "ВКонтакте"]] },
+  { label: "Продвижение", tabs: [["#vk", "ВКонтакте"], ["#support", "Поддержка автора"]] },
   { label: "Настройки", tabs: [["#server", "Настройки"], ["#security", "Безопасность"]] },
 ];
 

@@ -18,6 +18,7 @@ require __DIR__ . '/_private/catalog_heal.php';
 require __DIR__ . '/_private/home_collections.php';
 require __DIR__ . '/_private/school_images.php';
 require __DIR__ . '/_private/catalog_patch.php';
+require __DIR__ . '/_private/support.php';
 
 const VERSION = '0.41.0';
 // The site's time zone first: event days, «today» in the statistics and reminders all count in it.
@@ -136,6 +137,11 @@ try {
     elseif ($route === 'admin.collection.cover' && $method === 'POST') { require_admin(true); admin_collection_cover(); }
     elseif ($route === 'admin.collection.cover.delete' && $method === 'POST') { require_admin(true); admin_collection_cover_delete(read_json_body(2000)); }
     elseif ($route === 'school.images' && $method === 'GET') school_images_public();
+    // «Поддержать автора»: the page /avtor and its tab in the panel (support.php).
+    elseif ($route === 'admin.support' && $method === 'GET') { require_admin(); require_once __DIR__ . '/_private/seo.php'; admin_support_state(); }
+    elseif ($route === 'admin.support.save' && $method === 'POST') { require_admin(true); require_once __DIR__ . '/_private/seo.php'; admin_support_save(read_json_body(200000)); }
+    elseif ($route === 'admin.support.photo' && $method === 'POST') { require_admin(true); require_once __DIR__ . '/_private/seo.php'; admin_support_photo(); }
+    elseif ($route === 'admin.support.photo.delete' && $method === 'POST') { require_admin(true); require_once __DIR__ . '/_private/seo.php'; admin_support_photo_delete(); }
     elseif ($route === 'admin.school.image' && $method === 'POST') { require_admin(true); admin_school_image(); }
     elseif ($route === 'admin.school.image.delete' && $method === 'POST') { require_admin(true); admin_school_image_delete(read_json_body(2000)); }
     elseif ($route === 'menu.get' && $method === 'GET') menu_get((string)($_GET['code'] ?? ''));
