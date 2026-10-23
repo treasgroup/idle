@@ -1,0 +1,18 @@
+# treas.su/cook after the move to shefly.ru (2026-10). Upload this folder's contents into the emptied
+# treas.su/cook. The real site, its database and photos live in the shefly.ru folder.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteOptions Inherit
+  # The installed Android apps and the bots (Telegram, Alice) talk to the old address: their requests are passed
+  # to shefly.ru as they are (a redirect would turn a POST into a GET).
+  RewriteRule ^(api|bot)/ proxy.php [L,QSA]
+  RewriteRule ^proxy\.php$ - [L]
+  # The start page carries what a person saved in this browser to shefly.ru (index.html).
+  RewriteRule ^$ - [L]
+  RewriteRule ^index\.html$ - [L]
+  # The old installed copy of the site updates itself from sw.js: this one removes it.
+  RewriteRule ^sw\.js$ - [L]
+  # Everything else — recipes, catalog, collections, school, admin, photos — the same address on shefly.ru.
+  RewriteRule ^(.*)$ https://shefly.ru/$1 [R=301,L]
+</IfModule>
+DirectoryIndex index.html

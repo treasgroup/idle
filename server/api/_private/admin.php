@@ -27,7 +27,14 @@ function bump(string $key, int $max): bool { // portable counter with a limit; f
     $st->execute([$key, $max]);
     return $st->rowCount() > 0;
 }
-function client_ip(): string { return substr((string)($_SERVER['REMOTE_ADDR'] ?? '?'), 0, 64); }
+// After the move a request from an old app comes through treas.su/cook/proxy.php on this same server: the person's
+// own address is in X-Forwarded-For then (only trusted from this server itself, so nobody can fake it).
+function client_ip(): string {
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? '?');
+    $fwd = trim(explode(',', (string)($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''))[0]);
+    if ($fwd !== '' && $ip !== '' && ($ip === ($_SERVER['SERVER_ADDR'] ?? '') || $ip === '127.0.0.1' || $ip === '::1') && filter_var($fwd, FILTER_VALIDATE_IP)) $ip = $fwd;
+    return substr($ip, 0, 64);
+}
 function today(): string { return date('Y-m-d'); }
 function norm_text(string $s): string {
     $s = function_exists('mb_strtolower') ? mb_strtolower($s, 'UTF-8') : strtolower($s);

@@ -1,4 +1,4 @@
-// «Взять это меню себе»: a VK post «Меню на неделю» links to treas.su/cook/?m=<code>; the app (App.tsx) gets the
+// «Взять это меню себе»: a VK post «Меню на неделю» links to shefly.ru/?m=<code>; the app (App.tsx) gets the
 // dishes and opens the plan with this sheet — the week's dinners from today, and the products to the shopping list in
 // the same tap. Dinners already planned on those days are replaced; «Отменить» in the toast brings them back.
 import { useState } from "react";

@@ -9303,7 +9303,7 @@ var N_ = (e) =>
     String(e.getMonth() + 1).padStart(2, "0") +
     "-" +
     String(e.getDate()).padStart(2, "0"),
-  im = "https://treas.su/cook/";
+  im = "https://shefly.ru/";
 function Bi() {
   return typeof window > "u" ? null : window.CookNative || null;
 }

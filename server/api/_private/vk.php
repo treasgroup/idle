@@ -106,7 +106,7 @@ function vk_daily(): void {
 }
 
 // ---------- «Взять это меню себе»: a week's menu by a short link ----------
-// A VK post «Меню на неделю» ends with treas.su/cook/?m=<code>: the code keeps the 7 dishes here, and the site
+// A VK post «Меню на неделю» ends with shefly.ru/?m=<code>: the code keeps the 7 dishes here, and the site
 // (app/App.tsx) offers to put them into the person's plan and the products into the shopping list.
 const SHARED_MENUS_MAX = 300;
 function admin_menu_share(array $b): void {

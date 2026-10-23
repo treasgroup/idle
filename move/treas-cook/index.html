@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Что приготовить? переехал на shefly.ru</title>
+<link rel="canonical" href="https://shefly.ru/">
+<meta name="robots" content="noindex">
+<noscript><meta http-equiv="refresh" content="0; url=https://shefly.ru/"></noscript>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#FAF7F0;color:#211D1A;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px}a{color:#B7432F}</style>
+</head>
+<body>
+<p>«Что приготовить?» теперь на <a id="go" href="https://shefly.ru/">shefly.ru</a>.<br>Переносим ваши сохранённые рецепты и план…</p>
+<script>
+// The old address after the move: what this browser saved (the plan, shopping, favourites, profile, chats) is packed
+// into the link to shefly.ru (#move=…, never sent to a server) — the same format as web/src/app/moveHome.ts.
+(async function () {
+  var HOME = "https://shefly.ru/";
+  var path = location.pathname.replace(/^\/cook\/?/, "").replace(/^\//, "").replace(/^index\.html$/, "") + location.search;
+  var hash = location.hash.indexOf("#move=") === 0 ? "" : location.hash;
+  var target = HOME + path + hash;
+  document.getElementById("go").href = target;
+  try {
+    var SKIP = /^cook-(catalog-saved|today-server-|weather|ratings|recipe-stats|chunk-reload|offline-photos)/;
+    var ls = {}, n = 0;
+    for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i); if (k && k.indexOf("cook-") === 0 && !SKIP.test(k)) { ls[k] = localStorage.getItem(k) || ""; n++; } }
+    var state = await new Promise(function (ok) {
+      try {
+        var r = indexedDB.open("cook-mood-v1", 1);
+        r.onupgradeneeded = function () { r.result.createObjectStore("state"); };
+        r.onerror = function () { ok(null); };
+        r.onsuccess = function () {
+          try { var g = r.result.transaction("state", "readonly").objectStore("state").get("guest"); g.onsuccess = function () { ok(g.result || null); r.result.close(); }; g.onerror = function () { ok(null); }; }
+          catch (e) { ok(null); }
+        };
+      } catch (e) { ok(null); }
+    });
+    var has = n > 0 || (state && ((state.favorites || []).length || (state.menu || []).length || (state.shopping || []).length || (state.book || []).length));
+    if (!has) { location.replace(target); return; }
+    var pack = async function (v) {
+      var bytes = new TextEncoder().encode(JSON.stringify(v)), tag = "j";
+      if (typeof CompressionStream !== "undefined") try {
+        bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()); tag = "z";
+      } catch (e) { tag = "j"; bytes = new TextEncoder().encode(JSON.stringify(v)); }
+      var s = ""; for (var j = 0; j < bytes.length; j += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(j, j + 0x8000));
+      return tag + btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    };
+    var data = await pack({ v: 1, ls: ls, state: state, hash: hash });
+    if (data.length > 1500000) { delete ls["cook-chats-v1"]; data = await pack({ v: 1, ls: ls, state: state, hash: hash }); }
+    location.replace(HOME + path + "#move=" + data);
+  } catch (e) { location.replace(target); }
+})();
+</script>
+</body>
+</html>

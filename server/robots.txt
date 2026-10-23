@@ -1,0 +1,7 @@
+# Что приготовить? — https://shefly.ru (moved from treas.su/cook in 2026-10)
+User-agent: *
+Disallow: /admin/
+Disallow: /api/
+Allow: /
+
+Sitemap: https://shefly.ru/sitemap.xml

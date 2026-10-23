@@ -11,11 +11,11 @@ export const openedByLink = (): boolean => opened;
 
 export function takeLinks(): Link[] { const l = pending; pending = []; return l; }
 
-/** https://treas.su/cook/recipe/borsch, …/cook/?recipe=borsch, …/cook/#book=…, …/cook/#/r/borsch → what the page understands. */
+/** https://shefly.ru/recipe/borsch (and the old https://treas.su/cook/recipe/borsch), ?recipe=borsch, #book=…, #/r/borsch → what the page understands. */
 export function toLink(raw: string): Link | null {
   let u: URL;
   try { u = new URL(raw); } catch { return null; }
-  const path = u.pathname.replace(/^.*?\/cook\/?/, "");
+  const path = u.pathname.replace(/^\/(cook\/?)?/, "");
   const q = new URLSearchParams(u.search);
   const m = path.match(/^recipe\/([a-z0-9-]+)\/?$/);
   if (m) q.set("recipe", m[1]);

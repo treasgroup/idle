@@ -1,6 +1,6 @@
 // «Продвижение → ВКонтакте → Готовые посты»: two kinds of post to put in the community by hand (VK does not let a
 // site post by itself): «Меню на неделю» — 7 dinners by the week plan's rules, with the link «Взять это меню себе»
-// (treas.su/cook/?m=<code>, screens/TakeMenu) — and «Что приготовить из …» — 5 dishes with one product and the link
+// (shefly.ru/?m=<code>, screens/TakeMenu) — and «Что приготовить из …» — 5 dishes with one product and the link
 // to its page on the site (/iz/<product>). Each: the text to copy and one collage picture to download.
 import { useEffect, useMemo, useState } from "react";
 import {
