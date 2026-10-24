@@ -138,7 +138,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     c.toggle("xl-text", size === "xl");
     c.toggle("simple-mode", profile.simple);
   }, [size, profile.simple]);
-  useEffect(() => applyTheme(profile.theme), [profile.theme]);
+  useEffect(() => applyTheme(profile.theme, profile.palette), [profile.theme, profile.palette]);
 
   const sync = useAccountSync(s, ready, online, update);
   // Photos of the plan, Избранное and the last cooked dishes kept ahead for use without internet (app/offline).

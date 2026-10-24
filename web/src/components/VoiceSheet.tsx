@@ -29,7 +29,7 @@ export function VoiceSheet({ open, onClose }: { open: boolean; onClose: () => vo
             return (
               <li key={v.id || "auto"} className={cx("flex items-center gap-2 rounded-input border p-1.5 pl-3", on ? "border-brand bg-brand-soft" : "border-line bg-card")}>
                 <button className="flex min-h-[48px] min-w-0 flex-1 items-center gap-3 text-left" onClick={() => pick(v.id || undefined)} aria-pressed={on}>
-                  <span className={cx("grid h-6 w-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand bg-brand text-white" : "border-line-strong")} aria-hidden>{on && <Check size={14} strokeWidth={3} />}</span>
+                  <span className={cx("grid h-6 w-6 shrink-0 place-items-center rounded-full border-2", on ? "border-brand bg-brand-fill text-white" : "border-line-strong")} aria-hidden>{on && <Check size={14} strokeWidth={3} />}</span>
                   <span className="min-w-0"><span className="block text-body-sm font-semibold">{v.label}</span><span className="block text-caption text-ink-soft">{v.note}</span></span>
                 </button>
                 <button className="icon-btn shrink-0" onClick={() => say(SAMPLE, { voice: v.id || undefined, rate: profile.voiceRate })} aria-label={"Послушать: " + v.label}><Play size={18} /></button>

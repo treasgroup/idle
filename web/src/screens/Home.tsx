@@ -10,7 +10,7 @@ import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { goalConditions } from "../app/profile";
+import { goalConditions, type HomeBlock } from "../app/profile";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
@@ -151,6 +151,8 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   const holidayShelf = !!holiday && holidayDishes.length >= 4;
   // Near a holiday the season is a wide card in «Подборки» instead of a second shelf (one live shelf at a time).
   const seasonCard = holidayShelf && !!season && seasonDishes.length >= 4;
+  // «Оформление»: the blocks the person put away.
+  const shows = (b: HomeBlock) => !profile.homeHidden.includes(b);
   const themes = [...themesNow(), ...customThemes(custom)].map((t) => withCustom(t, custom[t.key])).filter((t): t is NonNullable<typeof t> => !!t)
     .map((t) => ({ t, list: dishes(t, custom[t.key]) })).filter((x) => x.list.length >= MIN_DISHES);
 
@@ -167,11 +169,11 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       </div>
 
       <ContinueCard />
-      <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+      <div className={cx("mt-5 grid gap-4", shows("hero") && "lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]")}>
         {/* The first second of a first visit: the day's dish is chosen from the full list, not the small built-in one. */}
-        {!catalog.version ? <Bone className="h-[340px] rounded-card lg:h-auto lg:min-h-[260px]" /> : hero && <TodayCard r={hero} badge={planned ? "По плану на сегодня" : "Рецепт дня"} onOpen={() => openRecipe(hero)} />}
+        {!shows("hero") ? null : !catalog.version ? <Bone className="h-[340px] rounded-card lg:h-auto lg:min-h-[260px]" /> : hero && <TodayCard r={hero} badge={planned ? "По плану на сегодня" : "Рецепт дня"} onOpen={() => openRecipe(hero)} />}
         {/* Wide screens: the actions share the height of the recipe card instead of leaving a blank below them. */}
-        <div className="grid content-start gap-3 lg:flex lg:flex-col lg:[&>*]:flex-1">
+        <div className={cx("grid content-start gap-3", shows("hero") ? "lg:flex lg:flex-col lg:[&>*]:flex-1" : "lg:grid-cols-3")}>
           <RepeatCard />
           <button onClick={() => setDeck({ title: "Выбрать за меня", pool: all, askTime: true, from: "pick" })} className="flex min-h-[64px] items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left transition-transform active:scale-[.99]">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Shuffle size={20} /></span>
@@ -194,7 +196,8 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       {pwa && <InstallCard pwa={pwa} />}
       <MonthCard />
       {/* Personal first: what is for today (and what must be used up), then the holiday, the season and the themes. */}
-      <Now skip={planned?.id} dayDish={planned && today?.id !== planned.id ? today : null} />
+      {/* Without the big card its dish (the planned one or the day's) still shows here. */}
+      {shows("today") && <Now skip={shows("hero") ? planned?.id : undefined} dayDish={!shows("hero") ? (planned ? null : today) : planned && today?.id !== planned.id ? today : null} />}
       <Rescue />
 
       {/* The holiday shelf only while a holiday is near; the season's shelf always; then the themes as cards. */}
@@ -204,8 +207,8 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       {/* One live shelf at a time: near a holiday its shelf is up there, and the season steps into «Подборки» as the
           first, wide card — two look-alike carousels in a row read as one long one. */}
-      {season && seasonDishes.length >= 4 && !holidayShelf && <Shelf from="season" c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true, from: "season" })} />}
-      {(themes.length > 0 || seasonCard) && (
+      {shows("collections") && season && seasonDishes.length >= 4 && !holidayShelf && <Shelf from="season" c={season} list={seasonDishes} all={() => setDeck({ title: season.title, pool: seasonDishes, list: true, from: "season" })} />}
+      {shows("collections") && (themes.length > 0 || seasonCard) && (
         <Section title="Подборки">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:gap-4">
             {seasonCard && season && <ThemeCard c={season} cover={seasonDishes[0]} drawn={custom[season.key]?.cover} wide={custom[season.key]?.coverWide} span

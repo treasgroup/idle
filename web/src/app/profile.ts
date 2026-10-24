@@ -3,6 +3,7 @@
 import type { Conditions } from "../engine";
 import { normalizeDates, type FamilyDate } from "./familyCalendar";
 import { normalizeFixes, type KitchenFix } from "./kitchenFit";
+import type { Tab } from "./router";
 
 export type Level = "beginner" | "confident" | "pro";
 export type Goal = "tasty" | "quick" | "budget" | "light" | "protein" | "family";
@@ -37,7 +38,35 @@ export interface Profile {
   familyDates: FamilyDate[];
   /** «Под вашу кухню»: the oven, the salt, the water for grains, from what went wrong before (app/kitchenFit). */
   kitchen: KitchenFix[];
+  /** «Оформление»: the colour set, the four places of the bottom bar around Шеф, the screen the app opens on, and
+   *  the blocks of Главная the person put away. */
+  palette: Palette;
+  nav: Tab[];
+  start: StartTab;
+  homeHidden: HomeBlock[];
 }
+
+export type Palette = "shefly" | "clean" | "olive" | "sea" | "berry" | "graphite";
+export type StartTab = "home" | "menu" | "chat" | "shopping";
+export type HomeBlock = "hero" | "today" | "collections";
+/** The colour sets: the swatch shows the background and the accent (light theme), `dark` is the bar colour at night. */
+export const PALETTES: { id: Palette; label: string; paper: string; brand: string; dark: string }[] = [
+  { id: "shefly", label: "Шефли", paper: "#FAF7F0", brand: "#B7432F", dark: "#181513" },
+  { id: "clean", label: "Чистый", paper: "#F6F7F9", brand: "#2F5FD0", dark: "#111317" },
+  { id: "olive", label: "Оливка", paper: "#FAF7F0", brand: "#4C7432", dark: "#181513" },
+  { id: "sea", label: "Море", paper: "#F5F8F8", brand: "#1C6A85", dark: "#0F1619" },
+  { id: "berry", label: "Ягода", paper: "#FAF7F0", brand: "#A8264F", dark: "#181513" },
+  { id: "graphite", label: "Графит", paper: "#F7F7F8", brand: "#27272A", dark: "#18181B" },
+];
+/** What may stand in the bottom bar (Шеф is always in the middle); the default is the bar as it always was. */
+export const NAV_CHOICES: Tab[] = ["home", "recipes", "favorites", "shopping", "menu", "pantry", "learn", "profile"];
+export const DEFAULT_NAV: Tab[] = ["home", "recipes", "favorites", "shopping"];
+export const START_CHOICES: StartTab[] = ["home", "menu", "chat", "shopping"];
+export const HOME_BLOCKS: { id: HomeBlock; label: string }[] = [
+  { id: "hero", label: "Рецепт дня" },
+  { id: "today", label: "На сегодня" },
+  { id: "collections", label: "Подборки" },
+];
 
 export interface Member { name: string; excluded: string[] }
 
@@ -58,6 +87,10 @@ export const DEFAULT_PROFILE: Profile = {
   voiceRate: 1.1,
   familyDates: [],
   kitchen: [],
+  palette: "shefly",
+  nav: DEFAULT_NAV,
+  start: "home",
+  homeHidden: [],
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
@@ -112,6 +145,13 @@ export function normalizeProfile(raw: unknown): Profile {
     .slice(0, 10).map((m) => ({ name: m.name.slice(0, 30), excluded: m.excluded.filter((x): x is string => typeof x === "string").slice(0, 40) }));
   p.familyDates = normalizeDates(r.familyDates);
   p.kitchen = normalizeFixes(r.kitchen);
+  if (PALETTES.some((x) => x.id === r.palette)) p.palette = r.palette as Palette;
+  if (Array.isArray(r.nav)) {
+    const n = [...new Set(r.nav.filter((t): t is Tab => NAV_CHOICES.includes(t as Tab)))];
+    if (n.length === 4) p.nav = n;
+  }
+  if (START_CHOICES.includes(r.start as StartTab)) p.start = r.start as StartTab;
+  if (Array.isArray(r.homeHidden)) p.homeHidden = [...new Set(r.homeHidden.filter((b): b is HomeBlock => HOME_BLOCKS.some((x) => x.id === b)))];
   return p;
 }
 
@@ -123,17 +163,20 @@ export function saveProfile(p: Profile): void {
   try { localStorage.setItem(KEY, JSON.stringify(p)); } catch { /* private mode: the profile lives for this visit only */ }
 }
 
-/** Puts the chosen theme on <html> (and keeps "Авто" in step with the device). Light unless dark was chosen. */
-export function applyTheme(theme: Profile["theme"]): () => void {
+/** Puts the chosen theme and colour set on <html> (and keeps "Авто" in step with the device). Light unless dark was
+ *  chosen; the contrast theme has its own colours, so the colour set is left off then. */
+export function applyTheme(theme: Profile["theme"], palette: Palette = "shefly"): () => void {
   const root = document.documentElement;
   const media = window.matchMedia?.("(prefers-color-scheme: dark)");
   const set = () => {
     const dark = theme === "dark" || (theme === "system" && !!media?.matches);
     root.dataset.theme = dark ? "dark" : theme === "contrast" ? "contrast" : "light";
+    const colours = theme === "contrast" ? undefined : PALETTES.find((x) => x.id === palette && x.id !== "shefly");
+    if (colours) root.dataset.palette = colours.id; else delete root.dataset.palette;
     // "only light" also keeps Chrome's Auto Dark and Yandex Browser's dark sites mode away.
     root.style.colorScheme = dark ? "dark" : "only light";
     document.querySelector('meta[name="color-scheme"]')?.setAttribute("content", dark ? "dark" : "only light");
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#181513" : theme === "contrast" ? "#FFFFFF" : "#FAF7F0");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "contrast" ? "#FFFFFF" : dark ? colours?.dark ?? "#181513" : colours?.paper ?? "#FAF7F0");
   };
   set();
   if (theme !== "system" || !media) return () => {};

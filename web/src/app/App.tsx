@@ -1,10 +1,11 @@
 // The app shell: the bottom bar on phones, a rail on tablets, a sidebar on desktop.
-// Five destinations: Главная · Поиск · Шеф · Избранное · Покупки (Шеф is the coloured one, level with the rest).
-// Simple mode keeps three: Главная · Шеф · Избранное. Everything else lives in Профиль.
+// Five destinations: Главная · Поиск · Шеф · Избранное · Покупки (Шеф is the coloured one, level with the rest);
+// «Оформление» in Профиль changes the four around Шеф. Simple mode keeps three: Главная · Шеф · Избранное.
+// Everything else lives in Профиль.
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DinnerLayer, useDinnerReminders } from "../components/DinnerPlan";
 import {
-  CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Heart, House, Refrigerator, Search, ShoppingCart, UserRound, WifiOff, X,
+  CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Refrigerator, UserRound, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
 import { apiUrl, expiringSoon, isNativeApp, recipeById, usePwa, type MyRecipe } from "../engine";
@@ -12,6 +13,7 @@ import { useStore } from "./store";
 import { useActions } from "./actions";
 import { AssistantProvider } from "./assistant";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
+import { NAV_ITEMS } from "./navItems";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
 import { Recipes } from "../screens/Recipes";
@@ -47,16 +49,14 @@ import { Boundary, Logo, Toast, cx, haptic, mmss, useScrolled } from "../compone
 import { useUpdateCheck } from "./updates";
 import { checkReplies } from "./myMessages";
 
-const NAV: { tab: Tab; label: string; icon: LucideIcon; simple?: boolean }[] = [
-  { tab: "home", label: "Главная", icon: House, simple: true },
-  { tab: "recipes", label: "Поиск", icon: Search },
-  { tab: "chat", label: "Шеф", icon: ChefHat, simple: true },
-  { tab: "favorites", label: "Избранное", icon: Heart, simple: true },
-  { tab: "shopping", label: "Покупки", icon: ShoppingCart },
-];
-const useNav = () => {
+const SIMPLE_NAV: Tab[] = ["home", "chat", "favorites"];
+const DEFAULT_BAR: Tab[] = ["home", "recipes", "chat", "favorites", "shopping"];
+/** `full`: the desktop sidebar keeps the usual five (it has room for the rest below them). */
+const useNav = (full?: boolean) => {
   const { profile } = useStore();
-  return profile.simple ? NAV.filter((n) => n.simple) : NAV;
+  const n = profile.nav;
+  const tabs = profile.simple ? SIMPLE_NAV : full ? DEFAULT_BAR : [n[0], n[1], "chat" as Tab, n[2], n[3]];
+  return tabs.map((t) => NAV_ITEMS[t]);
 };
 /** Screens opened from Профиль: their header leads back there. */
 const FROM_PROFILE: Tab[] = ["menu", "pantry"];
@@ -207,9 +207,10 @@ function Shell() {
     replace(routeHash({ tab }));
   };
 
-  // Android «Назад» with nothing open on top: from any section back to Главная; only there it leaves the app.
+  // Android «Назад» with nothing open on top: from any section back to the start screen (Главная unless «Оформление»
+  // says otherwise); only there it leaves the app.
   useEffect(() => {
-    const back = (e: Event) => { if (route.tab !== "home") { e.preventDefault(); go("home"); } };
+    const back = (e: Event) => { if (route.tab !== profile.start) { e.preventDefault(); go(profile.start); } };
     window.addEventListener("cook-back", back);
     return () => window.removeEventListener("cook-back", back);
   });
@@ -305,6 +306,7 @@ function BottomNav({ route, go }: { route: Route; go: (t: Tab) => void }) {
               </span>
               <span className={cx(profile.simple ? "text-small" : "text-micro", on || tab === "chat" ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
               {tab === "shopping" && <Badge n={badges.shopping} className="absolute left-1/2 top-1.5 ml-2" />}
+              {(tab === "pantry" || tab === "profile") && <Badge n={badges.pantry} warn className="absolute left-1/2 top-1.5 ml-2" />}
             </button>
           );
         })}
@@ -317,7 +319,10 @@ function BottomNav({ route, go }: { route: Route; go: (t: Tab) => void }) {
 function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const { online } = useStore();
   const scrolled = useScrolled();
-  const sub = FROM_PROFILE.includes(route.tab) || route.tab === "profile";
+  const bar = useNav().map((n) => n.tab);
+  // A screen that stands in the bar is a section of its own: no «Назад» to Профиль.
+  const sub = (FROM_PROFILE.includes(route.tab) || route.tab === "profile") && !bar.includes(route.tab);
+  const profileInBar = bar.includes("profile");
   return (
     <header className={cx("pt-safe sticky top-0 z-30 border-b bg-paper transition-colors lg:hidden", scrolled ? "border-line" : "border-transparent", "sm:ml-20")}>
       <div className="mx-auto flex h-14 max-w-3xl items-center gap-2 px-4 sm:px-6">
@@ -334,7 +339,7 @@ function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
         )}
         <span className="flex-1" />
         {!online && <span className="flex h-7 shrink-0 items-center gap-1 rounded-full bg-sunken px-2.5 text-caption text-ink-soft" title="Нет интернета: рецепты, план и покупки работают"><WifiOff size={14} aria-hidden />офлайн</span>}
-        {route.tab !== "profile" && <ProfileButton className="-mr-1.5 sm:hidden" />}
+        {route.tab !== "profile" && !profileInBar && <ProfileButton className="-mr-1.5 sm:hidden" />}
       </div>
     </header>
   );
@@ -366,13 +371,14 @@ function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
             <span className={cx("grid h-8 w-14 place-items-center rounded-full", on && "bg-brand-soft")}><NavIcon tab={tab} icon={icon} on={on} size={22} /></span>
             <span className={cx("text-micro", on || tab === "chat" ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
             {tab === "shopping" && <Badge n={badges.shopping} className="absolute right-3 top-1" />}
+            {(tab === "pantry" || tab === "profile") && <Badge n={badges.pantry} warn className="absolute right-3 top-1" />}
           </button>
         );
       })}
       <span className="flex-1" />
-      <button onClick={() => go("profile")} aria-label="Профиль и ещё" aria-current={route.tab === "profile" ? "page" : undefined} className="grid h-11 w-11 place-items-center rounded-full">
+      {!nav.some((n) => n.tab === "profile") && <button onClick={() => go("profile")} aria-label="Профиль и ещё" aria-current={route.tab === "profile" ? "page" : undefined} className="grid h-11 w-11 place-items-center rounded-full">
         <span className={cx("grid h-9 w-9 place-items-center rounded-full", route.tab === "profile" ? "bg-brand-soft text-brand-ink" : "bg-sunken text-ink-soft")}><UserRound size={18} /></span>
-      </button>
+      </button>}
     </nav>
   );
 }
@@ -381,7 +387,7 @@ function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
 function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
   const { s, profile } = useStore();
   const badges = useBadges();
-  const nav = useNav();
+  const nav = useNav(true);
   const cooking = (!!(s.cooking && !s.cooking.done) || !!profile.parallel) && !route.cook;
   const rowCls = (on: boolean) => cx("flex h-11 items-center gap-3 rounded-xl px-3 text-body-sm transition-colors", on ? "bg-brand-soft font-semibold text-brand-ink" : "text-ink hover:bg-sunken");
   return (

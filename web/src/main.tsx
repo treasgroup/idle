@@ -23,7 +23,11 @@ installFormShim();
 watchOpenFrom();
 
 // Before the first paint, so a dark device never flashes the wrong theme.
-applyTheme(loadProfile().theme);
+const saved = loadProfile();
+applyTheme(saved.theme, saved.palette);
+// «Стартовый экран»: a plain launch (no section, no link) opens where the person chose; links open as they say.
+if (saved.start !== "home" && !location.search && !location.hash)
+  history.replaceState(null, "", location.pathname + "#/" + saved.start);
 watchErrors();
 watchTaps();
 watchPicks();

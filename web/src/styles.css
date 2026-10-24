@@ -89,6 +89,43 @@
 }
 :root[data-theme="contrast"] body { font-weight: 450; }
 
+/* «Оформление»: the colour sets besides Шефли (the default above), each light and dark. The contrast theme keeps its
+   own colours: applyTheme leaves data-palette off then. Every text colour passes 4.5:1 on its background. */
+:root[data-palette="clean"] {
+  --paper: 246 247 249; --card: 255 255 255; --sunken: 236 239 243; --line: 225 229 235; --line-strong: 132 140 152;
+  --ink: 22 26 33; --ink-soft: 72 80 92; --ink-faint: 92 100 112;
+  --brand: 47 95 208; --brand-fill: 47 95 208; --brand-soft: 228 236 252; --brand-ink: 28 64 150;
+}
+:root[data-palette="clean"][data-theme="dark"] {
+  --paper: 17 19 23; --card: 27 30 36; --sunken: 36 40 47; --line: 52 57 66; --line-strong: 110 118 130;
+  --ink: 236 239 244; --ink-soft: 196 202 212; --ink-faint: 168 175 186;
+  --brand: 122 160 245; --brand-fill: 52 98 210; --brand-soft: 30 40 66; --brand-ink: 170 196 250;
+}
+:root[data-palette="olive"] { --brand: 76 116 50; --brand-fill: 76 116 50; --brand-soft: 232 240 222; --brand-ink: 50 80 30; }
+:root[data-palette="olive"][data-theme="dark"] { --brand: 150 196 112; --brand-fill: 76 116 50; --brand-soft: 36 50 28; --brand-ink: 186 220 156; }
+:root[data-palette="sea"] {
+  --paper: 245 248 248; --card: 255 255 255; --sunken: 233 240 241; --line: 222 230 231; --line-strong: 130 145 148;
+  --ink: 20 32 36; --ink-soft: 66 82 86; --ink-faint: 86 102 106;
+  --brand: 28 106 133; --brand-fill: 28 106 133; --brand-soft: 222 238 243; --brand-ink: 16 74 94;
+}
+:root[data-palette="sea"][data-theme="dark"] {
+  --paper: 15 22 25; --card: 23 32 36; --sunken: 32 43 48; --line: 47 60 66; --line-strong: 104 120 126;
+  --ink: 232 240 242; --ink-soft: 192 204 207; --ink-faint: 164 178 182;
+  --brand: 110 190 216; --brand-fill: 28 106 133; --brand-soft: 22 48 58; --brand-ink: 160 214 232;
+}
+:root[data-palette="berry"] { --brand: 168 38 79; --brand-fill: 168 38 79; --brand-soft: 250 228 235; --brand-ink: 120 22 54; }
+:root[data-palette="berry"][data-theme="dark"] { --brand: 236 120 156; --brand-fill: 168 38 79; --brand-soft: 64 26 38; --brand-ink: 246 172 196; }
+:root[data-palette="graphite"] {
+  --paper: 247 247 248; --card: 255 255 255; --sunken: 237 237 239; --line: 226 226 229; --line-strong: 140 140 146;
+  --ink: 24 24 27; --ink-soft: 75 75 82; --ink-faint: 95 95 102;
+  --brand: 39 39 42; --brand-fill: 39 39 42; --brand-soft: 232 232 235; --brand-ink: 24 24 27;
+}
+:root[data-palette="graphite"][data-theme="dark"] {
+  --paper: 24 24 27; --card: 33 33 37; --sunken: 42 42 47; --line: 58 58 64; --line-strong: 113 113 122;
+  --ink: 244 244 245; --ink-soft: 200 200 206; --ink-faint: 170 170 178;
+  --brand: 232 232 234; --brand-fill: 82 82 91; --brand-soft: 52 52 58; --brand-ink: 244 244 245;
+}
+
 /* Loading placeholders: a soft light passes over grey shapes (still, if motion is reduced). */
 @keyframes skel { from { background-position: 150% 0; } to { background-position: -50% 0; } }
 .img-in { animation: img-in .25s ease-out; }

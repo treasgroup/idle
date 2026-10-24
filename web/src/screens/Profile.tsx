@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, UserRound, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -24,6 +24,7 @@ import { Tour, tourWanted } from "../components/Tour";
 import { VoiceSheet } from "../components/VoiceSheet";
 import { WriteUs } from "../components/WriteUs";
 import { AliceSheetBody } from "../components/AliceSheet";
+import { LookSheet, lookHint } from "../components/LookSheet";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
 import { WeatherSheet, degrees } from "../components/WeatherSheet";
 import { usePlace, useWeather } from "../app/weather";
@@ -55,6 +56,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [calendar, setCalendar] = useState(false);
   const nextDate = byNext(profile.familyDates)[0];
   const [writeUs, setWriteUs] = useState(false);
+  const [look, setLook] = useState(false);
   const [tasteOpen, setTasteOpen] = useState(false);
   const understoodNow = useUnderstood();
   const [weatherOpen, setWeatherOpen] = useState(false);
@@ -157,16 +159,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         <div>
           <Section title="Удобство">
             <div className="card overflow-hidden">
-              <div className="border-b border-line px-4 py-3">
-                <p className="mb-2 text-body-sm font-semibold">Тема</p>
-                <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Тема">
-                  {([["light", "Светлая"], ["dark", "Тёмная"], ["contrast", "Контрастная"], ["system", "Как в телефоне"]] as const).map(([id, label]) => (
-                    <button key={id} role="radio" aria-checked={profile.theme === id} onClick={() => setProfile((p) => ({ ...p, theme: id }))}
-                      className={cx("h-11 rounded-input border px-2 text-small", profile.theme === id ? "border-brand bg-brand-soft text-brand-ink" : "border-line bg-card")}>{label}</button>
-                  ))}
-                </div>
-                {profile.theme === "contrast" && <p className="mt-2 text-caption text-ink-soft">Чёрный текст на белом и чёткие рамки — легче читать при слабом зрении.</p>}
-              </div>
+              <div className="border-b border-line"><Row icon={<Palette size={18} />} title="Оформление" hint={lookHint(profile) + " · меню и главная"} onClick={() => setLook(true)} /></div>
               <div className="divide-y divide-line px-4">
                 <Toggle on={s.readAloud} onChange={(v) => update((st) => ({ ...st, readAloud: v }))} label="Читать шаги вслух" hint="В режиме готовки" />
               </div>
@@ -229,6 +222,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
       <FamilyCalendarSheet open={calendar} onClose={() => setCalendar(false)} onReminders={() => { setCalendar(false); setSheet("reminders"); }} />
       <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
+      <LookSheet open={look} onClose={() => setLook(false)} />
       <TasteSheet open={tasteOpen} onClose={() => setTasteOpen(false)} />
       <WeatherSheet open={weatherOpen} onClose={() => setWeatherOpen(false)} />
       {/* On the page itself: the screen under it fades in and would make it see-through. */}
