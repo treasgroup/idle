@@ -33,6 +33,14 @@ test("the same meat or fish is not on two days running, nor more than three time
   expect(runs / pairs).toBeLessThan(0.03); // only when the rules leave nothing else
 });
 
+test("at least four dinners of seven are home cooking, not Turkish soups and Greek avgolemono", () => {
+  const home = new Set(["russian", "ukrainian", "belarusian", "tatar"]);
+  for (const days of weeks({ ...DEFAULT_MENU_PLAN, meals: ["dinner"], quickWeekdays: false, cookAhead: false }, 20)) {
+    const far = dinnersOf(days).filter((r) => r!.cuisine && !home.has(r!.cuisine));
+    expect(far.length, far.map((r) => r!.title).join(", ")).toBeLessThanOrEqual(3);
+  }
+});
+
 test("«полегче» with three meals keeps the whole day at 1200–1500 kcal, not only each dish", () => {
   // As the plan screen passes the goal: each dish at most 600 kcal (Menu.goalFilter), and the day as a whole.
   const lightDish = (r: Recipe) => { const k = nutritionOf(r).perServing.kcal; return k > 0 && k <= 600; };

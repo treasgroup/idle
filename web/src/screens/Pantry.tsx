@@ -95,7 +95,9 @@ export function Pantry() {
         </div>
       ) : (
         <>
-          <button onClick={() => cookFromHome()} className="mt-5 flex w-full items-center gap-3 rounded-card bg-brand-soft p-4 text-left transition-transform active:scale-[.99]">
+          {/* What spoils within three days goes into the dishes first (куриное филе «ещё 2 дня» was left out of four
+              potato dishes); with nothing urgent, everything at home. */}
+          <button onClick={() => { const urgent = s.fridge.filter((f) => { const d = daysLeft(f); return d != null && d >= 0 && d <= 3; }).sort((p, q) => (p.until ?? 0) - (q.until ?? 0)).slice(0, 2).map((f) => f.id); cookFromHome(urgent.length ? urgent : undefined); }} className="mt-5 flex w-full items-center gap-3 rounded-card bg-brand-soft p-4 text-left transition-transform active:scale-[.99]">
             <ChefAvatar size={40} />
             <span className="min-w-0 flex-1">
               <span className="block text-title text-brand-ink">Что приготовить из этого?</span>

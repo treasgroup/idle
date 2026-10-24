@@ -3385,6 +3385,10 @@ function italian(e) {
 function unusual(e) {
   return UNUSUAL_TITLE.test(e.title) || e.ingredients.some((t) => !t.optional && UNUSUAL_ING.has(t.id));
 }
+// «Привычные блюда»: a week mirrored the catalog — about half of the dinners Turkish soups, Greek avgolemono, Azeri dovga.
+// At most three lunches and three dinners a week from other cuisines; the rest home cooking. Breakfasts are free.
+var HOME_CUISINE = new Set(["russian", "ukrainian", "belarusian", "tatar"]),
+  farFromHome = (r) => !!r.cuisine && !HOME_CUISINE.has(r.cuisine);
 var PLAN_WEEKDAY = { breakfast: 40, lunch: 120, dinner: 120 },
   PLAN_WEEKEND = { breakfast: 90, lunch: 240, dinner: 240 };
 // «Полегче» with two or three meals a day: the day as a whole, not only each dish — 1200–1500 kcal a person for
@@ -3459,7 +3463,8 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
     _ = !1,
     B = i.meals.length > 1 || i.meals[0] !== "dinner",
     budget = i.light && i.meals.length > 1 ? i.meals.reduce((s0, m0) => s0 + DAY_SHARE[m0], 0) : null;
-  for (let it of y.flatMap((d) => d.items.filter((t) => !t.leftover))) { let r0 = ll(it.recipeId), p0 = r0 && proteinOf(r0); p0 && (protCount[p0] = (protCount[p0] || 0) + 1); }
+  let far = {};
+  for (let it of y.flatMap((d) => d.items.filter((t) => !t.leftover))) { let r0 = ll(it.recipeId), p0 = r0 && proteinOf(r0); p0 && (protCount[p0] = (protCount[p0] || 0) + 1); r0 && Hn(it) !== "breakfast" && farFromHome(r0) && (far[Hn(it)] = (far[Hn(it)] || 0) + 1); }
   for (let R = 0; R < y.length; R++) {
     let T = y[R],
       C = y[R + 1],
@@ -3490,6 +3495,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
           !w.has(gn(W)) &&
           !(odd >= 1 && unusual(W)) &&
           !(pasta >= 2 && italian(W)) &&
+          !(M !== "breakfast" && (far[M] || 0) >= 3 && farFromHome(W)) &&
           !(M === "dinner" && Ru(W) && (g >= 2 || _)) &&
           x(W) !== N[M],
         Q = m[M],
@@ -3526,6 +3532,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
         He = P[0];
       for (let W of P.slice(1)) vt(W) > vt(He) && (He = W);
       w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++, italian(He) && pasta++, (dayKcal += kcalOf(He));
+      M !== "breakfast" && farFromHome(He) && (far[M] = (far[M] || 0) + 1);
       for (let W of Am(He)) b.add(W);
       M === "dinner" && ((_ = Ru(He)), _ && g++), (N[M] = x(He));
       let pHe = proteinOf(He);

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { BellRing, ChevronLeft, RefreshCw, ShoppingCart, X } from "lucide-react";
 import {
-  CATALOG_SECTIONS, addToShopping, clampServings, courseOf, freshConditions, ingredientsToBuy, plural, rankRecipes, recipes,
+  CATALOG_SECTIONS, addToShopping, clampServings, courseOf, freshConditions, ingredientsToBuy, plural, proteinOf, rankRecipes, recipes,
   type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -15,6 +15,7 @@ import { Chip, Sheet, Stepper } from "./ui";
 import { Mascot } from "./Mascot";
 import { timeShort } from "../app/recipeTime";
 import { MONTHS } from "../app/familyCalendar";
+import { schedule } from "../app/dinner";
 
 const SLOTS: { key: string; label: string; courses: string[] }[] = [
   { key: "salad1", label: "Салат", courses: ["salad"] },
@@ -59,6 +60,8 @@ export function FeastSheet({ open, onClose, occasion }: { open: boolean; onClose
     for (const sl of SLOTS) {
       // Not for a festive table: memorial and fasting-day dishes.
       let fit = ranked.filter((r) => sl.courses.includes(courseOf(r)) && !/кутья|кутью|канун/i.test(r.title));
+      // «Сладкое» is sweet: pies with cabbage, pizza and bread are baking too, but not for the end of the table.
+      if (sl.key === "dessert") fit = fit.filter((r) => courseOf(r) === "dessert" || r.tags.includes("sweet"));
       if (ny && style === "nomayo") fit = fit.filter((r) => !mayo(r));
       if (ny && style === "simple") { const easy = fit.filter((r) => r.totalMinutes <= 120 && r.difficulty !== "hard"); if (easy.length) fit = easy; }
       const newYear = (r: Recipe) => !!r.occasions?.includes("new-year");
@@ -66,17 +69,26 @@ export function FeastSheet({ open, onClose, occasion }: { open: boolean; onClose
         ? [...fit.filter(newYear), ...fit.filter((r) => !newYear(r) && forGuests(r)), ...fit.filter((r) => !newYear(r) && !forGuests(r))]
         : [...fit.filter(forGuests), ...fit.filter((r) => !forGuests(r))];
     }
-    // The two salads differ.
-    out.salad2 = out.salad2.slice(1).concat(out.salad2.slice(0, 1));
     return out;
   }, [open, s.preferences, ny, style]);
-  const dishes = SLOTS.filter((sl) => !off.includes(sl.key) && pools[sl.key]?.length)
-    .map((sl) => ({ slot: sl, r: pools[sl.key][(pick[sl.key] ?? 0) % pools[sl.key].length] }));
+  const chosen = (key: string): Recipe => {
+    const pool = pools[key];
+    if (key !== "salad2" || !pools.salad1?.length) return pool[(pick[key] ?? 0) % pool.length];
+    // The two salads differ — and not only by name: two chicken salads side by side read as one.
+    const main = (r: Recipe) => proteinOf(r) ?? (r.mainIngredient || r.id);
+    const first = chosen("salad1");
+    const other = pool.filter((r) => r.id !== first.id && main(r) !== main(first));
+    const list = other.length ? other : pool.filter((r) => r.id !== first.id);
+    return list.length ? list[(pick[key] ?? 0) % list.length] : pool[0];
+  };
+  const dishes = SLOTS.filter((sl) => !off.includes(sl.key) && pools[sl.key]?.length).map((sl) => ({ slot: sl, r: chosen(sl.key) }));
 
   const serve = ny ? new Date(new Date().getFullYear(), 11, 31, hour) : new Date(occasion?.date ?? Date.now()); if (!ny) serve.setHours(hour, 0, 0, 0);
   const onTheDay = ny ? new Date().getDate() === 31 : !later;
   const onDay = later ? occasion!.date.getDate() + " " + MONTHS[occasion!.date.getMonth()] + " " : "";
-  const plan = dishes.map((d) => ({ ...d, start: new Date(serve.getTime() - d.r.totalMinutes * 60e3) }))
+  // One pair of hands: a dish starts earlier when its cutting or stirring would fall on another dish's.
+  const timeline = schedule(dishes.map((d) => d.r), serve.getTime());
+  const plan = dishes.map((d, i) => ({ ...d, start: new Date(Math.min(serve.getTime() - d.r.totalMinutes * 60e3, ...timeline.items.filter((it) => it.dish === i).map((it) => it.start))) }))
     .sort((a, b) => a.start.getTime() - b.start.getTime());
   const first = plan[0]?.start;
   const close = () => { setStep(0); onClose(); };
@@ -150,7 +162,7 @@ export function FeastSheet({ open, onClose, occasion }: { open: boolean; onClose
         <ul className="grid gap-2">
           {SLOTS.filter((sl) => pools[sl.key]?.length).map((sl) => {
             const on = !off.includes(sl.key);
-            const r = pools[sl.key][(pick[sl.key] ?? 0) % pools[sl.key].length];
+            const r = chosen(sl.key);
             return (
               <li key={sl.key} className={on ? "flex items-center gap-3 rounded-card border border-line bg-card p-2" : "flex items-center gap-3 rounded-card border border-dashed border-line p-2 opacity-60"}>
                 <div className="flex min-w-0 flex-1 items-center gap-3">
