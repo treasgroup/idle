@@ -445,8 +445,7 @@ function seo_recipe_page(string $id): void {
         'image' => $image, 'imageW' => $photo['w'] ?? null, 'imageH' => $photo['h'] ?? null, 'imageAlt' => $photo ? (string)$r['title'] : null,
         'ld' => array_merge([$ld, $crumbs], ($faqLd = seo_faq_ld(seo_recipe_faq($r, $kcal, $servings, $t))) ? [$faqLd] : [])]);
 
-    // With the photo's version the app's start script asks for the big photo at once (boot.js), not after the lists.
-    $app = h(seo_app_path($id) . ($photo ? '&pv=' . $photo['mtime'] : ''));
+    $app = h(seo_app_path($id));
     $icon = [
         'clock' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>',
     ];

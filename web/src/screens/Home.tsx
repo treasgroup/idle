@@ -78,9 +78,7 @@ function dayPick<T>(list: T[], salt = 0): T | null {
 // One request per page load, kept outside the screen: Главная is drawn again while the catalog loads.
 let serverToday: Promise<string | null> | null = null;
 function askServerToday(day: string): Promise<string | null> {
-  // A first visit: the start script (boot.js) asked already, together with the page.
-  const early = (window as { __cookToday?: Promise<{ id?: string; day?: string } | null> }).__cookToday;
-  serverToday ??= (early ?? fetch(apiUrl("today")).then((r) => (r.ok ? r.json() : null))).then((j: { id?: string; day?: string } | null) => {
+  serverToday ??= fetch(apiUrl("today")).then((r) => (r.ok ? r.json() : null)).then((j: { id?: string; day?: string } | null) => {
     if (!j?.id || j.day !== day) return null;
     try { localStorage.setItem("cook-today-server-" + day, j.id); } catch { /* private mode */ }
     return j.id;

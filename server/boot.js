@@ -23,32 +23,3 @@
     document.head.appendChild(l);
   } catch (e) { /* private mode: the page fetches it as before */ }
 })();
-// A first visit to the home page: its first big photo is «Рецепт дня», so the server is asked for the dish together
-// with the page and its photo starts at once (Home.tsx takes this same answer instead of asking again).
-(function () {
-  try {
-    if (window.CookNative || localStorage.getItem("cook-catalog-saved") || location.search || (location.hash && location.hash !== "#/")) return;
-    var p = fetch("./api/index.php?r=today").then(function (r) { return r.ok ? r.json() : null; });
-    window.__cookToday = p.catch(function () { return null; });
-    p.then(function (j) {
-      var m = j && /^[a-z0-9-]{1,60}$/.test(j.id || "") && /\?v=(\d{1,12})/.exec(j.photoFull || "");
-      if (!m) return;
-      var l = document.createElement("link");
-      l.rel = "preload"; l.as = "image"; l.href = "./photos/" + j.id + ".jpg?v=" + m[1];
-      l.setAttribute("fetchpriority", "high");
-      document.head.appendChild(l);
-    }).catch(function () { /* the page asks as before */ });
-  } catch (e) { /* private mode: the page asks as before */ }
-})();
-// «Готовить по шагам» on a search page (?recipe=borsch&pv=<photo version>): the dish's big photo is what the person
-// sees first, so it starts now — the same address the recipe page asks for, taken from the cache then.
-(function () {
-  try {
-    var q = new URLSearchParams(location.search), id = q.get("recipe"), v = q.get("pv");
-    if (!id || !v || !/^[a-z0-9-]{1,60}$/.test(id) || !/^\d{1,12}$/.test(v)) return;
-    var l = document.createElement("link");
-    l.rel = "preload"; l.as = "image"; l.href = "./photos/" + id + ".jpg?v=" + v;
-    l.setAttribute("fetchpriority", "high");
-    document.head.appendChild(l);
-  } catch (e) { /* the page asks for it as before */ }
-})();
