@@ -28,6 +28,8 @@ export const loadCatalog = (timeoutMs = 5000, keepWaiting = false): Promise<{ bu
 export const CATALOG_EVENT: string = svc.ym;
 /** A first visit: the catalog in memory has no steps and tips yet; the whole one comes a moment later (CATALOG_EVENT). */
 export const catalogIsLight = (): boolean => svc.catalogLight();
+/** A timed step: whether the next one can be done while it runs ([1, from?, to?]) or waits for it ([0]); null unmarked. */
+export const stepFlow = (recipeId: string, step: number): number[] | null => svc.stepFlow(recipeId, step);
 export const photoUrl = (recipeId: string): string | null => svc.pm(recipeId);
 /** A smaller copy for cards and thumbnails (the full photo stays for the recipe page). */
 export const photoSmallUrl = (recipeId: string): string | null => svc.pmSmall(recipeId);

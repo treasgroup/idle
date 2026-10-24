@@ -30,8 +30,10 @@ export function TimerStrip({ only, hide, onJump, className, flush }: {
   onJump?: (t: CookTimer) => void; className?: string; flush?: boolean;
 }) {
   const all = useTimers();
-  const list = (only ? all.filter((t) => t.recipeId === only || !t.recipeId) : all).filter((t) => !hide?.(t));
-  const now = useTick(list.some((t) => t.end && !t.rang));
+  const shown = (only ? all.filter((t) => t.recipeId === only || !t.recipeId) : all).filter((t) => !hide?.(t));
+  const now = useTick(shown.some((t) => t.end && !t.rang));
+  // The one to ring first leads (a rung one before all), so with three or four the urgent one is never off the screen.
+  const list = [...shown].sort((a, b) => (a.rang ? -1 : 0) - (b.rang ? -1 : 0) || secondsLeft(a, now) - secondsLeft(b, now));
   const [menu, setMenu] = useState<CookTimer | null>(null);
   const [fadeRef, fade] = useEdgeFade();
   if (!list.length) return null;

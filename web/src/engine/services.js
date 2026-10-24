@@ -880,6 +880,12 @@ async function dO(e) {
 }
 // The catalog in memory came without steps and tips; the whole one is on its way.
 var lightNow = !1;
+// Timed steps: [1 the next step can be done while it runs | 0 wait for it, first step meanwhile?, last?].
+var FLOW = {};
+function stepFlow(id, step) {
+  let m = FLOW[id]?.[String(step)];
+  return Array.isArray(m) && (m[0] === 0 || m[0] === 1) ? m : null;
+}
 function catalogLight() {
   return lightNow;
 }
@@ -933,6 +939,8 @@ function aA(e, t) {
       ),
     Array.isArray(e.realPhotos) &&
       XC(e.realPhotos.filter((i) => typeof i == "string")),
+    // «Можно дальше» / «дождитесь» for timed steps (server step_flow.php); a light catalog brings none and keeps them.
+    e.flow && typeof e.flow == "object" && !Array.isArray(e.flow) && (FLOW = e.flow),
     Array.isArray(e.thumbs) &&
       pmSetThumbs(e.thumbs.filter((i) => typeof i == "string")),
     e.photos &&
@@ -4084,5 +4092,6 @@ export {
   inSeason,
   italian,
   catalogLight,
+  stepFlow,
   proteinOf,
 };

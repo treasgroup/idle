@@ -2,15 +2,16 @@
 // cooked alongside, and a finish screen. Timers are the app's kitchen timers (app/timers.ts); the shell rings them.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import {
-  Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
+  ArrowRight, Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
   LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
-  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, suggestSides, rateDish, track, isNativeApp, useHandsFree,
+  SIDES, packageFor, plural, recipeById, recipes, scaleIngredient, searchRecipes, servingsWord, stepFlow, suggestSides, rateDish, track, isNativeApp, useHandsFree,
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
+import { SupportAsk } from "../components/SupportButton";
 import { signal } from "../app/personal";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
@@ -19,7 +20,7 @@ import { useReminders } from "../app/reminders";
 import { replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, speak, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { amountText, leftoversOf, rememberLeftovers } from "../app/nowaste";
-import { Chip, Layer, Sheet, Stepper, Toggle, cx, mmss } from "../components/ui";
+import { Chip, Layer, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { RecipeMini } from "../components/RecipeCard";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { TimerRing, TimerStrip } from "../components/TimerStrip";
@@ -67,8 +68,13 @@ function shortDish(title: string): string {
 
 /** What the step's timer is for: the first product it uses, or the dish: «Шаг 3 · лук», «Шаг 2 · пюре». */
 function stepLabel(r: Recipe, i: number): string {
-  const id = r.steps[i]?.uses?.find((u) => u !== "water" && u !== "salt");
-  const ing = id ? r.ingredients.find((x) => x.id === id) : undefined;
+  const st = r.steps[i];
+  const used = (st?.uses ?? []).filter((u) => u !== "water" && u !== "salt").map((id) => r.ingredients.find((x) => x.id === id)).filter((x): x is NonNullable<typeof x> => !!x);
+  // The product of the sentence that says how long («Положите в бульон картофель и варите 15 минут» — картофель, not
+  // the говядина taken out at the start of the step).
+  const timed = (st?.text.split(/(?<=[.!?;])\s+/).find((p) => /\d+\s*(мин|час|ч(?![а-яё]))|полчаса|(?<![а-яё])час/i.test(p)) ?? "").toLowerCase();
+  const stem = (name: string) => { const w = name.toLowerCase().split(/\s+/)[0]; return w.slice(0, Math.max(4, w.length - 2)); };
+  const ing = used.find((x) => timed.includes(stem(displayName(x.id, x.name)))) ?? used[0];
   return ing ? displayName(ing.id, ing.name).toLowerCase() : shortDish(r.title);
 }
 
@@ -178,6 +184,20 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   useEffect(() => { pane.current?.closest(".overflow-y-auto")?.scrollTo({ top: 0 }); }, [dish?.key, dish?.step]);
 
   const total = dish?.recipe.steps.length ?? 0;
+  // Steps really cooked here: 5 seconds on a step at least (flicking through to try the screen takes a second or two).
+  // «Поддержать» comes after three quarters of a dish cooked so (SupportAsk) — some steps may be skipped — not after a
+  // quick look at the steps.
+  const [cooked, setCooked] = useState<{ id: string; steps: Set<number> }>({ id: "", steps: new Set() });
+  useEffect(() => {
+    if (!dish) return;
+    const id = dish.recipe.id, step = dish.step;
+    const t = window.setTimeout(() => setCooked((c) => {
+      const steps = new Set(c.id === id ? c.steps : []);
+      steps.add(step);
+      return { id, steps };
+    }), 5000);
+    return () => window.clearTimeout(t);
+  }, [dish?.recipe.id, dish?.step]); // eslint-disable-line react-hooks/exhaustive-deps
   // A tap or swipe on the screen only buzzes; the page's sound is for voice commands (eyes on the stove).
   const go = useCallback((delta: number) => { if (dish) { cue("tap"); setStep(dish.key, dish.step + delta); } }, [dish, setStep]);
 
@@ -247,6 +267,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   }
 
   const r = dish.recipe;
+  const far = total >= 2 && cooked.id === r.id && cooked.steps.size / total >= 0.75;
   const cur = r.steps[dish.step] ?? r.steps[0];
   const tip = stepTips(r)[dish.step] ?? null;
   const last = dish.step >= total - 1;
@@ -308,9 +329,10 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
             )}
+            {running && <FlowHint flow={stepFlow(r.id, dish.step)} step={dish.step} total={total} seconds={running.total} />}
           </div>
 
-          {/* Phones: the voice button and «Ещё»; reading aloud and a second dish live inside. */}
+          {/* Phones: «Голосом», «Читать вслух» and ⋯ (a second dish, «Прекратить») in one row. */}
           <div className="mt-6 flex flex-wrap gap-2 lg:hidden">
             {hf.supported && (
               <button type="button" aria-pressed={handsFree} onClick={toggleVoice}
@@ -318,7 +340,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
                 <Mic size={18} aria-hidden />Голосом
               </button>
             )}
-            <Chip onClick={() => setSheet("more")}><MoreHorizontal size={18} aria-hidden />Ещё</Chip>
+            {/* Reading aloud in sight: inside «Ещё» nobody found it. «Ещё» keeps the second dish and «Прекратить». */}
+            <Chip on={s.readAloud} onClick={toggleRead}><Volume2 size={18} aria-hidden />Читать вслух</Chip>
+            <button type="button" className="chip w-11 justify-center px-0" onClick={() => setSheet("more")} aria-label="Ещё"><MoreHorizontal size={18} aria-hidden /></button>
           </div>
           {hint && <VoiceHint onClose={() => { setHint(false); markHintSeen(); }} />}
 
@@ -366,7 +390,8 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
         </aside>
       </div>
 
-      <BottomBar listening={handsFree ? { on: hf.listening, heard: hf.heard, off: () => setHandsFree(false) } : null}>
+      <BottomBar listening={handsFree ? { on: hf.listening, heard: hf.heard, off: () => setHandsFree(false) } : null}
+        top={<SupportAsk near={far} className={cx("mx-auto px-4 pt-2 sm:px-6 lg:px-8", WIDTH)} />}>
         {/* One way to help: what went wrong with this dish (app/rescue), or any question to Шеф. */}
         <button className="btn-outline h-13 px-4 text-body" onClick={() => setSheet("rescue")} aria-label="Помощь: что-то не так или вопрос Шефу">
           <LifeBuoy size={20} aria-hidden /><span className="max-[359px]:hidden">Помощь</span>
@@ -384,7 +409,6 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
       </Sheet>
       <Sheet open={sheet === "more"} title="Ещё" onClose={() => setSheet(null)}>
         <div className="divide-y divide-line">
-          <Toggle on={s.readAloud} onChange={() => toggleRead()} label="Читать шаги вслух" hint="Телефон прочитает каждый шаг" />
           <button className="flex min-h-[64px] w-full items-center gap-3 py-2 text-left" onClick={() => { if (second) { removeSecond(); setSheet(null); } else setSheet("second"); }}>
             <span className="min-w-0 flex-1">
               <span className="block text-body-sm font-medium">{second ? "Убрать второе блюдо" : "Готовить второе блюдо"}</span>
@@ -448,7 +472,29 @@ function StepFacts({ uses, tip }: { uses: { key: string; name: string; amount: s
   );
 }
 
-function BottomBar({ children, listening }: { children: ReactNode; listening: { on: boolean; heard: string; off: () => void } | null }) {
+/** Under a running timer: whether the next step can be done meanwhile («мясо варится — можно резать овощи») or waits
+ *  for it («капуста — в тот же бульон, после таймера»). Marks: server step_flow.php. A short wait says nothing. */
+function FlowHint({ flow, step, total, seconds }: { flow: number[] | null; step: number; total: number; seconds: number }) {
+  if (!flow || step >= total - 1) return null;
+  if (flow[0] === 1) {
+    const [from, to] = flow[1] && flow[2] ? [flow[1], flow[2]] : [step + 2, step + 2];
+    return (
+      <p className="mt-3 flex gap-2 rounded-input bg-herb-soft px-3.5 py-3 text-body-sm text-ink" role="status">
+        <ArrowRight size={18} className="mt-0.5 shrink-0 text-herb" aria-hidden />
+        <span>Пока таймер идёт, можно {from === to ? "делать шаг " + from : "делать шаги " + from + "–" + to}. Позову, когда время выйдет.</span>
+      </p>
+    );
+  }
+  if (seconds < 300) return null;
+  return (
+    <p className="mt-3 flex gap-2 rounded-input bg-warn-soft px-3.5 py-3 text-body-sm text-ink" role="status">
+      <Clock size={18} className="mt-0.5 shrink-0 text-warn" aria-hidden />
+      <span>Следующий шаг — когда таймер зазвенит.</span>
+    </p>
+  );
+}
+
+function BottomBar({ children, listening, top }: { children: ReactNode; listening: { on: boolean; heard: string; off: () => void } | null; top?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   // --dock: toasts float above the bar.
   useLayoutEffect(() => {
@@ -463,6 +509,7 @@ function BottomBar({ children, listening }: { children: ReactNode; listening: { 
   }, []);
   return (
     <div ref={ref} className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper">
+      {top}
       {listening && (
         <div className="bg-brand-fill text-white" role="status">
           <div className={cx("mx-auto flex min-h-[44px] items-center gap-2.5 px-4 sm:px-6 lg:px-8", WIDTH)}>

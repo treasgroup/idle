@@ -1,16 +1,21 @@
 // «Доработка»: the catalog improved with the owner's AI, a batch at a time. The tab writes the task (copy → paste
 // into the chat with the AI), checks the answer, shows what will change, and saves it into the catalog files on the
-// hosting (admin.recipes.patch, with a backup). Two jobs: long steps split into short ones; product swaps.
+// hosting (admin.recipes.patch, with a backup). Three jobs: long steps split into short ones; product swaps; timed steps marked «можно дальше / дождитесь».
 import { useEffect, useMemo, useState } from "react";
+import { buildCatalog } from "../engine";
 import { get, post } from "./api";
 import { BTN, BTN_OUTLINE, BTN_SM } from "./ui";
 
 interface RawLine { id: string; name: string; amount: number; unit: string; optional?: boolean; swap?: string[] }
 interface RawStep { text: string; timerSeconds?: number; uses?: string[] }
 interface RawRecipe { id: string; title: string; mainIngredient?: string; ingredients: RawLine[]; steps: RawStep[] }
-interface CatalogAnswer { files: { name: string; data?: { recipes?: RawRecipe[]; ingredients?: { id: string; name: string }[] } }[]; hidden: string[] }
+interface CatalogAnswer {
+  files: { name: string; data?: { recipes?: RawRecipe[]; ingredients?: { id: string; name: string }[] } }[]; hidden: string[];
+  /** Timed steps already marked «можно дальше / дождитесь» (server step_flow.php). */
+  flow?: Record<string, Record<string, number[]>>;
+}
 
-const STEP_BATCH = 6, SWAP_BATCH = 30;
+const STEP_BATCH = 6, SWAP_BATCH = 30, FLOW_BATCH = 25;
 const BASIC = new Set(["salt", "water", "sugar", "black-pepper"]);
 
 /** The JSON in an AI answer: code fences and words around it are dropped. */
@@ -132,6 +137,7 @@ export function Improve() {
         <>
           <LongSteps all={all} onSaved={load} />
           <Swaps all={all} products={products} onSaved={load} />
+          <TimerSteps cat={cat} onSaved={load} />
         </>
       )}
     </section>
@@ -297,6 +303,93 @@ function Swaps({ all, products, onSaved }: { all: RawRecipe[]; products: { id: s
             </ul>
           </details>
           {withSwaps > 0 && <button className={BTN} style={{ marginTop: 12 }} onClick={() => void save()}>Сохранить замены в {withSwaps} рецептах</button>}
+        </div>
+      )}
+      {msg.ok && <p className="cx-saved" style={{ marginTop: 10 }}>✓ {msg.ok}</p>}
+      {msg.err && <p className="cx-err" style={{ marginTop: 10 }}>{msg.err}</p>}
+    </div>
+  );
+}
+
+// ---------- Timed steps: can the next one be done while it runs ----------
+// The cooking screen says under a running timer «Пока таймер идёт, можно делать шаг 3» or «Следующий шаг — когда
+// таймер зазвенит». The whole catalog was marked once; here new recipes are, with the owner's AI. The timers are the
+// ones the app shows (engine tidy finds «варите 20 минут» without a timer too), so the catalog is built here first.
+interface TimedStep { id: string; title: string; i: number; minutes: number; text: string; next: string }
+
+function flowTask(list: TimedStep[]): string {
+  return [
+    "Для каждого шага с таймером ответь: можно ли, пока идёт таймер, делать СЛЕДУЮЩИЙ шаг рецепта.",
+    "",
+    "1 — можно: следующий шаг — подготовка чего-то другого (нарезать, натереть, смешать соус, разогреть духовку, сварить яйца в другой кастрюле), и ему не нужно то, что сейчас варится, жарится, остывает или подходит.",
+    "0 — нельзя: следующему шагу нужен результат этого таймера (добавить в ту же кастрюлю или сковороду, вынуть готовое, нарезать остывшее, раскатать отдохнувшее тесто), или у плиты надо стоять (жарить, помешивая).",
+    "Если сомневаешься — 0.",
+    "",
+    "Ответ — только JSON, без пояснений; номер шага — как в задании:",
+    '{"id-рецепта": {"номер шага": 0 или 1, …}, …}',
+    "",
+    "Шаги:",
+    ...list.flatMap((s) => ["", "### " + s.id + " — " + s.title, "Шаг " + (s.i + 1) + " (таймер " + s.minutes + " мин): " + s.text, "Следующий шаг: " + s.next]),
+  ].join("\n");
+}
+
+function TimerSteps({ cat, onSaved }: { cat: CatalogAnswer; onSaved: () => Promise<void> }) {
+  const [at, setAt] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [check, setCheck] = useState<{ items: { id: string; i: number; go: boolean }[]; go: number; bad: string[] } | null>(null);
+  const [msg, setMsg] = useState<{ ok?: string; err?: string }>({});
+  const list = useMemo(() => {
+    const hidden = new Set(cat.hidden ?? []);
+    const out: TimedStep[] = [];
+    for (const r of buildCatalog(cat.files).recipes) {
+      if (hidden.has(r.id)) continue;
+      r.steps.forEach((s, i) => {
+        if (!s.timerSeconds || i >= r.steps.length - 1 || cat.flow?.[r.id]?.[String(i)]) return;
+        out.push({ id: r.id, title: r.title, i, minutes: Math.max(1, Math.round(s.timerSeconds / 60)), text: s.text, next: r.steps[i + 1].text });
+      });
+    }
+    return out;
+  }, [cat]);
+  const batch = list.slice(at * FLOW_BATCH, (at + 1) * FLOW_BATCH);
+  useEffect(() => { if (at * FLOW_BATCH >= list.length) setAt(Math.max(0, Math.ceil(list.length / FLOW_BATCH) - 1)); }, [list.length, at]);
+
+  const verify = () => {
+    setMsg({});
+    try {
+      const j = parseAnswer(answer);
+      const items: { id: string; i: number; go: boolean }[] = []; const bad: string[] = [];
+      for (const [id, v] of Object.entries(j)) {
+        for (const [n, mark] of Object.entries((v ?? {}) as Record<string, unknown>)) {
+          const s = list.find((x) => x.id === id && x.i === Number(n) - 1);
+          if (!s) { bad.push(id + ", шаг " + n + ": такого шага с таймером в задании нет"); continue; }
+          if (mark !== 0 && mark !== 1 && mark !== "0" && mark !== "1") { bad.push(s.title + ", шаг " + n + ": нужен 0 или 1"); continue; }
+          items.push({ id, i: s.i, go: Number(mark) === 1 });
+        }
+      }
+      setCheck({ items, go: items.filter((x) => x.go).length, bad });
+    } catch (e) { setCheck(null); setMsg({ err: (e as Error).message }); }
+  };
+  const save = async () => {
+    if (!check) return;
+    try {
+      const res = await post<{ saved: number }>("admin.flow.save", { items: check.items });
+      setMsg({ ok: "Сохранено шагов: " + res.saved });
+      setAnswer(""); setCheck(null); await onSaved();
+    } catch (e) { setMsg({ err: (e as Error).message }); }
+  };
+
+  return (
+    <div className="adm-card">
+      <h2 style={{ marginBottom: 2 }}>Таймеры: можно ли делать следующий шаг</h2>
+      <p className="adm-muted" style={{ margin: 0 }}>Под запущенным таймером в готовке появляется «Пока таймер идёт, можно делать шаг 3» или «Следующий шаг — когда таймер зазвенит». Нужно для новых рецептов и для шагов, которые вы поменяли.</p>
+      <p style={{ margin: "12px 0 0", fontSize: 15 }}>{list.length ? <>Без отметки <b>{list.length}</b> шагов с таймером — {Math.ceil(list.length / FLOW_BATCH)} пачек по {FLOW_BATCH}.</> : "Все шаги с таймером отмечены 🎉"}</p>
+      <Batches count={list.length} size={FLOW_BATCH} at={at} setAt={setAt} task={() => flowTask(batch)} />
+      {list.length > 0 && <Answer answer={answer} setAnswer={setAnswer} verify={verify} />}
+      {check && (
+        <div className="cx-section">
+          {check.bad.map((b) => <p key={b} className="cx-err" style={{ margin: "0 0 6px" }}>✗ {b}</p>)}
+          <p style={{ margin: 0, fontSize: 15 }}>Отметок: <b>{check.items.length}</b> — «можно дальше» {check.go}, «дождитесь» {check.items.length - check.go}.</p>
+          {check.items.length > 0 && <button className={BTN} style={{ marginTop: 12 }} onClick={() => void save()}>Сохранить {check.items.length} отметок</button>}
         </div>
       )}
       {msg.ok && <p className="cx-saved" style={{ marginTop: 10 }}>✓ {msg.ok}</p>}

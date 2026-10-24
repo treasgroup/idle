@@ -18,6 +18,7 @@ require __DIR__ . '/_private/catalog_heal.php';
 require __DIR__ . '/_private/home_collections.php';
 require __DIR__ . '/_private/school_images.php';
 require __DIR__ . '/_private/catalog_patch.php';
+require __DIR__ . '/_private/step_flow.php';
 require __DIR__ . '/_private/support.php';
 
 const VERSION = '0.41.0';
@@ -123,12 +124,16 @@ try {
         // Recipes hidden by the owner and photo versions (so a replaced photo is not taken from the browser cache).
         $hidden = []; $taught = []; try { $hidden = setting('hidden', []); $taught = setting('taught', []); } catch (Throwable $e) {}
         $photos = photo_versions();
-        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos()) . ($light ? ',"light":true' : '') . '}';
+        echo '{"files":[' . implode(',', $parts) . '],"hidden":' . json_encode(array_values((array)$hidden)) . ',"photos":' . json_encode((object)$photos) . ',"thumbs":' . json_encode(thumb_ready($photos)) . ',"taught":' . json_encode(array_values((array)$taught), JSON_UNESCAPED_UNICODE) . ',"realPhotos":' . json_encode(real_photos())
+            // Under a running timer: «можно дальше» or «дождитесь» (step_flow.php); a light catalog has no steps.
+            . ($light ? ',"light":true' : ',"flow":' . json_encode((object)step_flow())) . '}';
     }
     elseif ($route === 'message.send' && $method === 'POST') message_send(read_json_body(8000));
     elseif ($route === 'weather' && $method === 'GET') weather_now();
     elseif ($route === 'weather.city' && $method === 'GET') weather_city();
     elseif ($route === 'collections' && $method === 'GET') collections_public();
+    // Timed steps of new recipes marked «можно дальше / дождитесь» with the owner's AI (step_flow.php).
+    elseif ($route === 'admin.flow.save' && $method === 'POST') { require_admin(true); admin_step_flow_save(read_json_body(400000)); }
     // The search pages in the app's words: the panel works the texts out and keeps them here (seo.php).
     elseif ($route === 'admin.seo.texts' && $method === 'GET') { require_admin(); require_once __DIR__ . '/_private/seo.php'; admin_seo_texts_state(); }
     elseif ($route === 'admin.seo.texts' && $method === 'POST') { require_admin(true); require_once __DIR__ . '/_private/seo.php'; admin_seo_texts_save(read_json_body(2000000)); }

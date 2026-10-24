@@ -174,4 +174,5 @@ export declare const unusual: any;
 export declare const inSeason: any;
 export declare const italian: any;
 export declare const catalogLight: () => boolean;
+export declare const stepFlow: (id: string, step: number) => number[] | null;
 export declare const proteinOf: (r: unknown) => string | null;
