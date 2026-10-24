@@ -23,13 +23,21 @@ $state = is_array($req['state']['session'] ?? null) ? $req['state']['session'] :
 $cmd = match_norm((string)($req['request']['command'] ?? ''));
 $orig = (string)($req['request']['original_utterance'] ?? '');
 
+// The recipe and step being cooked, kept on this speaker or phone between sessions («Хранилище» on in the console):
+// inside a skill Alice's own timer does not work, so the person says «хватит», sets Alice's timer, calls the skill again
+// and goes on from the same step. null — leave as it is; [] — clear.
+$APP = null;
+
 /** Sends the answer: text on screen, the same text for speech (Alice limit: 1024 characters each). */
 function say(string $text, array $state = [], array $buttons = [], bool $end = false, ?string $tts = null): void {
+    global $APP;
     $cut = fn($s) => mb_strlen($s, 'UTF-8') > 1000 ? mb_substr($s, 0, 997, 'UTF-8') . '…' : $s;
-    echo json_encode(['version' => '1.0', 'session_state' => $state, 'response' => [
+    $out = ['version' => '1.0', 'session_state' => $state, 'response' => [
         'text' => $cut($text), 'tts' => $cut(str_replace(['«', '»', '•'], '', $tts ?? $text)), 'end_session' => $end,
         'buttons' => array_map(fn($b) => is_array($b) ? $b : ['title' => $b, 'hide' => true], array_slice($buttons, 0, 6)),
-    ]], JSON_UNESCAPED_UNICODE);
+    ]];
+    if ($APP !== null) $out['application_state'] = $APP ?: new stdClass();
+    echo json_encode($out, JSON_UNESCAPED_UNICODE);
     exit;
 }
 function alice_count(string $type, string $text = '', ?string $recipe = null): void {
@@ -41,7 +49,11 @@ function step_text(array $r, int $n): string {
     $s = $steps[$n] ?? null;
     if (!$s) return '';
     $t = 'Шаг ' . ($n + 1) . ' из ' . count($steps) . '. ' . trim((string)$s['text']);
-    if (!empty($s['timerSeconds'])) $t .= ' Это займёт около ' . max(1, (int)round($s['timerSeconds'] / 60)) . ' ' . seo_plural(max(1, (int)round($s['timerSeconds'] / 60)), 'минуты', 'минут', 'минут') . ' — можете попросить Алису поставить таймер.';
+    // Alice's timer does not work while the skill is open: say how to set it and come back to this step.
+    if (!empty($s['timerSeconds'])) {
+        $m = max(1, (int)round($s['timerSeconds'] / 60));
+        $t .= ' Это займёт около ' . $m . ' ' . seo_plural($m, 'минуты', 'минут', 'минут') . '. Для таймера скажите «хватит» и попросите Алису поставить таймер на ' . $m . ' ' . seo_plural($m, 'минуту', 'минуты', 'минут') . ', а потом позовите меня снова — продолжу с этого шага.';
+    }
     return $t;
 }
 function offer(array $list, array $q): void {
@@ -64,11 +76,28 @@ function choose(array $r): void {
 
 try {
     if ($orig === 'ping') say('pong');
+    $hello = fn() => say('Привет! Скажите, что есть дома, — подберу рецепт и проведу по шагам. Например: «курица и картошка» или «суп за 30 минут».', [], ['Курица и картошка', 'Удиви меня', 'Суп за 30 минут']);
     if (!empty($req['session']['new']) && $cmd === '') {
         alice_count('visit', 'alice');
-        say('Привет! Скажите, что есть дома, — подберу рецепт и проведу по шагам. Например: «курица и картошка» или «суп за 30 минут».', [], ['Курица и картошка', 'Удиви меня', 'Суп за 30 минут']);
+        // Back after setting Alice's timer (within 12 hours): go on from the same step.
+        $was = is_array($req['state']['application'] ?? null) ? $req['state']['application'] : [];
+        $back = isset($was['rid'], $was['step']) && (time() - (int)($was['at'] ?? 0)) < 12 * 3600 ? bot_recipe_by_id((string)$was['rid']) : null;
+        if ($back) say('С возвращением! Продолжим «' . $back['title'] . '» — шаг ' . ((int)$was['step'] + 1) . '?', ['rid' => $back['id'], 'step' => (int)$was['step'], 'resume' => true], ['Продолжить', 'Другое блюдо']);
+        $hello();
     }
-    if (preg_match('/^(хватит|стоп|выход|закончить|спасибо все|все спасибо|пока)/u', $cmd)) say('Приятного аппетита! Возвращайтесь, когда снова встанет вопрос «что приготовить».', [], [], true);
+    if (!empty($state['resume'])) {
+        $back = isset($state['rid']) ? bot_recipe_by_id((string)$state['rid']) : null;
+        if ($back && preg_match('/(продолж|^да\b|давай|поехали|дальше)/u', $cmd)) { $state['resume'] = false; $APP = ['rid' => $back['id'], 'step' => (int)$state['step'], 'at' => time()]; say(step_text($back, (int)$state['step']), ['rid' => $back['id'], 'step' => (int)$state['step']], ['Дальше', 'Повтори', 'Назад']); }
+        if (preg_match('/(друг|нов|не надо|^нет\b)/u', $cmd)) { $APP = []; $hello(); }
+        $state = [];
+    }
+    if (preg_match('/^(хватит|стоп|выход|закончить|спасибо все|все спасибо|пока)/u', $cmd)) {
+        // In the middle of a recipe: the step is kept for the timer and the way back.
+        $mid = isset($state['rid'], $state['step']) && (int)$state['step'] >= 0 ? bot_recipe_by_id((string)$state['rid']) : null;
+        $name = trim((string)(config()['alice']['name'] ?? ''));
+        if ($mid) say('Хорошо. Когда будете готовы, ' . ($name !== '' ? 'скажите «Алиса, запусти навык ' . $name . '»' : 'позовите меня снова') . ' — продолжу с шага ' . ((int)$state['step'] + 1) . '.', [], [], true);
+        say('Приятного аппетита! Возвращайтесь, когда снова встанет вопрос «что приготовить».', [], [], true);
+    }
     if (preg_match('/(помощь|что ты умеешь|что умеешь)/u', $cmd))
         say('Назовите продукты — например, «фарш и рис без лука» или «быстрый ужин с рыбой». Я предложу три блюда. Выберите одно, и я назову продукты, а потом поведу по шагам: говорите «дальше», «назад» или «повтори».', $state, ['Удиви меня']);
 
@@ -77,8 +106,10 @@ try {
     if ($r) {
         $n = (int)($state['step'] ?? -1); $count = count($r['steps']);
         $go = function (int $to) use ($r, $count) {
-            if ($to >= $count) say('Готово! Приятного аппетита. Хотите подобрать что-нибудь ещё?', [], ['Удиви меня'], false);
+            global $APP;
+            if ($to >= $count) { $APP = []; say('Готово! Приятного аппетита. Хотите подобрать что-нибудь ещё?', [], ['Удиви меня'], false); }
             $to = max(0, $to);
+            $APP = ['rid' => $r['id'], 'step' => $to, 'at' => time()];
             say(step_text($r, $to), ['rid' => $r['id'], 'step' => $to], $to + 1 < $count ? ['Дальше', 'Повтори', 'Назад'] : ['Готово', 'Повтори']);
         };
         if (preg_match('/^(начать|начнем|начинай|давай|поехали|готовить|да)\b/u', $cmd) && $n < 0) $go(0);

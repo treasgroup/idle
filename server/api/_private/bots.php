@@ -4,6 +4,15 @@
 /** Searches; remembers the request so "ещё" can continue it. Returns [recipes, query]. */
 function bot_search(string $text, int $offset = 0, int $limit = 5): array {
     $q = match_parse($text);
+    // «борщ», «плов», «сырники», «оливье» are dishes, not products: the matcher skipped them and Alice offered a
+    // milkshake. A word that is a dish's name (the title's first word or a word in «…») picks those dishes; the
+    // products said with it («борщ с говядиной») and the time put the closest first.
+    $dish = bot_dishes($q);
+    // «что-нибудь из фарша»: one title starts with «Фарш», many dishes have mince — then by the product.
+    if ($dish && (count($dish) >= 3 || !$q['want'] || !match_recipes($q, 3))) {
+        $q['dish'] = true;
+        return [array_slice($dish, $offset, $limit), $q];
+    }
     $list = match_recipes($q, $limit, $offset);
     if (!$list && $offset === 0 && ($q['maxMinutes'] || $q['course'])) {
         // Nothing with every condition: keep the products, drop time and kind of dish.
@@ -12,7 +21,58 @@ function bot_search(string $text, int $offset = 0, int $limit = 5): array {
         if ($list) $q['relaxed'] = true;
     }
     if (!$q['want'] && !$q['course'] && !$q['maxMinutes'] && $offset === 0) $q['vague'] = true;
+    // «что приготовить на ужин»: nothing to search by gave the quickest of all — a milkshake and cocoa. A meal: the
+    // easy mains and soups (porridge and eggs in the morning), a different few each day.
+    if (!$q['want'] && !$q['course']) {
+        $breakfast = preg_match('/завтрак|утр/u', $q['text']);
+        $pool = array_values(array_filter(seo_recipes(), fn($r) => in_array($r['_course'], $breakfast ? ['breakfast'] : ['main', 'soup'], true)
+            && (int)($r['totalMinutes'] ?? 999) <= ($q['maxMinutes'] ?: 60)));
+        usort($pool, fn($a, $b) => crc32($a['id'] . date('Y-m-d')) <=> crc32($b['id'] . date('Y-m-d')));
+        if ($pool) $list = array_slice($pool, $offset, $limit);
+    }
     return [$list, $q];
+}
+
+/** One dish word in two forms («котлеты»/«котлет», «плов»/«плова»), stricter than products: «сыра» is not «сырники». */
+function bot_same_dish(string $a, string $b): bool {
+    if ($a === $b) return true;
+    $la = mb_strlen($a, 'UTF-8'); $lb = mb_strlen($b, 'UTF-8'); $min = min($la, $lb);
+    if ($min < 4 || abs($la - $lb) > 2) return false;
+    $common = 0;
+    while ($common < $min && mb_substr($a, $common, 1, 'UTF-8') === mb_substr($b, $common, 1, 'UTF-8')) $common++;
+    return $common >= max(4, $min - 1);
+}
+
+/** The dishes a word of the request names, best first; [] when no word is a dish's name. */
+function bot_dishes(array $q, bool $withProducts = false): array {
+    // Not the products said first («борщ с говядиной»: the dish is «борщ», «говядиной» only puts beef ones first);
+    // then with them — «плов», «пельмени» are products too.
+    $products = array_merge(array_column($q['want'], 'label'), array_column($q['without'], 'label'));
+    $all = array_values(array_filter(explode(' ', $q['text']), fn($w) => mb_strlen($w, 'UTF-8') >= 3 && !in_array($w, MATCH_STOP, true)
+        && !preg_match(MATCH_NOT_PRODUCT, $w) && !preg_match('/^\d/', $w)));
+    $words = $withProducts ? $all : array_values(array_filter($all, fn($w) => !in_array($w, $products, true)));
+    if (!$words) return $withProducts ? [] : bot_dishes($q, true);
+    $scored = [];
+    foreach (seo_recipes() as $r) {
+        $title = match_norm((string)$r['title']);
+        $names = [explode(' ', $title)[0]];
+        if (preg_match_all('/«([^»]+)»/u', mb_strtolower((string)$r['title'], 'UTF-8'), $m)) foreach ($m[1] as $x) $names = array_merge($names, explode(' ', match_norm($x)));
+        $hit = null;
+        foreach ($words as $w) foreach ($names as $n) if (bot_same_dish($w, $n)) { $hit = $w; break 2; }
+        if ($hit === null) continue;
+        $s = 10;
+        // The other products said must be there when the dish word is itself a product («фарш и рис» is not plain rice).
+        foreach ($q['want'] as $w) { if ($w['label'] === $hit) continue; if (match_has($r, $w)) $s += 3; elseif ($withProducts) continue 2; }
+        foreach ($q['without'] as $w) if (match_has($r, $w)) continue 2;
+        // Every word of the request in the title («Борщ с говядиной» for «борщ с говядиной»).
+        foreach (explode(' ', $title) as $tw) foreach ($all as $w) if (mb_strlen($tw, 'UTF-8') >= 4 && match_same($tw, $w)) $s += 2;
+        if ($q['maxMinutes'] && (int)($r['totalMinutes'] ?? 0) > $q['maxMinutes']) $s -= 4;
+        if (($r['difficulty'] ?? '') === 'easy') $s += 0.5;
+        $scored[] = [$s - (int)($r['totalMinutes'] ?? 60) / 600, $r];
+    }
+    if (!$scored) return $withProducts ? [] : bot_dishes($q, true);
+    usort($scored, fn($a, $b) => $b[0] <=> $a[0] ?: strcmp($a[1]['id'], $b[1]['id']));
+    return array_map(fn($x) => $x[1], $scored);
 }
 
 /** One line per recipe for a list. */
@@ -22,6 +82,7 @@ function bot_line(array $r): string {
 
 /** "Нашёл с курицей и картошкой:" */
 function bot_intro(array $q, int $count): string {
+    if ($count && !empty($q['dish'])) return 'Вот что нашёл:';
     if (!$count) return $q['want'] ? 'По запросу «' . match_names($q['want']) . '» пока ничего не нашёл. Попробуйте назвать продукты по-другому или убрать один.' : 'Не понял, что приготовить. Назовите продукты, которые есть дома: например, «курица, картошка».';
     $parts = [];
     if ($q['want']) $parts[] = match_names($q['want']);
@@ -50,7 +111,12 @@ function bot_random(): ?array {
     return $pool ? $pool[random_int(0, count($pool) - 1)] : null;
 }
 
-function bot_is_surprise(string $t): bool { return (bool)preg_match('/(удиви|что-нибудь|что нибудь|чтонибудь|любое|случайн|рандом|не знаю что|наугад)/u', match_norm($t)); }
+// «Что-нибудь из фарша», «что-нибудь быстрое» say what: only a request with nothing else is «удиви меня».
+function bot_is_surprise(string $t): bool {
+    if (!preg_match('/(удиви|что-нибудь|что нибудь|чтонибудь|любое|случайн|рандом|не знаю что|наугад)/u', match_norm($t))) return false;
+    $q = match_parse($t);
+    return !$q['want'] && !$q['without'] && !$q['maxMinutes'] && !$q['course'] && !bot_dishes($q);
+}
 
 function bot_post_json(string $url, array $body, int $timeout = 8): ?array {
     if (!function_exists('curl_init')) return null;
