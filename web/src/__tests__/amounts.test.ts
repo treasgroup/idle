@@ -5,6 +5,18 @@ import { speechText } from "../app/speech";
 
 const ing = (id: string, amount: number, unit = "г") => ({ id, name: id, amount, unit });
 
+describe("liquids and what is sold whole", () => {
+  it("shows weighed liquids in millilitres, spoons from the grams", () => {
+    expect(homeQuantity(ing("milk", 50))).toMatchObject({ unit: "мл", text: "50 мл", hint: "3 ст. л." });
+    expect(homeQuantity(ing("vegetable-oil", 25)).text).toBe("25 мл"); // 27 мл, rounded by 5 as the page rounds
+    expect(homeQuantity(ing("water", 500, "мл")).text).toBe("500 мл");
+  });
+  it("buys cabbage and pumpkin whole", () => {
+    expect(shopQuantity("cabbage", 125, "г")).toEqual({ text: "1 кочан", need: "нужно 125 г" });
+    expect(shopQuantity("pumpkin", 2500, "г")?.text).toBe("2 тыквы");
+  });
+});
+
 describe("amounts as people count them at home", () => {
   it("shows vegetables in medium pieces with the grams under them", () => {
     expect(homeQuantity(ing("beet", 125))).toMatchObject({ text: "½ шт.", grams: "125 г" });

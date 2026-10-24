@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { X, Heart, List, Zap, Timer, Clock3, UtensilsCrossed, ChevronRight, Star } from "lucide-react";
-import { type Recipe } from "../engine";
+import { mainIngredientOf, proteinOf, type Recipe } from "../engine";
 import { useActions } from "../app/actions";
 import { signal } from "../app/personal";
 import { useRatings, ratingLabel } from "../app/ratings";
@@ -24,7 +24,21 @@ const reduced = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-
 
 /** A light shuffle of the best-fitting dishes: the order stays roughly by fit, but no two decks are the same. */
 function shuffleTop(list: Recipe[], top = 48): Recipe[] {
-  return list.slice(0, top).map((r, i) => ({ r, k: i + Math.random() * 16 })).sort((a, b) => a.k - b.k).map((x) => x.r);
+  return varied(list.slice(0, top).map((r, i) => ({ r, k: i + Math.random() * 16 })).sort((a, b) => a.k - b.k).map((x) => x.r));
+}
+/** The same main product never twice in a row nor two cards apart (a morning deck was six egg dishes out of eight):
+ *  the next card is the first one in order whose main product differs from the last two shown. */
+function varied(list: Recipe[]): Recipe[] {
+  // What the dish is «about»: eggs (гречка с яйцом, омлет, яичница — eggs whatever the main product says), its meat or
+  // fish, else its main product.
+  const main = (r: Recipe) => (/яйц|яичн|омлет|фриттат|шакшук/i.test(r.title) ? "egg" : proteinOf(r) ?? mainIngredientOf(r) ?? r.ingredients[0]?.id ?? r.id);
+  const rest = [...list], out: Recipe[] = [];
+  while (rest.length) {
+    const last = out.slice(-2).map(main);
+    const k = rest.findIndex((r) => !last.includes(main(r)));
+    out.push(rest.splice(k < 0 ? 0 : k, 1)[0]);
+  }
+  return out;
 }
 
 export function Deck({ title, pool, askTime, startList, onClose, from }: {

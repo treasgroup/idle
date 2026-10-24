@@ -40,6 +40,7 @@ import { ChefAvatar, Chip, Layer, Section, Sheet, Stepper, cx, mmss } from "../c
 import { Reviews, Stars, useReviews } from "./Reviews";
 import { timeLong, timeShort } from "../app/recipeTime";
 import { withAmounts } from "../app/stepAmounts";
+import { forServings } from "../app/stepServings";
 import { useTerms } from "../components/Terms";
 
 const DIFF: Record<string, string> = { easy: "Просто", medium: "Средне", hard: "Сложно" };
@@ -249,7 +250,10 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const missing = needed.length - owned;
   // Rows of the shopping list that came from this recipe: then the button opens the list instead of adding again.
   const inList = rowsFor(s.shopping, recipe);
-  const firstMissing = recipe.ingredients.find((i) => i.id === needed.find((id) => !hasIt(id)));
+  // «Чем заменить то, чего нет дома» asks about a product not marked «есть», one the recipe knows a swap for first — never
+  // the dish's own main product (куриное филе in chicken cutlets got «Точного ответа у меня здесь нет»).
+  const missingNow = recipe.ingredients.filter((i) => needed.includes(i.id) && !hasIt(i.id) && i.id !== recipe.mainIngredient);
+  const firstMissing = missingNow.find((i) => i.swap?.length) ?? missingNow[0];
   const swapQuestion = firstMissing ? "Чем заменить " + accusative(displayName(firstMissing.id, firstMissing.name)) + "?" : undefined;
   const toggleHave = (id: string) => setHave((h) => (hasIt(id) ? h.filter((x) => !ingredientMatches(id, x)) : [...h, id]));
 
@@ -421,12 +425,14 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                 <ol className={cx("card divide-y divide-line overflow-hidden", light && "hidden")}>
                   {recipe.steps.map((st, n) => {
                     const part = splitSide(st.text);
+                    const sized = forServings(withAmounts(part.text, lines), base.servings, servings);
                     return (
                       <li key={n} id={"recipe-step-" + n} className={cx("flex gap-4 px-4 py-5 sm:px-5", UNDER_HEADER)}>
                         <span aria-hidden className="w-6 shrink-0 text-h2 leading-7 tabular-nums text-brand">{n + 1}</span>
                         <div className="min-w-0 max-w-[62ch] flex-1">
                           {part.side && <span className="label mb-1 block text-brand">Гарнир · {part.side}</span>}
-                          <p className="text-body leading-7 text-ink">{terms.render(withAmounts(part.text, lines))}</p>
+                          <p className="text-body leading-7 text-ink">{terms.render(sized.text)}</p>
+                          {sized.note && <p className="mt-1.5 text-caption text-ink-soft">{sized.note}</p>}
                           {tips[n] && (
                             <p className="mt-2.5 flex gap-2 text-body-sm text-ink-soft">
                               <Lightbulb size={16} className="mt-[3px] shrink-0 text-herb" aria-hidden /><span><span className="font-semibold text-herb">Совет: </span>{tips[n]}</span>

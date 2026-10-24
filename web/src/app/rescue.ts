@@ -13,7 +13,7 @@ export interface Trouble {
 }
 
 interface Kind {
-  soup: boolean; meat: boolean; fish: boolean; rice: boolean; grain: boolean; pasta: boolean; mash: boolean;
+  soup: boolean; meat: boolean; minced: boolean; fish: boolean; rice: boolean; grain: boolean; pasta: boolean; mash: boolean;
   baking: boolean; yeast: boolean; cream: boolean; sauce: boolean; dessert: boolean; pancakes: boolean;
   syrniki: boolean; salad: boolean; fry: boolean; omelet: boolean; casserole: boolean; dumplings: boolean; roastVeg: boolean; drink: boolean;
 }
@@ -27,6 +27,7 @@ function kindOf(r: Recipe): Kind {
   return {
     soup: course === "soup",
     meat: /beef|pork|lamb|veal|chicken|turkey|duck|minced|liver|meat/.test(main) && course !== "soup",
+    minced: /котлет|тефтел|фрикадел|биточ|зраз|люля/.test(title) && course !== "soup",
     fish: /fish|salmon|cod|pollock|tuna|trout|mackerel|hake|pike|perch|shrimp/.test(main) && course !== "soup",
     rice: /(?:^|-)rice/.test(main) || /плов|ризотто|паэль/.test(title),
     grain: /buckwheat|millet|pearl-barley|bulgur|couscous|oat-flakes|semolina|lentil/.test(main) || /каша|гречк|пшен|перлов|булгур/.test(title),
@@ -51,12 +52,12 @@ function kindOf(r: Recipe): Kind {
 
 const T = (id: string, title: string, steps: string[], minutes?: number): Trouble => ({ id, title, steps, ...(minutes ? { minutes } : {}) });
 
-const SALTY_SOUP = T("salty-soup", "Пересолил", [
+const SALTY_SOUP = T("salty-soup", "Пересолено", [
   "Долейте горячей воды или несолёного бульона и доведите до кипения.",
   "Добавьте ложку сметаны или немного лимонного сока — кислое и сливочное смягчают соль.",
   "Можно сварить в супе горсть риса или вермишели без соли — порций станет больше, соли в каждой меньше.",
 ]);
-const SALTY = T("salty", "Пересолил", [
+const SALTY = T("salty", "Пересолено", [
   "Увеличьте несолёную часть: добавьте овощей, крупы или гарнира без соли.",
   "Подайте со сметаной, йогуртом или долькой лимона — они смягчают солёность.",
   "Соус и гарнир к этому блюду не солите.",
@@ -97,6 +98,13 @@ const SOUP = [
     "Если нужен прозрачный — процедите через сито с бумажной салфеткой.",
   ]),
 ];
+
+// Cutlets, meatballs and the like: the trouble everyone meets first.
+const MINCED = T("minced-falls", "Котлеты разваливаются", [
+  "Уберите фарш в холодильник на 15–20 минут — холодный держит форму лучше.",
+  "Добавьте в фарш ещё немного хлеба, размоченного в молоке, или ложку манки и хорошо вымешайте, «отбейте» фарш о миску.",
+  "Жарьте на хорошо разогретой сковороде и не переворачивайте, пока снизу не схватится корочка.",
+]);
 
 const MEAT = [
   T("meat-tough", "Мясо жёсткое", [
@@ -267,7 +275,7 @@ const SALAD = [
   ]),
 ];
 
-/** 4–6 troubles that fit this dish: its own first, then «Пересолил» and «Подгорело». */
+/** 4–6 troubles that fit this dish: its own first, then «Пересолено» and «Подгорело». */
 export function troublesFor(r: Recipe): Trouble[] {
   const k = kindOf(r);
   if (k.drink) return DRINK;
@@ -281,6 +289,7 @@ export function troublesFor(r: Recipe): Trouble[] {
   else if (k.grain) own.push(UNDERCOOKED, MUSHY, WATERY);
   if (k.pasta) own.push(...PASTA);
   if (k.mash) own.push(...MASH);
+  if (k.minced) own.push(MINCED);
   if (k.meat) own.push(...MEAT);
   if (k.fish) own.push(...FISH);
   if (k.pancakes) own.push(...PANCAKES);
@@ -298,14 +307,14 @@ export function troublesFor(r: Recipe): Trouble[] {
 }
 
 /** Every answer once (for Школа готовки → «Спасение»). */
-export const ALL_TROUBLES: Trouble[] = [SALTY_SOUP, SALTY, BURNT, SMOKE, STICKS, ...SOUP, ...MEAT, ...FISH, UNDERCOOKED_RICE, UNDERCOOKED, MUSHY, WATERY,
+export const ALL_TROUBLES: Trouble[] = [SALTY_SOUP, SALTY, BURNT, SMOKE, STICKS, ...SOUP, MINCED, ...MEAT, ...FISH, UNDERCOOKED_RICE, UNDERCOOKED, MUSHY, WATERY,
   ...PASTA, ...MASH, ...BAKING, ...THICKEN, CREAM, ...PANCAKES, ...SYRNIKI, ...SALAD, ...OMELET, ...CASSEROLE, ...DUMPLINGS, ...ROAST_VEG, ...DRINK];
 
 /** Школа готовки → «Спасение»: the same answers, by kind of dish. */
 export const RESCUE_GROUPS: { title: string; items: Trouble[] }[] = [
   { title: "Супы", items: [...SOUP, SALTY_SOUP] },
   { title: "Крупы, паста, пюре", items: [UNDERCOOKED_RICE, UNDERCOOKED, MUSHY, WATERY, ...PASTA, ...MASH] },
-  { title: "Мясо и рыба", items: [...MEAT, ...FISH] },
+  { title: "Мясо и рыба", items: [MINCED, ...MEAT, ...FISH] },
   { title: "Жарка", items: [STICKS, SMOKE, BURNT, SALTY] },
   { title: "Выпечка, блины, сырники", items: [...BAKING, ...PANCAKES, ...SYRNIKI] },
   { title: "Соусы, кремы, сливки", items: [...THICKEN, CREAM] },

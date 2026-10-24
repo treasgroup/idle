@@ -12,6 +12,7 @@ import {
 } from "../engine";
 import { useStore } from "../app/store";
 import { SupportAsk } from "../components/SupportButton";
+import { forServings } from "../app/stepServings";
 import { signal } from "../app/personal";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
@@ -277,7 +278,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const next = r.steps[dish.step + 1];
   // «две пятых масла» with the amount for the servings being cooked.
   const lines = r.ingredients.map((i) => scaleIngredient(i, r, dish.servings));
-  const curText = withAmounts(cur.text, lines);
+  // «для 4 порций — 12 штук» for the servings being cooked; other mentions of portions get a note (app/stepServings).
+  const sized = forServings(withAmounts(cur.text, lines), r.servings, dish.servings);
+  const curText = sized.text;
   const fit = kitchenHints(r, profile.kitchen, lines);
   const nextText = next ? withAmounts(next.text, lines) : "";
   const both = live.length === 2 && !!c && !!second;
@@ -324,6 +327,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
             {/* A tap on the text does nothing: with wet hands a brush of the finger skipped a step unnoticed. «Дальше»,
                 «‹» and a swipe change it; underlined kitchen words still open their hint. */}
             <p className="mt-5 text-step md:text-step-lg lg:mt-8">{terms.render(curText)}</p>
+            {sized.note && <p className="mt-2 text-body-sm text-ink-soft">{sized.note}</p>}
             <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
             {fit.steps[dish.step] && <KitchenHint key={r.id + dish.step + fit.steps[dish.step].fix} hint={fit.steps[dish.step]} className="mt-5" />}
             {seconds > 0 && (

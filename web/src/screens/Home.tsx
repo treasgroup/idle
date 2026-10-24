@@ -158,8 +158,9 @@ export function Home({ pwa }: { pwa?: Pwa }) {
     <div className="pb-4" data-list="home">
       <div className="flex items-start justify-between gap-3 pt-3 sm:pt-6">
         <div>
-          <p className="text-body-sm text-ink-soft">{greeting()}!</p>
-          <h1 className="mt-1 text-h1 sm:text-display">Что приготовим {MEAL_WORD[meal]}?</h1>
+          {/* «Добрый день!» is for phones; on a computer the question alone heads the page. */}
+          <p className="text-body-sm text-ink-soft lg:hidden">{greeting()}!</p>
+          <h1 className="mt-1 text-h1 sm:text-display lg:mt-0">Что приготовим {MEAL_WORD[meal]}?</h1>
           {weather && <p className="mt-1.5 text-body-sm text-ink-soft">{weather}</p>}
         </div>
         <div className="flex shrink-0 items-center"><ProfileButton className="-mr-1.5 lg:hidden" /></div>

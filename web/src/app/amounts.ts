@@ -21,6 +21,12 @@ const MEDIUM: Record<string, number> = {
   onion: 100, "red-onion": 100, carrot: 100, potato: 120, tomato: 120, "green-tomato": 120, cucumber: 120,
   "bell-pepper": 150, apple: 150, pear: 150, zucchini: 300, eggplant: 250, beet: 200, avocado: 150, banana: 120, kiwi: 70, "orange-flesh": 150,
 };
+/** Bought whole: grams in one and its name for 1 / 2 / 5. */
+const WHOLE: Record<string, [number, [string, string, string]]> = {
+  cabbage: [1500, ["кочан", "кочана", "кочанов"]], "napa-cabbage": [800, ["кочан", "кочана", "кочанов"]],
+  cauliflower: [700, ["кочан", "кочана", "кочанов"]], broccoli: [400, ["кочан", "кочана", "кочанов"]],
+  pumpkin: [2000, ["тыква", "тыквы", "тыкв"]],
+};
 /** Fresh herbs: sprigs in a dish, bunches of about 30 г in the shop. */
 const HERB = /^(dill|parsley|cilantro|fresh-basil|green-onion)$/;
 const BUNCH = 30;
@@ -138,9 +144,21 @@ export function homeQuantity(i: Item): HomeAmount {
     if (i.amount < 5 && !EXACT.test(name) && aisleOf({ ingredientId: id, name: i.name }) === "spices")
       return { amount: i.amount, unit: i.unit, text: "по вкусу", toTaste: true };
   }
+  // Liquids the catalog weighs (молоко 50 г, масло 25 г — 772 recipes): measured at home in millilitres and spoons.
+  const density = LIQUID[id];
+  if (density && grams(i.unit) && i.amount > 0) {
+    const ml = i.amount / density;
+    return { amount: ml, unit: "мл", text: shown(ml, "мл", false), toTaste: false, hint: spoonHint(id, i.amount, i.unit) };
+  }
   const exact = EXACT.test((ingredient(id)?.name ?? i.name).toLowerCase());
   return { amount: i.amount, unit: i.unit, text: shown(i.amount, i.unit, exact), toTaste: false, hint: spoonHint(id, i.amount, i.unit) };
 }
+/** Grams in a millilitre of the liquids the catalog lists by weight (the nutrition keeps counting the grams). */
+const LIQUID: Record<string, number> = {
+  milk: 1.03, kefir: 1.03, cream: 1.01, "heavy-cream": 1, "vegetable-oil": 0.92, "toasted-sesame-oil": 0.92,
+  "lemon-juice": 1.03, "lime-juice": 1.03, "orange-juice": 1.04, "carrot-juice": 1.04, "beet-juice": 1.04, "grape-juice": 1.05,
+  "soy-sauce": 1.15, "rice-vinegar": 1.01, "table-vinegar-9": 1.01,
+};
 
 /** «2 шт.», «150 г · 6 ст. л.», «по вкусу» — the amount as it is shown on a recipe. */
 export function homeAmount(i: Item): string {
@@ -167,6 +185,12 @@ export function shopQuantity(id: string, amount: number, unit: string): { text: 
   if (HERB.test(id) && grams(unit)) {
     const n = Math.max(1, Math.ceil(amount / BUNCH - 0.1));
     return { text: n + " " + word(n, "пучок", "пучка", "пучков") };
+  }
+  // Sold whole, not by the 125 г a recipe needs: a head of cabbage (~1,5 кг), a pumpkin (~2 кг), a celery root.
+  const whole = WHOLE[id];
+  if (whole && grams(unit)) {
+    const n = Math.max(1, Math.ceil(amount / whole[0] - 0.1));
+    return { text: n + " " + word(n, ...whole[1]), need: "нужно " + formatAmount(amount, unit) };
   }
   if (id === "garlic") {
     const cloves = grams(unit) ? Math.max(1, Math.round(amount / 5)) : /^зубч/.test(unit.trim()) ? Math.ceil(amount) : 0;

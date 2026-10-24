@@ -9,6 +9,13 @@ const dish = (p: Omit<Partial<Recipe>, "steps"> & { ids?: string[]; steps?: stri
 } as unknown as Recipe);
 const titles = (r: Recipe) => troublesFor(r).map((t) => t.title);
 
+describe("Спасти блюдо: котлеты", () => {
+  it("cutlets and meatballs get «Котлеты разваливаются» first", () => {
+    expect(titles(dish({ title: "Котлеты куриные", mainIngredient: "chicken-fillet", steps: ["Обжарьте котлеты."] }))[0]).toBe("Котлеты разваливаются");
+    expect(titles(dish({ title: "Суп с фрикадельками", course: "soup" }))).not.toContain("Котлеты разваливаются");
+  });
+});
+
 describe("Спасти блюдо", () => {
   it("fits the dish", () => {
     const pilaf = titles(dish({ title: "Плов с говядиной", mainIngredient: "beef", ids: ["rice", "beef"], steps: ["Обжарьте мясо.", "Засыпьте рис."] }));
@@ -20,15 +27,15 @@ describe("Спасти блюдо", () => {
     expect(titles(dish({ title: "Блины на молоке", course: "breakfast", steps: ["Жарьте блины."] }))).toContain("Блины рвутся или прилипают");
     expect(titles(dish({ title: "Салат с огурцами", course: "salad" }))).not.toContain("Подгорело");
   });
-  it("drinks get their own, not «Пересолил»", () => {
+  it("drinks get their own, not «Пересолено»", () => {
     expect(titles(dish({ title: "Компот из яблок", course: "drink" }))).toEqual(["Слишком сладко", "Несладко или пресно"]);
   });
-  it("always 2–6, with «Пересолил»", () => {
+  it("always 2–6, with «Пересолено»", () => {
     for (const r of [dish({}), dish({ course: "soup" }), dish({ course: "dessert" }), dish({ title: "Плов", mainIngredient: "beef", steps: ["Обжарьте мясо"] })]) {
       const list = troublesFor(r);
       expect(list.length).toBeGreaterThanOrEqual(2);
       expect(list.length).toBeLessThanOrEqual(6);
-      expect(list.some((t) => t.title === "Пересолил")).toBe(true);
+      expect(list.some((t) => t.title === "Пересолено")).toBe(true);
     }
   });
   it("short answers", () => {
