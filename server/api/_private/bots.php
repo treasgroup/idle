@@ -93,14 +93,77 @@ function bot_intro(array $q, int $count): string {
     return $intro;
 }
 
+/** «Говядина», «Сметана», not «Сырая говядина без кости для варки» — the site's short names (core.js `We`). */
+function bot_short(string $id, string $fallback): string {
+    $ing = catalog_ingredients()[$id] ?? null;
+    $cap = fn(string $s) => mb_strtoupper(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8');
+    if ($ing) foreach ((array)($ing['aliases'] ?? []) as $al) if (count(explode(' ', (string)$al)) <= 2 && mb_strlen((string)$al, 'UTF-8') <= 18) return $cap((string)$al);
+    $n = (string)($ing['name'] ?? $fallback);
+    $n = preg_replace('/^((сыр|свеж|очищенн|охлажденн|охлаждённ|нечищенн)(ой|ый|ая|ое|ые|ого)\s+)+/iu', '', trim(explode(',', $n)[0]));
+    $n = preg_replace('/\s*\d+([,.]\d+)?(\s*[–—-]\s*\d+([,.]\d+)?)?\s*%/u', '', $n);
+    $n = trim(preg_split('/ \(| с | без | для /u', $n)[0]);
+    return $n !== '' ? $cap($n) : $fallback;
+}
+
 /** Ingredients for the recipe's own number of servings. */
 function bot_ingredients(array $r): array {
     $out = [];
     foreach ($r['ingredients'] as $i) {
         if (($i['id'] ?? '') === 'water') continue;
-        $out[] = trim((string)$i['name']) . ' — ' . seo_amount($i['amount'] ?? 0) . ' ' . trim((string)($i['unit'] ?? '')) . (!empty($i['optional']) ? ' (по желанию)' : '');
+        $out[] = bot_short((string)($i['id'] ?? ''), trim((string)$i['name'])) . ' — ' . seo_amount($i['amount'] ?? 0) . ' ' . trim((string)($i['unit'] ?? '')) . (!empty($i['optional']) ? ' (по желанию)' : '');
     }
     return $out;
+}
+
+// «Отложите одну двадцатую воды», «смешайте 11/13 муки»: the recipes say shares because amounts change with the
+// portions. Said aloud, the share becomes the amount (as the site does, app/stepAmounts.ts): «55 мл воды».
+const BOT_NUM = ['одну' => 1, 'одна' => 1, 'одной' => 1, 'две' => 2, 'двух' => 2, 'двумя' => 2, 'три' => 3, 'трех' => 3, 'тремя' => 3, 'четыре' => 4, 'четырех' => 4, 'четырьмя' => 4, 'пять' => 5, 'пяти' => 5, 'пятью' => 5, 'шесть' => 6, 'шести' => 6, 'семь' => 7, 'семи' => 7, 'восемь' => 8, 'восьми' => 8, 'девять' => 9, 'девяти' => 9, 'десять' => 10, 'десяти' => 10];
+const BOT_DEN = ['одиннадцат' => 11, 'двенадцат' => 12, 'тринадцат' => 13, 'четырнадцат' => 14, 'пятнадцат' => 15, 'шестнадцат' => 16, 'семнадцат' => 17, 'восемнадцат' => 18, 'девятнадцат' => 19, 'двадцат' => 20, 'тридцат' => 30, 'сороков' => 40, 'пятидесят' => 50, 'десят' => 10, 'девят' => 9, 'восьм' => 8, 'седьм' => 7, 'шест' => 6, 'пят' => 5, 'четверт' => 4, 'трет' => 3];
+
+function bot_amount_words(float $a, string $unit): string {
+    if ($unit === 'г' || $unit === 'мл') {
+        if ($a >= 1000) return str_replace('.', ',', (string)(round($a / 100) / 10)) . ($unit === 'г' ? ' кг' : ' л');
+        $n = $a >= 30 ? round($a / 5) * 5 : ($a >= 3 ? round($a) : round($a * 2) / 2);
+        return str_replace('.', ',', (string)$n) . ' ' . $unit;
+    }
+    return seo_amount(round($a * 2) / 2) . ' ' . $unit;
+}
+/** The recipe line the words after a share name («муки», «растительного масла»), or null. */
+function bot_line_for(array $r, string $words): ?array {
+    foreach (explode(' ', match_norm($words)) as $w) {
+        if (mb_strlen($w, 'UTF-8') < 3 || preg_match('/^(всей|всего|всех|всю|весь|оставш|остальн)/u', $w)) continue;
+        $stem = mb_substr($w, 0, max(3, min(4, mb_strlen($w, 'UTF-8') - 1)), 'UTF-8');
+        $hits = array_values(array_filter($r['ingredients'], fn($i) => (float)($i['amount'] ?? 0) > 0 && mb_strpos(match_norm(bot_short((string)($i['id'] ?? ''), (string)$i['name']) . ' ' . $i['name']), $stem) !== false));
+        if (count($hits) === 1) return $hits[0];
+        if (count($hits) > 1) return null; // «масла» with both butter and oil: left as written
+    }
+    return null;
+}
+function bot_step_amounts(string $text, array $r): string {
+    $last = null;
+    // In figures: «11/13 муки», «остальные 13/113 сохраните».
+    $text = preg_replace_callback('/(?<![\d,×\/\p{L}])((?:(?:остальн|оставш)\p{L}*\s+)?)(\d{1,3})\/(\d{1,3})(?![\d\/×])((?:\s+[\p{L}-]+){1,3})/u', function ($m) use ($r, &$last) {
+        [$all, $rest, $a, $b, $tail] = $m;
+        if (!((int)$a > 0 && (int)$b > (int)$a)) return $all;
+        $line = bot_line_for($r, $tail) ?? ($rest !== '' ? $last : null);
+        if (!$line) return $all;
+        $last = $line;
+        return $rest . bot_amount_words((float)$line['amount'] * (int)$a / (int)$b, (string)$line['unit']) . $tail;
+    }, $text);
+    // In words: «одну двадцатую воды», «двумя третями масла», «четверть сахара».
+    $nums = implode('|', array_keys(BOT_NUM));
+    $dens = implode('|', array_keys(BOT_DEN));
+    return preg_replace_callback('/(?<!\p{L})((?:(?:остальн|оставш)\p{L}*\s+)?)(?:(' . $nums . ')\s+)?((?:двадцат\p{L}*\s+)?)(' . $dens . ')(\p{L}*)((?:\s+част\p{L}*)?)((?:\s+[\p{L}-]+){1,3})/iu', function ($m) use ($r) {
+        [$all, $rest, $num, $twenty, $den, $end, $part, $tail] = $m;
+        $d = BOT_DEN[mb_strtolower($den, 'UTF-8')] ?? 0;
+        if ($twenty !== '') { $d = 20 + ($d < 10 ? $d : 0); if ($d === 20) return $all; }
+        // «треть», «четверть» without a number are one part; an ordinal needs a number («одну пятую»).
+        $n = $num !== '' ? (BOT_NUM[mb_strtolower($num, 'UTF-8')] ?? 0) : (preg_match('/^(ь|ью|и)$/u', $end) && ($d === 3 || $d === 4) ? 1 : ($part !== '' ? 1 : 0));
+        if (!$n || !$d || $n >= $d) return $all;
+        $line = bot_line_for($r, $tail);
+        if (!$line) return $all;
+        return $rest . bot_amount_words((float)$line['amount'] * $n / $d, (string)$line['unit']) . $tail;
+    }, $text);
 }
 
 function bot_recipe_by_id(string $id): ?array { return seo_recipes()[$id] ?? null; }

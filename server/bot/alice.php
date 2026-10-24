@@ -10,6 +10,7 @@ require __DIR__ . '/../api/_private/reviews.php';
 require __DIR__ . '/../api/_private/seo.php';
 require __DIR__ . '/../api/_private/match.php';
 require __DIR__ . '/../api/_private/bots.php';
+require __DIR__ . '/../api/_private/alice_home.php';
 
 @ini_set('display_errors', '0');
 $_SERVER['SCRIPT_NAME'] = dirname(dirname($_SERVER['SCRIPT_NAME'] ?? '/bot/alice.php')) . '/index.php';
@@ -49,7 +50,8 @@ function step_text(array $r, int $n): string {
     $steps = array_values($r['steps']);
     $s = $steps[$n] ?? null;
     if (!$s) return '';
-    $t = 'Шаг ' . ($n + 1) . ' из ' . count($steps) . '. ' . trim((string)$s['text']);
+    // «одну двадцатую воды» said as «55 мл воды» (bots.php).
+    $t = 'Шаг ' . ($n + 1) . ' из ' . count($steps) . '. ' . bot_step_amounts(trim((string)$s['text']), $r);
     // Alice's timer does not work while the skill is open: say how to set it and come back to this step.
     if (!empty($s['timerSeconds'])) {
         $m = max(1, (int)round($s['timerSeconds'] / 60));
@@ -100,7 +102,81 @@ try {
         say('Приятного аппетита! Возвращайтесь, когда снова встанет вопрос «что приготовить».', [], [], true);
     }
     if (preg_match('/(помощь|что ты умеешь|что умеешь)/u', $cmd))
-        say('Назовите продукты — например, «фарш и рис без лука» или «быстрый ужин с рыбой». Я предложу три блюда. Выберите одно, и я назову продукты, а потом поведу по шагам: говорите «дальше», «назад» или «повтори».', $state, ['Удиви меня']);
+        say('Назовите продукты — например, «фарш и рис без лука» или «быстрый ужин с рыбой». Я предложу три блюда. Выберите одно, и я назову продукты, а потом поведу по шагам: говорите «дальше», «назад» или «повтори». А если назвать код из профиля на сайте, буду знать ваш план и список покупок.', $state, ['Удиви меня']);
+
+    // ---------- «Шеф в Алисе»: the family's plan and shopping list (api/_private/alice_home.php) ----------
+    $device = alice_device($req);
+    $home = alice_household($device);
+    // «Запомни код 4821», «мой код четыре восемь два один».
+    if (preg_match('/(?:^|\s)код(?:\s|$)|запомни/u', $cmd)) {
+        $spoken = ['ноль' => 0, 'нуль' => 0, 'один' => 1, 'одна' => 1, 'два' => 2, 'две' => 2, 'три' => 3, 'четыре' => 4, 'пять' => 5, 'шесть' => 6, 'семь' => 7, 'восемь' => 8, 'девять' => 9];
+        $digits = preg_replace_callback('/(?<![а-я])(' . implode('|', array_keys($spoken)) . ')(?![а-я])/u', fn($m) => (string)$spoken[$m[1]], $cmd);
+        $digits = preg_replace('/\D+/', '', $digits);
+        if (strlen($digits) === 4) say(alice_link($device, $digits), [], ['Что на ужин?', 'Что купить?']);
+        if (preg_match('/запомни|мой код|код семьи/u', $cmd)) say('Назовите четыре цифры кода из профиля на сайте: «Профиль» → «Шеф в Алисе». Например: «запомни код 4821».', $state);
+    }
+    if (preg_match('/(забудь|отключи|отвяжи)\S*\s+(код|меня|семью|список|план)/u', $cmd)) {
+        alice_unlink($device);
+        say('Хорошо, на этом устройстве ваш план и список покупок больше не видны.', [], ['Удиви меня']);
+    }
+    $need = fn() => say('Чтобы я видел ваш план и список покупок, откройте на сайте «Профиль» → «Шеф в Алисе» и скажите: «запомни код» и четыре цифры оттуда.', $state, ['Удиви меня']);
+    // «Что на ужин?», «что сегодня готовим», «что по плану на завтра» — not «что приготовить на ужин» (a search).
+    $askPlan = !preg_match('/приготов|сготов/u', $cmd) && preg_match('/^(а\s+)?что\s+(у нас\s+|сегодня\s+|завтра\s+|по плану\s+)*(на\s+(ужин|обед|завтрак)|по плану|сегодня|завтра|готовим|едим)/u', $cmd);
+    if ($askPlan) {
+        if (!$home) $need();
+        [, $doc] = alice_doc($home);
+        $tomorrow = preg_match('/завтра/u', $cmd) ? 1 : 0;
+        $meal = preg_match('/завтрак/u', $cmd) ? 'breakfast' : (preg_match('/обед/u', $cmd) ? 'lunch' : (preg_match('/ужин/u', $cmd) ? 'dinner' : null));
+        $items = array_values(array_filter(alice_plan($doc, $tomorrow), fn($x) => !$meal || $x[1] === $meal));
+        $when = $tomorrow ? 'завтра' : 'сегодня';
+        if (!$items) say('На ' . $when . ($meal ? ' на ' . ['breakfast' => 'завтрак', 'lunch' => 'обед', 'dinner' => 'ужин'][$meal] : '') . ' в плане пусто. Подобрать что-нибудь? Назовите продукты или скажите «удиви меня».', [], ['Удиви меня', 'Что купить?']);
+        $words = array_map(fn($x) => $x[0]['title'] . ($x[2] ? ' (вчерашнее, разогреть)' : ''), $items);
+        $cook = array_values(array_filter($items, fn($x) => !$x[2]));
+        $first = $cook[0][0] ?? null;
+        // One dish: «По плану сегодня — Борщ с говядиной. Начнём готовить?»; several: which one is asked.
+        $start = $first ? (count($items) === 1 ? ' Начнём готовить?' : ' Начнём с «' . $first['title'] . '»?') : '';
+        say('По плану ' . $when . ' — ' . alice_list_words($words) . '.' . $start,
+            $first ? ['plan' => $first['id']] : [], $first ? ['Начнём', 'Что купить?'] : ['Что купить?']);
+    }
+    if (!empty($state['plan']) && preg_match('/^(да|давай|начн|начина|готов|поехали|хочу)/u', $cmd)) { $p = bot_recipe_by_id((string)$state['plan']); if ($p) choose($p); }
+    // «Что купить?», «что в списке», «вычеркни молоко», «добавь хлеб», «купил яйца и добавь сметану».
+    $readList = preg_match('/(что|чего)\s+(нужно\s+|надо\s+)?(купить|докупить)|список покупок|что в списке|прочитай список|какие покупки/u', $cmd);
+    $edits = preg_split('/\s+и\s+(?=(?:добавь|допиши|запиши|внеси|вычеркни|отметь|удали|убери|купил))/u', $cmd);
+    $isEdit = (bool)preg_match('/^(добавь|допиши|запиши|внеси|вычеркни|отметь|удали из списка|убери из списка|купил|купила|купили)\s/u', $cmd);
+    if ($readList || $isEdit) {
+        if (!$home) $need();
+        if ($isEdit) {
+            $done = []; $added = []; $missed = [];
+            for ($try = 0; $try < 3; $try++) {
+                [$version, $doc] = alice_doc($home);
+                $list = (array)($doc['shopping'] ?? []); $done = []; $added = []; $missed = [];
+                foreach ($edits as $e) {
+                    if (preg_match('/^(?:вычеркни|отметь|удали из списка|убери из списка|купил|купила|купили)\s+(.+)$/u', $e, $m)) {
+                        $rows = alice_find_rows(['shopping' => $list], preg_replace('/\s+(из списка|в списке|как купленн\S*)$/u', '', $m[1]));
+                        if (!$rows) $missed[] = $m[1];
+                        foreach ($rows as $k => $name) { $list[$k]['checked'] = true; $done[] = mb_strtolower($name, 'UTF-8'); }
+                    } elseif (preg_match('/^(?:добавь|допиши|запиши|внеси)\s+(.+?)(?:\s+в\s+(?:список|покупки).*)?$/u', $e, $m)) {
+                        foreach (array_filter(preg_split('/\s+и\s+|,\s*/u', $m[1])) as $w) { $row = alice_new_row(trim($w)); $list[] = $row; $added[] = mb_strtolower($row['name'], 'UTF-8'); }
+                    }
+                }
+                if (!$done && !$added) break;
+                $doc['shopping'] = array_values($list);
+                if (alice_doc_save($home, $version, $doc)) break;
+            }
+            $parts = [];
+            if ($done) $parts[] = 'Отметил как купленное: ' . alice_list_words($done) . '.';
+            if ($added) $parts[] = 'Добавил в список: ' . alice_list_words($added) . '.';
+            if ($missed) $parts[] = 'В списке нет: ' . alice_list_words($missed) . '.';
+            [, $doc] = alice_doc($home);
+            $left = count(alice_to_buy($doc));
+            say(implode(' ', $parts) . ' ' . ($left ? 'Осталось купить: ' . $left . ' ' . seo_plural($left, 'продукт', 'продукта', 'продуктов') . '.' : 'Всё куплено!'), [], ['Что купить?']);
+        }
+        [, $doc] = alice_doc($home);
+        $names = array_map(fn($x) => $x[1], alice_to_buy($doc));
+        if (!$names) say('Список покупок пуст. Можно сказать: «добавь молоко и хлеб».', [], ['Что на ужин?']);
+        $n = count($names);
+        say('В списке ' . $n . ' ' . seo_plural($n, 'продукт', 'продукта', 'продуктов') . ': ' . alice_list_words(array_map(fn($s) => mb_strtolower($s, 'UTF-8'), array_slice($names, 0, 25))) . ($n > 25 ? ' и другие' : '') . '.', [], ['Что на ужин?']);
+    }
 
     // Cooking a chosen recipe step by step.
     $r = isset($state['rid']) ? bot_recipe_by_id((string)$state['rid']) : null;

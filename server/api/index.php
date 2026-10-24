@@ -5,6 +5,7 @@ require __DIR__ . '/_private/lib.php';
 require __DIR__ . '/_private/providers.php';
 require __DIR__ . '/_private/admin.php';
 require __DIR__ . '/_private/accounts.php';
+require __DIR__ . '/_private/alice_home.php';
 require __DIR__ . '/_private/reviews.php';
 require __DIR__ . '/_private/push.php';
 require __DIR__ . '/_private/polls.php';
@@ -176,6 +177,10 @@ try {
     elseif ($route === 'account.code' && $method === 'POST') account_code();
     elseif ($route === 'account.login' && $method === 'POST') account_login(read_json_body(2000));
     elseif ($route === 'account.delete' && $method === 'POST') account_delete();
+    // «Шеф в Алисе»: a code that links a speaker to the family's plan and list (_private/alice_home.php).
+    elseif ($route === 'alice.code' && $method === 'POST') alice_code_route();
+    elseif ($route === 'alice.status' && $method === 'GET') alice_status_route();
+    elseif ($route === 'alice.unlink' && $method === 'POST') alice_unlink_route();
     elseif ($route === 'household.invite' && $method === 'POST') household_invite();
     elseif ($route === 'household.join' && $method === 'POST') household_join(read_json_body(2000));
     elseif ($route === 'household.leave' && $method === 'POST') household_leave();

@@ -23,6 +23,7 @@ import { byNext, dayMonth, daysUntil, whenText, AHEAD } from "../app/familyCalen
 import { Tour, tourWanted } from "../components/Tour";
 import { VoiceSheet } from "../components/VoiceSheet";
 import { WriteUs } from "../components/WriteUs";
+import { AliceSheetBody } from "../components/AliceSheet";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
 import { WeatherSheet, degrees } from "../components/WeatherSheet";
 import { usePlace, useWeather } from "../app/weather";
@@ -46,7 +47,7 @@ export interface Pwa { installed: boolean; canInstall: boolean; ios: boolean; in
 export function Profile({ pwa }: { pwa: Pwa }) {
   const { s, update, profile, setProfile, sync, toast, wipe, server } = useStore();
   const reminders = useReminders();
-  const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs">(null);
+  const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs" | "alice">(null);
   const [tour, setTour] = useState(false);
   const [voice, setVoice] = useState(false);
   const [wiping, setWiping] = useState(false);
@@ -147,10 +148,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
                 <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">Шеф в Telegram</span><span className="block truncate text-caption text-ink-soft">Спросить, что приготовить, прямо в мессенджере</span></span>
                 <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
               </a>}
-              {server.alice && <div className="flex min-h-[64px] items-center gap-3 px-4 py-2.5">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-sunken text-ink" aria-hidden><Mic size={18} /></span>
-                <span className="min-w-0 flex-1"><span className="block text-body-sm font-semibold">Шеф в Алисе</span><span className="block text-caption text-ink-soft">Скажите: «Алиса, запусти навык {server.alice}»</span></span>
-              </div>}
+              {server.alice && <Row icon={<Mic size={18} />} title="Шеф в Алисе" hint="План и покупки голосом — по коду" onClick={() => setSheet("alice")} />}
               <Row icon={<KeyRound size={18} />} title="Другое устройство" hint="Перенести рецепты на телефон или компьютер" onClick={() => setSheet("login")} />
             </div>
           </Section>
@@ -269,6 +267,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       </Sheet>
 
       <Sheet open={sheet === "family"} title="Семья" onClose={close}><Family /></Sheet>
+      {server.alice && <Sheet open={sheet === "alice"} title="Шеф в Алисе" onClose={close}>{sheet === "alice" && <AliceSheetBody name={server.alice} />}</Sheet>}
       <Sheet open={sheet === "login"} title="Другое устройство" onClose={close}><Login /></Sheet>
       <Sheet open={sheet === "reminders"} title="Напоминания" onClose={close}><Reminders /></Sheet>
       <Sheet open={sheet === "data"} title="Удалить все данные?" onClose={close}
