@@ -2,7 +2,7 @@
 // cooked alongside, and a finish screen. Timers are the app's kitchen timers (app/timers.ts); the shell rings them.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import {
-  ArrowRight, Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Heart, ListChecks,
+  ArrowRight, Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Flame, Heart, ListChecks,
   LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
 } from "lucide-react";
 import {
@@ -12,7 +12,7 @@ import {
 } from "../engine";
 import { useStore } from "../app/store";
 import { SupportAsk } from "../components/SupportButton";
-import { forServings } from "../app/stepServings";
+import { forServings, sizesFor } from "../app/stepServings";
 import { signal } from "../app/personal";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
@@ -21,6 +21,7 @@ import { useReminders } from "../app/reminders";
 import { replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, speak, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { batchPhase, batchesOf } from "../app/batches";
+import { ovenAhead, ovenLine } from "../app/oven";
 import { amountText, leftoversOf, rememberLeftovers } from "../app/nowaste";
 import { Chip, Layer, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { RecipeMini } from "../components/RecipeCard";
@@ -59,7 +60,7 @@ function timeWords(sec: number): string {
 /** The step as shown, for the voice too: «одну двадцатую воды» is read as «55 мл воды». */
 function stepSaid(d: Dish, i: number): string {
   const r = d.recipe;
-  return withAmounts(r.steps[i]?.text ?? "", r.ingredients.map((x) => scaleIngredient(x, r, d.servings)));
+  return sizesFor(withAmounts(r.steps[i]?.text ?? "", r.ingredients.map((x) => scaleIngredient(x, r, d.servings))), d.servings);
 }
 
 /** «Голубцы классические с мясом» → «голубцы», «Картофельное пюре» → «пюре». */
@@ -289,7 +290,9 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
   const sized = forServings(withAmounts(cur.text, lines), r.servings, dish.servings);
   const curText = sized.text;
   const fit = kitchenHints(r, profile.kitchen, lines);
-  const nextText = next ? withAmounts(next.text, lines) : "";
+  const nextText = next ? sizesFor(withAmounts(next.text, lines), dish.servings) : "";
+  // The oven heats while the step before baking is done (app/oven).
+  const oven = ovenLine(ovenAhead(r), dish.step);
   const both = live.length === 2 && !!c && !!second;
   const offset = both ? c.recipe.totalMinutes - second.totalMinutes : 0;
 
@@ -336,6 +339,11 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
             <p className="mt-5 text-step md:text-step-lg lg:mt-8">{terms.render(curText)}</p>
             {sized.note && <p className="mt-2 text-body-sm text-ink-soft">{sized.note}</p>}
             <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
+            {oven && (
+              <p className="mt-5 flex gap-2 rounded-input bg-warn-soft px-3.5 py-3 text-body-sm text-ink" role="status">
+                <Flame size={18} className="mt-0.5 shrink-0 text-warn" aria-hidden /><span>{oven}</span>
+              </p>
+            )}
             {fit.steps[dish.step] && <KitchenHint key={r.id + dish.step + fit.steps[dish.step].fix} hint={fit.steps[dish.step]} className="mt-5" />}
             {seconds > 0 && (
               <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} batches={batchesOf(cur.text, cur.timerSeconds)} />

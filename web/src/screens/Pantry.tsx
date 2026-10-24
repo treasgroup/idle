@@ -16,6 +16,28 @@ import { ProductTiles } from "../components/ProductTiles";
 
 const EXPIRY = [["Сегодня", 0], ["Завтра", 1], ["3 дня", 3], ["Неделя", 7], ["Месяц", 30], ["Без срока", null]] as const;
 
+// What people write in a list and shops print on a receipt, said plainly: the fuzzy search read «яйца» as egg white,
+// «огурцы» as pickled ones, «куриные бёдра» as hearts, «ФИЛЕ ГРУДКИ ЦБ» as pollock and «ТОМАТЫ ЧЕРРИ» as canned.
+// [] — a word to skip («сок»: which one is not said).
+const KNOWN: [RegExp, string[]][] = [
+  [/перепел/, ["quail-egg"]],
+  [/^(?!.*(?:белок|белк|желт|лапш)).*(?<![а-я])(?:яйц|яйк|яичк)/, ["egg"]],
+  [/бородин|ржан/, ["rye-bread"]],
+  [/огур\S*.*(?:солен|малосол|маринов|консерв|корнишон)|(?:солен|малосол|маринов|консерв)\S*.*огур|корнишон/, ["pickled-cucumber"]],
+  [/огур/, ["cucumber"]],
+  [/индейк/, ["turkey-fillet"]],
+  [/бедр/, ["chicken-thigh-fillet"]],
+  [/голен/, ["chicken-drumsticks"]],
+  [/крыл/, ["chicken-wings"]],
+  [/(?:грудк|филе)(?!.*копч).*(?:кур|цб|цыпл|бройл)|(?:кур|цб|цыпл|бройл)\S*.*(?:грудк|филе)(?!.*копч)|^филе грудки$/, ["chicken-fillet"]],
+  [/черри|(?<![а-я])(?:томат|помидор)(?!.*(?:паст|соус|собствен|вялен|зелен|консерв|кетчуп))/, ["tomato"]],
+  [/масло\S*\s+слив|слив\S*\s+масло|^масло$/, ["butter"]],
+  [/масло\S*\s+(?:подсолн|растит|рафин)|(?:подсолн|растит)\S*\s+масло/, ["vegetable-oil"]],
+  [/батон|нарезн/, ["white-bread"]],
+  [/^зелень$/, ["dill", "parsley"]],
+  [/^сок$/, []],
+];
+
 /** Picks product names out of a pasted receipt or a free list: "СМЕТАНА 20% 300Г  89,90" → sour cream. */
 export function parseReceipt(text: string, ids: string[]): string[] {
   const found = new Set<string>();
@@ -25,6 +47,8 @@ export function parseReceipt(text: string, ids: string[]): string[] {
       .replace(/\d+([.,]\d+)?\s*(?:(?:%|кг|гр?|мл|л|шт|уп|x|х|\*|руб|р\.?|₽)(?![а-яa-z]))?/g, " ")
       .replace(/[^а-яa-z\s-]/g, " ").replace(/\s+/g, " ").trim();
     if (line.length < 3 || /^(итог|итого|сумма|ндс|кассир|чек|скидк|оплат|безнал|наличн|сдача|смена|инн|фн|фд|фп|спасибо|пакет)/.test(line)) continue;
+    const known = KNOWN.find(([re]) => re.test(line));
+    if (known) { for (const id of known[1]) if (ids.includes(id)) found.add(id); continue; }
     // A one-word line in another case («2 лука») first tries its base form, if a product is named exactly that.
     const stem = line.replace(/(ов|ей|а|я|ы|и|у|ю)$/, "");
     const exact = !line.includes(" ") && stem !== line ? searchIngredients(stem, ids, 3).find((id) => shortName(id).toLowerCase().replace(/ё/g, "е") === stem) : undefined;
@@ -58,8 +82,16 @@ export function Pantry() {
   const cookFromHome = (focus?: string[]) => {
     const ids = s.fridge.map((f) => f.id);
     const c = { ...a.base(), available: ids, ...(focus ? { desired: focus } : { strictPantry: ids.length >= 4 }) };
-    a.show(focus ? "Использовать: " + focus.map((id) => shortName(id).toLowerCase()).join(", ") : "Из того, что дома", c,
-      focus ? "Чтобы ничего не пропало, приготовьте:" : "Из того, что есть, можно приготовить:", { fresh: true });
+    // When that finds nothing: each product that has to be used on its own, then only what is at home, then dishes
+    // where one or two things are to buy («Макароны по-флотски» wanting tomato paste was hidden altogether).
+    const name = (id: string) => shortName(id).toLowerCase();
+    const next = [
+      ...(focus && focus.length > 1 ? focus.map((id) => ({ c: { ...a.base(), available: ids, desired: [id] }, intro: "Чтобы не пропало (" + name(id) + "), приготовьте:" })) : []),
+      ...(ids.length >= 4 ? [{ c: { ...a.base(), available: ids, strictPantry: true }, intro: "Из того, что есть, можно приготовить:" }] : []),
+      { c: { ...a.base(), available: ids, strictPantry: false }, intro: "Почти всё есть — кое-что докупить:" },
+    ];
+    a.show(focus ? "Использовать: " + focus.map(name).join(", ") : "Из того, что дома", c,
+      focus ? "Чтобы ничего не пропало, приготовьте:" : "Из того, что есть, можно приготовить:", { fresh: true, next });
     goChat();
   };
   const remove = (id: string) => {

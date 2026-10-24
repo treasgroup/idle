@@ -110,8 +110,29 @@ function agree(rest: string): string {
     .replace(/^([Оо]ставш)(?:уюся|аяся|ееся)(?=\s)/u, "$1иеся").replace(/^([Оо]ставш)ейся(?=\s)/u, "$1имися");
 }
 
+// «Смешайте 11/13 муки», «используйте 100/113 всей воды, остальные 13/113 сохраните»: the same shares in figures.
+const DIGITS = /(?<![\d,×/\p{L}])((?:(?:остальн|оставш)\p{L}*\s+)?)(\d{1,3})\/(\d{1,3})(?![\d/×])((?:\s+[\p{L}-]+){0,3})/giu;
+
+function digitShares(text: string, lines: RecipeIngredient[]): string {
+  let last: { line: RecipeIngredient; words: string[] } | null = null;
+  return text.replace(DIGITS, (m, rest: string, a: string, b: string, tail: string) => {
+    const num = Number(a), den = Number(b);
+    if (!(num > 0 && den > num)) return m;
+    const found = productAfter(tail, lines);
+    const target = found ?? (rest && last ? { line: last.line, used: 0, words: last.words } : null);
+    if (!target) return m;
+    const portion = { ...target.line, amount: target.line.amount * (num / den) };
+    if (portion.amount < 1 && (portion.unit === "г" || portion.unit === "мл")) return m;
+    last = { line: target.line, words: target.words };
+    const [amount, spoons] = amountParts(portion);
+    const words = tail.match(/\s+[\p{L}-]+/gu) ?? [];
+    return agree(rest) + amount + " " + target.words.join(" ") + (spoons ? " (" + spoons + ")" : "") + words.slice(target.used).join("");
+  });
+}
+
 /** `lines`: the products already counted for the servings on screen. */
-export function withAmounts(text: string, lines: RecipeIngredient[]): string {
+export function withAmounts(raw: string, lines: RecipeIngredient[]): string {
+  const text = digitShares(raw, lines);
   const re = new RegExp(FRACTION.source, FRACTION.flags);
   let last: { line: RecipeIngredient; words: string[] } | null = null;
   let out = "", from = 0;

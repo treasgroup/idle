@@ -83,7 +83,8 @@ interface Assistant {
   /** A follow-up chip under a reply. */
   choose: (o: ChatOption) => void;
   /** Ready-made conditions (quick buttons, "из того, что дома"). */
-  show: (label: string, c: Conditions, intro: string, opts?: { fresh?: boolean }) => void;
+  /** `next`: what to try, in order, when the conditions find nothing — the first that finds dishes is shown. */
+  show: (label: string, c: Conditions, intro: string, opts?: { fresh?: boolean; next?: { c: Conditions; intro: string }[] }) => void;
   /** New conditions from the condition bar (a removed filter), with fresh results. */
   adjust: (c: Conditions, label: string) => void;
   /** Remembers the recipe opened from a reply, so "а сколько там соли?" is about it. */
@@ -388,10 +389,20 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     ], c);
   }, [push, found]);
 
-  const show = useCallback((label: string, c: Conditions, intro: string, opts: { fresh?: boolean } = {}) => {
+  const show = useCallback((label: string, c0: Conditions, intro0: string, opts: { fresh?: boolean; next?: { c: Conditions; intro: string }[] } = {}) => {
     if (opts.fresh && stateRef.current.conversation.length) newChat();
     stop();
-    const list = found(c);
+    // «Что приготовить из этого?»: the fridge's two soonest products may share no dish, and one product short hides a
+    // dish altogether — the next try instead of «Под это пока ничего нет».
+    let c = c0, intro = intro0, list = found(c0);
+    for (const t of opts.next ?? []) {
+      if (list.length) break;
+      // Fewest things to buy first: «Тако» wanting nine products came before «Макароны по-флотски» wanting one.
+      // «Чтобы не пропал фарш»: dishes with that very product («Язык говяжий» is beef, not mince).
+      const own = (m: Match) => t.c.desired.every((d) => d.startsWith("dish:") || m.recipe.ingredients.some((i) => i.id === d));
+      const l = found(t.c, 40).filter(own).map((m, i) => ({ m, i })).sort((a, b) => a.m.toBuy.length - b.m.toBuy.length || a.i - b.i).map((x) => x.m).slice(0, 5);
+      if (l.length) { c = t.c; intro = t.intro; list = l; }
+    }
     track({ type: "query", text: "[кнопка] " + label, count: list.length, source: "option" });
     push([
       { role: "user", text: label },

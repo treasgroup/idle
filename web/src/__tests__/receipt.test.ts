@@ -22,3 +22,18 @@ it("skips totals and reads several lines", () => {
   expect(r).toEqual(expect.arrayContaining(["sour-cream", "carrot", "kefir"]));
   expect(r.length).toBe(3);
 });
+
+it("reads the usual words of a list and a receipt as the usual products", () => {
+  const one = (w: string) => parseReceipt(w, ids());
+  expect(one("яйца")).toEqual(["egg"]);
+  expect(one("белок яйца")).not.toContain("egg");
+  expect(one("огурцы")).toEqual(["cucumber"]);
+  expect(one("огурцы малосольные")).toEqual(["pickled-cucumber"]);
+  expect(one("куриные бедра")).toEqual(["chicken-thigh-fillet"]);
+  expect(one("ФИЛЕ ГРУДКИ ЦБ ОХЛ 1КГ 399,00")).toEqual(["chicken-fillet"]);
+  expect(one("ТОМАТЫ ЧЕРРИ 250Г 129,00")).toEqual(["tomato"]);
+  expect(one("томатная паста")).toEqual(["tomato-paste"]);
+  expect(one("ХЛЕБ БОРОДИНСКИЙ 300Г 45,00")).toEqual(["rye-bread"]);
+  expect(one("масло")).toEqual(["butter"]);
+  expect(one("сок")).toEqual([]); // which juice is not said
+});
