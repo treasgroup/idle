@@ -3556,9 +3556,32 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
   return y;
 }
 var Eu = (e, t) => Math.min(e.maxServings, Math.max(e.minServings, t));
+// «Подобрать другие блюда на этот день»: Mu fills only empty places, so a full day came back as it was while the
+// screen said «День пересобран». The day is emptied first (its leftovers for tomorrow go with it) and other dishes
+// than the ones it had are looked for with a few seeds.
 function NA(e, t, n, a, i = Date.now(), s = U0) {
-  let r = Mu(e, n, a, i, { ...s, cookAhead: !1 }).find((o) => o.date === t);
-  return r ? e.map((o) => (o.date === t ? r : o)) : e;
+  let old = (e.find((o) => o.date === t)?.items ?? []).filter((o) => !o.leftover),
+    gone = new Set(old.map((o) => o.recipeId)),
+    next = SA(t, 1),
+    empty = e.map((o) =>
+      o.date === t
+        ? { ...o, items: o.items.filter((l) => l.leftover) }
+        : o.date === next
+          ? { ...o, items: o.items.filter((l) => !(l.leftover && gone.has(l.recipeId))) }
+          : o,
+    ),
+    best = null;
+  for (let k = 0; k < 6; k++) {
+    let m = Mu(empty, n, a, i + k * 7919, { ...s, cookAhead: !1 }),
+      r = m.find((o) => o.date === t);
+    if (!r) continue;
+    let same = r.items.filter((o) => !o.leftover && gone.has(o.recipeId)).length;
+    if (!best || same < best.same) best = { m, same };
+    if (!same) break;
+  }
+  if (!best) return e;
+  let r = best.m.find((o) => o.date === t);
+  return empty.map((o) => (o.date === t ? r : o));
 }
 function L0(e, t, n, a) {
   let i = e.find((r) => r.date === t)?.items[n];

@@ -4,12 +4,13 @@ import { PlaceHint } from "../components/PlaceHint";
 import { hintDone } from "../app/hints";
 import { BookOpen, Check, ChevronDown, ChevronRight, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
-  addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients, shoppingText,
+  addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients,
   shortName, useVoiceInput, weekDays, type ShoppingItem,
 } from "../engine";
 import { withWeek } from "../app/planShopping";
 import { useStore } from "../app/store";
 import { shopLine } from "../app/amounts";
+import { listText } from "../app/shoppingShare";
 import { dishesInList, removeDish, type ListDish } from "../app/shoppingDishes";
 import { useActions } from "../app/actions";
 import { replace, routeHash } from "../app/router";
@@ -91,7 +92,7 @@ export function Shopping() {
   };
 
   const order = async (p: Partner) => {
-    await copyText(shoppingText(s.shopping));
+    await copyText(listText(s.shopping));
     toast("Список скопирован — вставьте его в поиск или корзину магазина");
     window.open(apiUrl("go") + "&to=" + encodeURIComponent(p.id), "_blank", "noopener");
   };
@@ -213,7 +214,7 @@ export function Shopping() {
 
       <AddItem open={adding} onClose={() => setAdding(false)} onAdd={(item) => set((l) => [...l, item])} />
       <Sheet open={share} title="Отправить список" onClose={() => setShare(false)}>
-        <ShareOptions title="Список покупок" text={shoppingText(s.shopping)} onDone={() => setShare(false)} onPrint={() => printText("Список покупок", shoppingText(s.shopping))} />
+        <ShareOptions title="Список покупок" text={listText(s.shopping)} onDone={() => setShare(false)} onPrint={() => printText("Список покупок", listText(s.shopping))} />
       </Sheet>
       <Sheet open={clear} title="Очистить список?" onClose={() => setClear(false)}>
         <div className="grid gap-2">

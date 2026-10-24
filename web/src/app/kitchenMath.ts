@@ -81,6 +81,8 @@ export const ROAST: RoastKind[] = [
   { id: "potato", label: "Картофель дольками", temp: 200, perKg: 0, base: 35, min: 30, max: 45, tip: "В один слой, перевернуть один раз. Тесно — будет тушёный, а не румяный." },
 ];
 
+const OVEN = "Обычно так: мясо и птица — 180–200 °C, рыба — 190–200 °C, овощи — 200–220 °C, пироги и запеканки — 180 °C, бисквит — 170–180 °C, безе — 100–110 °C. Напишите, что запекаете, — скажу точнее.";
+
 /** Minutes for a kind and weight (kg), rounded to five. */
 export function roastMinutes(k: RoastKind, kg: number): number {
   const m = k.perKg ? k.base + k.perKg * kg : k.base;
@@ -90,12 +92,14 @@ export function roastMinutes(k: RoastKind, kg: number): number {
 /** «сколько запекать курицу 1,8 кг» → an answer; null when it is not such a question. */
 export function roastAnswer(q: string): string | null {
   const l = q.toLowerCase().replace(/ё/g, "е");
-  if (!/(сколько|как долго|время).*(запек|в духовк)|(запек\S*).*(сколько|как долго)/.test(l)) return null;
-  const k = /курин|курица|курицу|кур[уы]? /.test(l) ? (/(бедр|ножк|голен|крыл|кусоч)/.test(l) ? ROAST[1] : ROAST[0])
+  // «какая температура духовки для курицы»: «температура» alone read as being ill (soup, cozy).
+  const heat = /(температур|градус).*(духовк|запек|печь|выпек)|(духовк|запек\S*|выпек\S*).*(температур|градус)/.test(l);
+  if (!heat && !/(сколько|как долго|время).*(запек|в духовк)|(запек\S*).*(сколько|как долго)/.test(l)) return null;
+  const k = /курин|куриц|кур[уы]? /.test(l) ? (/(бедр|ножк|голен|крыл|кусоч)/.test(l) ? ROAST[1] : ROAST[0])
     : /свин/.test(l) ? ROAST[2] : /говяд/.test(l) ? ROAST[3] : /индейк/.test(l) ? ROAST[4]
       : /(рыб|скумбри|форел|горбуш|семг|лосос|судак|карп|дорад)/.test(l) ? (/филе|стейк/.test(l) ? ROAST[6] : ROAST[5])
         : /картош|картоф/.test(l) ? ROAST[7] : null;
-  if (!k) return null;
+  if (!k) return heat ? OVEN : null;
   const w = l.match(/(\d+(?:[.,]\d+)?)\s*(кг|килограм\S*|кило|г\b|грам\S*)/);
   let kg = w ? Number(w[1].replace(",", ".")) : NaN;
   if (w && /^г/.test(w[2])) kg = kg / 1000;

@@ -98,3 +98,20 @@ test("«кроме», «только не» and «без» take out only what wa
   expect(turn("без лука из курицы").results[0].recipe.ingredients.some((i) => i.id.startsWith("chicken"))).toBe(true);
   expect(turn("главное не острое").results.some((m) => /остр/i.test(m.recipe.title))).toBe(false);
 });
+
+test("how a dish is cooked is not a product: «тушёная» is not тушёнка, «варёная» is not колбаса", () => {
+  for (const [q, re] of [["курица тушеная", /туш|гуляш|рагу/i], ["тушеная капуста", /капуста туш|тушёная капуста/i], ["вареная картошка", /отварн|варён|мундир/i], ["запеченная рыба", /запеч|духовк/i], ["курица гриль", /гриль|духовк|шашлык/i]] as const) {
+    const t = turn(q);
+    expect(t.text, q).not.toMatch(/тушёнк|варёнк/);
+    expect(t.results[0]?.recipe.title, q).toMatch(re);
+  }
+  expect(titles("тушенка с макаронами")[0]).toMatch(/тушёнк/i); // the product stays a product
+});
+
+test("kitchen questions: the oven, calories, a soup left over", () => {
+  expect(turn("какая температура духовки для курицы").text).toMatch(/190 °C/);
+  expect(turn("при какой температуре печь пирог").text).toMatch(/180 °C/);
+  expect(turn("калории в борще").text).toMatch(/Борщ.*\d+ ккал на порцию/);
+  expect(turn("остался борщ").text).toMatch(/2–3 дня/);
+  expect(turn("у меня температура").results.length).toBeGreaterThan(0); // being ill still finds something warm
+});

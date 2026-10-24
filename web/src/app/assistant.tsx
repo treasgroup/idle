@@ -7,6 +7,8 @@ import { drinkAnswer, sideAnswer } from "./pairing";
 import { saidAnswer, saidPick, titleAnswer } from "./chefFallback";
 import { navigatorAnswer } from "./navigator";
 import { dropDates, occasionAnswer } from "./occasions";
+import { byMethod, cookingMethod } from "./methods";
+import { caloriesAnswer } from "./calories";
 import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
@@ -203,6 +205,14 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       setBusy(false);
       return;
     }
+    // «калории в борще»: the number per portion, not a list of borscht recipes.
+    const kcal = caloriesAnswer(text);
+    if (kcal) {
+      push([{ role: "assistant", text: kcal.text, results: toStoredResults(kcal.results) }]);
+      track({ type: "query", text, count: kcal.results.length, source: opts.source ?? (opts.voice ? "voice" : "chat") });
+      setBusy(false);
+      return;
+    }
     // «на 8 марта», «на пикник», «день рождения ребёнка»: the dishes marked for it, and the festive table.
     const occ = occasionAnswer(text, recipes(), (list) => rankRecipes(list, withGoals(base()), st.preferences, 400).map((m) => m.recipe).filter((r) => !MEMORIAL.test(r.title)));
     if (occ) {
@@ -239,7 +249,9 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         }
       }
       if (id !== turn.current) return;
-      const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(text))), titleSounds()));
+      // «курица тушёная»: the way it is cooked, not тушёнка (app/methods).
+      const method = cookingMethod(text);
+      const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(method ? method.text : text))), titleSounds()));
       if (!patch) await loadIntentModel().catch(() => null); // usually loaded already; on a quick first question, a moment
       if (id !== turn.current) return;
       const local = parseMessage(cleaned, st.conditions);
@@ -327,6 +339,10 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         if (over) out.text = out.text.replace(/[:.]?\s*$/, "") + ". Учтите: это блюдо " + over + ".";
       }
       if (out.results.length) out.results = tidyResults(out.results, out.conditions, text, (patch?.mood as string | undefined) === "comfort", found);
+      if (method && out.kind !== "talk") {
+        const res = byMethod(out.results, out.conditions, method, found);
+        if (res !== out.results && res.length) Object.assign(out, { kind: "found", results: res, options: undefined, text: out.kind === "found" && out.results.length ? out.text : "Вот " + method.say + ":" });
+      }
       if (out.kind !== "talk")
         track({ type: "query", text, count: out.kind === "unclear" ? -1 : out.kind === "near" ? 0 : out.results.length, source: opts.source ?? (opts.voice ? "voice" : "chat") });
       // A short pause so the answer does not flash in before the question has settled on screen.

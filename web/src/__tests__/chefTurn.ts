@@ -11,6 +11,8 @@ import { measureAnswer, roastAnswer } from "../app/kitchenMath";
 import { leftoverAnswer } from "../app/leftovers";
 import { drinkAnswer, sideAnswer } from "../app/pairing";
 import { dropDates, occasionAnswer } from "../app/occasions";
+import { byMethod, cookingMethod } from "../app/methods";
+import { caloriesAnswer } from "../app/calories";
 import { saidAnswer, saidPick, titleAnswer } from "../app/chefFallback";
 import { fixBySound, plainWords, saidWithout } from "../app/colloquial";
 import { HEALTH, healthOf, withHealth } from "../app/topic";
@@ -38,11 +40,14 @@ export function turn(text: string): Turn {
   if (left) return { kind: "talk", text: left.text, results: [], conditions: c0, via: "left" };
   const pair = sideAnswer(text) ?? drinkAnswer(text, NOW);
   if (pair) return { kind: "found", text: pair.text, results: pair.results, conditions: c0, via: "pair" };
+  const kcal = caloriesAnswer(text);
+  if (kcal) return { kind: "found", text: kcal.text, results: kcal.results, conditions: c0, via: "kcal" };
   const occ = occasionAnswer(text, recipes(), (list) => rankRecipes(list, c0, prefs, 400).map((m) => m.recipe).filter((r) => !MEMORIAL.test(r.title)));
   if (occ) return { kind: "found", text: occ.text, results: occ.results.map((recipe) => ({ recipe, available: [], missing: [], unknown: [], toBuy: [], reason: recipe.summary })), conditions: c0, via: occ.go ? "feast" : "occasion" };
   const health = healthOf(text);
   const st = health ? withHealth(c0, health) : c0;
-  const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(text))), titleSounds()));
+  const method = cookingMethod(text);
+  const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(method ? method.text : text))), titleSounds()));
   const patch = parseMessage(cleaned, st);
   const run = (conditions: Conditions) => respond({ message: cleaned, patch, reply: patch.reply, local: true, conditions, preferences: prefs,
     conversation: [], guess: classifyIntent(cleaned), focus: null, voice: false, now: NOW } as Parameters<typeof respond>[0]);
@@ -54,6 +59,10 @@ export function turn(text: string): Turn {
     else if (titled) out = { ...out, kind: "found", text: titled.text, results: titled.results.map((r) => ({ recipe: r, available: [], missing: [], unknown: [], toBuy: [], reason: r.summary })) };
   }
   if (out.results.length) out = { ...out, results: tidyResults(out.results, out.conditions, text, patch.mood === "comfort", found) };
+  if (method && out.kind !== "talk") {
+    const res = byMethod(out.results, out.conditions, method, found);
+    if (res !== out.results && res.length) out = { ...out, kind: "found", results: res, text: out.kind === "found" && out.results.length ? out.text : "Вот " + method.say + ":" };
+  }
   return { kind: out.kind, text: out.text, results: namedFirst(out.results, out.conditions).slice(0, 5), conditions: out.conditions, via: "chef" };
 }
 

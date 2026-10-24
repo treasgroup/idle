@@ -1,6 +1,6 @@
 // What the plan bench (planBench.test.ts) found wrong in generated weeks and their shopping lists.
 import { beforeAll, expect, test } from "vitest";
-import { DEFAULT_MENU_PLAN, DEFAULT_PREFERENCES, basics, generateMenu, menuShopping, nutritionOf, proteinOf, recipeById, type MenuDay, type MenuPlan, type Recipe } from "../engine";
+import { DEFAULT_MENU_PLAN, DEFAULT_PREFERENCES, basics, generateMenu, menuShopping, nutritionOf, proteinOf, recipeById, regenerateDay, type MenuDay, type MenuPlan, type Recipe } from "../engine";
 import { shopLine } from "../app/amounts";
 import { loadCatalog } from "./chefTurn";
 
@@ -31,6 +31,20 @@ test("the same meat or fish is not on two days running, nor more than three time
     for (const x of new Set(p.filter(Boolean))) expect(p.filter((y) => y === x).length).toBeLessThanOrEqual(3);
   }
   expect(runs / pairs).toBeLessThan(0.03); // only when the rules leave nothing else
+});
+
+test("«Подобрать другие блюда на этот день» changes the day and only it", () => {
+  const plan = { ...DEFAULT_MENU_PLAN, meals: ["breakfast", "lunch", "dinner"], cookAhead: false } as MenuPlan;
+  let changed = 0, tries = 0;
+  for (const [k, days] of weeks(plan, 6).entries()) for (const i of [0, 3, 5]) {
+    const before = days[i].items.map((it) => it.recipeId);
+    const after = regenerateDay(days, days[i].date, DEFAULT_PREFERENCES, 2, 1792857000000 + k * 31 + i, plan);
+    tries++;
+    if (after[i].items.some((it) => !before.includes(it.recipeId))) changed++;
+    expect(after[i].items.length).toBe(days[i].items.length);
+    for (const j of [0, 1, 2, 3, 4, 5, 6]) if (j !== i && j !== i + 1) expect(after[j]).toEqual(days[j]);
+  }
+  expect(changed).toBe(tries);
 });
 
 test("at least four dinners of seven are home cooking, not Turkish soups and Greek avgolemono", () => {

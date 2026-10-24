@@ -10122,6 +10122,12 @@ var w0 = D.object({
       .max(6)
       .optional(),
     chips: D.array(D.string().max(60)).max(10).optional(),
+    // Шеф's big button («Открыть план», «Собрать праздничный стол»): kept, so it is still there after a reload.
+    go: D.object({
+      label: D.string().max(80),
+      to: D.string().max(120),
+      icon: D.string().max(20).optional(),
+    }).optional(),
   }),
   G_ = D.object({
     operationId: D.string().uuid(),
