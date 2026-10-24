@@ -5,7 +5,7 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { DinnerLayer, useDinnerReminders } from "../components/DinnerPlan";
 import {
-  CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Refrigerator, UserRound, WifiOff, X,
+  CalendarDays, ChefHat, ChevronLeft, Flame, GraduationCap, Refrigerator, WifiOff, X,
   type LucideIcon,
 } from "lucide-react";
 import { apiUrl, expiringSoon, isNativeApp, recipeById, usePwa, type MyRecipe } from "../engine";
@@ -14,6 +14,7 @@ import { useActions } from "./actions";
 import { AssistantProvider } from "./assistant";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
 import { NAV_ITEMS } from "./navItems";
+import { Avatar } from "../components/Avatar";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
 import { Recipes } from "../screens/Recipes";
@@ -283,6 +284,8 @@ function Badge({ n, warn, className }: { n: number; warn?: boolean; className?: 
 
 /** The icon of a destination; Шеф is a coloured circle of the same size as the other icons. */
 function NavIcon({ tab, icon: Icon, on, size = 24 }: { tab: Tab; icon: LucideIcon; on: boolean; size?: number }) {
+  // Профиль in the bar: the person's own photo when there is one.
+  if (tab === "profile") return <Avatar size={size + 2} on={on} />;
   if (tab === "chat")
     return <span className="grid place-items-center rounded-full bg-brand-fill text-white" style={{ width: size + 6, height: size + 6 }}><ChefHat size={size - 6} strokeWidth={2.25} /></span>;
   return <Icon size={size} strokeWidth={on ? 2.25 : 1.75} className={on ? "text-brand" : "text-ink-soft"} />;
@@ -351,7 +354,7 @@ export function ProfileButton({ className }: { className?: string }) {
   const soon = expiringSoon(s.fridge).length;
   return (
     <button className={cx("relative grid h-11 w-11 shrink-0 place-items-center rounded-full", className)} onClick={() => openLayer(routeHash({ tab: "profile" }))} aria-label="Профиль и ещё">
-      <span className="grid h-9 w-9 place-items-center rounded-full bg-sunken text-ink-soft"><UserRound size={20} /></span>
+      <Avatar size={36} />
       {soon > 0 && <span className="absolute right-1 top-1 h-3 w-3 rounded-full border-2 border-paper bg-warn" aria-label="Есть продукты, которые пора использовать" />}
     </button>
   );
@@ -377,7 +380,7 @@ function Rail({ route, go }: { route: Route; go: (t: Tab) => void }) {
       })}
       <span className="flex-1" />
       {!nav.some((n) => n.tab === "profile") && <button onClick={() => go("profile")} aria-label="Профиль и ещё" aria-current={route.tab === "profile" ? "page" : undefined} className="grid h-11 w-11 place-items-center rounded-full">
-        <span className={cx("grid h-9 w-9 place-items-center rounded-full", route.tab === "profile" ? "bg-brand-soft text-brand-ink" : "bg-sunken text-ink-soft")}><UserRound size={18} /></span>
+        <Avatar size={36} on={route.tab === "profile"} />
       </button>}
     </nav>
   );
@@ -426,7 +429,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
         {cooking && <MiniPlayer card />}
         <button onClick={() => openLayer(routeHash({ tab: "learn" }))} aria-current={route.tab === "learn" ? "page" : undefined} className={rowCls(route.tab === "learn")}><GraduationCap size={20} className={route.tab === "learn" ? "text-brand" : "text-ink-soft"} />Школа готовки</button>
         <button onClick={() => go("profile")} aria-current={route.tab === "profile" ? "page" : undefined} className={rowCls(route.tab === "profile")}>
-          <UserRound size={20} className={route.tab === "profile" ? "text-brand" : "text-ink-soft"} />Профиль
+          <Avatar size={24} on={route.tab === "profile"} />Профиль
         </button>
       </div>
     </aside>

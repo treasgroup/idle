@@ -161,7 +161,7 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       <div className="flex items-start justify-between gap-3 pt-3 sm:pt-6">
         <div>
           {/* «Добрый день!» is for phones; on a computer the question alone heads the page. */}
-          <p className="text-body-sm text-ink-soft lg:hidden">{greeting()}!</p>
+          <p className="text-body-sm text-ink-soft lg:hidden">{greeting()}{profile.name && <>, <b className="font-semibold text-ink">{profile.name}</b></>}!</p>
           <h1 className="mt-1 text-h1 sm:text-display lg:mt-0">Что приготовим {MEAL_WORD[meal]}?</h1>
           {weather && <p className="mt-1.5 text-body-sm text-ink-soft">{weather}</p>}
         </div>
@@ -342,6 +342,7 @@ function ThemeCard({ c, cover, drawn, wide, span, onOpen }: { c: Collection; cov
 /** Simple mode: a greeting, one big voice button, two big ideas. */
 function SimpleHome({ today }: { today: Recipe | null }) {
   const { openRecipe } = useActions();
+  const { profile } = useStore();
   const a = useAssistant();
   const all = useSuitable();
   const second = dayPick(all.filter((r) => r.id !== today?.id && r.difficulty === "easy"), 3);
@@ -349,7 +350,7 @@ function SimpleHome({ today }: { today: Recipe | null }) {
   return (
     <div className="pb-4">
       <div className="flex items-start justify-between gap-3 pt-3">
-        <h1 className="text-display">{greeting()}!</h1>
+        <h1 className="text-display">{greeting()}{profile.name ? ", " + profile.name : ""}!</h1>
         <div className="flex shrink-0 items-center"><ProfileButton className="-mr-1.5 lg:hidden" /></div>
       </div>
       <button onClick={() => { a.newChat(); goChat(true); }} className="mt-5 flex w-full items-center gap-4 rounded-card bg-brand-soft p-4 text-left">

@@ -44,6 +44,9 @@ export interface Profile {
   nav: Tab[];
   start: StartTab;
   homeHidden: HomeBlock[];
+  /** «Фото и имя»: how to address the person and a small round photo (a 256 px JPEG) — on this device only. */
+  name?: string;
+  photo?: string;
 }
 
 export type Palette = "shefly" | "clean" | "olive" | "sea" | "berry" | "graphite";
@@ -151,6 +154,8 @@ export function normalizeProfile(raw: unknown): Profile {
     if (n.length === 4) p.nav = n;
   }
   if (START_CHOICES.includes(r.start as StartTab)) p.start = r.start as StartTab;
+  if (typeof r.name === "string" && r.name.trim()) p.name = r.name.trim().slice(0, 30);
+  if (typeof r.photo === "string" && r.photo.startsWith("data:image/jpeg;base64,") && r.photo.length < 200_000) p.photo = r.photo;
   if (Array.isArray(r.homeHidden)) p.homeHidden = [...new Set(r.homeHidden.filter((b): b is HomeBlock => HOME_BLOCKS.some((x) => x.id === b)))];
   return p;
 }
