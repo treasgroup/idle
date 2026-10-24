@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BellRing, Check, ChevronDown, Pause, Play, Timer, X } from "lucide-react";
-import { formatMinutes } from "../engine";
+import { formatMinutes, plural } from "../engine";
+import { batchPhase, type Batches } from "../app/batches";
 import { addMinute, secondsLeft, startTimer, stopTimer, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { TimerRing } from "./TimerStrip";
 import { cx, mmss } from "./ui";
@@ -21,15 +22,18 @@ export function useStepTimer(recipeId: string, step: number): CookTimer | null {
   return useTimers().find((t) => t.recipeId === recipeId && t.step === step) ?? null;
 }
 
-export function StepTimer({ dish, recipeId, step, seconds, label, onStart, className }: {
+export function StepTimer({ dish, recipeId, step, seconds: whole, label, batches, onStart, className }: {
   dish: string; recipeId: string; step: number;
   /** The step's own duration; a timer already running for the step wins. */
   seconds: number;
   label?: string;
+  /** Frying in batches: the timer goes side by side, «партия 2 из 4» (app/batches). */
+  batches?: Batches | null;
   onStart?: (seconds: number) => void;
   className?: string;
 }) {
   const t = useStepTimer(recipeId, step);
+  const seconds = batches ? batches.side : whole;
   const running = !!t && !t.rang && t.pausedLeft == null;
   const now = useTick(running);
   const paused = !!t && t.pausedLeft != null;
@@ -37,7 +41,16 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
   const left = rang ? 0 : t ? secondsLeft(t, now) : seconds;
   // Before the start the ring is full: the whole time is still ahead.
   const ring: CookTimer = t ?? { id: "idle", dish, step, label: "", end: null, pausedLeft: seconds, total: seconds };
-  const start = () => { cue("wind"); startTimer({ dish, recipeId, step, label, seconds }); onStart?.(seconds); };
+  const phaseTimer = (at: number) => {
+    const ph = batches ? batchPhase(batches, at) : null;
+    return ph ? { label: [label, ph.label].filter(Boolean).join(" · "), phase: at, ring: ph.ring } : { label };
+  };
+  const start = () => { cue("wind"); startTimer({ dish, recipeId, step, seconds, ...phaseTimer(0) }); onStart?.(seconds); };
+  // The next side or batch: the same step, the next phase.
+  const at = t?.phase;
+  const phase = batches && at != null ? batchPhase(batches, at) : null;
+  const next = batches && at != null && phase && !phase.last ? batchPhase(batches, at + 1) : null;
+  const goOn = () => { cue("wind"); startTimer({ dish, recipeId, step, seconds, ...phaseTimer((at ?? 0) + 1) }); };
 
   // With very large text the card can sit under the bottom bar: then a small copy of it floats just above the bar.
   const card = useRef<HTMLElement>(null);
@@ -52,10 +65,20 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
     return () => io.disconnect();
   }, []);
 
-  const status = rang ? "Время вышло" : paused ? "На паузе" : running ? "Осталось" : "Таймер на " + durationText(seconds) + " · нажмите круг";
+  const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+  const status = phase
+    ? (rang ? cap(phase.ring) : (paused ? "На паузе · " : "") + cap(phase.label))
+    : rang ? "Время вышло" : paused ? "На паузе" : running ? "Осталось" : batches
+      ? "По " + durationText(seconds) + (batches.flips ? " на сторону" : " на партию") + " · " + batches.rounds + " " + plural(batches.rounds, "партия", "партии", "партий")
+      : "Таймер на " + durationText(seconds) + " · нажмите круг";
   const icon = "shrink-0 max-[359px]:hidden";
   const buttons = !t ? (
     <button className="btn-primary h-12 flex-1 sm:flex-none" onClick={start}><Play size={18} className="shrink-0" aria-hidden />Запустить</button>
+  ) : rang && next ? (
+    <>
+      <button className="btn-outline h-12 flex-1 px-3 sm:flex-none sm:px-5" onClick={() => stopTimer(t.id)}><Check size={18} className={icon} aria-hidden />Всё</button>
+      <button className="btn-primary h-12 flex-[2] px-3 sm:flex-none sm:px-5" onClick={goOn} aria-label={(next.second ? "Вторая сторона" : "Следующая партия") + ", " + durationText(seconds)}><Play size={18} className={icon} aria-hidden />{next.second ? "Вторая сторона" : "Следующая партия"}</button>
+    </>
   ) : rang ? (
     <>
       <button className="btn-outline h-12 flex-1 px-3 sm:flex-none sm:px-5" onClick={() => addMinute(t.id)} aria-label="Добавить минуту">+1 мин</button>
@@ -103,6 +126,8 @@ export function StepTimer({ dish, recipeId, step, seconds, label, onStart, class
       <div className="fixed inset-x-3 z-[45] mx-auto flex max-w-md items-center gap-3 rounded-full border bg-card p-1.5 pr-2 shadow-e1 anim-fade" style={{ bottom: "calc(var(--dock, 0px) + 8px)", borderColor: t && !rang ? "rgb(var(--brand))" : undefined }} role="group" aria-label="Таймер шага">
         {!t ? (
           <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-fill text-white active:scale-[.96]" onClick={start} aria-label={"Запустить таймер на " + durationText(seconds)}><Play size={22} className="translate-x-px" aria-hidden /></button>
+        ) : rang && next ? (
+          <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-fill text-white" onClick={goOn} aria-label={next.second ? "Вторая сторона" : "Следующая партия"}><Play size={22} className="translate-x-px" aria-hidden /></button>
         ) : rang ? (
           <button type="button" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brand-fill text-white" onClick={() => stopTimer(t.id)} aria-label="Готово"><Check size={22} aria-hidden /></button>
         ) : (

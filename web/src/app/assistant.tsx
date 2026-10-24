@@ -6,6 +6,7 @@ import { leftoverAnswer } from "./leftovers";
 import { drinkAnswer, sideAnswer } from "./pairing";
 import { saidAnswer, saidPick, titleAnswer } from "./chefFallback";
 import { navigatorAnswer } from "./navigator";
+import { dropDates, occasionAnswer } from "./occasions";
 import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
@@ -15,7 +16,7 @@ import {
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
 import { archiveChat, markChatActive, takeChat } from "./chats";
-import { fixBySound, plainWords, soundBook } from "./colloquial";
+import { fixBySound, plainWords, saidWithout, soundBook } from "./colloquial";
 import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
 
 // The recipe titles by sound («хочопури» → «хачапури»), made again when the catalog changes.
@@ -202,6 +203,15 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       setBusy(false);
       return;
     }
+    // «на 8 марта», «на пикник», «день рождения ребёнка»: the dishes marked for it, and the festive table.
+    const occ = occasionAnswer(text, recipes(), (list) => rankRecipes(list, withGoals(base()), st.preferences, 400).map((m) => m.recipe).filter((r) => !MEMORIAL.test(r.title)));
+    if (occ) {
+      const res: Match[] = occ.results.map((recipe) => ({ recipe, available: [], missing: [], unknown: [], toBuy: [], reason: recipe.summary }));
+      push([{ role: "assistant", text: occ.text, results: toStoredResults(res), ...(occ.go ? { go: occ.go } : {}) }]);
+      track({ type: "query", text, count: res.length, source: opts.source ?? (opts.voice ? "voice" : "chat") });
+      setBusy(false);
+      return;
+    }
     let patch: Record<string, unknown> | null = null;
     let reply = "";
     let note = "";
@@ -229,7 +239,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         }
       }
       if (id !== turn.current) return;
-      const cleaned = cleanMessage(fixBySound(plainWords(text), titleSounds()));
+      const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(text))), titleSounds()));
       if (!patch) await loadIntentModel().catch(() => null); // usually loaded already; on a quick first question, a moment
       if (id !== turn.current) return;
       const local = parseMessage(cleaned, st.conditions);

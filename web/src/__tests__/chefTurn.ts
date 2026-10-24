@@ -10,8 +10,9 @@ import { DEFAULT_PROFILE } from "../app/profile";
 import { measureAnswer, roastAnswer } from "../app/kitchenMath";
 import { leftoverAnswer } from "../app/leftovers";
 import { drinkAnswer, sideAnswer } from "../app/pairing";
+import { dropDates, occasionAnswer } from "../app/occasions";
 import { saidAnswer, saidPick, titleAnswer } from "../app/chefFallback";
-import { fixBySound, plainWords } from "../app/colloquial";
+import { fixBySound, plainWords, saidWithout } from "../app/colloquial";
 import { HEALTH, healthOf, withHealth } from "../app/topic";
 import { namedFirst, tidyResults, titleSounds } from "../app/assistant";
 import { DEFAULT_STATE } from "../engine";
@@ -37,9 +38,11 @@ export function turn(text: string): Turn {
   if (left) return { kind: "talk", text: left.text, results: [], conditions: c0, via: "left" };
   const pair = sideAnswer(text) ?? drinkAnswer(text, NOW);
   if (pair) return { kind: "found", text: pair.text, results: pair.results, conditions: c0, via: "pair" };
+  const occ = occasionAnswer(text, recipes(), (list) => rankRecipes(list, c0, prefs, 400).map((m) => m.recipe).filter((r) => !MEMORIAL.test(r.title)));
+  if (occ) return { kind: "found", text: occ.text, results: occ.results.map((recipe) => ({ recipe, available: [], missing: [], unknown: [], toBuy: [], reason: recipe.summary })), conditions: c0, via: occ.go ? "feast" : "occasion" };
   const health = healthOf(text);
   const st = health ? withHealth(c0, health) : c0;
-  const cleaned = cleanMessage(fixBySound(plainWords(text), titleSounds()));
+  const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(text))), titleSounds()));
   const patch = parseMessage(cleaned, st);
   const run = (conditions: Conditions) => respond({ message: cleaned, patch, reply: patch.reply, local: true, conditions, preferences: prefs,
     conversation: [], guess: classifyIntent(cleaned), focus: null, voice: false, now: NOW } as Parameters<typeof respond>[0]);

@@ -31,6 +31,27 @@ const WORDS: [RegExp, string][] = [
   [/чесночок|чесночк\S*/, "чеснок"],
 ];
 
+/**
+ * «из картошки кроме пюре», «только не суп», «мясо, но не свинина» said the way the search reads it: «без …» right
+ * where it was meant. Before, «кроме» took everything said with it («без картофеля») and «только не суп» found soups.
+ * «Не» before how a dish is («не острое», «не долго») and «не хочу» stay as they are.
+ */
+export function saidWithout(raw: string): string {
+  // «не острое» found «Китайский кисло-острый суп» first; «без острого» is read right — at the end, since «без» reaches
+  // the words after it («не острое из курицы» is not «без курицы»).
+  const mild = /(?<!\p{L})(?:не\s+|не)остр\p{L}*/giu;
+  const text = mild.test(raw) ? raw.replace(mild, " ") + " без острого" : raw;
+  const said = text
+    .replace(/(?<!\p{L})(?:(?:но|только|лишь|а|и)\s+)?(?:кроме|за исключением)(?!\p{L})/giu, "без")
+    .replace(/(?<!\p{L})(?:но|только|лишь бы|лишь|главное|просто|а),?\s+не(?=\s+\p{L})(?!\s+(?:хочу|хочется|надо|нужно|люблю|ем|едим|ест|долг|сложн|остр|жирн|сладк|жарен|очень|слишком|больше|меньше|дорог|тяжел|много|мало)\p{L}*)/giu, "без")
+    .replace(/\s+/g, " ").trim();
+  // «без лука из курицы» was read as without both: what follows «без» goes to the end («из курицы без лука»).
+  const without = /(?<!\p{L})без\s+[\p{L}-]+(?:\s+(?:и|или)\s+[\p{L}-]+)*,?/giu;
+  const parts = said.match(without) ?? [];
+  const rest = said.replace(without, " ").replace(/\s+/g, " ").trim();
+  return parts.length && rest ? (rest + " " + parts.map((p) => p.replace(/,$/, "")).join(" ")).replace(/\s+/g, " ") : said;
+}
+
 export function plainWords(text: string): string {
   return text.replace(/[а-яё]+/gi, (w) => {
     const low = w.toLowerCase();

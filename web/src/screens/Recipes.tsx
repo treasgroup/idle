@@ -14,7 +14,7 @@ import { goChat } from "../app/chatNav";
 import { replace, routeHash, takeRecipesView } from "../app/router";
 import { SECTIONS } from "./Home";
 import { plainWords } from "../app/colloquial";
-import { readQuery } from "../app/searchWords";
+import { hasAny, readQuery } from "../app/searchWords";
 import { RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { ChefAvatar, Chip, Empty, Sheet, cx } from "../components/ui";
 import { mealNow } from "./Home";
@@ -151,7 +151,8 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     const plain = searchRecipes(query, pool);
     const read = readQuery(query);
     if (read.text === query.trim()) return { found: plain, said: [] };
-    const tagged = (list: Recipe[]) => (read.tag ? list.filter((r) => r.tags.includes(read.tag!)) : list);
+    const tagged = (list: Recipe[]) => (read.tag ? list.filter((r) => r.tags.includes(read.tag!)) : list)
+      .filter((r) => !read.without.length || !hasAny(r, read.without));
     // «десерт», «на завтрак»: the desserts and breakfasts themselves before the pies and pancakes also eaten so.
     const core = read.dish ? CORE[read.dish] ?? [] : [];
     const narrowed = tagged(applyFilters(read.text ? searchRecipes(read.text, pool) : pool, { time: read.time, on: read.on }, read.dish))
@@ -159,8 +160,9 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     // A title with every word of the query is what was meant («огурцы быстрые» is «Огурцы малосольные быстрые»): first.
     const words = query.toLowerCase().replace(/ё/g, "е").split(/[^a-zа-я0-9]+/).filter((w) => w.length >= 3).map((w) => w.slice(0, Math.max(3, w.length - 2)));
     const named = plain.filter((r) => { const t = r.title.toLowerCase().replace(/ё/g, "е"); return words.length > 0 && words.every((w) => t.includes(w)); });
-    const both = [...named, ...narrowed.filter((r) => !named.includes(r))];
-    return narrowed.length ? { found: both, said: read.said } : { found: plain, said: [] };
+    const both = [...named.filter((r) => !read.without.length || !hasAny(r, read.without)), ...narrowed.filter((r) => !named.includes(r))];
+    // «блины без яиц» with no such pancakes: nothing found, not the pancakes with eggs.
+    return narrowed.length ? { found: both, said: read.said } : read.without.length ? { found: [], said: read.said } : { found: plain, said: [] };
   }, [query, view, base, ordered]);
   const list = useMemo(() => applyFilters(found, f, dish), [found, f, dish]);
   // What people look for: a query once they stop typing for 2 s, with how many it found (before the chips) — for
@@ -186,10 +188,13 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   // with filters on — how many the query alone would find.
   const near = useMemo(() => {
     if (list.length || !(query || filtered)) return { list: [] as Recipe[], unfiltered: 0 };
-    const all = query ? searchRecipes(query) : [];
+    // «блины без яиц»: what may suit still has no eggs (the other pancakes with eggs are not «близко»).
+    const out = query ? readQuery(query).without : [];
+    const keep = (l: Recipe[]) => (out.length ? l.filter((r) => !hasAny(r, out)) : l);
+    const all = query ? keep(searchRecipes(query)) : [];
     const words = query.split(/\s+/).filter((w) => w.length >= 4);
-    const loose = [...new Map(words.flatMap((w) => searchRecipes(w).slice(0, 6)).map((r) => [r.id, r])).values()];
-    const pick = (all.length ? all : loose.length ? loose : photoFirst(ranked)).slice(0, 4);
+    const loose = keep([...new Map(words.flatMap((w) => searchRecipes(w).slice(0, 6)).map((r) => [r.id, r])).values()]);
+    const pick = (all.length ? all : loose.length ? loose : keep(photoFirst(ranked))).slice(0, 4);
     return { list: pick, unfiltered: filtered ? all.length : 0 };
   }, [list.length, query, filtered, ranked]); // eslint-disable-line react-hooks/exhaustive-deps
 

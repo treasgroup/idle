@@ -71,3 +71,30 @@ test("no cold soup out of season unless asked", () => {
 test("the first word of a title is the dish, not a product with a typo", () => {
   expect(first("хочу карбонару")).toMatch(/^Карбонара/); // not «карбонад», the pork cut
 });
+
+test("holidays and occasions are dishes for the day, not portions", () => {
+  const t = turn("на 8 марта");
+  expect(t.via).toBe("feast"); // with the «Собрать праздничный стол» button
+  expect(t.results.some((m) => /хот-дог/i.test(m.recipe.title))).toBe(false);
+  expect(turn("на 23 февраля").conditions.servings).not.toBe(12);
+  expect(titles("на новый год")[0]).toMatch(/Оливье/);
+  expect(titles("салаты на новый год").every((x) => /салат|оливье|шуб|мимоз|винегрет/i.test(x))).toBe(true);
+  expect(titles("на масленицу").every((x) => /^Блин/.test(x))).toBe(true);
+  expect(turn("на пикник").kind).toBe("found");
+  expect(turn("день рождения ребенка").results.some((m) => /омлет на пару/i.test(m.recipe.title))).toBe(false);
+  // Anything more said goes to the usual search, which reads it all.
+  expect(turn("на пикник без мяса").via).toBe("chef");
+});
+
+test("a week of meals is the plan", () => {
+  for (const q of ["меню на неделю", "план питания на неделю", "что приготовить на неделю", "что готовить всю неделю"]) expect(turn(q).via, q).toBe("nav");
+});
+
+test("«кроме», «только не» and «без» take out only what was said", () => {
+  const potato = turn("из картошки кроме пюре");
+  expect(potato.results[0].recipe.ingredients.some((i) => i.id === "potato")).toBe(true);
+  expect(potato.results.some((m) => /пюре/i.test(m.recipe.title))).toBe(false);
+  expect(turn("только не суп").results.some((m) => courseOf(m.recipe) === "soup")).toBe(false);
+  expect(turn("без лука из курицы").results[0].recipe.ingredients.some((i) => i.id.startsWith("chicken"))).toBe(true);
+  expect(turn("главное не острое").results.some((m) => /остр/i.test(m.recipe.title))).toBe(false);
+});

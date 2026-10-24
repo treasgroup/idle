@@ -12,8 +12,16 @@ export function chipLabel(label: string): string | null {
   return l;
 }
 
+// «Подобрал — без суп, без макароны»: the search says the dish's name as it is; after «без» it needs the other case.
+const AFTER_WITHOUT: Record<string, string> = {
+  суп: "супа", супы: "супов", салат: "салата", салаты: "салатов", макароны: "макарон", драники: "драников", картофель: "картофеля",
+  жаркое: "жаркого", орех: "орехов", каша: "каши", каши: "каш", выпечка: "выпечки", десерт: "десерта", десерты: "десертов",
+  борщ: "борща", сладкое: "сладкого", котлеты: "котлет", блины: "блинов", пельмени: "пельменей", гарнир: "гарнира", пицца: "пиццы", паста: "пасты",
+};
+
 /** Two intro sentences ending with ":" in a row read as a stutter — keep the last one. */
-export function tidyReply(text: string): string {
+export function tidyReply(raw: string): string {
+  const text = raw.replace(/(?<!\p{L})без ([а-яё]+)(?!\p{L})/gu, (all, w: string) => (AFTER_WITHOUT[w] ? "без " + AFTER_WITHOUT[w] : all));
   const parts = text.split(/(?<=:)\s+(?=[А-ЯЁA-Z])/);
   if (parts.length >= 2 && parts.slice(0, -1).every((p) => p.trim().endsWith(":"))) {
     const last = parts[parts.length - 1];

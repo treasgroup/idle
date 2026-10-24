@@ -16,6 +16,7 @@ const SET = /^(?:(?:а|ну|пожалуйста|шеф)\s+)*(?:сделай|с�
 const MAKE_PLAN = /^(?:составь|составить|сделай|создай|спланируй)(?!\p{L})/u;
 const PLAN = /(?<!\p{L})план|меню на неделю|ужины на неделю/u;
 const HOW = /^как(?!\p{L})/u;
+const WEEK = /(?:^|\s)(?:меню|рацион|питани\p{L}*|ужины|обеды|еду|еда|что (?:бы )?(?:приготовить|готовить|поесть|есть|кушать))\s+(?:на\s+)?(?:всю\s+|целую\s+|эту\s+|следующую\s+)?неделю(?!\p{L})|^(?:план питания|рацион|меню)$|(?<!\p{L})план питания(?!\p{L})|готовить всю неделю/u;
 
 const PLACES: { re: RegExp; short?: RegExp; answer: (s: EngineState) => NavAnswer }[] = [
   {
@@ -136,5 +137,7 @@ export function navigatorAnswer(raw: string, s: EngineState, p: Profile): NavAns
     if ((GO.test(t) && place.re.test(t)) || (words <= 4 && place.short?.test(t))) return place.answer(s);
   // «Составь план на неделю»: the plan itself is made there.
   if (MAKE_PLAN.test(t) && PLAN.test(t)) return PLACES[1].answer(s);
+  // «Меню на неделю», «план питания», «что готовить всю неделю»: that is the plan too, not one dish «на 8 порций».
+  if (WEEK.test(t) && words <= 7) return PLACES[1].answer(s);
   return null;
 }

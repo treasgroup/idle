@@ -20,6 +20,7 @@ import { goChat } from "../app/chatNav";
 import { useReminders } from "../app/reminders";
 import { replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, speak, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
+import { batchPhase, batchesOf } from "../app/batches";
 import { amountText, leftoversOf, rememberLeftovers } from "../app/nowaste";
 import { Chip, Layer, Sheet, Stepper, cx, mmss } from "../components/ui";
 import { RecipeMini } from "../components/RecipeCard";
@@ -150,7 +151,13 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
       case "repeat": speak(stepSaid(dish, i)); break;
       case "timer": {
         const sec = cmd.seconds ?? r.steps[i].timerSeconds;
-        if (sec) { startFor(dish, sec); speak("Таймер на " + timeWords(sec) + "."); } else speak("На сколько минут поставить таймер?");
+        // Frying in batches: the first side, not the whole half hour of all the batches.
+        const b = cmd.seconds ? null : batchesOf(r.steps[i].text, sec);
+        if (b) {
+          const ph = batchPhase(b, 0);
+          startTimer({ dish: r.title, recipeId: r.id, step: i, label: [stepLabel(r, i), ph.label].filter(Boolean).join(" · "), seconds: b.side, phase: 0, ring: ph.ring });
+          speak("Таймер на " + timeWords(b.side) + (b.flips ? " на первую сторону." : " на первую партию."));
+        } else if (sec) { startFor(dish, sec); speak("Таймер на " + timeWords(sec) + "."); } else speak("На сколько минут поставить таймер?");
         break;
       }
       case "timerStop": {
@@ -331,7 +338,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
             <StepFacts uses={uses.map((i) => ({ key: i.id + i.unit, name: displayName(i.id, i.name), amount: homeAmount(i) }))} tip={tip} />
             {fit.steps[dish.step] && <KitchenHint key={r.id + dish.step + fit.steps[dish.step].fix} hint={fit.steps[dish.step]} className="mt-5" />}
             {seconds > 0 && (
-              <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} />
+              <StepTimer key={r.id + dish.step} className="mt-6" dish={r.title} recipeId={r.id} step={dish.step} seconds={seconds} label={stepLabel(r, dish.step)} batches={batchesOf(cur.text, cur.timerSeconds)} />
             )}
             {running && <FlowHint flow={stepFlow(r.id, dish.step)} step={dish.step} total={total} seconds={running.total} />}
           </div>

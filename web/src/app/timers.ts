@@ -25,6 +25,9 @@ export interface CookTimer {
   rang?: boolean;
   /** When it rang: the alarm repeats for a minute unless the timer is dismissed. */
   rangAt?: number;
+  /** Frying in batches (app/batches): which side or batch this is, from 0, and what to say when it rings. */
+  phase?: number;
+  ring?: string;
 }
 
 const KEY = "cook-timers-v1";
@@ -52,10 +55,11 @@ export function secondsLeft(t: CookTimer, now = Date.now()): number {
 }
 
 /** Starts a timer; one already running for the same recipe step is replaced. */
-export function startTimer(o: { dish: string; recipeId?: string; step?: number | null; label?: string; seconds: number }): CookTimer {
+export function startTimer(o: { dish: string; recipeId?: string; step?: number | null; label?: string; seconds: number; phase?: number; ring?: string }): CookTimer {
   const t: CookTimer = {
     id: Math.random().toString(36).slice(2, 10), dish: o.dish, recipeId: o.recipeId, step: o.step ?? null, label: o.label ?? "",
     end: Date.now() + o.seconds * 1000, pausedLeft: null, total: o.seconds,
+    ...(o.phase != null ? { phase: o.phase, ring: o.ring } : {}),
   };
   const rest = current().filter((x) => !(o.recipeId && x.recipeId === o.recipeId && x.step === t.step && t.step != null));
   save([...rest, t]);
@@ -151,9 +155,10 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
       save(current().map((t) => (done.some((d) => d.id === t.id) ? { ...t, rang: true, rangAt: now } : t)));
       const what = done.map((t) => (t.dish && t.dish !== "Таймер" ? "«" + t.dish + "»" + (t.label ? ", " + t.label : "") : t.label || "таймер")).join("; ");
       // Said the way a person would say it: a step of the dinner timeline — what to do now; a cooking timer — what to check.
-      const said = done.map((t) => (/^(Ужин|Заготовки) к /.test(t.dish) ? "Пора: " + t.label.replace(/^([^:]+): /, "$1 — ")
+      // Frying in batches: «Драники — переверните».
+      const said = done.map((t) => (t.ring ? t.dish + " — " + t.ring : /^(Ужин|Заготовки) к /.test(t.dish) ? "Пора: " + t.label.replace(/^([^:]+): /, "$1 — ")
         : "Пора проверить: " + (t.label || (t.dish && t.dish !== "Таймер" ? t.dish : "таймер")))).join(". ");
-      toast(done.every((t) => /^(Ужин|Заготовки) к /.test(t.dish)) ? said : "Время вышло: " + what);
+      toast(done.every((t) => t.ring || /^(Ужин|Заготовки) к /.test(t.dish)) ? said : "Время вышло: " + what);
       beep();
       navigator.vibrate?.([300, 120, 300, 120, 300]);
       void notify("Таймер закончился", what);

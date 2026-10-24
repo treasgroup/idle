@@ -1,7 +1,7 @@
 // Pieces of the conversation with Шеф: messages, «Условия» (what Шеф takes into account), suggestion cards, mood tiles, the pantry picker.
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator, CalendarDays, ShoppingCart, Heart, GraduationCap, UserRound, Home, ChefHat, Type, Moon, Sun, VolumeX, Volume2, Check, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator, CalendarDays, ShoppingCart, Heart, GraduationCap, UserRound, Home, ChefHat, Type, Moon, Sun, VolumeX, Volume2, Check, PartyPopper, type LucideIcon } from "lucide-react";
 import {
   LABELS, addToFridge, conditionLabel, expiringSoon, freshConditions, ingredientOptions, pantryGroups, recipeById, searchIngredients, shortName,
   DEFAULT_CONDITIONS, type ChatGo, type ChatMessage, type ChatOption, type Conditions,
@@ -17,6 +17,7 @@ import { chipLabel, tidyReply, MOOD_LABEL } from "../app/chatText";
 import { RecipeFeatured, RecipeRow } from "./RecipeCard";
 import { ChefAvatar, Chip, Sheet, cx } from "./ui";
 import { AddToMenuSheet } from "./AddToMenu";
+import { FeastSheet } from "./Feast";
 import { ProductTiles, useFrequent } from "./ProductTiles";
 
 /** One message. Results: the best one big, the rest as rows; follow-up chips only under the last message. */
@@ -69,15 +70,18 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
 
 const GO_ICONS: Record<string, LucideIcon> = {
   plan: CalendarDays, cart: ShoppingCart, fridge: Refrigerator, heart: Heart, school: GraduationCap, profile: UserRound, search: Search,
-  home: Home, cook: ChefHat, text: Type, moon: Moon, sun: Sun, mute: VolumeX, sound: Volume2,
+  home: Home, cook: ChefHat, text: Type, moon: Moon, sun: Sun, mute: VolumeX, sound: Volume2, feast: PartyPopper,
 };
 
 /** Шеф's big button (app/navigator): opens a screen, or changes a setting — only on this tap, never by itself. */
 function GoButton({ go }: { go: ChatGo }) {
   const { setProfile, toast } = useStore();
   const [done, setDone] = useState(false);
+  const [feast, setFeast] = useState(false);
   const Icon = GO_ICONS[go.icon ?? ""] ?? ArrowUpRight;
   const run = () => {
+    // «на 8 марта»: the festive table opens right here, over the chat.
+    if (go.to === "feast") { cue("tap"); setFeast(true); return; }
     if (go.to.startsWith("set:")) {
       const [, key, value] = go.to.split(":");
       setProfile((p): Profile => {
@@ -96,9 +100,13 @@ function GoButton({ go }: { go: ChatGo }) {
     if (go.to === "#/cook") openLayer(go.to); else replace(go.to);
   };
   return (
-    <button className="btn-primary mt-3 flex h-12 w-full min-w-[220px] items-center justify-center gap-2" onClick={run} disabled={done}>
-      {done ? <><Check size={20} aria-hidden />Сделано</> : <><Icon size={20} aria-hidden />{go.label}</>}
-    </button>
+    <>
+      <button className="btn-primary mt-3 flex h-12 w-full min-w-[220px] items-center justify-center gap-2" onClick={run} disabled={done}>
+        {done ? <><Check size={20} aria-hidden />Сделано</> : <><Icon size={20} aria-hidden />{go.label}</>}
+      </button>
+      {/* Over the whole screen: inside the message (which moves in with a transform) the sheet sat under the composer. */}
+      {go.to === "feast" && createPortal(<FeastSheet open={feast} onClose={() => setFeast(false)} />, document.body)}
+    </>
   );
 }
 

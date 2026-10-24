@@ -18,3 +18,18 @@ test("a plain query is left as typed", () => {
   expect(readQuery("сладкий перец фаршированный").text).toBe("сладкий перец фаршированный");
   expect(readQuery("том ям").text).toBe("том ям");
 });
+
+test("«без молока», «без лактозы»: the dishes without it, not the ones named after it", async () => {
+  const { loadCatalog } = await import("./chefTurn");
+  const { recipes, searchRecipes } = await import("../engine");
+  const { hasAny } = await import("../app/searchWords");
+  loadCatalog();
+  const milk = readQuery("без молока");
+  expect(milk).toMatchObject({ text: "", without: ["milk"], said: ["без молока"] });
+  expect(recipes().filter((r) => !hasAny(r, milk.without)).some((r) => r.ingredients.some((i) => i.id === "milk" && !i.optional))).toBe(false);
+  const soup = readQuery("суп без лука");
+  expect(soup.text).toBe("суп");
+  expect(searchRecipes(soup.text).filter((r) => !hasAny(r, soup.without)).every((r) => !r.ingredients.some((i) => i.id === "onion" && !i.optional))).toBe(true);
+  expect(readQuery("без лактозы").without).toContain("dairy");
+  expect(readQuery("без варки").text).toBe("без варки"); // not a product: searched as typed
+});
