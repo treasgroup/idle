@@ -76,7 +76,7 @@ export function Menu() {
   const days = weekDays(s.menu);
   const filled = days.some((d) => d.items.length);
   const plan: MenuPlan = s.menuPlan;
-  const enginePlan = { ...plan, only: goalFilter(profile) } as MenuPlan;
+  const enginePlan = { ...plan, only: goalFilter(profile), light: profile.goals.includes("light") } as MenuPlan;
   const save = (menu: MenuDay[]) => update((st) => ({ ...st, menu: menu.filter((d) => d.date >= today && d.items.length).slice(0, 31) }));
   const withUndo = (text: string) => {
     const before = s.menu;

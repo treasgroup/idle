@@ -45,6 +45,7 @@ import {
   C0,
   MyR,
   vu,
+  Yt,
 } from "./core.js";
 
 var Nt = React;
@@ -3378,6 +3379,11 @@ function unusual(e) {
 }
 var PLAN_WEEKDAY = { breakfast: 40, lunch: 120, dinner: 120 },
   PLAN_WEEKEND = { breakfast: 90, lunch: 240, dinner: 240 };
+// «Полегче» with two or three meals a day: the day as a whole, not only each dish — 1200–1500 kcal a person for
+// breakfast, lunch and dinner (each meal's share), and a meal leaves room for the ones still to come that day.
+var DAY_SHARE = { breakfast: 400, lunch: 550, dinner: 550 },
+  DAY_MIN = { breakfast: 200, lunch: 250, dinner: 250 },
+  kcalOf = (r) => (r && Yt(r).perServing.kcal) || 0;
 // The meat or fish a dish is made of, by its products (the first that is one): for not repeating it day after day.
 var PROTEIN_IDS = [
   ["птица", /(chicken|turkey|duck|goose|rabbit|quail)/],
@@ -3443,11 +3449,14 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
     PROT = {},
     protCount = {},
     _ = !1,
-    B = i.meals.length > 1 || i.meals[0] !== "dinner";
+    B = i.meals.length > 1 || i.meals[0] !== "dinner",
+    budget = i.light && i.meals.length > 1 ? i.meals.reduce((s0, m0) => s0 + DAY_SHARE[m0], 0) : null;
   for (let it of y.flatMap((d) => d.items.filter((t) => !t.leftover))) { let r0 = ll(it.recipeId), p0 = r0 && proteinOf(r0); p0 && (protCount[p0] = (protCount[p0] || 0) + 1); }
   for (let R = 0; R < y.length; R++) {
     let T = y[R],
-      C = y[R + 1];
+      C = y[R + 1],
+      // What the day's dishes already add up to (kept ones, yesterday's leftovers), per person.
+      dayKcal = T.items.reduce((s0, it) => s0 + kcalOf(ll(it.recipeId)), 0);
     for (let M of Z0) {
       if (!i.meals.includes(M)) continue;
       let Z = T.items.find((W) => Hn(W) === M);
@@ -3489,6 +3498,17 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
         !ne.length)
       )
         continue;
+      if (budget !== null) {
+        // Room for this meal: the day's budget less what is chosen, less the least the meals still empty will need.
+        // And not too little: a light day is still a day's food — at least about four fifths of the budget (1200 kcal for
+        // three meals), so a meal that would leave the day short takes a fuller dish while there is one.
+        let open = Z0.slice(Z0.indexOf(M) + 1).filter((m0) => i.meals.includes(m0) && !T.items.some((W) => Hn(W) === m0)),
+          cap = budget - dayKcal - open.reduce((s0, m0) => s0 + DAY_MIN[m0], 0),
+          low = budget * 0.8 - dayKcal - open.reduce((s0, m0) => s0 + DAY_SHARE[m0], 0),
+          fit = ne.filter((W) => kcalOf(W) <= cap),
+          full = fit.filter((W) => kcalOf(W) >= low);
+        ne = full.length ? full : fit.length ? [...fit].sort((W, le) => kcalOf(le) - kcalOf(W)) : [...ne].sort((W, le) => kcalOf(W) - kcalOf(le));
+      }
       let ke = ne.filter((W) => !v.has(Us(W))),
         P = (ke.length ? ke : ne).slice(0, 8),
         vt = (W) =>
@@ -3497,7 +3517,7 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
           Math.min(2, Am(W).filter((le) => b.has(le)).length),
         He = P[0];
       for (let W of P.slice(1)) vt(W) > vt(He) && (He = W);
-      w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++, italian(He) && pasta++;
+      w.add(gn(He)), v.add(Us(He)), unusual(He) && odd++, italian(He) && pasta++, (dayKcal += kcalOf(He));
       for (let W of Am(He)) b.add(W);
       M === "dinner" && ((_ = Ru(He)), _ && g++), (N[M] = x(He));
       let pHe = proteinOf(He);

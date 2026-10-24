@@ -109,7 +109,11 @@ export interface ShoppingItem {
 
 export interface MenuItem { recipeId: string; servings: number; meal?: "breakfast" | "lunch" | "dinner"; leftover?: boolean; /** Cooked ahead on a meal-prep day (components/MealPrep): from the fridge or the freezer. */ prepped?: "fridge" | "freezer" }
 export interface MenuDay { date: string; items: MenuItem[] }
-export interface MenuPlan { meals: ("breakfast" | "lunch" | "dinner")[]; quickWeekdays: boolean; cookAhead: boolean }
+export interface MenuPlan {
+  meals: ("breakfast" | "lunch" | "dinner")[]; quickWeekdays: boolean; cookAhead: boolean;
+  /** The goal «полегче»: with two or three meals the day stays near 1500 kcal a person (engine, Mu). Not stored. */
+  light?: boolean;
+}
 
 export interface FridgeItem { id: string; at: number; until: number | null }
 
