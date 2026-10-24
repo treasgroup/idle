@@ -11,7 +11,7 @@ describe("text for reading aloud", () => {
     expect(speechText("2 шт. яиц")).toBe("2 штуки яиц");
   });
   it("ranges as people say them", () => {
-    expect(speechText("Жарьте 3–4 минуты.")).toBe("Жарьте 3 или 4 минуты.");
+    expect(speechText("Жарьте 3–4 минуты.")).toBe("Жарьте от 3 до 4 минут.");
     expect(speechText("Пеките при 180–200 °C.")).toBe("Пеките при 180 или 200 градусов.");
   });
   it("no symbols read as words", () => {

@@ -236,8 +236,9 @@ export interface VoiceInput {
 export const useVoiceInput = (onText: (text: string) => void, notify: (msg: string) => void, ensureSession: () => Promise<void>, enabled: boolean): VoiceInput =>
   svc.jC(onText, notify, ensureSession, enabled);
 export type VoiceCommand =
-  | { type: "next" | "back" | "repeat" | "ingredients" | "timeLeft" | "timerStop" | "close" | "help" | "stopListening" }
+  | { type: "next" | "back" | "repeat" | "ingredients" | "timeLeft" | "timerStop" | "timerPause" | "timerAdd" | "close" | "help" | "stopListening" }
   | { type: "timer"; seconds?: number }
+  | { type: "goto"; step: number }
   | { type: "ask"; text: string };
 /** Hands-free cooking: continuous listening for "дальше", "таймер на 5 минут", "сколько муки"… */
 export const useHandsFree = (active: boolean, onCommand: (c: VoiceCommand) => void, notify: (msg: string) => void): {

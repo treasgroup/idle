@@ -1192,13 +1192,29 @@ function hO(e) {
     )
   )
     return { type: "timeLeft" };
+  // «Стоп», «пауза», «плюс минута», «шаг 3» while cooking. Before the timer words: «поставь на паузу» is not a timer.
+  if (/^(стоп|стой|хватит)$/.test(t)) return { type: "timerStop" };
+  if (/(^|\s)(пауз|приостанов)/.test(t)) return { type: "timerPause" };
+  if (/(плюс|добавь|добавить|ещ[её])\s+(одну\s+|1\s+)?минут/.test(t)) return { type: "timerAdd" };
+  let step = t.match(/(?:^|\s)(?:к\s+|на\s+)?шаг\S*\s+(\d{1,2})(?:\s|$)/) ?? t.match(/(?:^|\s)(перв|втор|трет|четв[её]рт|пят|шест|седьм|восьм|девят|десят)\S*\s+шаг/);
+  if (step) {
+    let n = /^\d/.test(step[1]) ? Number(step[1]) : ["перв", "втор", "трет", "четв", "пят", "шест", "седьм", "восьм", "девят", "десят"].findIndex((w) => step[1].startsWith(w)) + 1;
+    if (n > 0) return { type: "goto", step: n };
+  }
+  // The timer was returned in «minutes» while cooking read «seconds»: «таймер на 5 минут» started the step's own timer,
+  // and «на 30 секунд» was 30 minutes. Now seconds: «1 час 20 минут», «полтора часа», «30 секунд», «пять минут».
   if (/(таймер|засеки|засечь|поставь на)/.test(t)) {
-    let n = t.match(/(\d{1,3})\s*(час|ч\b)?/);
-    if (n) return { type: "timer", minutes: Number(n[1]) * (n[2] ? 60 : 1) };
-    let a = Object.keys(oA)
-      .sort((i, s) => s.length - i.length)
-      .find((i) => t.includes(i));
-    return { type: "timer", minutes: a ? oA[a] : null };
+    if (/полтора\s+час/.test(t)) return { type: "timer", seconds: 5400 };
+    if (/полчаса/.test(t)) return { type: "timer", seconds: 1800 };
+    let words = Object.keys(oA).filter((k) => !/час|минут/.test(k)).sort((i, s) => s.length - i.length),
+      said = t.replace(new RegExp("(^|\\s)(" + words.join("|") + ")(?=\\s|$)", "g"), (m, p, w) => p + oA[w]),
+      sec = 0;
+    for (let m of said.matchAll(/(\d{1,3}(?:[.,]\d)?)\s*(час\S*|ч(?=\s|$)|мин\S*|сек\S*)?/g))
+      sec += Number(m[1].replace(",", ".")) * (!m[2] ? 60 : /^ч/.test(m[2]) ? 3600 : /^с/.test(m[2]) ? 1 : 60);
+    if (!sec && /(^|\s)(час|на час)(\s|$)/.test(t)) sec = 3600;
+    if (!sec && /(пару|пара)\s+минут/.test(t)) sec = 120;
+    if (!sec && /(одну\s+)?минуту/.test(t)) sec = 60;
+    return { type: "timer", seconds: sec ? Math.round(sec) : void 0 };
   }
   return /^(а\s+)?(сколько|чем|можно|как|какой|какая|какое|на сколько|что если|если нет)\s/.test(
     t,

@@ -166,6 +166,21 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
         if (t) { stopTimer(t.id); speak("Таймер выключен."); } else speak("Таймер не запущен.");
         break;
       }
+      case "timerPause": {
+        const t = mine.find((x) => x.step === i && !x.rang) ?? mine.find((x) => !x.rang);
+        if (t) { togglePause(t.id); speak(t.pausedLeft == null ? "Таймер на паузе." : "Таймер продолжает."); } else speak("Таймер не запущен.");
+        break;
+      }
+      case "timerAdd": {
+        const t = mine.find((x) => x.step === i) ?? mine[0];
+        if (t) { addMinute(t.id); speak("Добавлена минута."); } else speak("Таймер не запущен.");
+        break;
+      }
+      case "goto": {
+        const n = Math.min(Math.max(cmd.step, 1), r.steps.length) - 1;
+        cue("page"); setStep(dish.key, n); speak(stepSaid(dish, n));
+        break;
+      }
       case "timeLeft": {
         const t = mine[0] ?? timers.find((x) => !x.rang);
         speak(t ? "Осталось " + timeWords(secondsLeft(t)) + "." : "Таймер не запущен.");
@@ -174,7 +189,7 @@ export function CookingLayer({ onClose }: { onClose: () => void }) {
       case "ingredients": speak(r.ingredients.map((x) => { const y = scaleIngredient(x, r, dish.servings); return displayName(y.id, y.name) + " " + homeAmount(y); }).join(", ") + "."); break;
       case "close": onClose(); break;
       case "stopListening": setHandsFree(false); speak("Голосовое управление выключено."); break;
-      case "help": speak("Говорите: дальше, назад, повтори, таймер на пять минут, сколько осталось, какие продукты. Можно спросить: сколько муки, чем заменить сметану."); break;
+      case "help": speak("Говорите: дальше, назад, повтори, шаг три, таймер на пять минут, пауза, плюс минута, стоп, сколько осталось, какие продукты. Можно спросить: сколько муки, чем заменить сметану."); break;
       case "ask": {
         const a = answerRecipeQuestion(cmd.text, [r], dish.servings)?.text ?? answerKitchenQuestion(cmd.text, true)?.text;
         speak(a ? a.replace(/\n/g, ". ") : "Не знаю ответа. Скажите «дальше», «повтори» или «какие продукты».");

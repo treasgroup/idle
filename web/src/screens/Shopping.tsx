@@ -11,6 +11,7 @@ import { withWeek } from "../app/planShopping";
 import { useStore } from "../app/store";
 import { shopLine } from "../app/amounts";
 import { listText } from "../app/shoppingShare";
+import { knownProduct } from "../app/knownProducts";
 import { dishesInList, removeDish, type ListDish } from "../app/shoppingDishes";
 import { useActions } from "../app/actions";
 import { replace, routeHash } from "../app/router";
@@ -291,7 +292,9 @@ function splitList(text: string, ids: string[]): { ingredientId: string; name: s
     name = ALIAS[name.toLowerCase()] ?? name;
     const word = name.toLowerCase();
     const stem = word.slice(0, Math.max(3, word.length - 2));
-    const hit = searchIngredients(word, ids, 5).find((id) => shortName(id).toLowerCase().startsWith(stem) || word.startsWith(shortName(id).toLowerCase().slice(0, Math.max(3, shortName(id).length - 2))));
+    // The usual words first (app/knownProducts): «масло» is butter, not sesame oil; «сок» stays «Сок», as written.
+    const known = knownProduct(word.replace(/ё/g, "е"));
+    const hit = known ? (known.length === 1 && ids.includes(known[0]) ? known[0] : undefined) : searchIngredients(word, ids, 5).find((id) => shortName(id).toLowerCase().startsWith(stem) || word.startsWith(shortName(id).toLowerCase().slice(0, Math.max(3, shortName(id).length - 2))));
     const label = hit ? shortName(hit) : name.charAt(0).toUpperCase() + name.slice(1);
     return { ingredientId: hit ?? "custom-" + Math.random().toString(36).slice(2, 9), name: label.slice(0, 120), amount, unit: unit || (LIQUID.test(label) ? "л" : "шт.") };
   });

@@ -10,6 +10,7 @@ import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { homeAmount, mergeSame } from "../app/amounts";
 import { answerFromRecipe } from "../app/recipeAsk";
+import { extraAnswer } from "../app/recipeQuestions";
 import { ChefAvatar, Chip, Sheet } from "./ui";
 
 export interface AskRequest { text: string; key: number }
@@ -111,6 +112,9 @@ export function AskSheet({ open, onClose, recipe, servings, prefs, onServings, r
         action: { label: "Подобрать без духовки", icon: <Search size={18} />, run: () => { void a.ask(main + "без духовки", { fresh: true }); goChat(); } },
       };
     }
+    // The everyday questions (app/recipeQuestions): «можно без яиц?», «что подать?», «подгорело»…
+    const extra = extraAnswer(q, recipe);
+    if (extra) return { text: extra.text, action: extra.search ? { label: "Подобрать похожее", icon: <Search size={18} />, run: () => { void a.ask(extra.search!, { fresh: true }); goChat(); } } : undefined };
     // This recipe's own steps and products first: «сколько варить фрикадельки» is step 5 here, not a general note on cutlets.
     const mine = answerFromRecipe(q, recipe, previous);
     if (mine) return { text: mine.text, action: mine.search ? { label: "Подобрать похожее", icon: <Search size={18} />, run: () => { void a.ask(mine.search!, { fresh: true }); goChat(); } } : undefined };
