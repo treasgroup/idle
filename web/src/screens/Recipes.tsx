@@ -15,6 +15,7 @@ import { replace, routeHash, takeRecipesView } from "../app/router";
 import { SECTIONS } from "./Home";
 import { plainWords } from "../app/colloquial";
 import { hasAny, readQuery } from "../app/searchWords";
+import { familiesFirst, widen } from "../app/searchWiden";
 import { RecipeRow, RecipeTile } from "../components/RecipeCard";
 import { ChefAvatar, Chip, Empty, Sheet, cx } from "../components/ui";
 import { mealNow } from "./Home";
@@ -148,9 +149,12 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   const { found, said } = useMemo(() => {
     if (!query) return { found: base, said: [] as string[] };
     const pool = view === "all" ? ordered : base;
-    const plain = searchRecipes(query, pool);
+    // «плов узбекский»: the plovs as similar ones, not «Ничего не нашлось»; «сырн»: the larger family first (app/searchWiden).
+    const wide = widen(query, familiesFirst(query, searchRecipes(query, pool)), pool);
+    const plain = wide.list;
+    const near = wide.near ? ["похожие"] : [];
     const read = readQuery(query);
-    if (read.text === query.trim()) return { found: plain, said: [] };
+    if (read.text === query.trim()) return { found: plain, said: near };
     const tagged = (list: Recipe[]) => (read.tag ? list.filter((r) => r.tags.includes(read.tag!)) : list)
       .filter((r) => !read.without.length || !hasAny(r, read.without));
     // «десерт», «на завтрак»: the desserts and breakfasts themselves before the pies and pancakes also eaten so.
@@ -162,7 +166,7 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
     const named = plain.filter((r) => { const t = r.title.toLowerCase().replace(/ё/g, "е"); return words.length > 0 && words.every((w) => t.includes(w)); });
     const both = [...named.filter((r) => !read.without.length || !hasAny(r, read.without)), ...narrowed.filter((r) => !named.includes(r))];
     // «блины без яиц» with no such pancakes: nothing found, not the pancakes with eggs.
-    return narrowed.length ? { found: both, said: read.said } : read.without.length ? { found: [], said: read.said } : { found: plain, said: [] };
+    return narrowed.length ? { found: both, said: read.said } : read.without.length ? { found: [], said: read.said } : { found: plain, said: near };
   }, [query, view, base, ordered]);
   const list = useMemo(() => applyFilters(found, f, dish), [found, f, dish]);
   // What people look for: a query once they stop typing for 2 s, with how many it found (before the chips) — for

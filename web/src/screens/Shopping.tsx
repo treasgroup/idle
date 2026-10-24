@@ -5,13 +5,13 @@ import { hintDone } from "../app/hints";
 import { BookOpen, Check, ChevronDown, ChevronRight, Mic, MoreHorizontal, Plus, Square, Share2, ShoppingBag, ShoppingBasket, Refrigerator, Truck, Trash2, CalendarDays } from "lucide-react";
 import {
   addToFridge, apiUrl, copyText, formatAmount, groupShopping, ingredientOptions, plural, searchIngredients,
-  shortName, useVoiceInput, weekDays, type ShoppingItem,
+  recipes, shortName, useVoiceInput, weekDays, type ShoppingItem,
 } from "../engine";
 import { withWeek } from "../app/planShopping";
 import { useStore } from "../app/store";
 import { shopLine } from "../app/amounts";
 import { listText } from "../app/shoppingShare";
-import { knownProduct } from "../app/knownProducts";
+import { LIQUID, splitList } from "../app/typedList";
 import { dishesInList, removeDish, type ListDish } from "../app/shoppingDishes";
 import { useActions } from "../app/actions";
 import { replace, routeHash } from "../app/router";
@@ -58,7 +58,14 @@ export function Shopping() {
   // The plan's days from today with at least one dish.
   const week = weekDays(s.menu);
   const planned = week.some((d) => d.items.length > 0);
-  const fromPlan = () => { update((st) => ({ ...st, shopping: withWeek(st, week) })); toast("Продукты на неделю — в списке покупок"); };
+  // Dishes of the week whose products are not in the list yet (bought ones count as there).
+  const missingPlan = useMemo(() => {
+    const inList = new Set(s.shopping.flatMap((i) => [...Object.keys(i.parts ?? {}), ...(i.recipes ?? []).map((t) => recipes().find((r) => r.title === t)?.id ?? "")]));
+    return new Set(week.flatMap((d) => d.items.filter((it) => !it.leftover).map((it) => it.recipeId)).filter((id) => !inList.has(id))).size;
+  }, [s.shopping, week]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A dish whose products are all at home adds no rows: once pressed, the row goes until the screen is opened again.
+  const [taken, setTaken] = useState(false);
+  const fromPlan = () => { update((st) => ({ ...st, shopping: withWeek(st, week) })); setTaken(true); toast("Продукты на неделю — в списке покупок"); };
   const set = (fn: (l: ShoppingItem[]) => ShoppingItem[]) => update((st) => ({ ...st, shopping: fn(st.shopping) }));
   const toggle = (key: string) => {
     const item = s.shopping.find((x) => x.key === key);
@@ -149,6 +156,14 @@ export function Shopping() {
             {dishes.map((d, i) => (i ? d.title.charAt(0).toLowerCase() + d.title.slice(1) : d.title)).join(", ")}
           </span>
           <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
+        </button>
+      )}
+      {/* The plan's products when the list already has bread and milk: the button was only in an empty list. */}
+      {s.shopping.length > 0 && missingPlan > 0 && !taken && (
+        <button className="mt-3 flex min-h-[48px] w-full items-center gap-2 rounded-card border border-dashed border-line-strong/60 px-3 py-2 text-left text-body-sm hover:border-line-strong" onClick={fromPlan}>
+          <CalendarDays size={18} className="shrink-0 text-brand" aria-hidden />
+          <span className="min-w-0 flex-1">Добавить продукты из плана на неделю <span className="text-ink-soft">· {missingPlan} {plural(missingPlan, "блюдо", "блюда", "блюд")}</span></span>
+          <Plus size={18} className="shrink-0 text-ink-soft" aria-hidden />
         </button>
       )}
       {store && <StoreMode items={s.shopping} onToggle={toggle} onToPantry={toPantry} onClose={() => setStore(false)} />}
@@ -272,32 +287,6 @@ function Collapsible({ title, hint, open, onToggle, children }: { title: string;
       {open && <div className="border-t border-line">{children}</div>}
     </section>
   );
-}
-
-const LIQUID = /молок|кефир|сливк|сок|вод|масло растит|ряженк|йогурт питьев|бульон|квас|морс/i;
-
-/** «Молоко, хлеб, десяток яиц и сметана» → four rows; each name is matched to a known product when it is clearly one. */
-function splitList(text: string, ids: string[]): { ingredientId: string; name: string; amount: number; unit: string }[] {
-  const UNIT: Record<string, string> = { кг: "кг", кило: "кг", килограмм: "кг", г: "г", грамм: "г", л: "л", литр: "л", литра: "л", литров: "л", мл: "мл", шт: "шт.", штук: "шт.", штуки: "шт.", пачка: "пачка", пачки: "пачка", банка: "банка", банки: "банка", бутылка: "бутылка", бутылки: "бутылка" };
-  return text.split(/\s*(?:,|;|\n|\s+и\s+|\s+а ещё\s+|\s+еще\s+|\s+ещё\s+)\s*/i).map((p) => p.trim().replace(/[.!?]+$/, "")).filter((p) => p.length > 1).slice(0, 20).map((part) => {
-    let amount = 1, unit = "", name = part;
-    const ten = name.match(/^десяток\s+(.+)$/i);
-    const lead = name.match(/^(\d+(?:[.,]\d+)?)\s*([а-яё.]+)?\s+(.+)$/i);
-    const tail = name.match(/^(.+?)\s+(\d+(?:[.,]\d+)?)\s*([а-яё.]+)?$/i);
-    if (ten) { amount = 10; unit = "шт."; name = ten[1]; }
-    else if (lead) { amount = Number(lead[1].replace(",", ".")) || 1; const u = UNIT[(lead[2] ?? "").replace(/\.$/, "").toLowerCase()]; unit = u ?? ""; name = u ? lead[3] : ((lead[2] ? lead[2] + " " : "") + lead[3]); }
-    else if (tail) { amount = Number(tail[2].replace(",", ".")) || 1; unit = UNIT[(tail[3] ?? "").replace(/\.$/, "").toLowerCase()] ?? ""; name = tail[1]; }
-    // Said in the genitive after a number («десяток яиц», «2 пачки масла»): the usual words back to the product.
-    const ALIAS: Record<string, string> = { "яиц": "яйца", "яйца": "яйца", "картошки": "картофель", "картошку": "картофель", "картошка": "картофель", "молока": "молоко", "хлеба": "хлеб", "масла": "масло", "сметаны": "сметана", "муки": "мука", "сахара": "сахар", "сыра": "сыр", "лука": "лук", "кефира": "кефир" };
-    name = ALIAS[name.toLowerCase()] ?? name;
-    const word = name.toLowerCase();
-    const stem = word.slice(0, Math.max(3, word.length - 2));
-    // The usual words first (app/knownProducts): «масло» is butter, not sesame oil; «сок» stays «Сок», as written.
-    const known = knownProduct(word.replace(/ё/g, "е"));
-    const hit = known ? (known.length === 1 && ids.includes(known[0]) ? known[0] : undefined) : searchIngredients(word, ids, 5).find((id) => shortName(id).toLowerCase().startsWith(stem) || word.startsWith(shortName(id).toLowerCase().slice(0, Math.max(3, shortName(id).length - 2))));
-    const label = hit ? shortName(hit) : name.charAt(0).toUpperCase() + name.slice(1);
-    return { ingredientId: hit ?? "custom-" + Math.random().toString(36).slice(2, 9), name: label.slice(0, 120), amount, unit: unit || (LIQUID.test(label) ? "л" : "шт.") };
-  });
 }
 
 function AddItem({ open, onClose, onAdd }: { open: boolean; onClose: () => void; onAdd: (i: ShoppingItem) => void }) {

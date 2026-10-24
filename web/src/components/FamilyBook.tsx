@@ -2,10 +2,13 @@
 // person's other things and sent to children and grandchildren as a link that opens straight into their book.
 import { gramsHint } from "../app/kitchenMath";
 import { useRef, useState } from "react";
-import { Camera, Clock, PenLine, Printer, Send, Trash2, Users } from "lucide-react";
-import { canShare, copyText, plural, type MyRecipe } from "../engine";
+import { Camera, ChefHat, ChevronLeft, ChevronRight, Clock, PenLine, Printer, Send, ShoppingCart, Trash2, Users } from "lucide-react";
+import { addToShopping, basics, canShare, copyText, ingredientOptions, plural, type MyRecipe } from "../engine";
 import { useStore } from "../app/store";
-import { lines, newRecipe, recipeText, removeRecipe, saveRecipe, shareLink } from "../app/myRecipes";
+import { ingredientRows, lines, newRecipe, recipeText, removeRecipe, saveRecipe, shareLink } from "../app/myRecipes";
+import { minutesIn } from "../app/timers";
+import { useWakeLock } from "../app/wakeLock";
+import { StepTimer } from "./StepTimer";
 import { cue } from "../app/feedback";
 import { printPage } from "../app/print";
 import { Layer, Sheet, Stepper, cx } from "./ui";
@@ -125,8 +128,17 @@ function RecipeEditor({ initial, photo, onClose, onSaved }: { initial: MyRecipe;
 }
 
 function MyRecipeView({ r, onClose, onEdit }: { r: MyRecipe; onClose: () => void; onEdit: () => void }) {
-  const { update, toast } = useStore();
+  const { s, update, toast } = useStore();
   const [done, setDone] = useState<number[]>([]);
+  const [cooking, setCooking] = useState(false);
+  // «Продукты в покупки»: each line as a product; salt, pepper, water and oil are at home anyway.
+  const toShopping = () => {
+    const rows = ingredientRows(r, ingredientOptions().map((o) => o.id), basics(s.preferences));
+    if (!rows.length) return toast("Продуктов не нашёл — впишите их по одному на строку");
+    update((st) => ({ ...st, shopping: addToShopping(st.shopping, rows, r.title) }));
+    cue("list");
+    toast("В покупках: " + rows.length + " " + plural(rows.length, "продукт", "продукта", "продуктов"));
+  };
   const ing = lines(r.ingredients), steps = lines(r.steps);
   const send = async () => {
     const link = await shareLink(r);
@@ -178,14 +190,43 @@ function MyRecipeView({ r, onClose, onEdit }: { r: MyRecipe; onClose: () => void
           </section>
         )}
         {r.note && <p className="mt-6 rounded-input bg-sunken p-4 text-body-sm">{r.note}</p>}
-        <div className="mt-8 grid gap-2 sm:flex">
-          <button className="btn-primary" onClick={send}><Send size={18} />Отправить семье</button>
+        <div className="mt-8 grid gap-2 sm:flex sm:flex-wrap">
+          {steps.length > 0 && <button className="btn-primary" onClick={() => setCooking(true)}><ChefHat size={18} />Готовить по шагам</button>}
+          {ing.length > 0 && <button className="btn-outline" onClick={toShopping}><ShoppingCart size={18} />Продукты в покупки</button>}
+          <button className="btn-outline" onClick={send}><Send size={18} />Отправить семье</button>
           <button className="btn-outline" onClick={() => printPage(r.title, [
             ...(ing.length ? [{ title: "Продукты", items: ing }] : []),
             ...(steps.length ? [{ title: "Как готовить", items: steps }] : []),
             ...(r.note ? [{ text: r.note }] : []),
           ])}><Printer size={18} />Распечатать</button>
           <button className="btn-ghost text-ink-soft" onClick={remove}><Trash2 size={18} />Удалить</button>
+        </div>
+      </div>
+      {cooking && <CookSteps r={r} steps={steps} onClose={() => setCooking(false)} />}
+    </Layer>
+  );
+}
+
+/** A family recipe step by step: large type, one step at a time, a timer when the step says minutes; the screen stays on. */
+function CookSteps({ r, steps, onClose }: { r: MyRecipe; steps: string[]; onClose: () => void }) {
+  const [i, setI] = useState(0);
+  useWakeLock(true);
+  const min = minutesIn(steps[i]);
+  const last = i >= steps.length - 1;
+  return (
+    <Layer title={r.title} onClose={onClose} closeIcon="close" label={r.title} full private>
+      <div className="mx-auto max-w-2xl px-4 pb-32 pt-[calc(env(safe-area-inset-top)+4.5rem)] sm:px-6">
+        <p className="text-small text-ink-soft">Шаг {i + 1} из {steps.length}</p>
+        <div className="mt-2 flex gap-1" aria-hidden>{steps.map((_, k) => <span key={k} className={cx("h-1.5 flex-1 rounded-full", k <= i ? "bg-brand-fill" : "bg-sunken")} />)}</div>
+        <p key={i} className="anim-rise mt-6 text-step md:text-step-lg">{steps[i]}</p>
+        {min && <StepTimer key={"t" + i} className="mt-6" dish={r.title} recipeId={r.id} step={i} seconds={min * 60} />}
+      </div>
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3">
+        <div className="mx-auto flex max-w-2xl gap-2">
+          <button className="btn-outline h-13 w-14 shrink-0" disabled={i === 0} onClick={() => setI(i - 1)} aria-label="Предыдущий шаг"><ChevronLeft size={22} /></button>
+          {last
+            ? <button className="btn-primary h-13 flex-1" onClick={() => { cue("done"); onClose(); }}>Готово</button>
+            : <button className="btn-primary h-13 flex-1" onClick={() => { cue("page"); setI(i + 1); }}>Дальше<ChevronRight size={20} /></button>}
         </div>
       </div>
     </Layer>

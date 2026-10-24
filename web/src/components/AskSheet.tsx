@@ -10,7 +10,7 @@ import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { homeAmount, mergeSame } from "../app/amounts";
 import { answerFromRecipe } from "../app/recipeAsk";
-import { extraAnswer } from "../app/recipeQuestions";
+import { agree, extraAnswer } from "../app/recipeQuestions";
 import { ChefAvatar, Chip, Sheet } from "./ui";
 
 export interface AskRequest { text: string; key: number }
@@ -132,7 +132,9 @@ export function AskSheet({ open, onClose, recipe, servings, prefs, onServings, r
     setBusy(true);
     // A short pause, so the answer does not flash in before the question has settled.
     window.setTimeout(() => {
-      setMsgs((m) => [...m, { id: ++seq.current, role: "chef", ...answer(q, previous) }]);
+      // «"Котлеты домашние" хранятся», not «хранится» (app/recipeQuestions).
+      const said = answer(q, previous);
+      setMsgs((m) => [...m, { id: ++seq.current, role: "chef", ...said, text: agree(said.text, recipe.title) }]);
       setBusy(false);
     }, 450);
   };

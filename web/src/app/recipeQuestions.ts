@@ -54,6 +54,16 @@ const TROUBLE: [RegExp, string][] = [
   [/рвутся|прилипа/, "pancake-tear"], [/расползают|растекают/, "syrniki-spread"], [/не густе|жидк/, "not-thick"], [/комочк|комки/, "lumps"],
 ];
 
+// «Котлеты домашние», «Сырники…», «Щи…» are many: «хранятся», not «хранится». A few dish names end in «и» and are one.
+const ONE = /^(?:хачапури|чахохбили|сациви|харчо|лобио|оливье|рагу|фондю|суши|киви)$/i;
+/** The verbs after the recipe's title in an answer agree with it: «"Котлеты домашние" хранятся в холодильнике…». */
+export function agree(text: string, title: string): string {
+  const head = low(title).split(/[\s,«»-]+/)[0];
+  if (!/[ыи]$/.test(head) || ONE.test(head)) return text;
+  const MANY: Record<string, string> = { хранится: "хранятся", подходит: "подходят", готовится: "готовятся", получится: "получатся", получается: "получаются", подойдёт: "подойдут", подойдет: "подойдут" };
+  return text.replace(new RegExp("(«" + title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "»\\s+)(" + Object.keys(MANY).join("|") + ")", "g"), (_m, a: string, v: string) => a + MANY[v]);
+}
+
 export function extraAnswer(q: string, r: Recipe): ExtraAnswer | null {
   const ql = low(q).replace(/[?!.]+$/, "").trim();
   const course = courseOf(r);
@@ -90,7 +100,8 @@ export function extraAnswer(q: string, r: Recipe): ExtraAnswer | null {
   // «Сколько варить?» with no product: the longest step that cooks that way.
   const verb: [RegExp, string, RegExp][] = [[/вари/, "Варите", /вари|кипени/], [/жари/, "Жарьте", /жар/], [/туши/, "Тушите", /туш|томит/], [/запека|печь|выпека/, "Запекайте", /запек|пеките|выпек|духовк/]];
   const v = /сколько|как долго/.test(ql) ? verb.find(([re]) => re.test(ql)) : undefined;
-  if (v && ql.split(/\s+/).length <= 3) {
+  // «сколько варить без крышки» is the same question: how the pot stands does not change the time asked.
+  if (v && ql.replace(/(?:без|под)\s+крышк\S*|на\s+\S+\s+огне/g, " ").trim().split(/\s+/).length <= 3) {
     const steps = r.steps.map((s, k) => ({ k, s, min: s.timerSeconds ? Math.round(s.timerSeconds / 60) : 0 })).filter((x) => x.min && v[2].test(low(x.s.text)));
     const top = steps.sort((a, b) => b.min - a.min)[0];
     if (top) return { text: v[1] + " " + formatMinutes(top.min) + " (шаг " + (top.k + 1) + ")." };
@@ -116,6 +127,10 @@ export function extraAnswer(q: string, r: Recipe): ExtraAnswer | null {
 
   // «Подгорело», «пересолила», «разваливаются»: what to do, from «Спасти блюдо».
   const tr = TROUBLE.find(([re]) => re.test(ql));
+  // On a frying pan «переложите верхнюю часть в чистую посуду» (the pot's answer) does not fit.
+  const pan = /сковород/i.test(r.steps.map((s) => s.text).join(" ")) && !/кастрюл|казан|сотейник|духовк/i.test(r.steps.map((s) => s.text).join(" "));
+  if (tr?.[1] === "burnt" && pan)
+    return { text: "Подгорело: снимите сковороду с огня и переложите готовое на тарелку, подгоревший край срежьте. Сковороду протрите от пригоревшего, добавьте немного масла и следующую партию жарьте на огне поменьше." };
   if (tr) {
     const t = troublesFor(r).find((x) => x.id === tr[1] || (tr[1] === "salty" && x.id === "salty-soup")) ?? ALL_TROUBLES.find((x) => x.id === tr[1]);
     if (t) return { text: t.title + ": " + t.steps.join(" ") };

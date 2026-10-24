@@ -67,7 +67,9 @@ function timeAnswer(q: string, r: Recipe): RecipeAnswer | null {
   const verb = VERBS.find(([re]) => re.test(ql));
   const mine = recipeFamilies(r);
   // The thing asked about, as the person wrote it: words of the question found in the steps (not the meat they swap in).
-  const asked = words(q).filter((w) => w.length >= 4 && !STOP.has(w) && (!familyOf(w) || mine.has(familyOf(w)!)));
+  // Not the pan, the lid or the heat: «сколько варить без крышки» was «Варите крышки 90 минут».
+  const asked = words(q).filter((w) => w.length >= 4 && !STOP.has(w) && !/^(?:крышк|огн|огон|сковород|кастрюл|духовк|плит|миск|форм|сотейник|казан)/.test(w)
+    && (!familyOf(w) || mine.has(familyOf(w)!)));
   // Minutes only of steps that cook (a timer, or a cooking verb): «на лепку около 15 минут» is not a cooking time.
   const steps = r.steps.map((s, k) => {
     const l = low(s.text), g = groupOf(l);
