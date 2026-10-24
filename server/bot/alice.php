@@ -32,7 +32,8 @@ $APP = null;
 function say(string $text, array $state = [], array $buttons = [], bool $end = false, ?string $tts = null): void {
     global $APP;
     $cut = fn($s) => mb_strlen($s, 'UTF-8') > 1000 ? mb_substr($s, 0, 997, 'UTF-8') . '…' : $s;
-    $out = ['version' => '1.0', 'session_state' => $state, 'response' => [
+    // An empty state is an object for Yandex («{}»): PHP's empty array went out as «[]» — «Недопустимый тип поля: session_state».
+    $out = ['version' => '1.0', 'session_state' => $state ?: new stdClass(), 'response' => [
         'text' => $cut($text), 'tts' => $cut(str_replace(['«', '»', '•'], '', $tts ?? $text)), 'end_session' => $end,
         'buttons' => array_map(fn($b) => is_array($b) ? $b : ['title' => $b, 'hide' => true], array_slice($buttons, 0, 6)),
     ]];
