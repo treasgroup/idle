@@ -145,6 +145,10 @@
 .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
 
 /* Horizontal scroller for card carousels: edge fades so it is obvious there is more. */
+/* Computers: a thin scrollbar in the page's colours instead of the browser's grey one (phones hide theirs anyway). */
+@media (pointer: fine) {
+  html, .overflow-y-auto { scrollbar-width: thin; scrollbar-color: rgb(var(--line-strong) / 0.55) transparent; }
+}
 .scroller { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: 1rem; scrollbar-width: none; }
 .scroller::-webkit-scrollbar { display: none; }
 .scroller > * { scroll-snap-align: start; }

@@ -61,6 +61,10 @@ nav.cx-sub[hidden] { display: none; }
 .cx-sub-in a { display: inline-flex; align-items: center; white-space: nowrap; padding: 11px 12px; font-size: 14px; color: #5d6052; text-decoration: none; border-bottom: 2px solid transparent; }
 .cx-sub-in a:hover { color: #2f3328; }
 .cx-sub-in a.on { color: #a83e2b; border-bottom-color: #b7432f; font-weight: 600; }
+/* The old panel's «Обзор · Запросы · Рецепты · Аудитория»: the tabs' -1px underline made it scroll up and down — a
+   stray scrollbar at its right end. Sideways scroll on narrow screens stays, without the bar. */
+.adm-subtabs { overflow-y: hidden; scrollbar-width: none; }
+.adm-subtabs::-webkit-scrollbar { display: none; }
 @media (max-width: 640px) { .cx-sub-in { padding: 0 12px; } }
 .adm-nav a .cx-count, .cx-sub-in a .cx-count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; margin-left: 6px; border-radius: 99px; background: #b7432f; color: #fff; font-size: 12px; font-weight: 700; line-height: 1; }
 

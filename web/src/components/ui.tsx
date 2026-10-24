@@ -102,7 +102,8 @@ export function Layer({ title, onClose, children, actions, width = "max-w-3xl", 
           {/* Phones: «Назад» is enough when the page's own H1 is right below; the title appears once it scrolls away. */}
           <div className={cx("min-w-0 flex-1 truncate px-1 text-title transition-opacity duration-150", solid ? "opacity-100" : "opacity-0",
             closeIcon === "back" && transparentUntil === undefined && "invisible sm:visible")}>{title}</div>
-          {actions && <div className={cx("flex items-center gap-1", !solid && "[&>.icon-btn]:bg-card/90 [&>.icon-btn]:text-ink [&>.icon-btn]:shadow-e1 [&>.icon-btn]:backdrop-blur")}>{actions}</div>}
+          {/* lg: the header lies over the page's scrollbar — the icons keep clear of it. */}
+          {actions && <div className={cx("flex items-center gap-1 lg:mr-4", !solid && "[&>.icon-btn]:bg-card/90 [&>.icon-btn]:text-ink [&>.icon-btn]:shadow-e1 [&>.icon-btn]:backdrop-blur")}>{actions}</div>}
         </div>
       </div>
       <div ref={scroller} className={cx("flex-1 overflow-y-auto overscroll-contain", transparentUntil === undefined && "pt-[calc(env(safe-area-inset-top)+3.5rem)]")}>

@@ -2208,7 +2208,7 @@ var zp = {
   },
   GE = {
     excluded: [],
-    appliances: ["pan", "pot", "oven", "blender"],
+    appliances: ["pan", "pot", "oven", "blender", "multicooker", "microwave"],
     vegetarian: !1,
   },
   vS = ["cooked", "liked", "not_now", "too_hard", "dislike_ingredient"],
@@ -4140,9 +4140,13 @@ function Qe(e, t, n, a = 3, i = {}) {
         byName = t.desired.some((R) => R.startsWith("dish:") && !/^dish:(multicooker|airfryer|microwave|oven|freezer)$/.test(R)),
         course = Ne(p),
         device = /в (мультиварке|аэрогриле|микроволновке)/i.exec(p.title),
+        // Made with a gadget alone («кекс в кружке» — a microwave) and the gadget not asked for: «хочу пирожки» is pies.
+        gadgetOnly = !device && p.appliances.length > 0 && p.appliances.every((R) => R === "microwave" || R === "airfryer" || R === "multicooker") &&
+          !t.desired.some((R) => /^dish:(multicooker|airfryer|microwave)$/.test(R)),
         aside =
           (askedKind ? 0 : ["side", "sauce", "drink"].includes(course) ? 4 : course === "snack" ? 2 : 0) +
           (device && !t.desired.includes("dish:" + { мультиварке: "multicooker", аэрогриле: "airfryer", микроволновке: "microwave" }[device[1].toLowerCase()]) ? 1 : 0) +
+          (gadgetOnly ? 1.5 : 0) +
           (/для (детей|малышей|ребёнка|ребенка)/i.test(p.title) && t.occasion !== "kids" ? 1.5 : 0) +
           (byName && !t.vegetarian && /постн/i.test(p.title) ? 1.5 : 0) +
           // A cold soup out of its season (October to April) only when asked for by name.
@@ -10360,6 +10364,13 @@ function vu(e) {
     i.success && (t.conditions = i.data),
     s.success && (t.preferences = s.data),
     r.success && (t.cooking = r.data),
+    // Most kitchens have a multicooker and a microwave too (2026-10): a kitchen still on the old default of four gets
+    // them once; one the person set by hand afterwards is not touched again (kitchenV).
+    n.kitchenV !== 2 &&
+      t.preferences.appliances.length === 4 &&
+      ["pan", "pot", "oven", "blender"].every((x) => t.preferences.appliances.includes(x)) &&
+      (t.preferences = { ...t.preferences, appliances: [...t.preferences.appliances, "multicooker", "microwave"] }),
+    (t.kitchenV = 2),
     t
   );
 }
