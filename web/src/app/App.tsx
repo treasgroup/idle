@@ -18,6 +18,7 @@ import { OPEN_PARTY, type PartyDraft } from "./party";
 import { OPEN_DIARY } from "./diary";
 import { useMoveLocalFreezer } from "./freezer";
 import { useKeptSync } from "./kept";
+import { usePhotoSync } from "./photoSync";
 import { Avatar } from "../components/Avatar";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
@@ -181,6 +182,7 @@ function Shell() {
   useMoveLocalFreezer(ready);
   // The profile, the diary and the tables travel with the account (app/kept).
   useKeptSync();
+  usePhotoSync();
   // «Дневник еды»: from «На сегодня», Профиль.
   const [diary, setDiary] = useState(false);
   useEffect(() => {

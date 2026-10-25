@@ -5,6 +5,7 @@ import { Camera, ImagePlus, ShieldCheck, UserRound, ZoomIn, ZoomOut } from "luci
 import { useStore } from "../app/store";
 import { Sheet } from "./ui";
 import { feature } from "../app/feature";
+import { photoChanged } from "../app/photoSync";
 
 const BOX = 224; // the preview square, px
 const INSET = 6; // the circle sits this far inside it
@@ -71,11 +72,15 @@ export function PhotoSheet({ open, onClose }: { open: boolean; onClose: () => vo
       }
     }
     if (img?.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
-    setProfile((p) => ({ ...p, name: name.trim().slice(0, 30) || undefined, photo }));
+    const at = photo !== profile.photo ? Date.now() : profile.photoAt;
+    if (photo !== profile.photo && at) photoChanged(photo, at);
+    setProfile((p) => ({ ...p, name: name.trim().slice(0, 30) || undefined, photo, photoAt: at }));
     onClose();
   };
   const remove = () => {
-    setProfile((p) => ({ ...p, photo: undefined }));
+    const at = Date.now();
+    photoChanged(undefined, at);
+    setProfile((p) => ({ ...p, photo: undefined, photoAt: at }));
     toast("Фото убрано");
     onClose();
   };

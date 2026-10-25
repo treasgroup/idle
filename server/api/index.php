@@ -180,6 +180,7 @@ try {
     elseif ($route === 'account.code' && $method === 'POST') account_code();
     elseif ($route === 'account.login' && $method === 'POST') account_login(read_json_body(2000));
     elseif ($route === 'account.delete' && $method === 'POST') account_delete();
+    elseif ($route === 'profile.photo' && ($method === 'GET' || $method === 'POST')) profile_photo_route($method);
     // «Шеф в Алисе»: a code that links a speaker to the family's plan and list (_private/alice_home.php).
     elseif ($route === 'alice.code' && $method === 'POST') alice_code_route();
     elseif ($route === 'alice.status' && $method === 'GET') alice_status_route();

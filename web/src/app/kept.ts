@@ -12,8 +12,9 @@ import type { EngineState } from "../engine";
 
 type Kept = EngineState["kept"];
 const BASE_KEY = "cook-kept-base";
-/** Settings of this device only: its text size, its light or dark (a phone at night, a computer by day), the dish on the stove. */
-const DEVICE_ONLY: (keyof Profile)[] = ["textSize", "theme", "parallel"];
+/** Settings of this device only: its text size, its light or dark (a phone at night, a computer by day), the dish on the stove.
+ *  The photo travels on its own (app/photoSync): the settings carry only its time (photoAt). */
+const DEVICE_ONLY: (keyof Profile)[] = ["textSize", "theme", "parallel", "photo"];
 
 function sharedProfile(p: Profile): Record<string, unknown> {
   const out: Record<string, unknown> = {};
@@ -62,7 +63,9 @@ export function useKeptSync(): void {
 /** The account's copy onto this device: the profile keeps this device's own settings. */
 function apply(k: Kept, p: Profile, setProfile: (fn: (p: Profile) => Profile) => void): void {
   if (k.profile) {
-    const mine = Object.fromEntries(DEVICE_ONLY.map((key) => [key, p[key]]));
+    const mine: Record<string, unknown> = Object.fromEntries(DEVICE_ONLY.map((key) => [key, p[key]]));
+    // An account written before the photo travelled apart still has it inside: a device without one takes it.
+    if (!p.photo && typeof k.profile.photo === "string") mine.photo = k.profile.photo;
     setProfile(() => normalizeProfile({ ...k.profile, ...mine }));
   }
   if (k.diary) replaceDiary(k.diary as Diary);

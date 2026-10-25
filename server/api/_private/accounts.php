@@ -184,6 +184,7 @@ function account_delete(): void {
         $pdo->prepare('DELETE FROM devices WHERE account_id = ?')->execute([$a['id']]);
         $pdo->prepare('DELETE FROM login_codes WHERE account_id = ?')->execute([$a['id']]);
         $pdo->prepare('DELETE FROM docs WHERE owner = ?')->execute(['p:' . $a['id']]);
+        $pdo->prepare('DELETE FROM docs WHERE owner = ?')->execute(['ph:' . $a['id']]);
         $pdo->prepare('DELETE FROM accounts WHERE id = ?')->execute([$a['id']]);
         // "Очистить данные" removes the person's reviews, replies and likes too
         if (function_exists('reviews_forget')) reviews_forget($a['id']);
@@ -226,3 +227,25 @@ function admin_legal(array $b): void {
     send_json(legal_info());
 }
 function mb_strlen_safe(string $s): int { return function_exists('mb_strlen') ? mb_strlen($s) : strlen($s); }
+
+// ---------- The profile's photo, kept apart from the personal document ----------
+// The photo (a small JPEG, ~25 KB) changes rarely: kept on its own, so the diary and the settings travel without it.
+// GET gives {photo, at}; POST {photo|null, at} replaces it when «at» is newer.
+function profile_photo_route(string $method): void {
+    $a = require_account();
+    $owner = 'ph:' . $a['id'];
+    $cur = doc_get($owner);
+    $have = is_array($cur['data']) ? $cur['data'] : ['photo' => null, 'at' => 0];
+    if ($method === 'GET') { send_json($have); return; }
+    require_same_origin();
+    $b = read_json_body(220000);
+    $at = is_int($b['at'] ?? null) ? $b['at'] : 0;
+    $photo = $b['photo'] ?? null;
+    if ($photo !== null && (!is_string($photo) || strncmp($photo, 'data:image/jpeg;base64,', 23) !== 0 || strlen($photo) > 200000)) throw new ApiError(400, 'validation', 'Фото не подошло — выберите другое.');
+    if ($at > (int)($have['at'] ?? 0)) {
+        db()->prepare('INSERT OR REPLACE INTO docs (owner, data, version, updated_at) VALUES (?, ?, ?, ?)')
+            ->execute([$owner, json_encode(['photo' => $photo, 'at' => $at], JSON_UNESCAPED_SLASHES), $cur['version'] + 1, now_ms()]);
+        $have = ['photo' => $photo, 'at' => $at];
+    }
+    send_json(['at' => (int)$have['at']]);
+}
