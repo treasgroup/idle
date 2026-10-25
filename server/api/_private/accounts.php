@@ -187,7 +187,11 @@ function account_delete(): void {
         $pdo->prepare('DELETE FROM accounts WHERE id = ?')->execute([$a['id']]);
         // "Очистить данные" removes the person's reviews, replies and likes too
         if (function_exists('reviews_forget')) reviews_forget($a['id']);
-        if ($alone) { $pdo->prepare('DELETE FROM docs WHERE owner = ?')->execute(['h:' . $a['household_id']]); $pdo->prepare('DELETE FROM households WHERE id = ?')->execute([$a['household_id']]); $pdo->prepare('DELETE FROM invites WHERE household_id = ?')->execute([$a['household_id']]); }
+        if ($alone) {
+            $pdo->prepare('DELETE FROM docs WHERE owner = ?')->execute(['h:' . $a['household_id']]); $pdo->prepare('DELETE FROM households WHERE id = ?')->execute([$a['household_id']]); $pdo->prepare('DELETE FROM invites WHERE household_id = ?')->execute([$a['household_id']]);
+            // The speakers linked to this family («Шеф в Алисе») have nothing to read any more: unlinked too.
+            if (function_exists('alice_schema')) { alice_schema(); $pdo->prepare('DELETE FROM alice_links WHERE household_id = ?')->execute([$a['household_id']]); $pdo->prepare('DELETE FROM alice_codes WHERE household_id = ?')->execute([$a['household_id']]); }
+        }
     }
     setcookie(DEVICE_COOKIE, '', ['expires' => time() - 3600, 'path' => cookie_path(), 'secure' => is_https(), 'httponly' => true, 'samesite' => 'Lax']);
     send_json(['deleted' => true]);

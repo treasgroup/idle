@@ -9,6 +9,7 @@ import {
   recipes, saveState, setTasteScorer, tasteScorer, track, deviceSource, useAccountSync, type SyncApi,
 } from "../engine";
 import { applyTheme, loadProfile, saveProfile, type Profile } from "./profile";
+import { forgetElsewhere } from "./forget";
 import type { ToastMsg } from "../components/ui";
 
 export interface CatalogStatus { version: number; source: string; problem?: string; count: number }
@@ -147,6 +148,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     // Stop saving first, so the state is not written back after it is cleared.
     saveBroken.current = true;
     await saveChain.current.catch(() => {});
+    // What lives on the server apart from the account: the tables this person organised (with their guests'
+    // answers) and this browser's subscription to notices. Then the account itself.
+    await forgetElsewhere().catch(() => {});
     try { await sync.remove(); } catch { /* offline: the device data is still removed */ }
     await clearState().catch(() => {});
     try { localStorage.clear(); sessionStorage.clear(); } catch { /* ignore */ }
