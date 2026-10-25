@@ -2,7 +2,7 @@
 // what to bring), and the table itself — the same page for the organiser and the guests who opened the link:
 // «приду / не смогу», «Я приготовлю», «Возьму я», who can't eat what, and the optional split of the expenses.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CalendarDays, Check, ChevronRight, MapPin, Plus, RefreshCw, Send, Settings2, ShoppingCart, Trash2, Users, Wallet, X } from "lucide-react";
+import { AlertTriangle, CalendarDays, CalendarPlus, ChefHat, Check, Clock, ChevronRight, MapPin, Plus, RefreshCw, Send, Settings2, ShoppingCart, Trash2, Users, Wallet, X } from "lucide-react";
 import {
   LABELS, addToShopping, clampServings, ingredientsToBuy, plural, recipeById, searchRecipes, siteBase, type Recipe,
 } from "../engine";
@@ -10,11 +10,12 @@ import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { cue } from "../app/feedback";
 import {
-  CANT, FORMATS, candidates, forgetParty, formatOf, guestName, guestSecret, headcount, knownParties, nextSaturday, partyCall, rememberParty, settle,
+  CANT, FORMATS, ROAD_MIN, candidates, myStart, partyIcs, tableHints, forgetParty, formatOf, guestName, guestSecret, headcount, knownParties, nextSaturday, partyCall, rememberParty, settle,
   warnings, whenLine, type Party, type PartyDraft, type PartyFormat, type PartyItem, type Status,
 } from "../app/party";
 import { RecipeImage } from "./RecipeCard";
 import { ShareOptions } from "./ShareOptions";
+import { downloadIcs } from "../app/calendar";
 import { Chip, Layer, Sheet, Stepper, Toggle, cx } from "./ui";
 
 type Screen = { to: "list" } | { to: "new"; draft?: PartyDraft } | { to: "table"; token: string; fresh?: boolean };
@@ -231,6 +232,8 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   const url = siteBase() + "#party=" + token;
   const shareText = f.emoji + " " + p.title + " — " + whenLine(p) + (p.place ? ", " + p.place : "") + ". Отметься, придёшь ли и что принесёшь: " + url;
   const mine = p.dishes.filter((d) => d.by === p.me && d.id).map((d) => recipeById(d.id!)).filter((r): r is Recipe => !!r);
+  const start = myStart(p, mine);
+  const hints = tableHints(p);
   const toShopping = () => {
     const n = Math.max(people, 2), have = haveIds(s);
     update((st) => {
@@ -255,6 +258,8 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
 
       <div className="mt-4 flex gap-2">
         <button className="btn-primary flex-1" onClick={() => setShare(true)}><Send size={18} aria-hidden />Позвать гостей</button>
+        <button className="btn-outline px-3" onClick={() => { downloadIcs(partyIcs(p, mine, url), "stol.ics"); toast("Откройте файл — встреча появится в календаре" + (mine.length ? ", и напоминание начать готовить" : "")); }}
+          aria-label="В календарь" title="В календарь"><CalendarPlus size={18} aria-hidden /></button>
         {p.admin && <button className="btn-outline" onClick={() => setEdit(true)} aria-label="Изменить стол"><Settings2 size={18} aria-hidden />Изменить</button>}
       </div>
 
@@ -283,8 +288,23 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
           </button>
         )}
 
+      {hints.length > 0 && (
+        <div className="mt-6 flex gap-3 rounded-card bg-brand-soft p-3.5">
+          <ChefHat size={20} className="mt-0.5 shrink-0 text-brand" aria-hidden />
+          <div className="text-body-sm"><p className="font-semibold">Шеф о столе</p>{hints.map((h) => <p key={h} className="mt-0.5">{h}</p>)}</div>
+        </div>
+      )}
       <Items p={p} kind="dish" title={"Блюда" + (people > 1 ? " — на " + people + " " + plural(people, "человека", "человека", "человек") : "")} busy={busy}
         onAct={(b) => act(b, String(b.key ?? "add"))} onOpen={(id) => { const r = recipeById(id); if (r) openRecipe(r); }} canAct={answered} />
+      {start && (
+        <div className="mt-2 flex gap-3 rounded-card bg-herb-soft p-3.5 text-body-sm">
+          <Clock size={20} className="mt-0.5 shrink-0 text-herb" aria-hidden />
+          <div>
+            {+start.start < +start.readyBy && <p><b>Начните в {hm(start.start)}{!sameDay(start.start, start.readyBy) ? " накануне" : ""}</b> — к {hm(start.readyBy)} всё будет готово{p.me !== p.host ? " (за " + ROAD_MIN + " минут до встречи — собраться и доехать)" : ""}.</p>}
+            {start.dayBefore.length > 0 && <p className={cx(+start.start < +start.readyBy && "mt-1")}>{start.dayBefore.map((r) => "«" + r.title + "»").join(", ")} — долго готовить, лучше накануне.</p>}
+          </div>
+        </div>
+      )}
       {mine.length > 0 && <button className="btn-soft mt-2 w-full" onClick={toShopping}><ShoppingCart size={18} aria-hidden />Продукты для моих блюд — в покупки</button>}
       <Items p={p} kind="thing" title="Что взять, кроме еды" busy={busy} onAct={(b) => act(b, String(b.key ?? "add"))} canAct={answered} />
 
@@ -298,6 +318,9 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
     </>
   );
 }
+
+const hm = (d: Date) => d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
 function Answer({ p, busy, onSave, defaultName }: { p: Party; busy: boolean; defaultName: string; onSave: (a: { name?: string; status: Status; plus: number; cant: string[] }) => void }) {
   const me = p.guests.find((g) => g.key === p.me);

@@ -3,6 +3,7 @@
 // The tables this device made or opened are remembered here, so they are one tap away from Профиль.
 import { apiUrl, courseOf, freshConditions, inGroup, rankRecipes, recipeById, recipes, type Preferences, type Recipe } from "../engine";
 import { photoFirst } from "./photoFirst";
+import { schedule } from "./dinner";
 
 export type PartyFormat = "dinner" | "bbq" | "kids" | "newyear" | "match" | "birthday";
 export type Status = "yes" | "no" | "maybe";
@@ -149,4 +150,66 @@ export function whenLine(p: { date: string; time: string }): string {
   const d = new Date(p.date + "T12:00");
   if (isNaN(+d)) return p.time;
   return d.toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "long" }) + (p.time ? ", " + p.time : "");
+}
+
+// ---------- For each guest: when to start, the calendar, and Шеф's look at the table ----------
+/** The moment the table starts (the format's usual hour when the organiser gave no time). */
+export function partyStart(p: Party): Date {
+  const [h, m] = (p.time || formatOf(p.format).hour).split(":").map(Number);
+  const d = new Date(p.date + "T12:00");
+  d.setHours(h || 0, m || 0, 0, 0);
+  return d;
+}
+/** A guest brings the food: it should be ready 45 minutes before, to pack it and get there; the host — by the time. */
+export const ROAD_MIN = 45;
+export function myStart(p: Party, mine: Recipe[]): { start: Date; readyBy: Date; dayBefore: Recipe[] } | null {
+  if (!mine.length) return null;
+  const host = p.me === p.host;
+  const readyBy = new Date(+partyStart(p) - (host ? 0 : ROAD_MIN) * 60000);
+  // Long dishes (over 4 hours, the dough or the marinade overnight) are better made the day before.
+  const dayBefore = mine.filter((r) => r.totalMinutes > 240);
+  const today = mine.filter((r) => !dayBefore.includes(r));
+  const s = today.length ? schedule(today, +readyBy) : null;
+  return { start: new Date(s ? s.start : +readyBy), readyBy, dayBefore };
+}
+const pad = (n: number) => String(n).padStart(2, "0");
+const stamp = (d: Date) => d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" + pad(d.getHours()) + pad(d.getMinutes()) + "00";
+const esc = (s: string) => s.replace(/[\\;,]/g, (c) => "\\" + c).replace(/\n/g, "\\n");
+/** The table and, if the guest cooks, «Пора начинать» — as an .ics file for the phone's calendar. Nothing is sent. */
+export function partyIcs(p: Party, mine: Recipe[], url: string): string {
+  const now = new Date(), at = partyStart(p), uid = p.date + "-" + Math.abs(hashOf(p.title + p.date));
+  const ev = ["BEGIN:VEVENT", "UID:" + uid + "@shefly", "DTSTAMP:" + stamp(now), "DTSTART:" + stamp(at), "DTEND:" + stamp(new Date(+at + 3 * 3600000)),
+    "SUMMARY:" + esc(formatOf(p.format).emoji + " " + p.title), ...(p.place ? ["LOCATION:" + esc(p.place)] : []),
+    "DESCRIPTION:" + esc((mine.length ? "Я готовлю: " + mine.map((r) => r.title).join(", ") + "\n" : "") + "Стол: " + url),
+    "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc(p.title), "TRIGGER:-PT2H", "END:VALARM", "END:VEVENT"];
+  const st = myStart(p, mine);
+  if (st && +st.start < +st.readyBy) ev.push("BEGIN:VEVENT", "UID:" + uid + "-cook@shefly", "DTSTAMP:" + stamp(now), "DTSTART:" + stamp(st.start), "DTEND:" + stamp(st.readyBy),
+    "SUMMARY:" + esc("Готовить к столу: " + mine.filter((r) => !st.dayBefore.includes(r)).map((r) => r.title).join(", ")),
+    "DESCRIPTION:" + esc("Стол: " + url), "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc("Пора начинать готовить"), "TRIGGER:-PT15M", "END:VALARM", "END:VEVENT");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Шефли//RU", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR"].join("\r\n");
+}
+function hashOf(s: string): number { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) | 0; return h; }
+
+const MAYO = (r: Recipe) => r.ingredients.some((i) => i.id === "mayonnaise");
+const SWEET = (r: Recipe) => courseOf(r) === "dessert" || r.tags.includes("sweet");
+const MEATY = (r: Recipe) => r.ingredients.some((i) => !i.optional && (inGroup(i.id, "meat") || inGroup(i.id, "poultry")));
+/** Шеф looks at the whole table: no hot dish, three salads with mayonnaise, nothing for the guest who eats no meat… */
+export function tableHints(p: Party): string[] {
+  const rs = p.dishes.map((d) => (d.id ? recipeById(d.id) : undefined)).filter((r): r is Recipe => !!r);
+  if (rs.length < 2) return [];
+  const out: string[] = [];
+  const hot = rs.filter((r) => ["main", "soup"].includes(courseOf(r)) && !SWEET(r));
+  const veg = rs.filter((r) => ["salad", "side"].includes(courseOf(r)) || /овощ/i.test(r.title));
+  const mayo = rs.filter((r) => courseOf(r) === "salad" && MAYO(r));
+  if (!hot.length && p.format !== "match") out.push("Нет горячего — одно сытное блюдо сделает стол полным.");
+  if (mayo.length >= 3) out.push(mayo.length + " салата с майонезом — один можно заменить на овощной.");
+  if (!veg.length && p.format !== "kids") out.push("Нет ничего овощного — салат или овощи освежат стол.");
+  if (!rs.some(SWEET) && ["birthday", "kids", "newyear"].includes(p.format)) out.push("Нет сладкого — а на этот праздник его ждут.");
+  const people = headcount(p);
+  if (people >= 6 && p.dishes.length * 3 < people) out.push("На " + people + " человек маловато блюд — обычно одно блюдо на 3–4 гостей.");
+  for (const g of p.guests) {
+    if (g.status === "no" || !g.cant.includes("meat") || !hot.length) continue;
+    if (hot.every(MEATY)) { out.push((g.name || "Один из гостей") + " не ест мясо, а всё горячее — с мясом."); break; }
+  }
+  return out.slice(0, 3);
 }
