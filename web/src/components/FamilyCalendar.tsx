@@ -49,7 +49,7 @@ export function FamilyCalendarSheet({ open, onClose, onReminders }: { open: bool
           Напоминания выключены — дата появится только на Главной. <span className="font-semibold text-brand-ink">Включить</span>
         </button>
       )}
-      <p className="mt-3 text-caption text-ink-faint">Даты хранятся только на этом телефоне.</p>
+      <p className="mt-3 text-caption text-ink-faint">Даты хранятся в вашем аккаунте и видны только вам.</p>
       {edit && <DateSheet date={edit === "new" ? undefined : edit} onClose={() => setEdit(null)}
         onSave={(d) => { save(d); setEdit(null); }}
         onRemove={edit !== "new" ? () => { remove(edit.id); setEdit(null); } : undefined} />}

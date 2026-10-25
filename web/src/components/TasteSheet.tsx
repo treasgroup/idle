@@ -35,7 +35,7 @@ export function TasteSheet({ open, onClose }: { open: boolean; onClose: () => vo
   return (
     <Sheet open={open} title="Что я про вас понял" onClose={onClose}
       footer={u.count > 0 ? <button className="btn-ghost w-full" onClick={reset}>Начать заново</button> : undefined}>
-      <p className="text-body-sm text-ink-soft">Учусь по тому, что вы открываете, готовите и оцениваете, — и подбираю похожее. Хранится только на этом телефоне.</p>
+      <p className="text-body-sm text-ink-soft">Учусь по тому, что вы открываете, готовите и оцениваете, — и подбираю похожее. Хранится в вашем аккаунте и видно только вам.</p>
       {/* «Под вашу кухню» (app/kitchenFit): from «Что не так?» after cooking and «Спасти блюдо». */}
       {profile.kitchen.length > 0 && (
         <>

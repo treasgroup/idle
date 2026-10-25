@@ -118,7 +118,7 @@ export function PhotoSheet({ open, onClose }: { open: boolean; onClose: () => vo
       <input ref={gallery} type="file" accept="image/*" className="hidden" onChange={(e) => { pick(e.target.files); e.target.value = ""; }} />
       <input ref={camera} type="file" accept="image/*" capture="user" className="hidden" onChange={(e) => { pick(e.target.files); e.target.value = ""; }} />
       <p className="mt-3 flex gap-2 rounded-input bg-herb-soft px-3 py-2.5 text-caption text-ink-soft">
-        <ShieldCheck size={16} className="mt-0.5 shrink-0 text-herb" aria-hidden />Фото уменьшается и хранится только на этом устройстве — никуда не отправляется.
+        <ShieldCheck size={16} className="mt-0.5 shrink-0 text-herb" aria-hidden />Фото уменьшается и хранится в вашем аккаунте — его видите только вы, на своих устройствах.
       </p>
     </Sheet>
   );

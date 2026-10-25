@@ -126,7 +126,7 @@ export function LookSheet({ open, onClose }: { open: boolean; onClose: () => voi
             onChange={(v) => set({ homeHidden: v ? profile.homeHidden.filter((x) => x !== b.id) : [...profile.homeHidden, b.id] })} />
         ))}
       </div>
-      <p className="mt-2 text-caption text-ink-faint">Хранится на этом устройстве.</p>
+      <p className="mt-2 text-caption text-ink-faint">Цвет, меню и главная переносятся на другие ваши устройства; тема и размер текста у каждого устройства свои.</p>
     </Sheet>
   );
 }

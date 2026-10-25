@@ -2,7 +2,7 @@
 // a dish from our recipes (a portion of ½–2), a packaged product by barcode, or anything typed by hand.
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, ChevronRight, PenLine, Plus, ScanBarcode, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, PenLine, Plus, ScanBarcode, Search, Target, X } from "lucide-react";
 import { searchRecipes, type Recipe } from "../engine";
 import { useStore } from "../app/store";
 import {
@@ -50,14 +50,16 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
         <div className="card mt-3 p-4">
           <div className="flex items-baseline justify-between gap-2">
             <p className="text-display tabular-nums">{Math.round(sum.kcal).toLocaleString("ru-RU")}</p>
-            <button className="text-body-sm text-ink-soft" onClick={() => setGoalOpen(true)}>из {kcal(goal)} · <span className="text-brand">цель</span></button>
+            <span className="text-body-sm text-ink-soft">из {kcal(goal)}</span>
           </div>
           <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-sunken" role="progressbar" aria-valuemin={0} aria-valuemax={goal} aria-valuenow={Math.round(sum.kcal)} aria-label="Калории за день">
             <div className={cx("h-full rounded-full transition-[width]", sum.kcal > goal ? "bg-warn" : "bg-herb")} style={{ width: share * 100 + "%" }} />
           </div>
-          <p className="mt-2 text-body-sm text-ink-soft">
-            {sum.kcal > goal ? "Больше цели на " + kcal(sum.kcal - goal) : "Осталось " + kcal(goal - sum.kcal)}
-          </p>
+          {/* The goal decides the whole bar: its own button, not a small word beside the number. */}
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <p className="text-body-sm text-ink-soft">{sum.kcal > goal ? "Больше цели на " + kcal(sum.kcal - goal) : "Осталось " + kcal(goal - sum.kcal)}</p>
+            <button className="btn-outline h-10 px-3 text-small" onClick={() => setGoalOpen(true)}><Target size={16} aria-hidden />Цель: {kcal(goal)}</button>
+          </div>
           <div className="mt-3 grid grid-cols-3 gap-2 text-center">
             {([["Белки", sum.protein], ["Жиры", sum.fat], ["Углеводы", sum.carbs]] as const).map(([l, v]) => (
               <div key={l} className="rounded-input bg-sunken py-2"><p className="text-body font-semibold tabular-nums">{Math.round(v)} г</p><p className="text-caption text-ink-soft">{l}</p></div>
@@ -92,7 +94,7 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
             </section>
           );
         })}
-        <p className="mt-6 text-caption text-ink-faint">Калории блюд — по нашим рецептам, покупных продуктов — с этикетки (база Open Food Facts). Дневник хранится только на этом устройстве.</p>
+        <p className="mt-6 text-caption text-ink-faint">Калории блюд — по нашим рецептам, покупных продуктов — с этикетки (база Open Food Facts). Дневник хранится в вашем аккаунте — он есть на всех ваших устройствах, семья его не видит.</p>
       </div>
 
       <AddDish open={add === "dish"} date={date} onClose={() => setAdd(null)} />
