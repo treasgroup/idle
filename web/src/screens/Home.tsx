@@ -339,7 +339,7 @@ function ThemeCard({ c, cover, drawn, wide, span, onOpen }: { c: Collection; cov
           </picture>
         )
         : <RecipeImage recipe={cover} className="absolute inset-0 h-full w-full" rounded="rounded-none" />}
-      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white lg:px-5 lg:pb-4 lg:text-h3">
+      <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-3 pb-3 pt-12 text-body font-semibold leading-tight text-white hyphens-auto [overflow-wrap:break-word] lg:px-5 lg:pb-4 lg:text-h3">
         {c.title}
         {span && c.hint && <span className="mt-0.5 block text-small font-normal text-white/85">{c.hint}</span>}
       </span>

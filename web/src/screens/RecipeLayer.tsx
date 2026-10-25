@@ -495,7 +495,8 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
       <div ref={bar} className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 shadow-e2 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-3xl gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 min-[360px]:gap-3 sm:px-6">
           <button className="btn-outline btn-bar px-4" onClick={() => setMenuOpen(true)}><CalendarPlus size={20} />В план</button>
-          <button className="btn-primary btn-bar flex-1 px-4" onClick={cook}>
+          {/* Very large text on a narrow phone: the words go to two lines instead of being cut. */}
+          <button className="btn-primary btn-bar min-w-0 flex-1 whitespace-normal px-4 text-center leading-tight" onClick={cook}>
             <ChefHat size={20} className="max-[359px]:hidden" />
             {cookingThis ? <><span className="max-[359px]:hidden">Продолжить готовить</span><span className="min-[360px]:hidden">Продолжить</span></> : cookLabel}
           </button>
@@ -608,11 +609,11 @@ function Nutrition({ recipe, n, side }: { recipe: Recipe; n: { kcal: number; pro
 function HaveBar({ owned, total, missing, marked, inList, onBuy, onOpenList }: { owned: number; total: number; missing: number; marked: boolean; inList: number; onBuy: () => void; onOpenList: () => void }) {
   // Added already: the same place now leads to the list, so the recipe and the list are one tap apart.
   const buy = inList > 0 ? (
-    <button className="btn h-11 w-full border border-herb/30 bg-herb-soft px-4 text-herb hover:border-herb/50" onClick={onOpenList}>
+    <button className="btn h-auto min-h-11 w-full whitespace-normal border border-herb/30 bg-herb-soft px-4 py-2 text-center leading-tight text-herb hover:border-herb/50" onClick={onOpenList}>
       <Check size={18} aria-hidden />{inList} {plural(inList, "продукт", "продукта", "продуктов")} в покупках · Открыть
     </button>
   ) : (
-    <button className="btn h-11 w-full border border-line bg-card px-4 text-ink shadow-e1 hover:border-line-strong" onClick={onBuy}>
+    <button className="btn h-auto min-h-11 w-full whitespace-normal border border-line bg-card px-4 py-2 text-center leading-tight text-ink shadow-e1 hover:border-line-strong" onClick={onBuy}>
       <ShoppingCart size={18} className="text-brand" />Добавить {missing} {plural(missing, "продукт", "продукта", "продуктов")} в покупки
     </button>
   );

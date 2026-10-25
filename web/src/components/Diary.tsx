@@ -66,9 +66,9 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="mt-4 grid grid-cols-3 gap-2">
-          <button className="btn-primary px-2" onClick={() => setAdd("dish")}><Search size={18} aria-hidden />Блюдо</button>
-          <button className="btn-outline px-2" onClick={() => setAdd("barcode")}><ScanBarcode size={18} aria-hidden />Штрихкод</button>
-          <button className="btn-outline px-2" onClick={() => setAdd("manual")}><PenLine size={18} aria-hidden />Вручную</button>
+          <button className="btn-primary h-auto min-h-11 px-1 py-2 text-[min(0.875rem,4.2vw)] max-[359px]:flex-col max-[359px]:gap-1 [.xl-text_&]:flex-col [.xl-text_&]:gap-1" onClick={() => setAdd("dish")}><Search size={18} aria-hidden />Блюдо</button>
+          <button className="btn-outline h-auto min-h-11 px-1 py-2 text-[min(0.875rem,4.2vw)] max-[359px]:flex-col max-[359px]:gap-1 [.xl-text_&]:flex-col [.xl-text_&]:gap-1" onClick={() => setAdd("barcode")}><ScanBarcode size={18} aria-hidden />Штрихкод</button>
+          <button className="btn-outline h-auto min-h-11 px-1 py-2 text-[min(0.875rem,4.2vw)] max-[359px]:flex-col max-[359px]:gap-1 [.xl-text_&]:flex-col [.xl-text_&]:gap-1" onClick={() => setAdd("manual")}><PenLine size={18} aria-hidden />Вручную</button>
         </div>
 
         {!list.length && <p className="mt-6 text-center text-body-sm text-ink-soft">{isToday ? "Пока ничего не записано. Блюдо из рецептов — в одно касание, а после готовки я сам предложу записать порцию." : "В этот день ничего не записано."}</p>}

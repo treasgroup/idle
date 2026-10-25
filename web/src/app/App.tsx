@@ -332,11 +332,11 @@ function BottomNav({ route, go }: { route: Route; go: (t: Tab) => void }) {
           const on = route.tab === tab;
           return (
             <button key={tab} onClick={() => go(tab)} aria-current={on ? "page" : undefined}
-              className={cx("relative flex flex-1 flex-col items-center justify-center gap-1", profile.simple ? "h-[4.5rem]" : "h-16")}>
-              <span className={cx("grid h-8 w-14 place-items-center rounded-full transition-colors", on && "bg-brand-soft")}>
+              className={cx("relative flex min-w-0 flex-1 flex-col items-center justify-center gap-1", profile.simple ? "h-[4.5rem]" : "h-16")}>
+              <span className={cx("grid h-8 w-14 max-w-full place-items-center rounded-full transition-colors", on && "bg-brand-soft")}>
                 <NavIcon tab={tab} icon={icon} on={on} size={profile.simple ? 26 : 24} />
               </span>
-              <span className={cx(profile.simple ? "text-small" : "text-micro", on || tab === "chat" ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
+              <span className={cx(profile.simple ? "text-small" : "max-w-full truncate px-0.5 text-[min(0.8125rem,3.4vw)] leading-tight", on || tab === "chat" ? "font-semibold text-brand" : "text-ink-soft")}>{label}</span>
               {tab === "shopping" && <Badge n={badges.shopping} className="absolute left-1/2 top-1.5 ml-2" />}
               {(tab === "pantry" || tab === "profile") && <Badge n={badges.pantry} warn className="absolute left-1/2 top-1.5 ml-2" />}
             </button>
