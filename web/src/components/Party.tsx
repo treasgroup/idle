@@ -17,6 +17,8 @@ import { RecipeImage } from "./RecipeCard";
 import { ShareOptions } from "./ShareOptions";
 import { downloadIcs } from "../app/calendar";
 import { feature } from "../app/feature";
+import { canNotify, markSeen, notifyEndpoint } from "../app/partyNews";
+import { useReminders } from "../app/reminders";
 import { Chip, Layer, Sheet, Stepper, Toggle, cx } from "./ui";
 
 type Screen = { to: "list" } | { to: "new"; draft?: PartyDraft } | { to: "table"; token: string; fresh?: boolean };
@@ -199,8 +201,9 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   const [edit, setEdit] = useState(false);
   const [answering, setAnswering] = useState(false);
   const [busy, setBusy] = useState("");
+  const reminders = useReminders();
 
-  const take = (v: Party) => { setP(v); rememberParty({ token, title: v.title, date: v.date }); };
+  const take = (v: Party) => { setP(v); rememberParty({ token, title: v.title, date: v.date }); if (v.admin) markSeen(token, v); };
   const load = () => partyCall("party.get", { token, guest, admin }).then(take).catch((e: Error & { status?: number }) => {
     if (e.status === 404) { forgetParty(token); setError(e.message); } else if (!p) setError(e.message);
   });
@@ -270,6 +273,17 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
           aria-label="В календарь" title="В календарь"><CalendarPlus size={18} aria-hidden /></button>
         {p.admin && <button className="btn-outline" onClick={() => setEdit(true)} aria-label="Изменить стол"><Settings2 size={18} aria-hidden />Изменить</button>}
       </div>
+
+      {/* The site: the organiser's browser can show «Оля придёт +1» by itself. In the app the news is on Главная. */}
+      {p.admin && canNotify() && (
+        <div className="mt-3 rounded-card border border-line px-4">
+          <Toggle on={(p.notify ?? 0) > 0} label="Сообщать мне об ответах" hint="Уведомление, когда гость ответит или возьмёт блюдо"
+            onChange={async (v) => {
+              try { await act({ act: v ? "notify" : "unnotify", endpoint: await notifyEndpoint(reminders.on) }, "notify"); if (v) toast("Буду сообщать об ответах гостей"); }
+              catch (e) { toast((e as Error).message); }
+            }} />
+        </div>
+      )}
 
       {/* Who is coming. */}
       <div className="card mt-4 px-4 py-3">

@@ -94,7 +94,7 @@ function party_view(array $p, array $doc, ?string $me, bool $admin): array {
         'title' => $doc['title'], 'format' => $doc['format'], 'date' => $doc['date'], 'time' => $doc['time'] ?? '',
         'place' => $doc['place'] ?? '', 'note' => $doc['note'] ?? '', 'host' => $doc['host'] ?? null,
         'dishes' => $doc['dishes'] ?? [], 'things' => $doc['things'] ?? [], 'expenses' => !empty($doc['expenses']),
-        'split' => $doc['split'] ?? null, 'guests' => $guests, 'me' => $me, 'admin' => $admin, 'version' => (int)$p['version'],
+        'split' => $doc['split'] ?? null, 'guests' => $guests, 'notify' => $admin ? count($doc['notify'] ?? []) : 0, 'me' => $me, 'admin' => $admin, 'version' => (int)$p['version'],
     ];
 }
 
@@ -182,6 +182,19 @@ function party_act(array $b): void {
         } elseif ($act === 'edit') {
             if (!$admin) throw new ApiError(403, 'forbidden', 'Менять стол может только организатор.');
             $doc = party_fields(is_array($b['patch'] ?? null) ? $b['patch'] : [], $doc);
+        } elseif ($act === 'notify' || $act === 'unnotify') {
+            // «Сообщать мне об ответах»: the organiser's browser (its web push subscription) hears of guests' answers.
+            if (!$admin) throw new ApiError(403, 'forbidden', 'Это настройка организатора.');
+            if (!function_exists('push_endpoint_ok') || !push_endpoint_ok($b['endpoint'] ?? null)) throw new ApiError(400, 'endpoint', 'Этот браузер не умеет показывать уведомления.');
+            $id = push_id($b['endpoint']);
+            $list = array_values(array_filter($doc['notify'] ?? [], fn($x) => $x !== $id));
+            if ($act === 'notify') {
+                push_schema();
+                $st = db()->prepare('SELECT 1 FROM push_subs WHERE id = ?'); $st->execute([$id]);
+                if (!$st->fetchColumn()) throw new ApiError(400, 'endpoint', 'Сначала разрешите уведомления.');
+                $list = array_slice(array_merge([$id], $list), 0, 3);
+            }
+            $doc['notify'] = $list;
         } elseif ($act === 'kick') {
             if (!$admin) throw new ApiError(403, 'forbidden', 'Убрать гостя может только организатор.');
             $who = (string)($b['who'] ?? '');
@@ -192,9 +205,57 @@ function party_act(array $b): void {
         } else throw new ApiError(400, 'validation', 'Неизвестное действие.');
         party_save($p, $doc);
         $db->exec('COMMIT');
+        // A guest's answer or a taken dish: the organiser hears of it (not of their own doings, not of the expenses).
+        if (!$admin && $me !== ($doc['host'] ?? null) && in_array($act, ['answer', 'take', 'add'], true) && !array_key_exists('spent', $b)) {
+            $g = $doc['guests'][$me] ?? [];
+            $who = ($g['name'] ?? '') !== '' ? $g['name'] : 'Гость';
+            $what = $act === 'answer' ? ($g['status'] === 'yes' ? ' придёт' . (!empty($g['plus']) ? ' +' . (int)$g['plus'] : '') : ($g['status'] === 'no' ? ' не сможет' : ' пока не знает'))
+                : ($act === 'take' ? ' возьмёт: ' : ' принесёт: ') . (function () use ($doc, $b, $kind, $act) {
+                    if ($act === 'add') { $l = $doc[$kind] ?? []; return (string)(end($l)['title'] ?? ''); }
+                    foreach ($doc[$kind] ?? [] as $x) if ($x['key'] === ($b['key'] ?? null)) return (string)$x['title'];
+                    return '';
+                })();
+            try { party_notice($doc, $b['token'], $who . $what); } catch (Throwable $e) { error_log('[what-to-cook] party notice: ' . $e->getMessage()); }
+        }
     } catch (Throwable $e) {
         if ($db->inTransaction()) $db->exec('ROLLBACK');
         throw $e;
     }
     send_json(party_view(party_load($b['token']), $doc, $me, $admin));
+}
+
+// ---------- The organiser hears of answers (web push, push.php) ----------
+// One note per subscription, gathered until it is shown: «Оля придёт +1 · Петя возьмёт: мангал». A push at most every
+// two minutes per subscription; the service worker asks push.next and gets the note (url: the table).
+function party_notes_schema(): void {
+    static $done = false;
+    if ($done) return;
+    db()->exec('CREATE TABLE IF NOT EXISTS push_notes (sub_id TEXT PRIMARY KEY, title TEXT NOT NULL, body TEXT NOT NULL, url TEXT NOT NULL, at INTEGER NOT NULL, sent_at INTEGER NOT NULL DEFAULT 0)');
+    $done = true;
+}
+function party_notice(array $doc, string $token, string $text): void {
+    if (empty($doc['notify']) || !function_exists('push_send')) return;
+    push_schema(); party_notes_schema();
+    $title = mb_substr((string)($doc['title'] ?? 'Стол в складчину'), 0, 60);
+    $url = './#party=' . $token;
+    foreach ($doc['notify'] as $id) {
+        $st = db()->prepare('SELECT * FROM push_subs WHERE id = ?'); $st->execute([$id]); $sub = $st->fetch(PDO::FETCH_ASSOC);
+        if (!$sub) continue;
+        $st = db()->prepare('SELECT body, url, sent_at FROM push_notes WHERE sub_id = ?'); $st->execute([$id]); $old = $st->fetch(PDO::FETCH_ASSOC);
+        $body = $old && $old['url'] === $url ? mb_substr($old['body'] . ' · ' . $text, -200) : $text;
+        $sent = $old ? (int)$old['sent_at'] : 0;
+        db()->prepare('INSERT OR REPLACE INTO push_notes (sub_id, title, body, url, at, sent_at) VALUES (?, ?, ?, ?, ?, ?)')->execute([$id, $title, $body, $url, time(), $sent]);
+        if (time() - $sent >= 120) {
+            push_send($sub, 'party');
+            db()->prepare('UPDATE push_notes SET sent_at = ? WHERE sub_id = ?')->execute([time(), $id]);
+        }
+    }
+}
+/** For push_next: the gathered note, once (then it is gone). */
+function party_note_take(string $subId): ?array {
+    party_notes_schema();
+    $st = db()->prepare('SELECT title, body, url FROM push_notes WHERE sub_id = ?'); $st->execute([$subId]); $n = $st->fetch(PDO::FETCH_ASSOC);
+    if (!$n) return null;
+    db()->prepare('DELETE FROM push_notes WHERE sub_id = ?')->execute([$subId]);
+    return ['title' => '🍽️ ' . $n['title'], 'body' => $n['body'], 'url' => $n['url']];
 }

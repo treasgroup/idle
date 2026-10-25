@@ -18,12 +18,12 @@ import {
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
 import { fastExcluded, keepsFast } from "./fasting";
-
-/** What, asked for in so many words, lifts the fast for that search («с курицей», «сырники»). */
-const FAST_GROUPS = ["meat", "poultry", "fish", "seafood", "dairy", "eggs"];
 import { archiveChat, markChatActive, takeChat } from "./chats";
 import { fixBySound, plainWords, saidWithout, soundBook } from "./colloquial";
 import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
+
+/** What, asked for in so many words, lifts the fast for that search («с курицей», «сырники»). */
+const FAST_GROUPS = ["meat", "poultry", "fish", "seafood", "dairy", "eggs"];
 
 // The recipe titles by sound («хочопури» → «хачапури»), made again when the catalog changes.
 let sounds: { n: number; v: number; book: ReturnType<typeof soundBook> } | null = null;

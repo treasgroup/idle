@@ -13,6 +13,8 @@ export interface Party {
   title: string; format: PartyFormat; date: string; time: string; place: string; note: string; host: string | null;
   dishes: PartyItem[]; things: PartyItem[]; expenses: boolean; split: number | null; guests: Guest[];
   me: string | null; admin: boolean; version: number;
+  /** How many of the organiser's browsers hear of the answers (web push); 0 for guests. */
+  notify?: number;
 }
 
 /** A place on the table: the courses it takes, words its title should have, and «sweet» for the sweet ones only

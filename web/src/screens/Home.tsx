@@ -14,6 +14,7 @@ import { goalConditions, type HomeBlock } from "../app/profile";
 import { fastOffer, fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
 import { FastSheet } from "../components/FastSheet";
 import { openParty } from "../app/party";
+import { usePartyNews } from "../app/partyNews";
 import { dateKeyOf, entriesOn, goalOf, openDiary, totals, useDiary } from "../app/diary";
 import { thawOffer, useFreezer } from "../app/freezer";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
@@ -416,6 +417,8 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const fastToday = keepsFast(profile, new Date());
   const diary = useDiary();
   // «Морозилка»: in the evening, with no dinner planned for tomorrow, the oldest frozen dish — one tap to take it out.
+  // «Стол в складчину»: what the guests of my coming tables answered since I last looked.
+  const partyNews = usePartyNews();
   const fz = useFreezer();
   const thawPick = thawOffer(s);
   const thawIt = () => {
@@ -459,6 +462,8 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {family.map((d) => <span key={d.id} className="contents">{action(<span className="text-[22px] leading-none">{KIND_ICON[d.kind]}</span>,
           d.who + " — " + whenText(daysUntil(d)).toLowerCase() + (daysUntil(d) === 0 ? " 🎉" : ""),
           "Собрать стол: блюда, покупки и когда что начинать", () => setFeastFor(d))}</span>)}
+        {partyNews.map((n) => <span key={n.token} className="contents">{action(<span className="text-[22px] leading-none">🍽️</span>, "«" + n.title + "»: новости",
+          n.news.slice(0, 2).join(", ") + (n.news.length > 2 ? " и ещё " + (n.news.length - 2) : ""), () => openParty({ token: n.token }))}</span>)}
         {thawPick && action(<Snowflake size={22} />, "В морозилке: " + thawPick.title.toLowerCase(), "Достать на завтрашний ужин?", thawIt)}
         {showFast && action(<span className="text-[22px] leading-none">🌿</span>, offerFast!.name + " — с " + offerFast!.from.toLocaleDateString("ru-RU", { day: "numeric", month: "long" }),
           "Соблюдаете? Включите — план и Шеф возьмут постное", () => { markOffered(offerFast!.key); setFastSheet(true); })}

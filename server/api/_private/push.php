@@ -128,9 +128,12 @@ function push_next(array $b): void {
     push_schema(); push_body($b);
     $st = db()->prepare('SELECT * FROM push_subs WHERE id = ?'); $st->execute([push_id($b['endpoint'])]); $s = $st->fetch(PDO::FETCH_ASSOC);
     $title = 'Что приготовить?';
-    if (!$s) send_json(['title' => $title, 'body' => 'Загляните — идея дня уже ждёт.', 'url' => './']);
-    if ($s['last_kind'] === 'weekly') send_json(['title' => 'План на неделю', 'body' => 'Составим план на следующую неделю? Это займёт минуту, а список покупок соберётся сам.', 'url' => './?tab=menu']);
-    if ($s['last_kind'] === 'test') send_json(['title' => $title, 'body' => 'Готово! Так будут выглядеть напоминания.', 'url' => './']);
+    // send_json does not stop the script: each answer returns, or the service worker got two answers glued together.
+    if (!$s) { send_json(['title' => $title, 'body' => 'Загляните — идея дня уже ждёт.', 'url' => './']); return; }
+    if ($s['last_kind'] === 'weekly') { send_json(['title' => 'План на неделю', 'body' => 'Составим план на следующую неделю? Это займёт минуту, а список покупок соберётся сам.', 'url' => './?tab=menu']); return; }
+    if ($s['last_kind'] === 'test') { send_json(['title' => $title, 'body' => 'Готово! Так будут выглядеть напоминания.', 'url' => './']); return; }
+    // «Стол в складчину»: what the guests answered (parties.php).
+    if ($s['last_kind'] === 'party' && function_exists('party_note_take') && ($n = party_note_take((string)$s['id']))) { send_json($n); return; }
     $today = gmdate('Y-m-d', time() + (int)$s['tz'] * 60);
     $body = 'Не знаете, что приготовить? Идея дня уже ждёт.';
     foreach (json_decode((string)$s['plan'], true) ?: [] as $p) if (($p['date'] ?? '') === $today) { $body = (string)$p['body']; break; }

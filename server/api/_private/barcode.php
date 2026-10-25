@@ -8,7 +8,8 @@ function barcode_lookup(string $code): void {
     $pdo = db();
     $pdo->exec('CREATE TABLE IF NOT EXISTS barcodes (code TEXT PRIMARY KEY, name TEXT, created_at INTEGER NOT NULL)');
     $st = $pdo->prepare('SELECT name FROM barcodes WHERE code = ?'); $st->execute([$code]); $row = $st->fetch();
-    if ($row) send_json(['name' => $row['name']]);
+    // send_json does not stop the script: without the return a known product was looked up again and answered twice.
+    if ($row) { send_json(['name' => $row['name']]); return; }
     limit_or_fail('barcode', 120, 5000);
     if (!function_exists('curl_init')) throw new ApiError(503, 'provider', 'На хостинге нет расширения PHP curl.');
     $ch = curl_init('https://world.openfoodfacts.org/api/v2/product/' . $code . '.json?fields=product_name_ru,product_name,generic_name_ru,generic_name');
@@ -32,7 +33,7 @@ function barcode_food(string $code): void {
     $pdo = db();
     $pdo->exec('CREATE TABLE IF NOT EXISTS barcode_food (code TEXT PRIMARY KEY, data TEXT, created_at INTEGER NOT NULL)');
     $st = $pdo->prepare('SELECT data FROM barcode_food WHERE code = ?'); $st->execute([$code]); $row = $st->fetch();
-    if ($row) send_json(json_decode((string)$row['data'], true) ?: ['name' => null]);
+    if ($row) { send_json(json_decode((string)$row['data'], true) ?: ['name' => null]); return; }
     limit_or_fail('barcode', 120, 5000);
     if (!function_exists('curl_init')) throw new ApiError(503, 'provider', 'На хостинге нет расширения PHP curl.');
     $ch = curl_init('https://world.openfoodfacts.org/api/v2/product/' . $code . '.json?fields=product_name_ru,product_name,generic_name_ru,generic_name,brands,nutriments,serving_quantity,product_quantity');

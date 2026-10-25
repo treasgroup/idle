@@ -43,3 +43,12 @@ it("splits the expenses with the fewest transfers", () => {
   expect(s.share).toBe(1250);
   expect(s.transfers).toEqual([{ from: "a", to: "o", sum: 700 }, { from: "a", to: "m", sum: 550 }]);
 });
+
+import { newsOf } from "../app/partyNews";
+it("tells the organiser what changed since the last look", () => {
+  const before = party({ me: "h", host: "h", dishes: [{ key: "d1", title: "Салат", by: null }], guests: [{ key: "h", name: "Анна", status: "yes", plus: 0, cant: [], spent: null }] });
+  const seen = { g: {}, i: { d1: "" } };
+  const now = { ...before, guests: [...before.guests, { key: "o", name: "Оля", status: "yes" as const, plus: 1, cant: [], spent: null }], dishes: [{ key: "d1", title: "Салат", by: "o" }] };
+  expect(newsOf(now, seen)).toEqual(["Оля придёт +1", "Оля возьмёт: салат"]);
+  expect(newsOf(now, { g: { o: "yes+1" }, i: { d1: "o" } })).toEqual([]);
+});

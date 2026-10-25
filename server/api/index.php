@@ -1,6 +1,8 @@
 <?php
 // "Что приготовить?" API. All routes: api/index.php?r=<route>
 declare(strict_types=1);
+// Warnings go to the log, never into an answer: they break the JSON and show the hosting's folders.
+@ini_set('display_errors', '0');
 require __DIR__ . '/_private/lib.php';
 require __DIR__ . '/_private/providers.php';
 require __DIR__ . '/_private/admin.php';

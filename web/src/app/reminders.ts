@@ -74,14 +74,14 @@ const b64ToBytes = (b64: string) => {
   return Uint8Array.from(s, (c) => c.charCodeAt(0));
 };
 
-async function post(route: string, body: unknown) {
+export async function post(route: string, body: unknown) {
   const r = await fetch(apiUrl(route), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), credentials: "same-origin" });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(j.error || "Сервер не ответил. Попробуйте позже.");
   return j;
 }
 
-async function subscription(create: boolean): Promise<PushSubscription | null> {
+export async function subscription(create: boolean): Promise<PushSubscription | null> {
   const reg = await navigator.serviceWorker.ready;
   let sub = await reg.pushManager.getSubscription();
   if (!sub && create) {
