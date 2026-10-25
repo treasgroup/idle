@@ -174,7 +174,7 @@ try {
     // ---------- Accounts without registration, households (семья) ----------
     elseif ($route === 'account.init' && $method === 'POST') account_init();
     elseif ($route === 'account.state' && $method === 'GET') account_state_route();
-    elseif ($route === 'account.save' && $method === 'POST') account_save(read_json_body(HOUSEHOLD_MAX + 20000));
+    elseif ($route === 'account.save' && $method === 'POST') account_save(read_json_body(max(PERSONAL_MAX, HOUSEHOLD_MAX) + 20000));
     elseif ($route === 'account.code' && $method === 'POST') account_code();
     elseif ($route === 'account.login' && $method === 'POST') account_login(read_json_body(2000));
     elseif ($route === 'account.delete' && $method === 'POST') account_delete();

@@ -5,7 +5,8 @@
 // Each data document has a version: a save with an old version is refused (409) and the client merges.
 
 const DEVICE_COOKIE = 'cook_account';
-const PERSONAL_MAX = 200000;
+// 600 KB: the personal document also keeps the profile (with its small photo), the food diary and the tables (app/kept).
+const PERSONAL_MAX = 600000;
 const HOUSEHOLD_MAX = 300000;
 
 function accounts_schema(): void {

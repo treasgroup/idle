@@ -43,6 +43,7 @@ import {
   lm,
   S0,
   FZ,
+  Kv,
   C0,
   MyR,
   vu,
@@ -1553,7 +1554,27 @@ function wm(e) {
     myRecipes: e.myRecipes || [],
     rewards: e.rewards,
     joined: e.joined,
+    kept: e.kept || {},
   };
+}
+// state.kept of two devices: each part on its own — the diary's entries and the tables one by one, the profile and
+// the guest's secret as a whole (the device that changed it wins). With no common base: what the account has first.
+function keptMerge(e, t, n) {
+  (e = e || {}), (t = t || {}), (n = n || {});
+  let pick = (k) => (e[k] === void 0 ? (n[k] !== void 0 ? n[k] : t[k]) : rl(e[k], t[k], n[k])),
+    o = {},
+    p = pick("profile"),
+    g = pick("guest");
+  p !== void 0 && (o.profile = p);
+  g !== void 0 && (o.guest = g);
+  if (t.diary || n.diary) {
+    let ed = e.diary || { entries: [] }, td = t.diary || { entries: [] }, nd = n.diary || { entries: [] };
+    o.diary = { entries: Tu(ed.entries || [], td.entries || [], nd.entries || [], (a) => a.id).sort((a, b) => a.at - b.at).slice(-600) };
+    let goal = ed.goal === void 0 ? (nd.goal ?? td.goal) : rl(ed.goal, td.goal, nd.goal);
+    goal !== void 0 && (o.diary.goal = goal);
+  }
+  (t.parties || n.parties) && (o.parties = Tu(e.parties || [], t.parties || [], n.parties || [], (a) => a.token).slice(0, 20));
+  return o;
 }
 function Tm(e) {
   return { shopping: e.shopping, menu: e.menu, fridge: e.fridge, freezer: e.freezer || [] };
@@ -1601,6 +1622,7 @@ function gA(e, t, n) {
           myRecipes: Tu(e.myRecipes || [], t.myRecipes || [], n.myRecipes || [], (a) => a.id),
           rewards: rl(e.rewards, t.rewards, n.rewards),
           joined: wu(e.joined || [], t.joined || [], n.joined || []),
+          kept: keptMerge(e.kept, t.kept, n.kept),
         }
       : {
           ...n,
@@ -1619,6 +1641,7 @@ function gA(e, t, n) {
           myRecipes: Tu([], t.myRecipes || [], n.myRecipes || [], (a) => a.id),
           rewards: n.rewards ?? t.rewards,
           joined: [...new Set([...(n.joined || []), ...(t.joined || [])])],
+          kept: keptMerge(null, t.kept, n.kept),
         }
     : t;
 }
@@ -1719,6 +1742,8 @@ function _0(e, t) {
     notes: l,
     myRecipes: mr,
     joined: u,
+    // A document from before «kept» has none: what this device has stays.
+    kept: t.kept && typeof t.kept == "object" ? Kv(t.kept) : e.kept || {},
     rewards: typeof t.rewards == "boolean" ? t.rewards : e.rewards,
     favorites: s.favorites,
     recent: s.recent,

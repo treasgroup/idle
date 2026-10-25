@@ -2240,6 +2240,7 @@ var zp = {
     today: { date: "", skip: [] },
     fridge: [],
     freezer: [],
+    kept: {},
     polls: [],
     voter: "",
     joined: [],
@@ -10215,6 +10216,19 @@ function C0(e) {
       (t[n] = a.slice(0, X_));
   return t;
 }
+// state.kept (app/kept): the profile, the diary, the tables and the guest's secret, checked loosely — they are
+// checked again where they are used — and only while the whole is small enough for the account's document.
+function Kv(e) {
+  if (!e || typeof e != "object" || Array.isArray(e)) return {};
+  let o = {};
+  e.profile && typeof e.profile == "object" && !Array.isArray(e.profile) && (o.profile = e.profile);
+  typeof e.guest == "string" && /^[0-9a-f-]{36}$/.test(e.guest) && (o.guest = e.guest);
+  e.diary && typeof e.diary == "object" && Array.isArray(e.diary.entries) &&
+    (o.diary = { entries: e.diary.entries.filter((x) => x && typeof x.id == "string" && typeof x.kcal == "number").slice(-600), ...(typeof e.diary.goal == "number" ? { goal: e.diary.goal } : {}) });
+  Array.isArray(e.parties) &&
+    (o.parties = e.parties.filter((x) => x && typeof x.token == "string" && /^[0-9a-f]{32}$/.test(x.token)).slice(0, 20));
+  return JSON.stringify(o).length > 250000 ? {} : o;
+}
 function vu(e) {
   let t = structuredClone(Es);
   if (!e || typeof e != "object") return t;
@@ -10268,6 +10282,7 @@ function vu(e) {
   (t.noticeOk = n.noticeOk === !0),
     (t.fridge = a("fridge", S0, lm)),
     (t.freezer = a("freezer", FZ, 80)),
+    (t.kept = Kv(n.kept)),
     (t.polls = a("polls", Q_, 5)),
     (t.voter =
       typeof n.voter == "string" && /^[a-f0-9-]{36}$/.test(n.voter)
@@ -10768,6 +10783,7 @@ export {
   lm,
   S0,
   FZ,
+  Kv,
   Q_,
   C0,
   vu,

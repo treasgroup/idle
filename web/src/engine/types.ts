@@ -174,6 +174,8 @@ export interface EngineState {
   today: { date: string; skip: string[] };
   fridge: FridgeItem[];
   freezer: FrozenItem[];
+  /** Kept with the account (app/kept): the profile, the food diary, the tables of «Стол в складчину», the guest's secret. */
+  kept: { profile?: Record<string, unknown>; guest?: string; diary?: { entries: unknown[]; goal?: number }; parties?: unknown[] };
   polls: { token: string; day: string; at: number }[];
   voter: string;
   joined: string[];

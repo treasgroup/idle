@@ -123,13 +123,25 @@ export interface KnownParty { token: string; admin?: string; title: string; date
 export function knownParties(): KnownParty[] {
   try { const l = JSON.parse(localStorage.getItem(LIST_KEY) || "[]"); return Array.isArray(l) ? l.filter((x) => x && typeof x.token === "string") : []; } catch { return []; }
 }
+/** The tables changed (app/kept takes them to the account). */
+export const PARTIES_EVENT = "cook-parties";
+function saveList(list: KnownParty[]): void {
+  try { localStorage.setItem(LIST_KEY, JSON.stringify(list)); } catch { /* private mode */ }
+  window.dispatchEvent(new Event(PARTIES_EVENT));
+}
 export function rememberParty(x: Omit<KnownParty, "at">): void {
   const before = knownParties().find((k) => k.token === x.token);
-  const list = [{ ...before, ...x, admin: x.admin ?? before?.admin, at: Date.now() }, ...knownParties().filter((k) => k.token !== x.token)].slice(0, 20);
-  try { localStorage.setItem(LIST_KEY, JSON.stringify(list)); } catch { /* private mode */ }
+  // Seen again with nothing new: nothing to write (the table is looked at every 15 seconds while open).
+  if (before && before.title === x.title && before.date === x.date && (x.admin ?? before.admin) === before.admin) return;
+  saveList([{ ...before, ...x, admin: x.admin ?? before?.admin, at: before?.at ?? Date.now() }, ...knownParties().filter((k) => k.token !== x.token)].slice(0, 20));
 }
 export function forgetParty(token: string): void {
-  try { localStorage.setItem(LIST_KEY, JSON.stringify(knownParties().filter((k) => k.token !== token))); } catch { /* ignore */ }
+  saveList(knownParties().filter((k) => k.token !== token));
+}
+/** From the account (app/kept): the tables and the guest's secret of another device of the same person. */
+export function replaceParties(list: KnownParty[], guest?: string): void {
+  try { if (guest) localStorage.setItem(GUEST_KEY, guest); } catch { /* ignore */ }
+  saveList(list);
 }
 
 export async function partyCall<T = Party>(route: string, body: Record<string, unknown>): Promise<T> {

@@ -14,7 +14,7 @@ export interface DiaryEntry {
   /** Where it came from, kept for the second stage (a photo of the plate) and to know what to trust. */
   from: DiarySource; recipeId?: string; portion?: number; grams?: number;
 }
-interface Diary { entries: DiaryEntry[]; goal?: number }
+export interface Diary { entries: DiaryEntry[]; goal?: number }
 
 export const MEALS: { id: DiaryMeal; label: string }[] = [
   { id: "breakfast", label: "Завтрак" }, { id: "lunch", label: "Обед" }, { id: "dinner", label: "Ужин" }, { id: "snack", label: "Перекус" },
@@ -37,6 +37,15 @@ function write(d: Diary): void {
   const cut = dateKeyOf(new Date(Date.now() - 90 * 86400000));
   cache = { ...d, entries: d.entries.filter((e) => e.date >= cut) };
   try { localStorage.setItem(KEY, JSON.stringify(cache)); } catch { /* private mode: for this visit only */ }
+  window.dispatchEvent(new Event(EVENT));
+}
+/** For app/kept: the diary as it is, and the diary from the account (another device of the same person). */
+export const DIARY_EVENT = EVENT;
+export const readDiary = (): Diary => read();
+export function replaceDiary(d: Diary): void {
+  cache = null;
+  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch { /* private mode */ }
+  cache = d;
   window.dispatchEvent(new Event(EVENT));
 }
 const subscribe = (f: () => void) => { window.addEventListener(EVENT, f); return () => window.removeEventListener(EVENT, f); };
