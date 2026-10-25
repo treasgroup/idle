@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { comingFasts, fastOn, fastTomorrow, keepsFast } from "../app/fasting";
+import { comingFasts, fastOffer, fastOn, fastTomorrow, keepsFast } from "../app/fasting";
 import { DEFAULT_PROFILE } from "../app/profile";
 
 const d = (s: string) => new Date(s + "T12:00");
@@ -34,4 +34,12 @@ it("follows the person's choice and says the eve", () => {
   expect(fastTomorrow(on, d("2026-11-27"))).toBe("Рождественский пост");
   expect(fastTomorrow(on, d("2026-11-28"))).toBe(null);
   expect(comingFasts(d("2026-10-25"))[0].name).toBe("Рождественский пост");
+});
+it("offers the fast a week before, once, only when it is off", () => {
+  const off = DEFAULT_PROFILE;
+  expect(fastOffer(off, d("2026-11-21"))?.name).toBe("Рождественский пост"); // a week before the 28th
+  expect(fastOffer(off, d("2026-11-15"))).toBe(null);
+  expect(fastOffer(off, d("2026-12-01"))?.name).toBe("Рождественский пост");
+  expect(fastOffer(off, d("2026-12-05"))).toBe(null);
+  expect(fastOffer({ ...off, fast: { on: true, weekly: true, fish: false } }, d("2026-11-21"))).toBe(null);
 });

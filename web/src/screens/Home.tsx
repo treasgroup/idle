@@ -11,7 +11,9 @@ import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { goalConditions, type HomeBlock } from "../app/profile";
-import { fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
+import { fastOffer, fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
+import { FastSheet } from "../components/FastSheet";
+import { openParty } from "../app/party";
 import { dateKeyOf, entriesOn, goalOf, openDiary, totals, useDiary } from "../app/diary";
 import { thawOffer, useFreezer } from "../app/freezer";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
@@ -424,6 +426,16 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   };
   const eaten = Math.round(totals(entriesOn(diary, dateKeyOf(new Date()))).kcal);
   const fastNext = fastTomorrow(profile);
+  // Once a season: «Скоро Рождественский пост — включить?» (a week before) and «Новый год в складчину» in December.
+  // A tap opens it; after that the offer is not shown again.
+  const [, setSeen] = useState(0);
+  const offered = (key: string) => { try { return !!localStorage.getItem(key); } catch { return true; } };
+  const markOffered = (key: string) => { try { localStorage.setItem(key, "1"); } catch { /* ignore */ } setSeen((n) => n + 1); };
+  const offerFast = fastOffer(profile);
+  const showFast = !!offerFast && !offered(offerFast.key);
+  const nyKey = "cook-offer-party-ny-" + new Date().getFullYear();
+  const showParty = sections && new Date().getMonth() === 11 && new Date().getDate() <= 30 && !offered(nyKey);
+  const [fastSheet, setFastSheet] = useState(false);
   if (!menu.length && !toBuy && !timers && !thaw && !dayDish && !family.length && !fastToday && !fastNext && profile.simple) return null;
   // 150 px on phones: the third tile peeks out at the edge, so it is clear the row scrolls.
   const tile = "w-[150px] shrink-0 snap-start sm:w-[200px]";
@@ -448,6 +460,10 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
           d.who + " — " + whenText(daysUntil(d)).toLowerCase() + (daysUntil(d) === 0 ? " 🎉" : ""),
           "Собрать стол: блюда, покупки и когда что начинать", () => setFeastFor(d))}</span>)}
         {thawPick && action(<Snowflake size={22} />, "В морозилке: " + thawPick.title.toLowerCase(), "Достать на завтрашний ужин?", thawIt)}
+        {showFast && action(<span className="text-[22px] leading-none">🌿</span>, offerFast!.name + " — с " + offerFast!.from.toLocaleDateString("ru-RU", { day: "numeric", month: "long" }),
+          "Соблюдаете? Включите — план и Шеф возьмут постное", () => { markOffered(offerFast!.key); setFastSheet(true); })}
+        {showParty && action(<span className="text-[22px] leading-none">🎄</span>, "Новый год в складчину", "Каждый принесёт своё — соберу стол и ссылку для гостей",
+          () => { markOffered(nyKey); openParty({ draft: { format: "newyear" } }); })}
         {fastNext && action(<span className="text-[22px] leading-none">🌿</span>, "Завтра начинается " + fastNext.replace(/ пост$/, " пост"),
           "Составить постный план на неделю", () => openLayer(routeHash({ tab: "menu" })))}
         {fastToday && action(<span className="text-[22px] leading-none">🌿</span>,
@@ -471,6 +487,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
         {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
       </ScrollRow>
+      <FastSheet open={fastSheet} onClose={() => setFastSheet(false)} />
       {feastFor && <FeastSheet open occasion={{ date: nextDate(feastFor), what: eventPhrase(feastFor) }} onClose={() => setFeastFor(null)} />}
     </Section>
   );

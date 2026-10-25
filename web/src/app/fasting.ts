@@ -92,3 +92,11 @@ export function comingFasts(now = new Date(), n = 4): { name: string; from: Date
     .sort((a, b) => +a.from - +b.from).slice(0, n).map((f) => ({ ...f, now: within(d, f.from, f.to) }));
 }
 export const daysLeft = (to: Date, now = new Date()) => Math.round((+dayOf(to) - +dayOf(now)) / DAY);
+
+/** For someone who has not switched «Соблюдаю пост» on: a long fast begins within a week (or began in the last
+ *  three days) — Главная offers it once per fast. */
+export function fastOffer(p: Profile, now = new Date()): { name: string; from: Date; key: string } | null {
+  if (p.fast.on) return null;
+  const f = comingFasts(now, 2).find((x) => { const d = daysLeft(x.from, now); return d <= 7 && d >= -3; });
+  return f ? { name: f.name, from: f.from, key: "cook-offer-fast-" + f.from.getFullYear() + "-" + f.from.getMonth() } : null;
+}
