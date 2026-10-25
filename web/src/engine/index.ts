@@ -73,6 +73,8 @@ export const withSide = (r: Recipe, side: Recipe): Recipe => core.UC(r, side);
 export const CATALOG_SECTIONS: { key: string; label: string; group: string; test: (r: Recipe) => boolean; min?: number }[] = svc.R0;
 export const searchRecipes = (query: string, list?: Recipe[]): Recipe[] => svc.fm(query, list);
 export const searchIngredients = (query: string, ids: string[], limit?: number): string[] => core.a0(query, ids, limit);
+/** Whether a product belongs to a group of «не едим» (nuts, dairy, meat…), as the engine filters recipes. */
+export const inGroup = (id: string, group: string): boolean => core.Os(id, group);
 export const ingredientMatches = (have: string, wanted: string): boolean => core.ia(have, wanted);
 /** Staples that are assumed to be at home (water, salt, oil…). */
 export const basics = (prefs?: Preferences): Set<string> => core.zs(prefs);

@@ -14,6 +14,7 @@ import { useActions } from "./actions";
 import { AssistantProvider } from "./assistant";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
 import { NAV_ITEMS } from "./navItems";
+import { OPEN_PARTY, type PartyDraft } from "./party";
 import { Avatar } from "../components/Avatar";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
@@ -45,6 +46,7 @@ const DocLayer = lazyScreen(() => loadExtras().then((m) => ({ default: m.DocLaye
 const Learn = lazyScreen(() => loadExtras().then((m) => ({ default: m.Learn })));
 const Onboarding = lazyScreen(() => loadExtras().then((m) => ({ default: m.Onboarding })));
 const PollSheet = lazyScreen(() => loadExtras().then((m) => ({ default: m.PollSheet })));
+const PartyLayer = lazyScreen(() => import("../components/Party").then((m) => ({ default: m.PartyLayer })));
 const IncomingRecipe = lazyScreen(() => import("../components/FamilyBook").then((m) => ({ default: m.IncomingRecipe })));
 import { Boundary, Logo, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
 import { useUpdateCheck } from "./updates";
@@ -65,8 +67,8 @@ const FROM_PROFILE: Tab[] = ["menu", "pantry"];
 // The address the page was opened with (the links below are removed from it once handled).
 const OPENED_WITH = new URLSearchParams(location.search);
 
-/** Links from the old site and from shared messages: ?recipe=, ?tab=, #poll=, #family=, #login=, #privacy. */
-function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRecipe>) => void) {
+/** Links from the old site and from shared messages: ?recipe=, ?tab=, #poll=, #party=, #family=, #login=, #privacy. */
+function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRecipe>) => void, onParty: (t: string) => void) {
   const { sync, toast, ready, catalog } = useStore();
   const { openRecipe } = useActions();
   const loaded = catalog.version > 0;
@@ -78,6 +80,8 @@ function useIncomingLinks(onPoll: (t: string) => void, onBook: (r: Partial<MyRec
     const poll = h.match(/^#poll=([0-9a-f]{32})$/), family = h.match(/^#family=([0-9a-f]{32})$/), login = h.match(/^#login=(\d{16})$/), doc = h.match(/^#(privacy|rules|terms|info)$/);
     const book = h.match(/^#book=([jz][A-Za-z0-9_-]{10,})$/);
     if (book) { clean(); void import("./myRecipes").then((m) => m.readLink(book[1])).then((r) => (r ? onBook(r) : toast("Ссылка на рецепт повреждена — попросите прислать её ещё раз"))); }
+    const party = h.match(/^#party=([0-9a-f]{32})$/);
+    if (party) { clean(); onParty(party[1]); }
     if (poll) { clean(); onPoll(poll[1]); }
     else if (family) { clean(); sync.join(family[1]).then(() => toast("Вы в семье: план и покупки теперь общие")).catch((e: Error) => toast(e.message)); }
     else if (login) { clean(); sync.login(login[1]).then(() => toast("Готово — данные объединены")).catch((e: Error) => toast(e.message)); }
@@ -161,7 +165,14 @@ function Shell() {
   const keyboard = useKeyboardOpen();
   const bottom = useRef<HTMLDivElement>(null);
   const [incoming, setIncoming] = useState<Partial<MyRecipe> | null>(null);
-  useIncomingLinks(setPoll, setIncoming);
+  // «Стол в складчину»: by a guest's link, from Профиль or from «Праздничный стол».
+  const [party, setParty] = useState<{ token?: string; draft?: PartyDraft } | null>(null);
+  useEffect(() => {
+    const on = (e: Event) => setParty({ ...(e as CustomEvent).detail });
+    window.addEventListener(OPEN_PARTY, on);
+    return () => window.removeEventListener(OPEN_PARTY, on);
+  }, []);
+  useIncomingLinks(setPoll, setIncoming, (token) => setParty({ token }));
   useTimerAlarm(toast, s.readAloud);
   useDinnerReminders();
   // The screen stays on while something is on the stove or a timer is counting.
@@ -172,7 +183,7 @@ function Shell() {
   useEffect(() => { if (!profile.setUp) void loadExtras(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!ready) return;
-    if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=") && !location.hash.startsWith("#book=") && !openedByLink()) setOnboarding(true);
+    if (!profile.setUp && s.onboarding === "new" && !OPENED_WITH.has("recipe") && !location.hash.startsWith("#poll=") && !location.hash.startsWith("#party=") && !location.hash.startsWith("#book=") && !openedByLink()) setOnboarding(true);
     const c = s.cooking;
     migrateOldTimer([
       ...(c ? [{ title: c.recipe.title, recipeId: c.recipe.id, end: c.timerEnd, step: c.timerStep }] : []),
@@ -247,6 +258,8 @@ function Shell() {
       {/* Школа first: a recipe opened from a lesson lies over it, and «Назад» returns to the same lesson. */}
       <Suspense fallback={route.tab === "learn" && !route.recipe ? <LayerSkeleton /> : null}>
         {route.tab === "learn" && <Learn onClose={closeTop} />}
+        {/* Under the recipe layer: a dish opened from the table lies over it, «Назад» returns to the table. */}
+        {party && <PartyLayer token={party.token} draft={party.draft} onClose={() => setParty(null)} />}
       </Suspense>
       <Boundary resetKey={(route.recipe ?? "") + route.cook}>
         <Suspense fallback={<LayerSkeleton />}>

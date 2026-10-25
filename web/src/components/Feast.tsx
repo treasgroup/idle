@@ -1,7 +1,7 @@
 // «Праздничный стол»: three short steps — how many guests and when to serve, the dishes (one tap to swap), and the
 // result: one shopping list for everybody and a plan of when to start each dish so all is ready on time.
 import { useMemo, useState } from "react";
-import { BellRing, ChevronLeft, RefreshCw, ShoppingCart, X } from "lucide-react";
+import { BellRing, ChevronLeft, RefreshCw, ShoppingCart, Users, X } from "lucide-react";
 import {
   CATALOG_SECTIONS, addToShopping, clampServings, courseOf, freshConditions, ingredientsToBuy, plural, proteinOf, rankRecipes, recipes,
   type Recipe,
@@ -16,6 +16,7 @@ import { Mascot } from "./Mascot";
 import { timeShort } from "../app/recipeTime";
 import { MONTHS } from "../app/familyCalendar";
 import { schedule } from "../app/dinner";
+import { openParty } from "../app/party";
 
 const SLOTS: { key: string; label: string; courses: string[] }[] = [
   { key: "salad1", label: "Салат", courses: ["salad"] },
@@ -128,6 +129,10 @@ export function FeastSheet({ open, onClose, occasion }: { open: boolean; onClose
         : <div className="grid gap-2 sm:grid-cols-2">
             <button className="btn-primary" onClick={toShopping}><ShoppingCart size={18} />Всё в список покупок</button>
             {onTheDay && <button className="btn-outline" onClick={remind}><BellRing size={18} />Напомнить начать в {first ? hhmm(first) : "—"}</button>}
+            {/* Not alone at the stove: the same dishes as a table in складчину — every guest takes one. */}
+            <button className="btn-ghost text-brand sm:col-span-2" onClick={() => { close(); openParty({ draft: { format: ny ? "newyear" : occasion ? "birthday" : "dinner", dishes: dishes.map(({ slot, r }) => ({ id: r.id, title: r.title, slot: slot.label })) } }); }}>
+              <Users size={18} />Раздать блюда гостям — в складчину
+            </button>
           </div>}>
       {step === 0 && (
         <div>

@@ -9,6 +9,7 @@ require __DIR__ . '/_private/alice_home.php';
 require __DIR__ . '/_private/reviews.php';
 require __DIR__ . '/_private/push.php';
 require __DIR__ . '/_private/polls.php';
+require __DIR__ . '/_private/parties.php';
 require __DIR__ . '/_private/partners.php';
 require __DIR__ . '/_private/barcode.php';
 require __DIR__ . '/_private/ops.php';
@@ -190,6 +191,10 @@ try {
     elseif ($route === 'poll.create' && $method === 'POST') poll_create(read_json_body(4000));
     elseif ($route === 'poll.get' && $method === 'POST') poll_get(read_json_body(1000));
     elseif ($route === 'poll.vote' && $method === 'POST') poll_vote(read_json_body(1000));
+    // ---------- «Стол в складчину» ----------
+    elseif ($route === 'party.create' && $method === 'POST') party_create(read_json_body(16000));
+    elseif ($route === 'party.get' && $method === 'POST') party_get(read_json_body(1000));
+    elseif ($route === 'party.act' && $method === 'POST') party_act(read_json_body(16000));
     // ---------- Delivery partners for the shopping list ----------
     elseif ($route === 'error' && $method === 'POST') client_error(read_json_body(6000));
     elseif ($route === 'taps' && $method === 'POST') client_taps(read_json_body(8000));

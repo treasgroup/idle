@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette, Camera,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette, Camera, HandPlatter,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, expiringSoon, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -26,6 +26,7 @@ import { WriteUs } from "../components/WriteUs";
 import { AliceSheetBody } from "../components/AliceSheet";
 import { LookSheet, lookHint } from "../components/LookSheet";
 import { PhotoSheet } from "../components/PhotoSheet";
+import { openParty } from "../app/party";
 import { Avatar } from "../components/Avatar";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
 import { WeatherSheet, degrees } from "../components/WeatherSheet";
@@ -185,6 +186,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         {profile.simple && tile(<ShoppingCart size={18} />, "Покупки", () => openLayer(routeHash({ tab: "shopping" })))}
         {tile(<BookHeart size={18} />, "Семейная книга", () => openRecipesView("mine"))}
         {tile(<PartyPopper size={18} />, "Праздничный стол", () => setFeast(true))}
+        {tile(<HandPlatter size={18} />, "Складчина", () => openParty())}
         {tile(<CalendarHeart size={18} />, "Календарь", () => setCalendar(true), !!nextDate && daysUntil(nextDate) <= AHEAD)}
         {tile(<BookOpenCheck size={18} />, "Я готовил(а)", () => openRecipesView("book"))}
         {tile(<GraduationCap size={18} />, "Школа", () => openLayer(routeHash({ tab: "learn" })))}
