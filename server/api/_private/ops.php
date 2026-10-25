@@ -121,6 +121,13 @@ function admin_insights(int $days): void {
         'return7' => $returned(7),
         'wrong' => $all("SELECT norm AS text, COUNT(*) AS n, MAX(ts) AS last FROM events WHERE type = 'wrong' AND day >= ? GROUP BY norm ORDER BY n DESC, last DESC LIMIT 50", [$from]),
         'shares' => (int)$one("SELECT COUNT(*) FROM events WHERE type = 'share' AND day >= ?", [$from]),
+        // The newer parts: how many times and how many people (events «feature»), and the tables made (from the tables themselves).
+        'features' => $all("SELECT text AS feature, COUNT(*) AS n, COUNT(DISTINCT visitor) AS people FROM events WHERE type = 'feature' AND day >= ? GROUP BY text", [$from]),
+        'parties' => (function () use ($one, $from) {
+            if (!function_exists('parties_schema')) return null;
+            parties_schema();
+            return ['made' => (int)$one('SELECT COUNT(*) FROM parties WHERE created_at >= ?', [strtotime($from)]), 'live' => (int)$one('SELECT COUNT(*) FROM parties')];
+        })(),
         'errors' => $all('SELECT day, message, place, version, agent, n, last FROM client_errors WHERE day >= ? ORDER BY last DESC LIMIT 60', [$from]),
         'taps' => (function () use ($all, $from) { taps_schema(); return $all('SELECT route, kind, label, SUM(n) AS n, MAX(last) AS last FROM ux_taps WHERE day >= ? GROUP BY route, kind, label ORDER BY n DESC, last DESC LIMIT 40', [$from]); })(),
         'backups' => backups_list(),

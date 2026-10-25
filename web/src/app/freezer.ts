@@ -4,6 +4,7 @@
 import { useCallback, useEffect } from "react";
 import { dateKey, ingredient, plural, recipeById, type EngineState, type FrozenItem, type MenuDay } from "../engine";
 import { useStore } from "./store";
+import { feature } from "./feature";
 
 export type Frozen = FrozenItem;
 const DAY = 86400000;
@@ -13,12 +14,12 @@ const MAX = 80;
 export function useFreezer() {
   const { s, update } = useStore();
   const list = s.freezer ?? [];
-  const add = useCallback((x: Omit<Frozen, "id" | "at">) => update((st) => ({ ...st, freezer: withAdded(st.freezer ?? [], x) })), [update]);
+  const add = useCallback((x: Omit<Frozen, "id" | "at">) => { update((st) => ({ ...st, freezer: withAdded(st.freezer ?? [], x) })); feature("freezer_add"); }, [update]);
   const remove = useCallback((id: string) => update((st) => ({ ...st, freezer: (st.freezer ?? []).filter((f) => f.id !== id) })), [update]);
   const take = useCallback((id: string, n: number) => update((st) => ({ ...st, freezer: takenOut(st.freezer ?? [], id, n) })), [update]);
   /** Puts back what was before (the plan too): for «Отменить». */
   const restore = useCallback((before: Pick<EngineState, "freezer" | "menu">) => update((st) => ({ ...st, freezer: before.freezer, menu: before.menu })), [update]);
-  const thaw = useCallback((f: Frozen, eaters: number) => update((st) => thawForTomorrow(st, f, eaters)), [update]);
+  const thaw = useCallback((f: Frozen, eaters: number) => { update((st) => thawForTomorrow(st, f, eaters)); feature("freezer_thaw"); }, [update]);
   return { list, add, remove, take, restore, thaw, snapshot: { freezer: list, menu: s.menu } };
 }
 

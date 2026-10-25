@@ -1,5 +1,6 @@
 // Профиль → «Соблюдаю пост»: one switch, two choices (Wednesday and Friday, fish) and the coming fasts with dates.
 import { useStore } from "../app/store";
+import { feature } from "../app/feature";
 import { comingFasts, daysLeft, keepsFast } from "../app/fasting";
 import { plural } from "../engine";
 import { Sheet, Toggle } from "./ui";
@@ -22,7 +23,7 @@ export function FastSheet({ open, onClose }: { open: boolean; onClose: () => voi
     <Sheet open={open} title="Соблюдаю пост" onClose={onClose}>
       <p className="text-body-sm text-ink-soft">В постные дни план на неделю, «Рецепт дня» и Шеф сами возьмут постное. Накануне многодневного поста напомню на главной.</p>
       <div className="mt-2 divide-y divide-line">
-        <Toggle on={f.on} onChange={(v) => set({ on: v })} label="Соблюдаю пост" hint="Без мяса, молочного и яиц" />
+        <Toggle on={f.on} onChange={(v) => { set({ on: v }); if (v) feature("fast_on"); }} label="Соблюдаю пост" hint="Без мяса, молочного и яиц" />
         {f.on && <>
           <Toggle on={f.weekly} onChange={(v) => set({ weekly: v })} label="Среда и пятница" hint="Кроме сплошных седмиц: Святки, Светлая, Троицкая" />
           <Toggle on={f.fish} onChange={(v) => set({ fish: v })} label="Рыба можно" hint="Если в ваши дни рыба разрешена" />

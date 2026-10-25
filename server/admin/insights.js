@@ -56,6 +56,19 @@
       + '<div class="card"><div class="big">' + pct(d.return7.back, d.return7.base) + '</div><div class="muted">вернулись через неделю или позже (' + d.return7.back + " из " + d.return7.base + ")</div></div>"
       + '<div class="card"><div class="big">' + d.shares + '</div><div class="muted">раз поделились рецептом</div></div></div>';
 
+    // The newer parts of the service: is anybody using them?
+    var FEAT = [["party_create", "Собрали стол в складчину"], ["party_answer", "Гости ответили на стол"], ["party_take", "Взяли блюдо или вещь на стол"],
+      ["diary_add", "Записи в дневник еды"], ["fast_on", "Включили «Соблюдаю пост»"], ["freezer_add", "Положили в морозилку"], ["freezer_thaw", "Достали из морозилки на завтра"],
+      ["look_change", "Поменяли оформление"], ["photo_set", "Поставили своё фото"]];
+    var fmap = {}; (d.features || []).forEach(function (f) { fmap[f.feature] = f; });
+    h += '<h2>Новые функции</h2><div class="card">';
+    FEAT.forEach(function (f) {
+      var x = fmap[f[0]] || { n: 0, people: 0 };
+      h += '<div class="row"><span class="label">' + esc(f[1]) + '</span><span style="flex:1"></span><span class="num">' + x.n + '</span><span class="num muted">' + x.people + " чел.</span></div>";
+    });
+    if (d.parties) h += '<p class="muted">Столов создано за период: ' + d.parties.made + ", сейчас живых: " + d.parties.live + ". Слева — сколько раз, справа — сколько разных людей.</p>";
+    h += "</div>";
+
     h += '<h2>«Не то» — Шеф ответил не так</h2><div class="card">';
     if (!d.wrong.length) h += '<p class="empty">Пока никто не нажимал «Не то».</p>';
     d.wrong.forEach(function (w) { h += '<div class="row"><span style="flex:1">' + esc(w.text) + '</span><span class="num">' + w.n + "</span></div>"; });

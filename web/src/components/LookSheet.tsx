@@ -6,6 +6,7 @@ import { Check, ChefHat, RotateCcw } from "lucide-react";
 import { useStore } from "../app/store";
 import { DEFAULT_PROFILE, HOME_BLOCKS, NAV_CHOICES, PALETTES, START_CHOICES, type Profile } from "../app/profile";
 import { NAV_ITEMS } from "../app/navItems";
+import { feature } from "../app/feature";
 import type { Tab } from "../app/router";
 import { Sheet, Toggle, cx } from "./ui";
 
@@ -21,7 +22,7 @@ export function LookSheet({ open, onClose }: { open: boolean; onClose: () => voi
   const { profile, setProfile, toast } = useStore();
   // The place of the bar being changed: tap it, then tap what goes there.
   const [slot, setSlot] = useState<number | null>(null);
-  const set = (patch: Partial<Profile>) => setProfile((p) => ({ ...p, ...patch }));
+  const set = (patch: Partial<Profile>) => { setProfile((p) => ({ ...p, ...patch })); feature("look_change"); };
   const changed = profile.palette !== DEFAULT_PROFILE.palette || profile.theme !== DEFAULT_PROFILE.theme || profile.start !== DEFAULT_PROFILE.start
     || profile.nav.join() !== DEFAULT_PROFILE.nav.join() || profile.homeHidden.length > 0;
   const put = (t: Tab) => {

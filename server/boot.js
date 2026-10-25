@@ -5,6 +5,8 @@
     var root = document.documentElement;
     var dark = p.theme === "dark" || (p.theme === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
     root.setAttribute("data-theme", dark ? "dark" : p.theme === "contrast" ? "contrast" : "light");
+    // «Оформление»: the colour set too (not in the contrast theme), so the first second is not in Шефли's colours.
+    if (p.theme !== "contrast" && /^(clean|olive|sea|berry|graphite)$/.test(p.palette || "")) root.setAttribute("data-palette", p.palette);
     if (p.textSize === "l" || p.simple) root.classList.add("large-text");
     if (p.textSize === "xl") root.classList.add("xl-text");
     if (p.simple) root.classList.add("simple-mode");

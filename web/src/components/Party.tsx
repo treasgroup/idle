@@ -16,6 +16,7 @@ import {
 import { RecipeImage } from "./RecipeCard";
 import { ShareOptions } from "./ShareOptions";
 import { downloadIcs } from "../app/calendar";
+import { feature } from "../app/feature";
 import { Chip, Layer, Sheet, Stepper, Toggle, cx } from "./ui";
 
 type Screen = { to: "list" } | { to: "new"; draft?: PartyDraft } | { to: "table"; token: string; fresh?: boolean };
@@ -101,6 +102,7 @@ function PartyNew({ draft, onCreated }: { draft?: PartyDraft; onCreated: (token:
         expenses, me: { name: name.trim(), status: "yes", plus: 0 },
       });
       rememberParty({ token: j.token, admin: j.admin, title: j.party.title, date: j.party.date });
+      feature("party_create");
       cue("done");
       onCreated(j.token);
     } catch (e) { toast((e as Error).message); setBusy(false); }
@@ -210,7 +212,12 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
   const act = async (body: Record<string, unknown>, what = "act") => {
     setBusy(what);
-    try { take(await partyCall("party.act", { token, guest, admin, ...body })); return true; }
+    try {
+      take(await partyCall("party.act", { token, guest, admin, ...body }));
+      if (body.act === "answer" && !body.spent) feature("party_answer");
+      if (body.act === "take") feature("party_take");
+      return true;
+    }
     catch (e) { toast((e as Error).message); void load(); return false; }
     finally { setBusy(""); }
   };

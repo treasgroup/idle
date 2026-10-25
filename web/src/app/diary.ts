@@ -4,6 +4,7 @@
 import { useSyncExternalStore } from "react";
 import { apiUrl, nutritionOf, type Recipe } from "../engine";
 import type { Profile } from "./profile";
+import { feature } from "./feature";
 
 export type DiaryMeal = "breakfast" | "lunch" | "dinner" | "snack";
 export type DiarySource = "recipe" | "plan" | "cook" | "barcode" | "manual";
@@ -49,6 +50,7 @@ export function addEntry(e: Omit<DiaryEntry, "id" | "at" | "date"> & { date?: st
   const entry: DiaryEntry = { ...e, id: crypto.randomUUID().slice(0, 8), at: Date.now(), date: e.date ?? dateKeyOf(new Date()),
     kcal: Math.round(e.kcal), protein: Math.round(e.protein), fat: Math.round(e.fat), carbs: Math.round(e.carbs) };
   write({ ...read(), entries: [...read().entries, entry] });
+  feature("diary_add");
   return entry;
 }
 export const removeEntry = (id: string) => write({ ...read(), entries: read().entries.filter((e) => e.id !== id) });

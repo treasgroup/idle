@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, ImagePlus, ShieldCheck, UserRound, ZoomIn, ZoomOut } from "lucide-react";
 import { useStore } from "../app/store";
 import { Sheet } from "./ui";
+import { feature } from "../app/feature";
 
 const BOX = 224; // the preview square, px
 const INSET = 6; // the circle sits this far inside it
@@ -66,6 +67,7 @@ export function PhotoSheet({ open, onClose }: { open: boolean; onClose: () => vo
         g.imageSmoothingQuality = "high";
         g.drawImage(img, (INSET - left) / scale, (INSET - top) / scale, (BOX - 2 * INSET) / scale, (BOX - 2 * INSET) / scale, 0, 0, OUT, OUT);
         photo = c.toDataURL("image/jpeg", 0.85);
+        feature("photo_set");
       }
     }
     if (img?.src.startsWith("blob:")) URL.revokeObjectURL(img.src);
