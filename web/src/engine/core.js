@@ -3,7 +3,7 @@
 // Recipe engine: catalog, matching, parsing, answers, state schema.
 // Ported as-is from the previous build of the site (minified names kept for now).
 // Readable names live in ./index.ts — import from there, not from this file.
-import { z as D } from "zod";
+import { z as D } from "./schema.js";
 import { tidyRecipe } from "./tidy";
 
 var bS = {

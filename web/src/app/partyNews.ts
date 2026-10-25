@@ -3,7 +3,7 @@
 // Главная is open (every 5 minutes), and compared with what the organiser saw last time on the table itself.
 // On the site the browser can also show a notice by itself — «Сообщать мне об ответах» on the table (web push).
 import { useEffect, useState } from "react";
-import { guestSecret, knownParties, partyCall, type Party } from "./party";
+import { forgetParty, guestSecret, knownParties, partyCall, type Party } from "./party";
 import { post, subscription } from "./reminders";
 import { isNativeApp } from "../engine";
 
@@ -51,7 +51,10 @@ export function usePartyNews(): { token: string; title: string; news: string[] }
           if (!seen) { markSeen(k.token, p); continue; }
           const news = newsOf(p, seen);
           if (news.length) out.push({ token: k.token, title: p.title, news });
-        } catch { /* offline or the table is gone: nothing to say */ }
+        } catch (e) {
+          // The table was deleted: it leaves the list (and is not asked about again). Offline: nothing to say.
+          if ((e as { status?: number }).status === 404) forgetParty(k.token);
+        }
       }
       if (alive) setList(out);
     };
