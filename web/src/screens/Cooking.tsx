@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import {
   ArrowRight, Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Flame, Heart, ListChecks,
-  LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X,
+  LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X, NotebookPen,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
@@ -11,6 +11,7 @@ import {
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
+import { eatRecipe, removeEntry } from "../app/diary";
 import { SupportAsk } from "../components/SupportButton";
 import { forServings, sizesFor } from "../app/stepServings";
 import { signal } from "../app/personal";
@@ -827,6 +828,14 @@ function Done({ onClose }: { onClose: () => void }) {
     replace(routeHash({ tab: "favorites" }));
   };
   const tomorrow = () => { void a.ask("что приготовить завтра", { fresh: true }); goChat(); };
+  // «Дневник еды»: one portion of what was just cooked, in one tap (undone from the toast).
+  const [eaten, setEaten] = useState<string | null>(null);
+  const eat = () => {
+    const e = eatRecipe(r, "cook");
+    if (!e) return toast("У этого рецепта калории не посчитаны — запишите в дневник вручную");
+    setEaten(e.id);
+    toast("В дневнике: 1 порция — " + e.kcal + " ккал", { label: "Отменить", run: () => { removeEntry(e.id); setEaten(null); } });
+  };
 
   return (
     <Layer title={r.title} onClose={close} closeIcon="close" full label="Блюдо готово">
@@ -870,6 +879,7 @@ function Done({ onClose }: { onClose: () => void }) {
             <Heart size={16} className={cx(fav && "fill-brand text-brand")} aria-hidden />{fav ? "Сохранено" : "Сохранить"}
           </button>
           <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken" onClick={() => setSheet("menu")}><CalendarPlus size={16} aria-hidden />В план</button>
+          <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken disabled:text-herb" disabled={!!eaten} onClick={eat}><NotebookPen size={16} aria-hidden />{eaten ? "В дневнике" : "В дневник — 1 порция"}</button>
         </div>
 
         {askRemind && (

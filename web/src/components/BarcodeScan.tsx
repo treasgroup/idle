@@ -24,7 +24,8 @@ export function matchProduct(name: string): string | null {
   return null;
 }
 
-export function BarcodeScan({ onFound, onClose }: { onFound: (r: { id: string | null; name: string | null }) => void; onClose: () => void }) {
+/** `onCode`: just the code (the food diary looks up the label itself) instead of the product for «Мои продукты». */
+export function BarcodeScan({ onFound, onClose, onCode }: { onFound?: (r: { id: string | null; name: string | null }) => void; onClose: () => void; onCode?: (code: string) => void }) {
   const video = useRef<HTMLVideoElement>(null);
   const [state, setState] = useState<"start" | "look" | "ask" | "error">("start");
   const [error, setError] = useState("");
@@ -45,6 +46,7 @@ export function BarcodeScan({ onFound, onClose }: { onFound: (r: { id: string | 
     const found = async (code: string) => {
       stop = true;
       stream?.getTracks().forEach((t) => t.stop());
+      if (onCode) { cue("scan"); onCode(code); return; }
       setState("ask");
       try {
         const r = await fetch(apiUrl("barcode"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }), credentials: "same-origin" });
@@ -53,7 +55,7 @@ export function BarcodeScan({ onFound, onClose }: { onFound: (r: { id: string | 
         const name = typeof j.name === "string" ? j.name : null;
         const id = name ? matchProduct(name) : null;
         cue(id ? "scan" : "error");
-        onFound({ id, name });
+        onFound?.({ id, name });
       } catch (e) {
         cue("error"); setError(e instanceof Error ? e.message : "Не получилось узнать продукт."); setState("error");
       }

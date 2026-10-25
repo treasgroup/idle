@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator } from "lucide-react";
+import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator, NotebookPen } from "lucide-react";
 import {
   apiUrl, courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -12,6 +12,7 @@ import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { goalConditions, type HomeBlock } from "../app/profile";
 import { fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
+import { dateKeyOf, entriesOn, goalOf, openDiary, totals, useDiary } from "../app/diary";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
@@ -410,6 +411,8 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const [feastFor, setFeastFor] = useState<FamilyDate | null>(null);
   // «Соблюдаю пост»: today's fast, or the eve of a long one — the plan for it is one tap away.
   const fastToday = keepsFast(profile, new Date());
+  const diary = useDiary();
+  const eaten = Math.round(totals(entriesOn(diary, dateKeyOf(new Date()))).kcal);
   const fastNext = fastTomorrow(profile);
   if (!menu.length && !toBuy && !timers && !thaw && !dayDish && !family.length && !fastToday && !fastNext && profile.simple) return null;
   // 150 px on phones: the third tile peeks out at the edge, so it is clear the row scrolls.
@@ -452,6 +455,8 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {sections && action(<GraduationCap size={22} />, "Школа готовки",
           !nextLesson ? "Все " + LESSONS.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + LESSONS.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
           () => openLayer(routeHash({ tab: "learn" })), true)}
+        {sections && action(<NotebookPen size={22} />, eaten ? "Дневник · " + eaten.toLocaleString("ru-RU") + " ккал" : "Дневник еды",
+          eaten ? "Из " + goalOf(diary, profile).toLocaleString("ru-RU") + " на день" : "Записать, что съели — калории и БЖУ", openDiary)}
         {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
         {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
       </ScrollRow>

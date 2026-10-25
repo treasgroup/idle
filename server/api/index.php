@@ -200,6 +200,7 @@ try {
     elseif ($route === 'taps' && $method === 'POST') client_taps(read_json_body(8000));
     elseif ($route === 'admin.insights' && $method === 'GET') { require_admin(); admin_insights((int)($_GET['days'] ?? 30)); }
     elseif ($route === 'barcode' && $method === 'POST') { require_same_origin(); barcode_lookup((string)(read_json_body(500)['code'] ?? '')); }
+    elseif ($route === 'barcode.food' && $method === 'POST') { require_same_origin(); barcode_food((string)(read_json_body(500)['code'] ?? '')); }
     elseif ($route === 'partners' && $method === 'GET') partners_route();
     elseif ($route === 'go' && $method === 'GET') partner_go((string)($_GET['to'] ?? ''));
     // ---------- Reminders (web push) ----------

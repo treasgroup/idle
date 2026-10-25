@@ -1,7 +1,7 @@
 // «Меню»: the week of dishes, the plan it is built from, and one tap to the shopping list.
 import { useEffect, useMemo, useState } from "react";
 import {
-  CalendarDays, ChevronDown, Clock, MoreHorizontal, Package, Pencil, ArrowRightLeft, Eraser, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, CalendarPlus, Repeat2, Bookmark, X,
+  CalendarDays, ChevronDown, Clock, MoreHorizontal, Package, Pencil, ArrowRightLeft, Eraser, RefreshCw, Settings2, Share2, ShoppingCart, Sparkles, Recycle, Plus, Vote, Trash2, CalendarPlus, Repeat2, Bookmark, X, NotebookPen,
 } from "lucide-react";
 import {
   MEAL_LABELS, apiUrl, courseOf, dateKey, dayLabel, freshConditions, generateMenu, menuPlanSummary, menuText, nutritionOf, plural,
@@ -21,6 +21,7 @@ import { downloadIcs, planIcs } from "../app/calendar";
 import { applyWeek, removeWeek, saveWeek, savedWeeks } from "../app/savedWeeks";
 import type { Profile } from "../app/profile";
 import { fitsFast, keepsFast } from "../app/fasting";
+import { eatRecipe, removeEntry } from "../app/diary";
 import { RecipeImage } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
@@ -296,6 +297,13 @@ export function Menu() {
           <div className="grid gap-2">
             <button className="btn-primary justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), planFor(itemMenu.date))); withUndo("Блюдо заменено"); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
             <button className="btn-outline justify-start" onClick={() => setMoving((v) => !v)} aria-expanded={moving}><ArrowRightLeft size={18} />Перенести на другой день</button>
+            {/* «Дневник еды»: a portion of this dish, for today (the plan's day is when it was cooked, today is when eaten). */}
+            {itemMenu.date <= today && <button className="btn-outline justify-start" onClick={() => {
+              const r = recipeById(days.find((d) => d.date === itemMenu.date)?.items[itemMenu.index]?.recipeId ?? "");
+              const e = r ? eatRecipe(r, "plan") : null;
+              toast(e ? "В дневнике: 1 порция — " + e.kcal + " ккал" : "У этого блюда калории не посчитаны — запишите в дневник вручную", e ? { label: "Отменить", run: () => removeEntry(e.id) } : undefined);
+              setItemMenu(null);
+            }}><NotebookPen size={18} />Съели — в дневник</button>}
             {moving && (
               <div className="flex flex-wrap gap-2 pb-1">
                 {days.filter((d) => d.date !== itemMenu.date).map((d) => (

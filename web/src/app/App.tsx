@@ -15,6 +15,7 @@ import { AssistantProvider } from "./assistant";
 import { close, openLayer, replace, routeHash, useRoute, type Route, type Tab } from "./router";
 import { NAV_ITEMS } from "./navItems";
 import { OPEN_PARTY, type PartyDraft } from "./party";
+import { OPEN_DIARY } from "./diary";
 import { Avatar } from "../components/Avatar";
 import { migrateOldTimer, secondsLeft, useTick, useTimerAlarm, useTimers } from "./timers";
 import { Home } from "../screens/Home";
@@ -46,6 +47,7 @@ const DocLayer = lazyScreen(() => loadExtras().then((m) => ({ default: m.DocLaye
 const Learn = lazyScreen(() => loadExtras().then((m) => ({ default: m.Learn })));
 const Onboarding = lazyScreen(() => loadExtras().then((m) => ({ default: m.Onboarding })));
 const PollSheet = lazyScreen(() => loadExtras().then((m) => ({ default: m.PollSheet })));
+const DiaryLayer = lazyScreen(() => import("../components/Diary").then((m) => ({ default: m.DiaryLayer })));
 const PartyLayer = lazyScreen(() => import("../components/Party").then((m) => ({ default: m.PartyLayer })));
 const IncomingRecipe = lazyScreen(() => import("../components/FamilyBook").then((m) => ({ default: m.IncomingRecipe })));
 import { Boundary, Logo, Toast, cx, haptic, mmss, useScrolled } from "../components/ui";
@@ -173,6 +175,13 @@ function Shell() {
     return () => window.removeEventListener(OPEN_PARTY, on);
   }, []);
   useIncomingLinks(setPoll, setIncoming, (token) => setParty({ token }));
+  // «Дневник еды»: from «На сегодня», Профиль.
+  const [diary, setDiary] = useState(false);
+  useEffect(() => {
+    const on = () => setDiary(true);
+    window.addEventListener(OPEN_DIARY, on);
+    return () => window.removeEventListener(OPEN_DIARY, on);
+  }, []);
   useTimerAlarm(toast, s.readAloud);
   useDinnerReminders();
   // The screen stays on while something is on the stove or a timer is counting.
@@ -260,6 +269,7 @@ function Shell() {
         {route.tab === "learn" && <Learn onClose={closeTop} />}
         {/* Under the recipe layer: a dish opened from the table lies over it, «Назад» returns to the table. */}
         {party && <PartyLayer token={party.token} draft={party.draft} onClose={() => setParty(null)} />}
+        {diary && <DiaryLayer onClose={() => setDiary(false)} />}
       </Suspense>
       <Boundary resetKey={(route.recipe ?? "") + route.cook}>
         <Suspense fallback={<LayerSkeleton />}>
