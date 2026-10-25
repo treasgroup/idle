@@ -77,7 +77,7 @@ function alice_link(string $device, string $code): string {
     $now = now_ms();
     db()->prepare('INSERT OR REPLACE INTO alice_links (device_hash, household_id, created_at, seen_at) VALUES (?, ?, ?, ?)')->execute([$device, $hh, $now, $now]);
     db()->prepare('DELETE FROM alice_codes WHERE code_hash = ?')->execute([token_hash('alice:' . $code)]);
-    return 'Готово! Теперь я знаю ваш план и список покупок. Спрашивайте: «что на ужин» или «что купить». А ещё можно «вычеркни молоко» и «добавь хлеб».';
+    return 'Готово! Теперь я знаю ваш план, список покупок и морозилку. Спрашивайте: «что на ужин», «что купить», «что в морозилке». А ещё можно «вычеркни молоко», «добавь хлеб» и «достань котлеты на завтра».';
 }
 function alice_unlink(string $device): void {
     alice_schema();
@@ -146,4 +146,45 @@ function alice_list_words(array $names): string {
     $names = array_values($names);
     if (count($names) <= 1) return implode('', $names);
     return implode(', ', array_slice($names, 0, -1)) . ' и ' . end($names);
+}
+
+// ---------- «Морозилка» (the family's, kept in the same document as the plan) ----------
+/** «котлеты (4 порции), пельмени» — what is frozen, the oldest first. */
+function alice_freezer(array $doc): array {
+    $list = array_values(array_filter((array)($doc['freezer'] ?? []), fn($f) => is_array($f) && is_string($f['title'] ?? null)));
+    usort($list, fn($a, $b) => ((int)($a['at'] ?? 0)) <=> ((int)($b['at'] ?? 0)));
+    return $list;
+}
+function alice_freezer_words(array $list): string {
+    return alice_list_words(array_map(fn($f) => mb_strtolower((string)$f['title'], 'UTF-8') . (!empty($f['portions']) ? ' (' . (int)$f['portions'] . ' ' . seo_plural((int)$f['portions'], 'порция', 'порции', 'порций') . ')' : ''), array_slice($list, 0, 6)));
+}
+/** The frozen thing the words name («котлеты», «фарш»), or null. */
+function alice_freezer_find(array $list, string $words): ?int {
+    $want = array_filter(explode(' ', match_norm($words)), fn($x) => mb_strlen($x, 'UTF-8') >= 3);
+    foreach ($list as $i => $f) foreach (explode(' ', match_norm((string)$f['title'])) as $y) foreach ($want as $x) if (match_same($x, $y)) return $i;
+    return null;
+}
+/** «Достань котлеты на завтра»: out of the freezer; a dish goes to tomorrow's dinner as «Из морозилки · разогреть». */
+function alice_thaw(string $hh, string $words): string {
+    for ($try = 0; $try < 3; $try++) {
+        [$version, $doc] = alice_doc($hh);
+        $list = alice_freezer($doc);
+        $i = alice_freezer_find($list, $words);
+        if ($i === null) return $list ? 'В морозилке такого нет. Там: ' . alice_freezer_words($list) . '.' : 'Морозилка пустая — на сайте её можно заполнить в «Мои продукты».';
+        $f = $list[$i];
+        $n = !empty($f['portions']) ? (int)$f['portions'] : 2;
+        $doc['freezer'] = array_values(array_filter((array)$doc['freezer'], fn($x) => ($x['id'] ?? null) !== $f['id']));
+        $title = mb_strtolower((string)$f['title'], 'UTF-8');
+        $planned = false;
+        if (!empty($f['recipeId']) && bot_recipe_by_id((string)$f['recipeId'])) {
+            $day = date('Y-m-d', time() + 86400);
+            $item = ['recipeId' => $f['recipeId'], 'servings' => max(1, min(12, $n)), 'meal' => 'dinner', 'leftover' => true, 'prepped' => 'freezer'];
+            $menu = (array)($doc['menu'] ?? []); $found = false;
+            foreach ($menu as &$d) if (($d['date'] ?? '') === $day) { $d['items'][] = $item; $found = true; } unset($d);
+            if (!$found) $menu[] = ['date' => $day, 'items' => [$item]];
+            $doc['menu'] = $menu; $planned = true;
+        }
+        if (alice_doc_save($hh, $version, $doc)) return 'Переложите ' . $title . ' из морозилки в холодильник — к завтра разморозится.' . ($planned ? ' Поставил на завтрашний ужин в план.' : '');
+    }
+    return 'Не получилось записать — попробуйте ещё раз.';
 }
