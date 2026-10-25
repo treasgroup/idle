@@ -53,3 +53,11 @@ describe("Шеф knows the newer parts", () => {
       expect(ask(q)).toBeNull();
   });
 });
+
+import { toLink } from "../app/appLinks";
+describe("links tapped in a messenger", () => {
+  it("opens a table in складчину by its short address", () => {
+    expect(toLink("https://shefly.ru/stol/0123456789abcdef0123456789abcdef")?.hash).toBe("#party=0123456789abcdef0123456789abcdef");
+    expect(toLink("https://shefly.ru/recipe/borsch")?.query.get("recipe")).toBe("borsch");
+  });
+});

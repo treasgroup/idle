@@ -236,7 +236,8 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   const answered = !!me && (!!me.name || p.me === p.host);
   const people = headcount(p);
   const maybe = p.guests.filter((g) => g.status === "maybe").length;
-  const url = siteBase() + "#party=" + token;
+  // The short address shows the table in the messenger's preview (server/stol.php), then opens it here.
+  const url = siteBase() + "stol/" + token;
   const shareText = f.emoji + " " + p.title + " — " + whenLine(p) + (p.place ? ", " + p.place : "") + ". Отметься, придёшь ли и что принесёшь: " + url;
   const mine = p.dishes.filter((d) => d.by === p.me && d.id).map((d) => recipeById(d.id!)).filter((r): r is Recipe => !!r);
   const start = myStart(p, mine);

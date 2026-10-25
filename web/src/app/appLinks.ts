@@ -11,7 +11,8 @@ export const openedByLink = (): boolean => opened;
 
 export function takeLinks(): Link[] { const l = pending; pending = []; return l; }
 
-/** https://shefly.ru/recipe/borsch (and the old https://treas.su/cook/recipe/borsch), ?recipe=borsch, #book=…, #/r/borsch → what the page understands. */
+/** https://shefly.ru/recipe/borsch (and the old https://treas.su/cook/recipe/borsch), ?recipe=borsch, #book=…, #/r/borsch,
+ *  https://shefly.ru/stol/<token> («Стол в складчину») → what the page understands. */
 export function toLink(raw: string): Link | null {
   let u: URL;
   try { u = new URL(raw); } catch { return null; }
@@ -19,6 +20,8 @@ export function toLink(raw: string): Link | null {
   const q = new URLSearchParams(u.search);
   const m = path.match(/^recipe\/([a-z0-9-]+)\/?$/);
   if (m) q.set("recipe", m[1]);
+  const table = path.match(/^stol\/([0-9a-f]{32})\/?$/);
+  if (table) return { hash: "#party=" + table[1], query: q };
   if (u.hash.startsWith("#/")) { opened = true; location.hash = u.hash; return null; }
   return { hash: u.hash, query: q };
 }
