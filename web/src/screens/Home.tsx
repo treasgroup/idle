@@ -11,6 +11,7 @@ import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
 import { goalConditions, type HomeBlock } from "../app/profile";
+import { fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
@@ -99,6 +100,7 @@ function useServerToday(): string | null {
 /** «Рецепт дня» stays the same all day (per meal), even when the saved data or the catalog changes the list.
  * `common`: the day's dish for everybody, when it suits this person — it wins, so the app, VK and the widget agree. */
 function useToday(pick: Recipe | null, meal: string, ready: boolean, common?: Recipe | null): Recipe | null {
+  // `meal` also says «-fast» on a fasting day: turning the fast on mid-day brings a fasting dish, not the kept one.
   const key = "cook-today-" + dateKey(new Date()) + "-" + meal;
   if (!ready) return pick;
   if (common) { try { localStorage.setItem(key, common.id); } catch { /* private mode */ } return common; }
@@ -128,7 +130,10 @@ export function Home({ pwa }: { pwa?: Pwa }) {
   // From lunch on, the day's dish of the whole service (VK, the widget) when it suits the person; a breakfast in the morning.
   const serverToday = useServerToday();
   const common = meal !== "breakfast" && serverToday ? all.find((r) => r.id === serverToday) ?? null : null;
-  const today = useToday(dayPick(photoFirst(all.filter((r) => ["main", "soup"].includes(courseOf(r)) || meal === "breakfast"), 80)), meal, catalog.version > 0, common);
+  const fast = keepsFast(profile, new Date());
+  const fastFit = fast ? fitsFast(profile, fast) : null;
+  const today = useToday(dayPick(photoFirst(all.filter((r) => (["main", "soup"].includes(courseOf(r)) || meal === "breakfast") && (!fastFit || fastFit(r))), 80)), fastFit ? meal + "-fast" : meal, catalog.version > 0,
+    common && (!fastFit || fastFit(common)) ? common : null);
   // The owner's changes from the admin panel: titles, hand-picked recipes, switched-off collections, covers.
   const [custom, setCustom] = useState(savedCustoms);
   useEffect(() => { void loadCustoms().then(setCustom); }, []);
@@ -403,7 +408,10 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   // «Семейный календарь»: from three days before — the table for that day.
   const family = comingSoon(profile.familyDates);
   const [feastFor, setFeastFor] = useState<FamilyDate | null>(null);
-  if (!menu.length && !toBuy && !timers && !thaw && !dayDish && !family.length && profile.simple) return null;
+  // «Соблюдаю пост»: today's fast, or the eve of a long one — the plan for it is one tap away.
+  const fastToday = keepsFast(profile, new Date());
+  const fastNext = fastTomorrow(profile);
+  if (!menu.length && !toBuy && !timers && !thaw && !dayDish && !family.length && !fastToday && !fastNext && profile.simple) return null;
   // 150 px on phones: the third tile peeks out at the edge, so it is clear the row scrolls.
   const tile = "w-[150px] shrink-0 snap-start sm:w-[200px]";
   const action = (icon: ReactNode, title: string, line: string, onClick: () => void, school?: boolean) => (
@@ -426,6 +434,12 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {family.map((d) => <span key={d.id} className="contents">{action(<span className="text-[22px] leading-none">{KIND_ICON[d.kind]}</span>,
           d.who + " — " + whenText(daysUntil(d)).toLowerCase() + (daysUntil(d) === 0 ? " 🎉" : ""),
           "Собрать стол: блюда, покупки и когда что начинать", () => setFeastFor(d))}</span>)}
+        {fastNext && action(<span className="text-[22px] leading-none">🌿</span>, "Завтра начинается " + fastNext.replace(/ пост$/, " пост"),
+          "Составить постный план на неделю", () => openLayer(routeHash({ tab: "menu" })))}
+        {fastToday && action(<span className="text-[22px] leading-none">🌿</span>,
+          fastToday.kind === "weekly" ? "Сегодня " + fastToday.name + " — постный день" : fastToday.kind === "nomeat" ? "Масленица — без мяса" : fastToday.name,
+          fastToday.kind === "nomeat" ? "Блины и всё без мяса — спросите Шефа" : "Подберу постное — без мяса, молочного и яиц",
+          () => { void ask.ask(fastToday.kind === "nomeat" ? "что приготовить без мяса" : "что приготовить постное", { fresh: true }); goChat(); })}
         {dayDish && <RecipeTile recipe={dayDish} badge="Рецепт дня" onOpen={() => openRecipe(dayDish)} className={tile} />}
         {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? "Приготовлено вчера" : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
         {left.length > 0 && action(<Refrigerator size={22} />, "Осталось: " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(", "),

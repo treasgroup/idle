@@ -20,6 +20,7 @@ import { PlaceHint } from "../components/PlaceHint";
 import { downloadIcs, planIcs } from "../app/calendar";
 import { applyWeek, removeWeek, saveWeek, savedWeeks } from "../app/savedWeeks";
 import type { Profile } from "../app/profile";
+import { fitsFast, keepsFast } from "../app/fasting";
 import { RecipeImage } from "../components/RecipeCard";
 import { Chip, Empty, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
@@ -77,6 +78,22 @@ export function Menu() {
   const filled = days.some((d) => d.items.length);
   const plan: MenuPlan = s.menuPlan;
   const enginePlan = { ...plan, only: goalFilter(profile), light: profile.goals.includes("light") } as MenuPlan;
+  // «Соблюдаю пост»: a fasting day of the plan takes only dishes that fit it (the rest of the week as usual).
+  const fastOf = (date: string) => keepsFast(profile, new Date(date + "T12:00"));
+  const planFor = (date: string): MenuPlan => {
+    const f = fastOf(date);
+    if (!f) return enginePlan;
+    const fit = fitsFast(profile, f), only = (enginePlan as { only?: (r: Recipe) => boolean }).only;
+    return { ...enginePlan, only: only ? (r: Recipe) => only(r) && fit(r) : fit } as MenuPlan;
+  };
+  /** The fasting days among `dates` whose dishes don't fit the fast are made again with the fasting dishes. */
+  const keepFast = (menu: MenuDay[], dates: string[]) => menu.reduce((m, d) => {
+    const f = dates.includes(d.date) ? fastOf(d.date) : null;
+    if (!f) return m;
+    const fit = fitsFast(profile, f);
+    const wrong = d.items.some((i) => !i.leftover && !(recipeById(i.recipeId) && fit(recipeById(i.recipeId)!)));
+    return wrong ? regenerateDay(m, d.date, s.preferences, servings, Date.now(), planFor(d.date)) : m;
+  }, menu);
   const save = (menu: MenuDay[]) => update((st) => ({ ...st, menu: menu.filter((d) => d.date >= today && d.items.length).slice(0, 31) }));
   const withUndo = (text: string) => {
     const before = s.menu;
@@ -88,11 +105,12 @@ export function Menu() {
 
   const make = () => {
     const had = filled;
-    save(generateMenu(days.map((d) => ({ date: d.date, items: [] })), s.preferences, servings, Date.now(), enginePlan));
+    save(keepFast(generateMenu(days.map((d) => ({ date: d.date, items: [] })), s.preferences, servings, Date.now(), enginePlan), days.map((d) => d.date)));
     if (had) withUndo("План собран заново");
     else toast("План готов. Любое блюдо можно заменить.");
   };
-  const fill = () => save(generateMenu(days, s.preferences, servings, Date.now(), enginePlan));
+  // Only the days that were empty: what the person put in by hand stays as it is.
+  const fill = () => save(keepFast(generateMenu(days, s.preferences, servings, Date.now(), enginePlan), days.filter((d) => !d.items.length).map((d) => d.date)));
   // The whole week empty in one tap; «Отменить» brings it back.
   const clear = () => { withUndo("План очищен"); save([]); setManual(false); };
   const addTo = (date: string, r: Recipe) => {
@@ -186,7 +204,8 @@ export function Menu() {
               <section key={d.date} aria-label={dayLabel(d.date)}>
                 {/* «+» beside the day instead of a «Добавить в этот день» row under every day (seven of them on a phone). */}
                 <div className="mb-1 flex items-center justify-between gap-2 px-1">
-                  <h3 className={cx("text-body font-semibold", d.date === today && "text-brand")}>{dayLabel(d.date)}</h3>
+                  <h3 className={cx("text-body font-semibold", d.date === today && "text-brand")}>{dayLabel(d.date)}
+                    {fastOf(d.date) && <span className="ml-2 rounded-full bg-herb-soft px-2 py-0.5 align-middle text-micro font-medium text-herb" title={fastOf(d.date)!.name}>{fastOf(d.date)!.kind === "nomeat" ? "без мяса" : "пост"}</span>}</h3>
                   {d.items.length > 0 && (
                     <button className="-my-1.5 inline-flex h-11 min-w-[44px] shrink-0 items-center justify-center gap-1 rounded-full px-2.5 text-small text-brand hover:bg-brand-soft" onClick={() => setAddDay(d.date)} aria-label={"Добавить блюдо: " + dayLabel(d.date)}>
                       <span className="grid h-7 w-7 place-items-center rounded-full border border-line-strong"><Plus size={16} aria-hidden /></span><span className="hidden sm:inline">Добавить</span>
@@ -195,7 +214,7 @@ export function Menu() {
                 </div>
                 {d.items.length === 0 ? (
                   <div className="card flex flex-wrap gap-2 p-3">
-                    <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), enginePlan))}><Sparkles size={16} />Подобрать блюдо</button>
+                    <button className="btn-soft h-11" onClick={() => save(regenerateDay(days, d.date, s.preferences, servings, Date.now(), planFor(d.date)))}><Sparkles size={16} />Подобрать блюдо</button>
                     <button className="btn-outline h-11" onClick={() => setAddDay(d.date)}><Plus size={16} />Добавить</button>
                   </div>
                 ) : (
@@ -275,7 +294,7 @@ export function Menu() {
       <Sheet open={!!itemMenu} title={itemMenu ? recipeById(days.find((d) => d.date === itemMenu.date)?.items[itemMenu.index]?.recipeId ?? "")?.title ?? "Блюдо" : ""} onClose={() => { setItemMenu(null); setMoving(false); }}>
         {itemMenu && (
           <div className="grid gap-2">
-            <button className="btn-primary justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), enginePlan)); withUndo("Блюдо заменено"); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
+            <button className="btn-primary justify-start" onClick={() => { save(replaceMenuItem(days, itemMenu.date, itemMenu.index, s.preferences, servings, Date.now(), planFor(itemMenu.date))); withUndo("Блюдо заменено"); setItemMenu(null); }}><RefreshCw size={18} />Заменить другим</button>
             <button className="btn-outline justify-start" onClick={() => setMoving((v) => !v)} aria-expanded={moving}><ArrowRightLeft size={18} />Перенести на другой день</button>
             {moving && (
               <div className="flex flex-wrap gap-2 pb-1">
@@ -286,7 +305,7 @@ export function Menu() {
             )}
             <button className="btn-outline justify-start" onClick={() => { save(removeMenuItem(days, itemMenu.date, itemMenu.index, servings)); withUndo("Блюдо убрано"); setItemMenu(null); }}><Trash2 size={18} />Убрать из плана</button>
             <p className="label mt-3">{dayLabel(itemMenu.date)}</p>
-            <button className="btn-outline justify-start" onClick={() => { save(regenerateDay(days, itemMenu.date, s.preferences, servings, Date.now(), enginePlan)); withUndo("День пересобран"); setItemMenu(null); }}><Sparkles size={18} />Подобрать весь день заново</button>
+            <button className="btn-outline justify-start" onClick={() => { save(regenerateDay(days, itemMenu.date, s.preferences, servings, Date.now(), planFor(itemMenu.date))); withUndo("День пересобран"); setItemMenu(null); }}><Sparkles size={18} />Подобрать весь день заново</button>
             <button className="btn-outline justify-start" onClick={() => { const d = itemMenu.date; setItemMenu(null); setAddDay(d); }}><Plus size={18} />Добавить ещё блюдо в этот день</button>
             <button className="btn-outline justify-start" onClick={() => { clearDay(itemMenu.date); setItemMenu(null); }}><Eraser size={18} />Очистить весь день</button>
             <button className="btn-outline justify-start" onClick={() => { const d = itemMenu.date; setItemMenu(null); void startPoll(d); }}><Vote size={18} />Спросить семью, что приготовить</button>
@@ -295,7 +314,7 @@ export function Menu() {
       </Sheet>
       <AddToDaySheet open={!!addDay} title={addDay ? "Добавить: " + dayLabel(addDay).toLowerCase() : ""} onClose={() => setAddDay(null)}
         onAdd={(r) => addDay && addTo(addDay, r)}
-        onPick={addDay && !days.find((d) => d.date === addDay)?.items.length ? () => { save(regenerateDay(days, addDay, s.preferences, servings, Date.now(), enginePlan)); } : undefined} />
+        onPick={addDay && !days.find((d) => d.date === addDay)?.items.length ? () => { save(regenerateDay(days, addDay, s.preferences, servings, Date.now(), planFor(addDay))); } : undefined} />
       <MealPrepSheet open={prep} onClose={() => setPrep(false)} />
       {take && <TakeMenu ids={take} days={days} dayShort={dayShort} onTake={(shop) => takeMenu(take, shop)} onClose={() => { dropTakeMenu(); setTake(null); }} />}
       <Sheet open={more} title="План на неделю" onClose={() => setMore(false)}>

@@ -4,6 +4,7 @@ import type { Conditions } from "../engine";
 import { normalizeDates, type FamilyDate } from "./familyCalendar";
 import { normalizeFixes, type KitchenFix } from "./kitchenFit";
 import type { Tab } from "./router";
+import { DEFAULT_FAST, type FastSettings } from "./fasting";
 
 export type Level = "beginner" | "confident" | "pro";
 export type Goal = "tasty" | "quick" | "budget" | "light" | "protein" | "family";
@@ -47,6 +48,8 @@ export interface Profile {
   /** «Фото и имя»: how to address the person and a small round photo (a 256 px JPEG) — on this device only. */
   name?: string;
   photo?: string;
+  /** «Соблюдаю пост» (app/fasting): on, Wednesdays and Fridays too, fish allowed. */
+  fast: FastSettings;
 }
 
 export type Palette = "shefly" | "clean" | "olive" | "sea" | "berry" | "graphite";
@@ -94,6 +97,7 @@ export const DEFAULT_PROFILE: Profile = {
   nav: DEFAULT_NAV,
   start: "home",
   homeHidden: [],
+  fast: DEFAULT_FAST,
 };
 
 export const GOALS: { id: Goal; label: string; hint: string; emoji: string }[] = [
@@ -154,6 +158,8 @@ export function normalizeProfile(raw: unknown): Profile {
     if (n.length === 4) p.nav = n;
   }
   if (START_CHOICES.includes(r.start as StartTab)) p.start = r.start as StartTab;
+  const fs = r.fast as Partial<FastSettings> | undefined;
+  if (fs && typeof fs === "object") p.fast = { on: fs.on === true, weekly: fs.weekly !== false, fish: fs.fish === true };
   if (typeof r.name === "string" && r.name.trim()) p.name = r.name.trim().slice(0, 30);
   if (typeof r.photo === "string" && r.photo.startsWith("data:image/jpeg;base64,") && r.photo.length < 200_000) p.photo = r.photo;
   if (Array.isArray(r.homeHidden)) p.homeHidden = [...new Set(r.homeHidden.filter((b): b is HomeBlock => HOME_BLOCKS.some((x) => x.id === b)))];

@@ -12,11 +12,15 @@ import { caloriesAnswer } from "./calories";
 import { didYouMean } from "./didYouMean";
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  DEFAULT_CONDITIONS, apiUrl, classifyIntent, cleanMessage, loadIntentModel, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
+  DEFAULT_CONDITIONS, apiUrl, inGroup, classifyIntent, cleanMessage, loadIntentModel, freshConditions, parseMessage, patchSchema, rankRecipes, recipeById, recipes, shortName,
   catalogVersion, dishLabel, formatMinutes, matchesDish, nutritionOf, plural, relaxCondition, relaxOptions, respond, toStoredResults, track, type ChatMessage, type ChatOption, type Conditions, type Match,
 } from "../engine";
 import { useStore } from "./store";
 import { goalConditions } from "./profile";
+import { fastExcluded, keepsFast } from "./fasting";
+
+/** What, asked for in so many words, lifts the fast for that search («с курицей», «сырники»). */
+const FAST_GROUPS = ["meat", "poultry", "fish", "seafood", "dairy", "eggs"];
 import { archiveChat, markChatActive, takeChat } from "./chats";
 import { fixBySound, plainWords, saidWithout, soundBook } from "./colloquial";
 import { HEALTH, hasTopic, healthOf, isNewTopic, withHealth } from "./topic";
@@ -118,13 +122,23 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
   openRef.current = onOpen;
   // Profile goals (lighter, more protein, quick) apply to every search until the person removes one in this conversation.
   const relaxedGoals = useRef(new Set<string>());
+  // «Соблюдаю пост»: on a fasting day what the fast leaves out is added to every search — unless the person asked for
+  // meat, milk or eggs themselves («с курицей») or for a dish by name. Said once per conversation.
+  const fastSaid = useRef(false);
+  const fastAdditions = useCallback((c: Conditions): string[] => {
+    const f = keepsFast(profileRef.current, new Date());
+    if (!f || c.desired.some((d) => d.startsWith("dish:") || FAST_GROUPS.some((g) => inGroup(d, g)))) return [];
+    return fastExcluded(profileRef.current, f).filter((x) => !c.excluded.includes(x));
+  }, []);
   const withGoals = useCallback((c: Conditions): Conditions => {
     // A dish asked for by name («хочу равиоли») is shown even when it is heavier or longer than the profile's goals.
     if (c.desired.some((d) => d.startsWith("dish:"))) return c;
     const g = goalConditions(profileRef.current, c);
     const r = relaxedGoals.current;
-    return { ...g, maxKcal: r.has("kcal") ? c.maxKcal : g.maxKcal, minProtein: r.has("protein") ? c.minProtein : g.minProtein, maxMinutes: r.has("time") ? c.maxMinutes : g.maxMinutes };
-  }, []);
+    const fast = fastAdditions(c);
+    return { ...g, maxKcal: r.has("kcal") ? c.maxKcal : g.maxKcal, minProtein: r.has("protein") ? c.minProtein : g.minProtein, maxMinutes: r.has("time") ? c.maxMinutes : g.maxMinutes,
+      excluded: fast.length ? [...g.excluded, ...fast] : g.excluded };
+  }, [fastAdditions]);
 
   const base = useCallback((): Conditions => ({
     ...freshConditions({ servings: profileRef.current.eaters, appliances: DEFAULT_CONDITIONS.appliances, vegetarian: stateRef.current.preferences.vegetarian }),
@@ -147,6 +161,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
     archiveChat(st.conversation, st.conditions);
     focus.current = null;
     relaxedGoals.current.clear();
+    fastSaid.current = false;
     const c = base();
     stateRef.current = { ...st, conversation: [], conditions: c };
     update((x) => ({ ...x, conversation: [], conditions: c }));
@@ -274,6 +289,14 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
         focusServings: f && f.after === shown ? f.servings : st.cooking?.servings, voice: !!opts.voice,
       });
       let out = turnWith(withGoals(st.conditions));
+      // The fast's exclusions are for this day's searches only: they are not kept in the conversation's conditions
+      // (what the person said themselves — «без молочного» — stays).
+      const fastAdd = fastAdditions(st.conditions);
+      if (fastAdd.length) {
+        const said = ((patch?.excludedAdd as string[] | undefined) ?? []);
+        out = { ...out, conditions: { ...out.conditions, excluded: out.conditions.excluded.filter((x) => !fastAdd.includes(x) || said.includes(x)) } };
+        if (out.results.length && !fastSaid.current) { fastSaid.current = true; out.text = "Сегодня пост — подбираю постное. " + out.text; }
+      }
       // «хочу равиоли» with the goal «полегче»: the goal must not hide the dish asked for by name — once more without it.
       const goalsAdded = JSON.stringify(withGoals(st.conditions)) !== JSON.stringify(st.conditions);
       if (goalsAdded && out.conditions.desired.some((d) => d.startsWith("dish:"))) out = turnWith(st.conditions);

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette, Camera, HandPlatter,
+  Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette, Camera, HandPlatter, Leaf,
 } from "lucide-react";
 import {
   LABELS, LEGAL_TITLES, expiringSoon, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
@@ -26,6 +26,7 @@ import { WriteUs } from "../components/WriteUs";
 import { AliceSheetBody } from "../components/AliceSheet";
 import { LookSheet, lookHint } from "../components/LookSheet";
 import { PhotoSheet } from "../components/PhotoSheet";
+import { FastSheet, fastHint } from "../components/FastSheet";
 import { openParty } from "../app/party";
 import { Avatar } from "../components/Avatar";
 import { TasteSheet, useUnderstood } from "../components/TasteSheet";
@@ -65,6 +66,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [look, setLook] = useState(false);
   const [group, setGroup] = useState<null | keyof typeof GROUP_TITLE>(null);
   const [photo, setPhoto] = useState(false);
+  const [fastOpen, setFastOpen] = useState(false);
   const [tasteOpen, setTasteOpen] = useState(false);
   const understoodNow = useUnderstood();
   const [weatherOpen, setWeatherOpen] = useState(false);
@@ -98,6 +100,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
                 hint={place ? place.name + (weather ? " · " + degrees(weather.t) : "") + " — учитываю при подборе" : "Выключено. В холод — супы, в жару — лёгкое"}
                 onClick={() => setWeatherOpen(true)} />
               <Row icon={<Ban size={18} />} title="Ограничения" hint={excludedHint || "Ничего не исключено"} onClick={() => setSheet("limits")} />
+              <Row icon={<Leaf size={18} />} title="Соблюдаю пост" hint={fastHint(profile)} onClick={() => setFastOpen(true)} />
               <Row icon={<Utensils size={18} />} title="Техника" hint={prefs.appliances.map((a) => (LABELS[a] ?? a).toLowerCase()).join(", ")} onClick={() => setSheet("kitchen")} />
     </div>,
     family: <div className="card divide-y divide-line overflow-hidden">
@@ -198,7 +201,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       <p className="label mb-2 mt-6">Настройки</p>
       <div className="card divide-y divide-line overflow-hidden lg:max-w-xl">
         <Row icon={<Target size={18} />} title={GROUP_TITLE.me}
-          hint={[profile.eaters + " " + plural(profile.eaters, "человек", "человека", "человек"), ...profile.goals.map((g) => GOALS.find((x) => x.id === g)?.label.toLowerCase()), excludedHint].filter(Boolean).join(" · ")}
+          hint={[profile.eaters + " " + plural(profile.eaters, "человек", "человека", "человек"), ...profile.goals.map((g) => GOALS.find((x) => x.id === g)?.label.toLowerCase()), excludedHint, profile.fast.on && "пост"].filter(Boolean).join(" · ")}
           onClick={() => setGroup("me")} />
         <Row icon={<Users size={18} />} title={GROUP_TITLE.family}
           hint={sync.status.members > 1 ? "В семье: " + sync.status.members + " · общий план и покупки" : ["Семья", server.telegram && "Telegram", server.alice && "Алиса", "другое устройство"].filter(Boolean).join(" · ")}
@@ -216,6 +219,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         </Layer>
       )}
       <PhotoSheet open={photo} onClose={() => setPhoto(false)} />
+      <FastSheet open={fastOpen} onClose={() => setFastOpen(false)} />
 
       <Sheet open={sheet === "goals"} title="Для кого, цели и опыт" onClose={close}>
         <div className="flex items-center justify-between gap-3"><span className="text-body-sm">Сколько человек едят</span><Stepper value={profile.eaters} min={1} max={12} onChange={(n) => { setProfile((p) => ({ ...p, eaters: n })); update((st) => ({ ...st, conditions: { ...st.conditions, servings: n } })); }} label="Едоков" /></div>
