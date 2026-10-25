@@ -12,6 +12,7 @@ import {
   catalogIsLight,
 } from "../engine";
 import { useStore } from "../app/store";
+import { takeServingsFor } from "../app/recipeFor";
 import { signal } from "../app/personal";
 import { useActions, haveIds } from "../app/actions";
 import { homeAmount, homeQuantity, mergeSame } from "../app/amounts";
@@ -193,9 +194,12 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const pan = useMemo(() => panOf(base), [base]);
   const { isFavorite, toggleFavorite, addRecipeToShopping, startCooking, openRecipe } = useActions();
   const reviews = useReviews(base.id);
-  const [servings, setServings] = useState(() => clampServings(base, s.conditions.servings || profile.eaters));
+  // Opened from «Стол в складчину»: for everybody coming (app/recipeFor), once.
+  const [forMany] = useState(() => takeServingsFor(base.id));
+  const [servings, setServings] = useState(() => clampServings(base, forMany?.servings ?? (s.conditions.servings || profile.eaters)));
+  const manyTimes = forMany ? Math.ceil(forMany.servings / clampServings(base, forMany.servings)) : 1;
   // Борщ for 2 opens for 3: the pot is not made smaller than that. Said once, so the 3 is not a surprise.
-  const atLeast = (s.conditions.servings || profile.eaters) < base.minServings && servings === base.minServings;
+  const atLeast = !forMany && (s.conditions.servings || profile.eaters) < base.minServings && servings === base.minServings;
   const [sideId, setSideId] = useState<string | null>(null);
   const [have, setHave] = useState<string[]>(() => haveIds(s));
   const [menuOpen, setMenuOpen] = useState(false);
@@ -380,7 +384,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
                   <h2 className="text-h2">Продукты</h2>
                   <Stepper value={servings} min={base.minServings} max={base.maxServings} onChange={setServings} label="Сколько человек" suffix={plural(servings, "человек", "человека", "человек")} />
                 </div>
-                {(!!base.yields || haveHint || atLeast) && <p className="-mt-2 mb-3 text-small text-ink-soft">{atLeast && "Меньше чем на " + base.minServings + " " + plural(base.minServings, "человека", "человека", "человек") + " не приготовить — останется на завтра. "}{base.yields ? yieldLine(base, servings) + " " : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
+                {(!!base.yields || haveHint || atLeast || !!forMany) && <p className="-mt-2 mb-3 text-small text-ink-soft">{forMany && forMany.note + (manyTimes > 1 ? " — рецепт рассчитан максимум на " + servings + " " + plural(servings, "порцию", "порции", "порций") + ", приготовьте " + manyTimes + " " + plural(manyTimes, "раз", "раза", "раз") + ". " : ". ")}{atLeast && "Меньше чем на " + base.minServings + " " + plural(base.minServings, "человека", "человека", "человек") + " не приготовить — останется на завтра. "}{base.yields ? (manyTimes > 1 ? "За один раз: " + yieldLine(base, servings).replace(/^П/, "п") : yieldLine(base, servings)) + " " : ""}{haveHint && "Отметьте кружком то, что у вас уже есть."}</p>}
                 <HaveBar owned={owned} total={needed.length} missing={missing} marked={marked} inList={inList} onBuy={() => addRecipeToShopping(recipe, servings, have)} onOpenList={() => openLayer(routeHash({ tab: "shopping" }))} />
                 <div className="mt-3 space-y-4">
                   {groups.map((g) => (

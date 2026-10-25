@@ -17,6 +17,7 @@ import { RecipeImage } from "./RecipeCard";
 import { ShareOptions } from "./ShareOptions";
 import { downloadIcs } from "../app/calendar";
 import { feature } from "../app/feature";
+import { openForMany } from "../app/recipeFor";
 import { canNotify, markSeen, notifyEndpoint } from "../app/partyNews";
 import { useReminders } from "../app/reminders";
 import { Chip, Layer, Sheet, Stepper, Toggle, cx } from "./ui";
@@ -317,7 +318,8 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
         </div>
       )}
       <Items p={p} kind="dish" title={"Блюда" + (people > 1 ? " — на " + people + " " + plural(people, "человека", "человека", "человек") : "")} busy={busy}
-        onAct={(b) => act(b, String(b.key ?? "add"))} onOpen={(id) => { const r = recipeById(id); if (r) openRecipe(r); }} canAct={answered} />
+        onAct={(b) => act(b, String(b.key ?? "add"))} canAct={answered}
+        onOpen={(id) => { const r = recipeById(id); if (!r) return; if (people > 1) openForMany(r.id, people, "На всех гостей: " + people + " " + plural(people, "человек", "человека", "человек")); openRecipe(r); }} />
       {start && (
         <div className="mt-2 flex gap-3 rounded-card bg-herb-soft p-3.5 text-body-sm">
           <Clock size={20} className="mt-0.5 shrink-0 text-herb" aria-hidden />
