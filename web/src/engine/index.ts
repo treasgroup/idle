@@ -264,13 +264,9 @@ export interface SyncApi {
 export const useAccountSync = (state: EngineState, ready: boolean, online: boolean, update: (fn: (s: EngineState) => EngineState) => void): SyncApi =>
   svc.bA(state, ready, online, update);
 
-// ---------- Legal documents ----------
-import * as legal from "./legal.js";
+// ---------- Legal documents (the texts: ./legalApi, loaded with the screens that show them) ----------
 export interface LegalInfo { operator: string; email: string; site: string; serverAi: boolean; serverSpeech: boolean }
 export type LegalKey = "privacy" | "rules" | "terms" | "info";
-export const LEGAL_TITLES: Record<LegalKey, string> = legal.Or;
-export const legalInfo = (): Promise<LegalInfo> => legal.PO();
-export const legalDoc = (key: LegalKey, info: LegalInfo): { key: string; title: string; sections: { h?: string; p: string[] }[] } => legal.YA(key, info);
 
 // ---------- Native app (Android shell) timers ----------
 /** In the Android app the cooking timer is also scheduled as a system notification (works with the screen off). */

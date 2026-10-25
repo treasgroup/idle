@@ -9,10 +9,10 @@ import {
 import { useStore } from "../app/store";
 import { useActions, haveIds } from "../app/actions";
 import { cue } from "../app/feedback";
+import { forgetParty, guestSecret, knownParties, partyCall, rememberParty, type Party, type PartyDraft, type PartyFormat, type PartyItem, type Status } from "../app/party";
 import {
-  CANT, FORMATS, ROAD_MIN, candidates, myStart, partyIcs, tableHints, forgetParty, formatOf, guestName, guestSecret, headcount, knownParties, nextSaturday, partyCall, rememberParty, settle,
-  warnings, whenLine, type Party, type PartyDraft, type PartyFormat, type PartyItem, type Status,
-} from "../app/party";
+  CANT, FORMATS, ROAD_MIN, candidates, formatOf, guestName, headcount, myStart, nextSaturday, partyIcs, settle, tableHints, warnings, whenLine,
+} from "../app/partyTable";
 import { RecipeImage } from "./RecipeCard";
 import { ShareOptions } from "./ShareOptions";
 import { downloadIcs } from "../app/calendar";

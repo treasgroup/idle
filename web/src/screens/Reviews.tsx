@@ -2,7 +2,8 @@
 // and the form in a sheet. The rules open in a sheet over the form, so a half-written review is kept.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Star, ThumbsUp, Flag, Camera, X, PenLine, RotateCw } from "lucide-react";
-import { legalDoc, legalInfo, plural, reviewsApi, reviewsWord, ratingText, type Recipe, type Review, type ReviewList } from "../engine";
+import { legalDoc, legalInfo } from "../engine/legalApi";
+import { plural, reviewsApi, reviewsWord, ratingText, type Recipe, type Review, type ReviewList } from "../engine";
 import { useStore } from "../app/store";
 import { Section, Segmented, Sheet, cx } from "../components/ui";
 

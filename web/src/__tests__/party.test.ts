@@ -1,6 +1,7 @@
 import { beforeAll, expect, it } from "vitest";
 import { recipes, courseOf } from "../engine";
-import { myStart, partyIcs, settle, tableHints, type Party } from "../app/party";
+import { myStart, partyIcs, settle, tableHints } from "../app/partyTable";
+import type { Party } from "../app/party";
 import { loadCatalog } from "./chefTurn";
 
 beforeAll(loadCatalog);

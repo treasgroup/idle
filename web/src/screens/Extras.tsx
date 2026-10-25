@@ -1,7 +1,8 @@
 // Smaller screens: the beginner course, legal documents, the family poll, first-run questions.
 import { useEffect, useState } from "react";
 import { CircleCheck, ArrowUpRight, Search, Egg, Soup, CalendarDays, ChevronRight } from "lucide-react";
-import { apiUrl, legalDoc, legalInfo, plural, recipeById, type LegalInfo, type LegalKey } from "../engine";
+import { apiUrl, plural, recipeById, type LegalInfo, type LegalKey } from "../engine";
+import { legalDoc, legalInfo } from "../engine/legalApi";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";

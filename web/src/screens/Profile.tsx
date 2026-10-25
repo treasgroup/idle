@@ -5,9 +5,10 @@ import {
   Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette, Camera, HandPlatter, Leaf, NotebookPen,
 } from "lucide-react";
 import {
-  LABELS, LEGAL_TITLES, expiringSoon, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
+  LABELS, expiringSoon, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
 } from "../engine";
 import { useStore } from "../app/store";
+import { LEGAL_TITLES } from "../engine/legalApi";
 import { useReminders } from "../app/reminders";
 import { GOALS, LEVELS } from "../app/profile";
 import { openLayer, openRecipesView, routeHash } from "../app/router";
@@ -15,7 +16,7 @@ import { Chip, Layer, Sheet, Stepper, Toggle, cx } from "../components/ui";
 import { ShareOptions } from "../components/ShareOptions";
 import { FamilyMembers } from "../components/FamilyMembers";
 import { cue } from "../app/feedback";
-import { FeastSheet } from "../components/Feast";
+import { FeastSheet } from "../components/LazyParts";
 import { FamilyCalendarSheet } from "../components/FamilyCalendar";
 import { FIX_INFO } from "../app/kitchenFit";
 import { supportUrl } from "../components/SupportButton";

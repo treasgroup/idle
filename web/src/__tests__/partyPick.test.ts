@@ -1,7 +1,7 @@
 // Prints the dishes each «Стол в складчину» format suggests (run with PARTY_PICK=1).
 import { beforeAll, test } from "vitest";
 import { DEFAULT_PREFERENCES } from "../engine";
-import { FORMATS, candidates } from "../app/party";
+import { FORMATS, candidates } from "../app/partyTable";
 import { loadCatalog } from "./chefTurn";
 
 beforeAll(loadCatalog);

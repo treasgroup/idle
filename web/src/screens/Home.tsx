@@ -26,14 +26,12 @@ import { recentLeftovers } from "../app/nowaste";
 import { dinnerTitle } from "../app/dinner";
 import { TimerStrip } from "../components/TimerStrip";
 import { useTimers } from "../app/timers";
-import { Deck } from "../components/Deck";
+import { Deck, FeastSheet } from "../components/LazyParts";
 import { RatingBadge, RecipeImage, RecipeTile } from "../components/RecipeCard";
 import { photoFirst } from "../app/photoFirst";
 import { ChefAvatar, ScrollRow, Section, cx } from "../components/ui";
 import { ProfileButton } from "../app/App";
-import { LESSONS } from "./learn-data";
 import type { Pwa } from "./Profile";
-import { FeastSheet } from "../components/Feast";
 import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 import { thawTomorrow } from "../app/reminders";
 import { KIND_ICON, comingSoon, daysUntil, eventPhrase, nextDate, whenText, type FamilyDate } from "../app/familyCalendar";
@@ -408,8 +406,11 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   // the side menu repeats them, and the shelf is not left with one lonely tile). Not in the simple mode.
   const sections = !profile.simple;
   const soon = expiringSoon(s.fridge);
-  const nextLesson = LESSONS.find((l) => !profile.lessonsDone.includes(l.id));
-  const lessonNo = nextLesson ? LESSONS.indexOf(nextLesson) + 1 : 0;
+  // The School's texts load a moment later than the page (only the ids and titles are needed here).
+  const [lessons, setLessons] = useState<{ id: string; title: string }[]>([]);
+  useEffect(() => { void import("./learn-data").then((m) => setLessons(m.LESSONS.map((l) => ({ id: l.id, title: l.title })))); }, []);
+  const nextLesson = lessons.find((l) => !profile.lessonsDone.includes(l.id));
+  const lessonNo = nextLesson ? lessons.indexOf(nextLesson) + 1 : 0;
   // «Семейный календарь»: from three days before — the table for that day.
   const family = comingSoon(profile.familyDates);
   const [feastFor, setFeastFor] = useState<FamilyDate | null>(null);
@@ -484,8 +485,8 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {sections && <span className="contents">{action(<Refrigerator size={22} />, "Мои продукты",
           s.fridge.length ? "Дома " + s.fridge.length + (soon.length ? " · скоро испортится: " + shortName(soon[0].id).toLowerCase() : "") : "Что есть дома — подскажу, что приготовить",
           () => openLayer(routeHash({ tab: "pantry" })))}</span>}
-        {sections && action(<GraduationCap size={22} />, "Школа готовки",
-          !nextLesson ? "Все " + LESSONS.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + LESSONS.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
+        {sections && lessons.length > 0 && action(<GraduationCap size={22} />, "Школа готовки",
+          !nextLesson ? "Все " + lessons.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + lessons.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
           () => openLayer(routeHash({ tab: "learn" })), true)}
         {sections && action(<NotebookPen size={22} />, eaten ? "Дневник · " + eaten.toLocaleString("ru-RU") + " ккал" : "Дневник еды",
           eaten ? "Из " + goalOf(diary, profile).toLocaleString("ru-RU") + " на день" : "Записать, что съели — калории и БЖУ", openDiary)}
