@@ -1,7 +1,7 @@
 // Pieces of the conversation with Шеф: messages, «Условия» (what Шеф takes into account), suggestion cards, mood tiles, the pantry picker.
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator, CalendarDays, ShoppingCart, Heart, GraduationCap, UserRound, Home, ChefHat, Type, Moon, Sun, VolumeX, Volume2, Check, PartyPopper, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator, CalendarDays, ShoppingCart, Heart, GraduationCap, UserRound, Home, ChefHat, Type, Moon, Sun, VolumeX, Volume2, Check, PartyPopper, HandPlatter, Leaf, NotebookPen, type LucideIcon } from "lucide-react";
 import {
   LABELS, addToFridge, conditionLabel, expiringSoon, freshConditions, ingredientOptions, pantryGroups, recipeById, searchIngredients, shortName,
   DEFAULT_CONDITIONS, type ChatGo, type ChatMessage, type ChatOption, type Conditions,
@@ -9,6 +9,8 @@ import {
 import { useStore } from "../app/store";
 import { push as openLayer, replace } from "../app/router";
 import { cue } from "../app/feedback";
+import { openParty } from "../app/party";
+import { openDiary } from "../app/diary";
 import type { Profile } from "../app/profile";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
@@ -71,6 +73,7 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
 const GO_ICONS: Record<string, LucideIcon> = {
   plan: CalendarDays, cart: ShoppingCart, fridge: Refrigerator, heart: Heart, school: GraduationCap, profile: UserRound, search: Search,
   home: Home, cook: ChefHat, text: Type, moon: Moon, sun: Sun, mute: VolumeX, sound: Volume2, feast: PartyPopper,
+  party: HandPlatter, leaf: Leaf, snow: Snowflake, diary: NotebookPen,
 };
 
 /** Шеф's big button (app/navigator): opens a screen, or changes a setting — only on this tap, never by itself. */
@@ -82,6 +85,9 @@ function GoButton({ go }: { go: ChatGo }) {
   const run = () => {
     // «на 8 марта»: the festive table opens right here, over the chat.
     if (go.to === "feast") { cue("tap"); setFeast(true); return; }
+    // «Стол в складчину» and «Дневник еды» open over the chat; the fast is switched on here and now.
+    if (go.to === "party") { cue("tap"); openParty(); return; }
+    if (go.to === "diary") { cue("tap"); openDiary(); return; }
     if (go.to.startsWith("set:")) {
       const [, key, value] = go.to.split(":");
       setProfile((p): Profile => {
@@ -89,6 +95,7 @@ function GoButton({ go }: { go: ChatGo }) {
         if (key === "theme" && (value === "light" || value === "dark")) return { ...p, theme: value };
         if (key === "sounds") return { ...p, sounds: value === "on" };
         if (key === "simple") return { ...p, simple: value === "on" };
+        if (key === "fast") return { ...p, fast: { ...p.fast, on: value === "on" } };
         return p;
       });
       setDone(true);

@@ -35,3 +35,21 @@ describe("Шеф as a navigator", () => {
       expect(ask(q), q).toBeNull();
   });
 });
+
+describe("Шеф knows the newer parts", () => {
+  it("answers about them with a button", () => {
+    expect(ask("собираемся с друзьями на шашлыки, кто что принесёт")?.go?.to).toBe("party");
+    expect(ask("хочу собрать стол вскладчину")?.go?.to).toBe("party");
+    expect(ask("я соблюдаю пост")?.go?.to).toBe("set:fast:on");
+    expect(ask("пощусь")?.go?.to).toBe("set:fast:on");
+    expect(navigatorAnswer("я соблюдаю пост", state, { ...DEFAULT_PROFILE, fast: { on: true, weekly: true, fish: false } })?.text).toContain("уже включён");
+    expect(ask("что у меня в морозилке")?.go?.to).toBe("#/pantry");
+    expect(navigatorAnswer("что в морозилке", { ...state, freezer: [{ id: "a", title: "Котлеты", portions: 2, at: 1 }] } as EngineState, DEFAULT_PROFILE)?.text).toContain("котлеты (2 порции)");
+    expect(ask("хочу считать калории")?.go?.to).toBe("diary");
+    expect(ask("сколько я съел сегодня")?.go?.to).toBe("diary");
+  });
+  it("leaves questions about dishes to the recipe search", () => {
+    for (const q of ["постный борщ", "что приготовить в пост", "можно ли заморозить котлеты", "блюда для морозилки", "сколько калорий в борще", "шашлык на мангале"])
+      expect(ask(q)).toBeNull();
+  });
+});

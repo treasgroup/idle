@@ -126,9 +126,35 @@ function howTo(t: string, s: EngineState): NavAnswer | null {
 }
 
 /** An answer about the service itself, or null — then it is a food question for the usual search. */
+// The newer parts of the service, asked in plain words: «кто что принесёт», «я соблюдаю пост», «что в морозилке»,
+// «хочу считать калории». Asked about a dish («постный борщ», «можно ли заморозить котлеты») — that is still a recipe.
+const PARTY = /складчин|кто что (?:принес|приготов|возьм)|каждый (?:принес|приготов|возьм)|(?:собрать|собираем|собираемся)\s.*(?:вскладчину|кто что)|раздать блюда гостям/u;
+const FAST = /(?<!\p{L})(?:соблюдаю|соблюдаем|держу|держим|включи|включить|начинаю|начинаем|режим) пост(?:а)?(?!\p{L})|(?<!\p{L})(?:пощусь|постимся|пощусь)(?!\p{L})|^пост$|^(?:я )?в пост(?:е)?$/u;
+const FREEZER = /(?:что|чего) (?:у меня |у нас |есть |лежит |осталось )*в морозилк|^(?:моя |наша )?морозилк\p{L}*$|(?:открой|покажи|где) (?:мою |нашу )?морозилк/u;
+const DIARY = /дневник (?:еды|питания|калорий)|(?:считать|посчитать|подсчитать|записать|запиши|вести) (?:калори|что (?:я )?съел|съеденн)|сколько (?:я )?(?:съел\p{L}*|ккал|калорий) (?:сегодня|за день)|сч[её]тчик калорий|^дневник$/u;
+
+function featureAnswer(t: string, s: EngineState, p: Profile): NavAnswer | null {
+  if (PARTY.test(t))
+    return { text: "Соберу стол в складчину: выберите повод и блюда, отправьте ссылку — гости сами отметят, кто придёт, что приготовит и что принесёт.", go: { label: "Собрать стол в складчину", to: "party", icon: "party" } };
+  if (FAST.test(t))
+    return p.fast.on
+      ? { text: "«Соблюдаю пост» уже включён: в постные дни план, «Рецепт дня» и я сам берём постное. Настроить — в Профиле → «Под меня»." }
+      : { text: "Включу «Соблюдаю пост»: в среду, пятницу и многодневные посты план на неделю, «Рецепт дня» и я будем брать постное — без мяса, молочного и яиц.", go: { label: "Включить пост", to: "set:fast:on", icon: "leaf" } };
+  if (FREEZER.test(t)) {
+    const list = s.freezer ?? [];
+    return { text: list.length ? "В морозилке: " + list.slice(0, 4).map((f) => f.title.toLowerCase() + (f.portions ? " (" + f.portions + " " + plural(f.portions, "порция", "порции", "порций") + ")" : "")).join(", ") + (list.length > 4 ? " и ещё " + (list.length - 4) : "") + "."
+      : "Морозилка пока пустая. Запишите, что заморожено, — вечером подскажу достать на завтра.", go: { label: "Открыть морозилку", to: "#/pantry", icon: "snow" } };
+  }
+  if (DIARY.test(t))
+    return { text: "Дневник еды: записывайте, что съели, — посчитаю калории и БЖУ за день. Блюда из рецептов — в одно касание, покупное — по штрихкоду.", go: { label: "Открыть дневник", to: "diary", icon: "diary" } };
+  return null;
+}
+
 export function navigatorAnswer(raw: string, s: EngineState, p: Profile): NavAnswer | null {
   const t = norm(raw);
   if (!t || t.length > 80) return null;
+  const feat = featureAnswer(t, s, p);
+  if (feat) return feat;
   if (SET.test(t)) { const a = setting(t, p); if (a) return a; }
   const how = howTo(t, s);
   if (how) return how;
