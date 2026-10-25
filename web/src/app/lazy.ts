@@ -16,6 +16,9 @@ export function lazyScreen<T extends ComponentType<any>>(load: () => Promise<{ d
 
 /** Starts loading the usual next screens while the person looks at the first one. */
 export function preload(loads: (() => Promise<unknown>)[]): void {
+  // «Экономия трафика» or a slow mobile connection: each screen loads when opened, nothing ahead.
+  const net = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  if (net?.saveData || /(^|-)(2g|3g)$/.test(net?.effectiveType ?? "")) return;
   const go = () => loads.forEach((l) => { l().catch(() => {}); });
   const idle = (window as Window & { requestIdleCallback?: (cb: () => void) => void }).requestIdleCallback;
   if (idle) idle(go); else window.setTimeout(go, 1500);
