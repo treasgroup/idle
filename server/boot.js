@@ -1,4 +1,7 @@
 // Runs before the page is drawn: the chosen theme and text size, so the loading screen already looks right.
+// Opened as http://shefly.ru (the hosting answers on both): over to https at once — the microphone, notices and
+// working offline need it, and nothing goes unencrypted. Only for the real domain, never for a local copy.
+if (location.protocol === "http:" && /(^|\.)shefly\.ru$/.test(location.hostname)) location.replace("https://" + location.host + location.pathname + location.search + location.hash);
 (function () {
   try {
     var p = JSON.parse(localStorage.getItem("cook-profile-v1") || "null") || {};

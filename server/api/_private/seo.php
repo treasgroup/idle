@@ -668,6 +668,12 @@ function seo_sitemap(): void {
 // Entry for the three page files: errors never reach the page as text.
 function seo_run(callable $page): void {
     @ini_set('display_errors', '0');
+    // Pages asked over http (the hosting answers on both): one address for people and search engines — https.
+    $host = strtolower((string)($_SERVER['HTTP_HOST'] ?? ''));
+    if (!is_https() && preg_match('/(^|\.)shefly\.ru$/', $host)) {
+        header('Location: https://' . $host . ($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
+        return;
+    }
     try { config(); $page(); }
     catch (Throwable $e) {
         error_log('[what-to-cook] seo: ' . $e->getMessage());
