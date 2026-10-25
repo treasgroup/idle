@@ -8,6 +8,7 @@ import {
 } from "../engine";
 import { photoFirst } from "../app/photoFirst";
 import { useStore } from "../app/store";
+import { keepsFast } from "../app/fasting";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
@@ -105,7 +106,11 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
   const [q, setQ] = useState("");
   const query = useDeferredValue(plainWords(q.trim()));
   const [dish, setDish] = useState<string | null>(null);
-  const [f, setF] = useState<Filters>(NONE);
+  // «Соблюдаю пост»: on a fasting day the search starts with «Постное» on (Масленица — «Без мяса»); one tap removes it.
+  const [f, setF] = useState<Filters>(() => {
+    const fast = mode === "search" ? keepsFast(profile, new Date()) : null;
+    return fast ? { ...NONE, on: [fast.kind === "nomeat" ? "veg" : "lent"] } : NONE;
+  });
   const [sheet, setSheet] = useState(false);
   const [limit, setLimit] = useState(PAGE);
   // The first screen of Поиск: sections and ten popular dishes, the whole catalog one tap further.
