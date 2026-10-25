@@ -6,6 +6,7 @@ import {
   searchIngredients, setExpiry, shortName, type FridgeItem,
 } from "../engine";
 import { useStore } from "../app/store";
+import { FreezerSection } from "../components/Freezer";
 import { knownProduct } from "../app/knownProducts";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
@@ -171,6 +172,8 @@ export function Pantry() {
           </div>
         </>
       )}
+
+      <FreezerSection />
 
       <Section title="Осталось от вчера?">
         <div className="flex flex-wrap gap-2">

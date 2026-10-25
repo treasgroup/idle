@@ -13,6 +13,7 @@ import { goChat } from "../app/chatNav";
 import { goalConditions, type HomeBlock } from "../app/profile";
 import { fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
 import { dateKeyOf, entriesOn, goalOf, openDiary, totals, useDiary } from "../app/diary";
+import { restoreFrozen, thawForTomorrow, thawOffer, useFreezer } from "../app/freezer";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
@@ -385,7 +386,7 @@ function SimpleHome({ today }: { today: Recipe | null }) {
 /** «На сегодня» as one shelf: the day's dish, what is planned, yesterday's to warm up, then the week plan and the
  * shopping list as tiles of the same size. One row instead of a list of four — and it stays on one line on phones. */
 function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
-  const { s, profile } = useStore();
+  const { s, profile, update, toast } = useStore();
   const dinner = useDinner();
   // Left after yesterday's cooking (app/nowaste): offered first, while it is fresh.
   const left = recentLeftovers(s);
@@ -412,6 +413,14 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   // «Соблюдаю пост»: today's fast, or the eve of a long one — the plan for it is one tap away.
   const fastToday = keepsFast(profile, new Date());
   const diary = useDiary();
+  // «Морозилка»: in the evening, with no dinner planned for tomorrow, the oldest frozen dish — one tap to take it out.
+  const frozen = useFreezer();
+  const thawPick = thawOffer(s, frozen);
+  const thawIt = () => {
+    if (!thawPick) return;
+    update((st) => ({ ...st, menu: thawForTomorrow(st.menu, thawPick, profile.eaters) }));
+    toast("Переложите «" + thawPick.title + "» в холодильник — к завтрашнему ужину разморозится", { label: "Отменить", run: () => restoreFrozen(thawPick) });
+  };
   const eaten = Math.round(totals(entriesOn(diary, dateKeyOf(new Date()))).kcal);
   const fastNext = fastTomorrow(profile);
   if (!menu.length && !toBuy && !timers && !thaw && !dayDish && !family.length && !fastToday && !fastNext && profile.simple) return null;
@@ -437,6 +446,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {family.map((d) => <span key={d.id} className="contents">{action(<span className="text-[22px] leading-none">{KIND_ICON[d.kind]}</span>,
           d.who + " — " + whenText(daysUntil(d)).toLowerCase() + (daysUntil(d) === 0 ? " 🎉" : ""),
           "Собрать стол: блюда, покупки и когда что начинать", () => setFeastFor(d))}</span>)}
+        {thawPick && action(<Snowflake size={22} />, "В морозилке: " + thawPick.title.toLowerCase(), "Достать на завтрашний ужин?", thawIt)}
         {fastNext && action(<span className="text-[22px] leading-none">🌿</span>, "Завтра начинается " + fastNext.replace(/ пост$/, " пост"),
           "Составить постный план на неделю", () => openLayer(routeHash({ tab: "menu" })))}
         {fastToday && action(<span className="text-[22px] leading-none">🌿</span>,
@@ -444,7 +454,7 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
           fastToday.kind === "nomeat" ? "Блины и всё без мяса — спросите Шефа" : "Подберу постное — без мяса, молочного и яиц",
           () => { void ask.ask(fastToday.kind === "nomeat" ? "что приготовить без мяса" : "что приготовить постное", { fresh: true }); goChat(); })}
         {dayDish && <RecipeTile recipe={dayDish} badge="Рецепт дня" onOpen={() => openRecipe(dayDish)} className={tile} />}
-        {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? "Приготовлено вчера" : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
+        {menu.map(({ i, r }) => <RecipeTile key={r.id + i.servings} recipe={r} badge={i.leftover ? "Разогреть" : "По плану"} note={i.leftover ? (i.prepped === "freezer" ? "Из морозилки" : "Приготовлено вчера") : i.servings + " порц."} onOpen={() => openRecipe(r)} className={tile} />)}
         {left.length > 0 && action(<Refrigerator size={22} />, "Осталось: " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(", "),
           "После «" + left[0].from + "» — что из этого приготовить",
           () => { void ask.ask("что приготовить из " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(" и "), { fresh: true, source: "leftovers" }); goChat(); })}

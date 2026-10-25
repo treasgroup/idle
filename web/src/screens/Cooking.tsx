@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type TouchEvent } from "react";
 import {
   ArrowRight, Bell, BookOpenCheck, CalendarPlus, Camera, Check, ChevronLeft, ChevronRight, CircleCheck, Clock, CookingPot, Flame, Heart, ListChecks,
-  LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X, NotebookPen,
+  LifeBuoy, Lightbulb, MessageCircle, Mic, MoreHorizontal, Pause, PenLine, Play, Plus, Refrigerator, Search, Star, ThumbsDown, ThumbsUp, Volume2, X, NotebookPen, Snowflake,
 } from "lucide-react";
 import {
   addToFridge, answerKitchenQuestion, answerRecipeQuestion, basics, clampServings, dateKey, dayLabel, displayName, formatMinutes,
@@ -12,6 +12,7 @@ import {
 } from "../engine";
 import { useStore } from "../app/store";
 import { eatRecipe, removeEntry } from "../app/diary";
+import { FreezeSheet } from "../components/Freezer";
 import { SupportAsk } from "../components/SupportButton";
 import { forServings, sizesFor } from "../app/stepServings";
 import { signal } from "../app/personal";
@@ -830,6 +831,7 @@ function Done({ onClose }: { onClose: () => void }) {
   const tomorrow = () => { void a.ask("что приготовить завтра", { fresh: true }); goChat(); };
   // «Дневник еды»: one portion of what was just cooked, in one tap (undone from the toast).
   const [eaten, setEaten] = useState<string | null>(null);
+  const [freeze, setFreeze] = useState(false);
   const eat = () => {
     const e = eatRecipe(r, "cook");
     if (!e) return toast("У этого рецепта калории не посчитаны — запишите в дневник вручную");
@@ -879,9 +881,11 @@ function Done({ onClose }: { onClose: () => void }) {
             <Heart size={16} className={cx(fav && "fill-brand text-brand")} aria-hidden />{fav ? "Сохранено" : "Сохранить"}
           </button>
           <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken" onClick={() => setSheet("menu")}><CalendarPlus size={16} aria-hidden />В план</button>
+          {(r.freezerDays ?? 0) > 0 && <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken" onClick={() => setFreeze(true)}><Snowflake size={16} aria-hidden />В морозилку</button>}
           <button className="inline-flex h-11 items-center gap-1.5 rounded-full px-3 hover:bg-sunken disabled:text-herb" disabled={!!eaten} onClick={eat}><NotebookPen size={16} aria-hidden />{eaten ? "В дневнике" : "В дневник — 1 порция"}</button>
         </div>
 
+        <FreezeSheet open={freeze} onClose={() => setFreeze(false)} recipe={r} />
         {askRemind && (
           <div className="card mt-4 p-4">
             <p className="flex items-center gap-2 text-body-sm font-semibold"><Bell size={18} className="text-ink-soft" aria-hidden />Подсказывать, что приготовить?</p>

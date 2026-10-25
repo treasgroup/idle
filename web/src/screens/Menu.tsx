@@ -231,7 +231,7 @@ export function Menu() {
                             <span className="min-w-0">
                               {meal && <span className="block text-caption text-ink-soft">{meal}</span>}
                               <span className="line-clamp-2 text-body-sm font-semibold leading-snug">{r.title}</span>
-                              <span className="block text-caption text-ink-soft">{it.leftover ? "Разогреть вчерашнее" : it.prepped === "freezer" ? "Из заготовки · достать из морозилки накануне" : it.prepped ? "Из заготовки · 15 мин" : timeShort(r)}</span>
+                              <span className="block text-caption text-ink-soft">{it.leftover && it.prepped === "freezer" ? "Из морозилки · разогреть" : it.leftover ? "Разогреть вчерашнее" : it.prepped === "freezer" ? "Из заготовки · достать из морозилки накануне" : it.prepped ? "Из заготовки · 15 мин" : timeShort(r)}</span>
                             </span>
                           </button>
                           {/* One clear button per dish: replace, remove and the day's actions are inside. Phones: just the pencil. */}
