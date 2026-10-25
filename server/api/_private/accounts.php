@@ -99,6 +99,13 @@ function account_save(array $b): void {
     try {
         $cur = doc_get($owner);
         if ($cur['version'] !== $base) { $pdo->exec('COMMIT'); send_json(['conflict' => true, 'current' => $cur], 409); return; }
+        // An older app (an APK on someone's phone) does not know the newer parts of the document — «Морозилка» —
+        // and sends it without them: what it did not send is kept, not wiped for the whole family.
+        if (is_array($cur['data'])) {
+            $kept = false;
+            foreach ($cur['data'] as $k => $val) if (!array_key_exists($k, $data)) { $data[$k] = $val; $kept = true; }
+            if ($kept) $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+        }
         $v = $cur['version'] + 1;
         $pdo->prepare('INSERT OR REPLACE INTO docs (owner, data, version, updated_at) VALUES (?, ?, ?, ?)')->execute([$owner, $json, $v, now_ms()]);
         $pdo->exec('COMMIT');

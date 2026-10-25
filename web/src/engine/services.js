@@ -42,6 +42,7 @@ import {
   T0,
   lm,
   S0,
+  FZ,
   C0,
   MyR,
   vu,
@@ -1555,7 +1556,7 @@ function wm(e) {
   };
 }
 function Tm(e) {
-  return { shopping: e.shopping, menu: e.menu, fridge: e.fridge };
+  return { shopping: e.shopping, menu: e.menu, fridge: e.fridge, freezer: e.freezer || [] };
 }
 var Sm = (e, t) => JSON.stringify(e) === JSON.stringify(t);
 function Tu(e, t, n, a) {
@@ -1628,6 +1629,8 @@ function hA(e, t, n) {
     s = Tu(a.fridge || [], t.fridge || [], n.fridge || [], (u) => u.id).slice(
       -lm,
     ),
+    // «Морозилка»: merged like the products at home — each frozen thing by its id.
+    fz = Tu(a.freezer || [], t.freezer || [], n.freezer || [], (u) => u.id).slice(0, 80),
     r = [
       ...new Set([...n.menu.map((u) => u.date), ...t.menu.map((u) => u.date)]),
     ].sort(),
@@ -1653,7 +1656,7 @@ function hA(e, t, n) {
             };
       })
       .filter((u) => u.items.length);
-  return { shopping: i, menu: l, fridge: s };
+  return { shopping: i, menu: l, fridge: s, freezer: fz };
 }
 function _0(e, t) {
   let n = (f, p) => p.find((m) => m.id === f) ?? F.find((m) => m.id === f),
@@ -1736,8 +1739,17 @@ function O0(e, t) {
             return s.success ? [s.data] : [];
           })
           .slice(-lm)
-      : e.fridge;
-  return { ...e, shopping: n.shopping, menu: n.menu, fridge: a };
+      : e.fridge,
+    // A document from before «Морозилка» has none: what this device has stays.
+    z = Array.isArray(t.freezer)
+      ? t.freezer
+          .flatMap((i) => {
+            let s = FZ.safeParse(i);
+            return s.success ? [s.data] : [];
+          })
+          .slice(0, 80)
+      : e.freezer || [];
+  return { ...e, shopping: n.shopping, menu: n.menu, fridge: a, freezer: z };
 }
 var yA = Sm;
 var z0 = { p: { version: 0, doc: null }, h: { version: 0, doc: null } };

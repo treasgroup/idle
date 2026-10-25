@@ -116,6 +116,8 @@ export interface MenuPlan {
 }
 
 export interface FridgeItem { id: string; at: number; until: number | null }
+/** «Морозилка»: a frozen dish (ours or one's own) or a product; portions are not counted for products. */
+export interface FrozenItem { id: string; title: string; recipeId?: string; productId?: string; portions: number | null; at: number }
 
 export interface Cooking {
   recipe: Recipe;
@@ -171,6 +173,7 @@ export interface EngineState {
   reminders: { daily: string | null; weekly: boolean };
   today: { date: string; skip: string[] };
   fridge: FridgeItem[];
+  freezer: FrozenItem[];
   polls: { token: string; day: string; at: number }[];
   voter: string;
   joined: string[];

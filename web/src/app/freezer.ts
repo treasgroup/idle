@@ -1,49 +1,37 @@
 // «Морозилка»: what lies frozen — cooked dishes (заготовки, остатки) and products bought ahead — with portions and how
-// long each has been there. In the evening Главная offers to take a dish out for tomorrow; one tap puts it into
-// tomorrow's plan as «Разогреть». Kept on this device for now (the family's shared list is «Мои продукты»).
-import { useSyncExternalStore } from "react";
-import { dateKey, ingredient, plural, recipeById, type EngineState, type MenuDay } from "../engine";
+// long each has been there. Shared by the family like the plan and the shopping list (state.freezer, synced with the
+// household's document). In the evening Главная offers to take a dish out; one tap puts it into tomorrow's plan.
+import { useCallback, useEffect } from "react";
+import { dateKey, ingredient, plural, recipeById, type EngineState, type FrozenItem, type MenuDay } from "../engine";
+import { useStore } from "./store";
 
-export interface Frozen { id: string; title: string; recipeId?: string; productId?: string; portions: number | null; at: number }
-
-const KEY = "cook-freezer-v1";
-const EVENT = "cook-freezer";
+export type Frozen = FrozenItem;
 const DAY = 86400000;
-let cache: Frozen[] | null = null;
-function read(): Frozen[] {
-  if (cache) return cache;
-  try {
-    const l = JSON.parse(localStorage.getItem(KEY) || "[]");
-    cache = Array.isArray(l) ? l.filter((x: Frozen) => x && typeof x.id === "string" && typeof x.title === "string" && typeof x.at === "number") : [];
-  } catch { cache = []; }
-  return cache;
-}
-function write(l: Frozen[]): void {
-  cache = l.slice(0, 80);
-  try { localStorage.setItem(KEY, JSON.stringify(cache)); } catch { /* private mode */ }
-  window.dispatchEvent(new Event(EVENT));
-}
-const subscribe = (f: () => void) => { window.addEventListener(EVENT, f); return () => window.removeEventListener(EVENT, f); };
-export const useFreezer = (): Frozen[] => useSyncExternalStore(subscribe, read, read);
+const MAX = 80;
 
-export function addFrozen(x: Omit<Frozen, "id" | "at">): Frozen {
-  // The same dish frozen again: the portions add up, the date is the older one (it is eaten first anyway).
-  const same = read().find((f) => (x.recipeId && f.recipeId === x.recipeId) || (!x.recipeId && f.title.toLowerCase() === x.title.toLowerCase()));
-  if (same) {
-    const merged = { ...same, portions: same.portions != null && x.portions != null ? same.portions + x.portions : same.portions ?? x.portions };
-    write(read().map((f) => (f.id === same.id ? merged : f)));
-    return merged;
-  }
-  const item: Frozen = { ...x, id: crypto.randomUUID().slice(0, 8), at: Date.now() };
-  write([item, ...read()]);
-  return item;
+/** The freezer and what can be done with it; every change goes through the shared state (and so to the family). */
+export function useFreezer() {
+  const { s, update } = useStore();
+  const list = s.freezer ?? [];
+  const add = useCallback((x: Omit<Frozen, "id" | "at">) => update((st) => ({ ...st, freezer: withAdded(st.freezer ?? [], x) })), [update]);
+  const remove = useCallback((id: string) => update((st) => ({ ...st, freezer: (st.freezer ?? []).filter((f) => f.id !== id) })), [update]);
+  const take = useCallback((id: string, n: number) => update((st) => ({ ...st, freezer: takenOut(st.freezer ?? [], id, n) })), [update]);
+  /** Puts back what was before (the plan too): for «Отменить». */
+  const restore = useCallback((before: Pick<EngineState, "freezer" | "menu">) => update((st) => ({ ...st, freezer: before.freezer, menu: before.menu })), [update]);
+  const thaw = useCallback((f: Frozen, eaters: number) => update((st) => thawForTomorrow(st, f, eaters)), [update]);
+  return { list, add, remove, take, restore, thaw, snapshot: { freezer: list, menu: s.menu } };
 }
-export const removeFrozen = (id: string) => write(read().filter((f) => f.id !== id));
-export const restoreFrozen = (item: Frozen) => write([item, ...read().filter((f) => f.id !== item.id)]);
-/** Takes `n` portions out (all of it when the portions are not counted). */
-export function takeOut(id: string, n: number): void {
-  write(read().flatMap((f) => (f.id !== id ? [f] : f.portions != null && f.portions > n ? [{ ...f, portions: f.portions - n }] : [])));
+
+function withAdded(list: Frozen[], x: Omit<Frozen, "id" | "at">): Frozen[] {
+  // The same dish frozen again: the portions add up, the date stays the older one (it is eaten first anyway).
+  const same = list.find((f) => (x.recipeId && f.recipeId === x.recipeId) || (!x.recipeId && f.title.toLowerCase() === x.title.toLowerCase()));
+  if (same) return list.map((f) => (f.id === same.id ? { ...f, portions: f.portions != null && x.portions != null ? Math.min(99, f.portions + x.portions) : f.portions ?? x.portions } : f));
+  const item: Frozen = { ...x, title: x.title.slice(0, 80), id: crypto.randomUUID().slice(0, 8), at: Date.now() };
+  return [item, ...list].slice(0, MAX);
 }
+/** `n` portions out (all of it when the portions are not counted). */
+const takenOut = (list: Frozen[], id: string, n: number): Frozen[] =>
+  list.flatMap((f) => (f.id !== id ? [f] : f.portions != null && f.portions > n ? [{ ...f, portions: f.portions - n }] : []));
 
 /** How long it keeps frozen: the recipe's own word, else by the kind of product (cooked food — two months). */
 export function keepsDays(f: Frozen): number {
@@ -69,19 +57,34 @@ export function ageText(f: Frozen, now = Date.now()): string {
 export const portionsText = (n: number) => n + " " + plural(n, "порция", "порции", "порций");
 
 /** The evening's offer: a frozen dish for tomorrow when tomorrow has no dinner yet — the oldest first. */
-export function thawOffer(s: EngineState, list: Frozen[], now = new Date()): Frozen | null {
+export function thawOffer(s: EngineState, now = new Date()): Frozen | null {
   if (now.getHours() < 16) return null;
   const tomorrow = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
   const day = s.menu.find((d) => d.date === tomorrow);
   if (day?.items.some((i) => (i.meal ?? "dinner") === "dinner")) return null;
-  return [...list].filter((f) => f.recipeId && recipeById(f.recipeId)).sort((a, b) => a.at - b.at)[0] ?? null;
+  return [...(s.freezer ?? [])].filter((f) => f.recipeId && recipeById(f.recipeId)).sort((a, b) => a.at - b.at)[0] ?? null;
 }
-/** Out of the freezer onto tomorrow's dinner: «Разогреть» in the plan, the portions taken. */
-export function thawForTomorrow(menu: MenuDay[], f: Frozen, eaters: number, now = new Date()): MenuDay[] {
+/** Out of the freezer onto tomorrow's dinner: «Из морозилки · разогреть» in the plan, the portions taken. */
+export function thawForTomorrow<T extends Pick<EngineState, "menu" | "freezer">>(st: T, f: Frozen, eaters: number, now = new Date()): T {
   const date = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
   const n = f.portions != null ? Math.min(f.portions, eaters) : eaters;
-  takeOut(f.id, n);
   const item = { recipeId: f.recipeId!, servings: n, meal: "dinner" as const, leftover: true, prepped: "freezer" as const };
-  const has = menu.some((d) => d.date === date);
-  return has ? menu.map((d) => (d.date === date ? { ...d, items: [...d.items, item] } : d)) : [...menu, { date, items: [item] }];
+  const menu: MenuDay[] = st.menu.some((d) => d.date === date)
+    ? st.menu.map((d) => (d.date === date ? { ...d, items: [...d.items, item].slice(0, 6) } : d))
+    : [...st.menu, { date, items: [item] }];
+  return { ...st, menu, freezer: takenOut(st.freezer ?? [], f.id, n) };
+}
+
+/** The first version kept the freezer on the device: moved once into the shared state, then the old copy is gone. */
+const OLD_KEY = "cook-freezer-v1";
+export function useMoveLocalFreezer(ready: boolean): void {
+  const { update } = useStore();
+  useEffect(() => {
+    if (!ready) return;
+    let old: Frozen[] = [];
+    try { const l = JSON.parse(localStorage.getItem(OLD_KEY) || "[]"); if (Array.isArray(l)) old = l; } catch { /* ignore */ }
+    if (!old.length) return;
+    update((st) => ({ ...st, freezer: [...old.filter((f) => !(st.freezer ?? []).some((x) => x.id === f.id)).map((f) => ({ ...f, portions: f.portions ?? null })), ...(st.freezer ?? [])].slice(0, MAX) }));
+    try { localStorage.removeItem(OLD_KEY); } catch { /* ignore */ }
+  }, [ready, update]);
 }

@@ -2239,6 +2239,7 @@ var zp = {
     reminders: { daily: null, weekly: !1 },
     today: { date: "", skip: [] },
     fridge: [],
+    freezer: [],
     polls: [],
     voter: "",
     joined: [],
@@ -10166,6 +10167,15 @@ var w0 = D.object({
     at: D.number().int().positive(),
     until: D.number().int().positive().nullable(),
   }),
+  // «Морозилка» (app/freezer): a frozen dish or product, shared by the family like the products at home.
+  FZ = D.object({
+    id: D.string().min(1).max(40),
+    title: D.string().min(1).max(80),
+    recipeId: D.string().max(80).optional(),
+    productId: D.string().max(80).optional(),
+    portions: D.number().int().min(1).max(99).nullable(),
+    at: D.number().int().positive(),
+  }),
   Q_ = D.object({
     token: D.string().regex(/^[0-9a-f]{32}$/),
     day: D.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -10257,6 +10267,7 @@ function vu(e) {
   }
   (t.noticeOk = n.noticeOk === !0),
     (t.fridge = a("fridge", S0, lm)),
+    (t.freezer = a("freezer", FZ, 80)),
     (t.polls = a("polls", Q_, 5)),
     (t.voter =
       typeof n.voter == "string" && /^[a-f0-9-]{36}$/.test(n.voter)
@@ -10756,6 +10767,7 @@ export {
   T0,
   lm,
   S0,
+  FZ,
   Q_,
   C0,
   vu,

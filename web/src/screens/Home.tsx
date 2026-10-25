@@ -13,7 +13,7 @@ import { goChat } from "../app/chatNav";
 import { goalConditions, type HomeBlock } from "../app/profile";
 import { fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
 import { dateKeyOf, entriesOn, goalOf, openDiary, totals, useDiary } from "../app/diary";
-import { restoreFrozen, thawForTomorrow, thawOffer, useFreezer } from "../app/freezer";
+import { thawOffer, useFreezer } from "../app/freezer";
 import { MIN_DISHES, coverUrl, customThemes, holidayCollection, loadCustoms, savedCustoms, seasonCollection, themesNow, withCustom, type Collection, type Custom } from "../app/seasonal";
 import { useWeather, weatherLine } from "../app/weather";
 import { MonthCard } from "../components/MonthCard";
@@ -386,7 +386,7 @@ function SimpleHome({ today }: { today: Recipe | null }) {
 /** «На сегодня» as one shelf: the day's dish, what is planned, yesterday's to warm up, then the week plan and the
  * shopping list as tiles of the same size. One row instead of a list of four — and it stays on one line on phones. */
 function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
-  const { s, profile, update, toast } = useStore();
+  const { s, profile, toast } = useStore();
   const dinner = useDinner();
   // Left after yesterday's cooking (app/nowaste): offered first, while it is fresh.
   const left = recentLeftovers(s);
@@ -414,12 +414,13 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const fastToday = keepsFast(profile, new Date());
   const diary = useDiary();
   // «Морозилка»: in the evening, with no dinner planned for tomorrow, the oldest frozen dish — one tap to take it out.
-  const frozen = useFreezer();
-  const thawPick = thawOffer(s, frozen);
+  const fz = useFreezer();
+  const thawPick = thawOffer(s);
   const thawIt = () => {
     if (!thawPick) return;
-    update((st) => ({ ...st, menu: thawForTomorrow(st.menu, thawPick, profile.eaters) }));
-    toast("Переложите «" + thawPick.title + "» в холодильник — к завтрашнему ужину разморозится", { label: "Отменить", run: () => restoreFrozen(thawPick) });
+    const before = fz.snapshot;
+    fz.thaw(thawPick, profile.eaters);
+    toast("Переложите «" + thawPick.title + "» в холодильник — к завтрашнему ужину разморозится", { label: "Отменить", run: () => fz.restore(before) });
   };
   const eaten = Math.round(totals(entriesOn(diary, dateKeyOf(new Date()))).kcal);
   const fastNext = fastTomorrow(profile);

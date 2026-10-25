@@ -1,16 +1,17 @@
 // «Морозилка» in «Мои продукты»: what is frozen, how many portions, how long it has been there; take a dish out
 // for tomorrow (it goes into the plan), a portion now, or mark it eaten. «В морозилку» adds a dish or a product.
+// The family sees the same freezer (it is synced like the plan and the list).
 import { useMemo, useState } from "react";
 import { Plus, Snowflake } from "lucide-react";
 import { ingredientOptions, recipeById, searchIngredients, searchRecipes, shortName, type Recipe } from "../engine";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
-import { addFrozen, ageText, overdue, portionsText, removeFrozen, restoreFrozen, takeOut, thawForTomorrow, useFreezer, type Frozen } from "../app/freezer";
+import { ageText, overdue, portionsText, useFreezer, type Frozen } from "../app/freezer";
 import { RecipeImage } from "./RecipeCard";
 import { Section, Sheet, Stepper, cx } from "./ui";
 
 export function FreezerSection() {
-  const list = useFreezer();
+  const { list } = useFreezer();
   const [adding, setAdding] = useState(false);
   const [open, setOpen] = useState<Frozen | null>(null);
   return (
@@ -44,22 +45,23 @@ export function FreezerSection() {
 
 /** What to do with one frozen thing. */
 function FrozenSheet({ item, onClose }: { item: Frozen | null; onClose: () => void }) {
-  const { update, profile, toast } = useStore();
+  const { profile, toast } = useStore();
   const { openRecipe } = useActions();
+  const fz = useFreezer();
   const r = item?.recipeId ? recipeById(item.recipeId) : undefined;
-  const gone = (f: Frozen) => { removeFrozen(f.id); toast("Убрал из морозилки: " + f.title, { label: "Вернуть", run: () => restoreFrozen(f) }); onClose(); };
+  const gone = (f: Frozen) => { const before = fz.snapshot; fz.remove(f.id); toast("Убрал из морозилки: " + f.title, { label: "Вернуть", run: () => fz.restore(before) }); onClose(); };
   return (
     <Sheet open={!!item} title={item?.title ?? ""} onClose={onClose}>
       {item && <>
         <p className="text-body-sm text-ink-soft">{item.portions != null ? portionsText(item.portions) + " · " : ""}{ageText(item)}{overdue(item) ? " — лучше съесть в ближайшие дни" : ""}.</p>
         <div className="mt-4 grid gap-2">
           {r && <button className="btn-primary justify-start" onClick={() => {
-            const before = item;
-            update((st) => ({ ...st, menu: thawForTomorrow(st.menu, item, profile.eaters) }));
-            toast("Переложите в холодильник — к завтрашнему ужину разморозится. В плане: «Разогреть»", { label: "Отменить", run: () => restoreFrozen(before) });
+            const before = fz.snapshot;
+            fz.thaw(item, profile.eaters);
+            toast("Переложите в холодильник — к завтрашнему ужину разморозится. В плане: «Разогреть»", { label: "Отменить", run: () => fz.restore(before) });
             onClose();
           }}><Snowflake size={18} aria-hidden />Достать на завтра — в план</button>}
-          {item.portions != null && item.portions > 1 && <button className="btn-outline justify-start" onClick={() => { takeOut(item.id, 1); toast("Достали 1 порцию"); onClose(); }}>Достать 1 порцию сейчас</button>}
+          {item.portions != null && item.portions > 1 && <button className="btn-outline justify-start" onClick={() => { fz.take(item.id, 1); toast("Достали 1 порцию"); onClose(); }}>Достать 1 порцию сейчас</button>}
           {r && <button className="btn-outline justify-start" onClick={() => { onClose(); openRecipe(r); }}>Открыть рецепт</button>}
           <button className="btn-ghost justify-start" onClick={() => gone(item)}>Закончилось</button>
         </div>
@@ -71,6 +73,7 @@ function FrozenSheet({ item, onClose }: { item: Frozen | null; onClose: () => vo
 /** «В морозилку»: a dish (ours or one's own) or a product, with portions for the dishes. */
 export function FreezeSheet({ open, onClose, recipe }: { open: boolean; onClose: () => void; recipe?: Recipe }) {
   const { toast } = useStore();
+  const fz = useFreezer();
   const [q, setQ] = useState("");
   const [pick, setPick] = useState<{ title: string; recipeId?: string; productId?: string } | null>(null);
   const [portions, setPortions] = useState(2);
@@ -81,7 +84,7 @@ export function FreezeSheet({ open, onClose, recipe }: { open: boolean; onClose:
   const close = () => { setQ(""); setPick(null); setPortions(2); onClose(); };
   const save = () => {
     if (!chosen) return;
-    addFrozen({ ...chosen, portions: chosen.productId ? null : portions });
+    fz.add({ ...chosen, portions: chosen.productId ? null : portions });
     toast("В морозилке: " + chosen.title);
     close();
   };
@@ -101,7 +104,7 @@ export function FreezeSheet({ open, onClose, recipe }: { open: boolean; onClose:
         <p className="text-body font-semibold">{chosen.title}</p>
         {!recipe && <button className="text-body-sm text-brand" onClick={() => setPick(null)}>Другое</button>}
         {!chosen.productId && <div className="mt-4 flex items-center justify-between gap-3"><span className="text-body-sm">Сколько порций</span><Stepper value={portions} min={1} max={30} onChange={setPortions} label="Порций" /></div>}
-        <p className="mt-3 text-caption text-ink-faint">Вечером, когда на завтра нет ужина, подскажу достать. Хранится на этом устройстве.</p>
+        <p className="mt-3 text-caption text-ink-faint">Вечером, когда на завтра нет ужина, подскажу достать. Морозилку видит вся семья.</p>
       </>}
     </Sheet>
   );
