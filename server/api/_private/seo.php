@@ -268,6 +268,8 @@ function seo_head(array $o): string {
     $out = "<!doctype html>\n<html lang=\"ru\">\n<head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>$t</title>\n<meta name=\"description\" content=\"$d\">\n<link rel=\"canonical\" href=\"$url\">\n"
         . "<meta property=\"og:type\" content=\"" . h($o['ogType'] ?? 'website') . "\">\n<meta property=\"og:site_name\" content=\"" . h(SEO_SITE) . "\">\n<meta property=\"og:locale\" content=\"ru_RU\">\n"
         . "<meta property=\"og:title\" content=\"" . h($o['ogTitle'] ?? $o['title']) . "\">\n<meta property=\"og:description\" content=\"$d\">\n<meta property=\"og:url\" content=\"$url\">\n<meta property=\"og:image\" content=\"" . h($img) . "\">\n";
+    // A page for people, not for the search («из соды и лука»): its links are still followed.
+    if (!empty($o['noindex'])) $out .= "<meta name=\"robots\" content=\"noindex, follow\">\n";
     if (!empty($o['imageW'])) $out .= '<meta property="og:image:width" content="' . (int)$o['imageW'] . "\">\n<meta property=\"og:image:height\" content=\"" . (int)$o['imageH'] . "\">\n";
     if (!empty($o['imageAlt'])) $out .= '<meta property="og:image:alt" content="' . h($o['imageAlt']) . "\">\n";
     $out .= '<meta name="twitter:card" content="' . (isset($o['image']) ? 'summary_large_image' : 'summary') . "\">\n<meta name=\"theme-color\" content=\"#FAF7F0\">\n<meta name=\"color-scheme\" content=\"only light\">\n<link rel=\"icon\" href=\"" . h(seo_path()) . "favicon.svg\" type=\"image/svg+xml\">\n<link rel=\"apple-touch-icon\" href=\"" . h(seo_path()) . "icons/apple-touch-icon.png\">\n";
@@ -657,7 +659,7 @@ function seo_sitemap(): void {
     $url(seo_abs(seo_path() . (seo_pretty() ? 'avtor' : 'avtor.php')), $newest);
     $url(seo_abs(seo_combo_path('')), $newest);
     foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
-    foreach (seo_combo_pairs() as [$a, $b]) $url(seo_abs(seo_combo_path($a, $b)), $newest);
+    foreach (seo_combo_pairs() as [$a, $b, $n]) if (seo_pair_strong($a, $b, $n)) $url(seo_abs(seo_combo_path($a, $b)), $newest);
     foreach ($all as $r) {
         $p = seo_photo($r['id']);
         $url(seo_abs(seo_recipe_path($r['id'])), max((int)$r['_mtime'], $p['mtime'] ?? 0), $p ? '<image:image><image:loc>' . $x(seo_abs($p['path'])) . '</image:loc></image:image>' : '');
@@ -796,7 +798,8 @@ function seo_combo_page(string $a, ?string $b): void {
         'itemListElement' => array_values(array_map(fn($r, $k) => ['@type' => 'ListItem', 'position' => $k + 1, 'url' => seo_abs(seo_recipe_path($r['id'])), 'name' => (string)$r['title']], $list, array_keys($list)))];
     header('Content-Type: text/html; charset=utf-8');
     header('Cache-Control: public, max-age=600');
-    echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld]]);
+    echo seo_head(['title' => $title . ' | ' . SEO_SITE, 'description' => $desc, 'canonical' => $canonical, 'ld' => [$ld],
+        'noindex' => $b !== null && !seo_pair_strong($a, $b, $n)]);
     echo '<nav class="crumbs" aria-label="Навигация"><a href="' . h(seo_combo_path('')) . '">Что приготовить из продуктов</a>' . ($b ? ' › <a href="' . h(seo_combo_path($a)) . '">' . h(seo_ucfirst(seo_ing_name($a))) . '</a>' : '') . "</nav>\n";
     echo '<h1>' . h($heading) . '</h1><p class="lead">' . h($desc) . "</p>\n";
     echo seo_grid_with_cta($list, '<div class="cta"><p>Есть ещё продукты? Скажите голосом или напишите всё, что есть дома, — Шеф подберёт блюдо и подскажет, что докупить.</p><a class="btn" href="' . h(seo_path()) . "\">Спросить Шефа</a></div>\n");
@@ -817,6 +820,13 @@ function seo_combo_page(string $a, ?string $b): void {
 }
 // Seasonings, baking things and sauces: real products, but nobody starts a dinner from them. On the index page they
 // are only in «Все продукты», and not in «Популярные сочетания».
+/** A pair worth the search: two main products (not a spice or a sauce) and at least five recipes. The others
+ * («из соды и лука») stay for people, but search engines are asked not to take them — a thousand thin pages
+ * would make the whole site look thin and slow down the recipes. */
+const SEO_PAIR_INDEX_MIN = 5;
+function seo_pair_strong(string $a, string $b, int $n): bool {
+    return $n >= SEO_PAIR_INDEX_MIN && !in_array($a, SEO_COMBO_MINOR, true) && !in_array($b, SEO_COMBO_MINOR, true);
+}
 const SEO_COMBO_MINOR = ['garlic', 'lemon-juice', 'vanilla-sugar', 'tomato-paste', 'parsley', 'dill', 'mayonnaise', 'paprika', 'green-onion', 'cilantro',
     'cumin', 'canned-tomato', 'instant-yeast', 'soy-sauce', 'chili', 'coriander', 'breadcrumbs', 'ginger', 'cinnamon', 'baking-soda', 'baking-powder',
     'potato-starch', 'rice-vinegar', 'egg-yolk', 'egg-white', 'prepared-mustard', 'dried-oregano', 'lime-juice', 'fresh-basil', 'ground-nutmeg',
@@ -837,7 +847,7 @@ function seo_combo_list(): void {
     echo '<h2>Основные продукты</h2><ul class="cats">';
     foreach (array_slice($main, 0, 40, true) as $id => $rs) echo $chip($id, count($rs));
     echo "</ul>\n<h2>Удачные сочетания</h2><ul class=\"cats\">";
-    $pairs = array_filter(seo_combo_pairs(400), fn($x) => !in_array($x[0], SEO_COMBO_MINOR, true) && !in_array($x[1], SEO_COMBO_MINOR, true));
+    $pairs = array_filter(seo_combo_pairs(), fn($x) => seo_pair_strong($x[0], $x[1], $x[2]));
     foreach (array_slice($pairs, 0, 36) as [$x, $y, $n]) echo '<li><a href="' . h(seo_combo_path($x, $y)) . '">' . h(seo_ucfirst(seo_ing_name($x)) . ' и ' . seo_ing_name($y)) . '<small>' . $n . '</small></a></li>';
     echo "</ul>\n";
     // Every product with a page, for those who look for something rarer (and for search engines).
