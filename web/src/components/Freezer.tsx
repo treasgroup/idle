@@ -6,7 +6,7 @@ import { Plus, Snowflake } from "lucide-react";
 import { ingredientOptions, recipeById, searchIngredients, searchRecipes, shortName, type Recipe } from "../engine";
 import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
-import { ageText, overdue, portionsText, useFreezer, type Frozen } from "../app/freezer";
+import { ageText, keepsText, overdue, overdueList, portionsText, useFreezer, type Frozen } from "../app/freezer";
 import { RecipeImage } from "./RecipeCard";
 import { Section, Sheet, Stepper, cx } from "./ui";
 
@@ -16,6 +16,7 @@ export function FreezerSection() {
   const [open, setOpen] = useState<Frozen | null>(null);
   return (
     <Section title="Морозилка" icon={<Snowflake size={20} className="text-ink-soft" aria-hidden />} action="Добавить" onAction={() => setAdding(true)}>
+      <EatSoon list={list} />
       {!list.length
         ? <button className="flex w-full items-center gap-3 rounded-card border border-dashed border-line-strong/50 p-4 text-left" onClick={() => setAdding(true)}>
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sunken text-ink-soft" aria-hidden><Snowflake size={20} /></span>
@@ -40,6 +41,33 @@ export function FreezerSection() {
       <FreezeSheet open={adding} onClose={() => setAdding(false)} />
       <FrozenSheet item={open} onClose={() => setOpen(null)} />
     </Section>
+  );
+}
+
+/** «Пора съесть»: what lies longer than it keeps, on top — take it out for tomorrow or mark it eaten. */
+function EatSoon({ list }: { list: Frozen[] }) {
+  const { profile, toast } = useStore();
+  const fz = useFreezer();
+  const old = overdueList(list);
+  const f = old[0];
+  if (!f) return null;
+  const r = f.recipeId ? recipeById(f.recipeId) : undefined;
+  const thaw = () => {
+    const before = fz.snapshot;
+    if (r) { fz.thaw(f, profile.eaters); toast("Переложите в холодильник — к завтрашнему ужину разморозится. В плане: «Разогреть»", { label: "Отменить", run: () => fz.restore(before) }); }
+    else { fz.remove(f.id); toast("Переложите в холодильник — к завтра разморозится", { label: "Отменить", run: () => fz.restore(before) }); }
+  };
+  const gone = () => { const before = fz.snapshot; fz.remove(f.id); toast("Убрал из морозилки: " + f.title, { label: "Вернуть", run: () => fz.restore(before) }); };
+  return (
+    <div className="mb-3 rounded-card border border-warn/25 bg-warn-soft p-4">
+      <p className="text-body font-semibold text-warn">Пора съесть</p>
+      <p className="mt-1 text-body-sm">{f.title}{f.portions != null ? ", " + portionsText(f.portions) : ""} — {ageText(f)}, хранится {keepsText(f)}</p>
+      {old.length > 1 && <p className="mt-0.5 text-caption text-ink-soft">И ещё: {old.slice(1, 4).map((x) => x.title).join(", ")}{old.length > 4 ? " и другое" : ""}</p>}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button className="btn-primary h-10 px-4 text-small" onClick={thaw}><Snowflake size={16} aria-hidden />{r ? "Достать на завтра" : "Достать"}</button>
+        <button className="btn-outline h-10 bg-card px-4 text-small" onClick={gone}>Закончились</button>
+      </div>
+    </div>
   );
 }
 

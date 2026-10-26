@@ -8,6 +8,7 @@ import {
   LABELS, expiringSoon, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
 } from "../engine";
 import { useStore } from "../app/store";
+import { overdueList } from "../app/freezer";
 import { LEGAL_TITLES } from "../engine/legalApi";
 import { useReminders } from "../app/reminders";
 import { GOALS, LEVELS } from "../app/profile";
@@ -188,7 +189,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       {/* Four in a row only when they fit: a narrow phone or larger text gets three (words like «Праздничный» stay whole). */}
       <div className={cx("grid gap-2 lg:grid-cols-8", size === "m" ? "grid-cols-3 min-[360px]:grid-cols-4" : size === "l" ? "grid-cols-3" : "grid-cols-2 min-[400px]:grid-cols-3")}>
         {!profile.simple && tile(<CalendarDays size={18} />, "План", () => openLayer(routeHash({ tab: "menu" })))}
-        {!profile.simple && tile(<Refrigerator size={18} />, "Продукты", () => openLayer(routeHash({ tab: "pantry" })), soonFridge > 0)}
+        {!profile.simple && tile(<Refrigerator size={18} />, "Продукты", () => openLayer(routeHash({ tab: "pantry" })), soonFridge > 0 || overdueList(s.freezer ?? []).length > 0)}
         {profile.simple && tile(<ShoppingCart size={18} />, "Покупки", () => openLayer(routeHash({ tab: "shopping" })))}
         {tile(<BookHeart size={18} />, "Семейная книга", () => openRecipesView("mine"))}
         {tile(<PartyPopper size={18} />, "Праздничный стол", () => setFeast(true))}

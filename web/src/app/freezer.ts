@@ -55,6 +55,16 @@ export function ageText(f: Frozen, now = Date.now()): string {
   const m = Math.floor(d / 30);
   return "лежит " + m + " " + plural(m, "месяц", "месяца", "месяцев");
 }
+/** «до 3 месяцев», «до 6 недель» — how long it keeps. */
+export function keepsText(f: Frozen): string {
+  const d = keepsDays(f);
+  if (d >= 60) { const m = Math.round(d / 30); return "до " + m + " " + (m === 1 ? "месяца" : "месяцев"); }
+  const w = Math.max(1, Math.round(d / 7));
+  return "до " + w + " " + (w === 1 ? "недели" : "недель");
+}
+/** What lies longer than it keeps, the most overdue first («Пора съесть»; a dot on Профиль's «Продукты»). */
+export const overdueList = (list: Frozen[], now = Date.now()) =>
+  list.filter((f) => overdue(f, now)).sort((a, b) => (ageDays(b, now) - keepsDays(b)) - (ageDays(a, now) - keepsDays(a)));
 export const portionsText = (n: number) => n + " " + plural(n, "порция", "порции", "порций");
 
 /** The evening's offer: a frozen dish for tomorrow when tomorrow has no dinner yet — the oldest first. */
