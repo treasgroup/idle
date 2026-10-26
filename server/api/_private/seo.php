@@ -299,7 +299,7 @@ function seo_footer(): string {
     $p = h(seo_path());
     return "</main>\n<footer class=\"foot\"><div class=\"wrap\"><a class=\"brand\" href=\"$p\"><img src=\"{$p}logo-round.svg\" alt=\"\" width=\"28\" height=\"28\" loading=\"lazy\"><span>" . h(SEO_SITE) . "</span></a>"
         . "<p>Подбор домашних рецептов по продуктам, времени и настроению. Голосом или текстом, бесплатно и без регистрации.</p>"
-        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'skolko/' : 'skolko.php')) . "\">Сколько варить и запекать</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'avtor' : 'avtor.php')) . "\">Поддержать автора</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
+        . "<nav aria-label=\"Ещё\"><a href=\"" . h(seo_list_path()) . "\">Все рецепты</a><a href=\"" . h(seo_collection_path_safe()) . "\">Подборки</a><a href=\"" . h(seo_combo_path('')) . "\">Что приготовить из продуктов</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'shkola/' : 'shkola.php')) . "\">Школа готовки</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'stati/' : 'stati.php')) . "\">Статьи</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'skolko/' : 'skolko.php')) . "\">Сколько варить и запекать</a><a href=\"" . h(seo_path() . (seo_pretty() ? 'avtor' : 'avtor.php')) . "\">Поддержать автора</a><a href=\"{$p}#info\">Откуда сведения</a><a href=\"{$p}#privacy\">Конфиденциальность</a></nav></div></footer>\n</body>\n</html>\n";
 }
 /** The site's own font (Golos Text), served from /fonts next to the app. */
 function seo_fonts(): string {
@@ -701,6 +701,10 @@ function seo_sitemap(?callable $collect = null): void {
     }
     if (function_exists('school_sitemap')) school_sitemap($url);
     if (function_exists('skolko_sitemap')) skolko_sitemap($url);
+    if (function_exists('art_published')) {
+        $url(seo_abs(art_path()), $newest);
+        foreach (art_published() as $a) $url(seo_abs(art_path($a['slug'])), (int)$a['at']);
+    }
     $url(seo_abs(seo_path() . (seo_pretty() ? 'avtor' : 'avtor.php')), $newest);
     $url(seo_abs(seo_combo_path('')), $newest);
     foreach (seo_combo_index() as $id => $_) $url(seo_abs(seo_combo_path($id)), $newest);
@@ -728,7 +732,7 @@ function seo_indexnow_send(): array {
     $f = seo_indexnow_state_file();
     @touch($f); // one sender at a time: the next pages see it fresh
     // Whatever page started it, the whole sitemap: its other parts too.
-    foreach (['collections', 'school_seo', 'skolko_seo'] as $part) require_once __DIR__ . '/' . $part . '.php';
+    foreach (['collections', 'school_seo', 'skolko_seo', 'articles'] as $part) require_once __DIR__ . '/' . $part . '.php';
     $urls = [];
     seo_sitemap(function (string $loc) use (&$urls) { $urls[] = $loc; });
     $body = ['host' => 'shefly.ru', 'key' => INDEXNOW_KEY, 'keyLocation' => 'https://shefly.ru/' . INDEXNOW_KEY . '.txt'];

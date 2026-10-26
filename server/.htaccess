@@ -51,6 +51,10 @@ AddType text/javascript .js
   RewriteRule ^avtor/?$ avtor.php [L,QSA]
   RewriteRule ^skolko/([a-z-]+)/?$ skolko.php?k=$1 [L,QSA]
   RewriteRule ^sitemap\.xml$ sitemap.php [L]
+  # «Статьи» and their feed for Дзен (stati.php?s=<slug>, stati.php?rss=1 without mod_rewrite).
+  RewriteRule ^stati/?$ stati.php [L,QSA]
+  RewriteRule ^stati/([a-z0-9-]+)/?$ stati.php?s=$1 [L,QSA]
+  RewriteRule ^dzen\.xml$ stati.php?rss=1 [L]
 </IfModule>
 
 # Uncomment to force HTTPS (voice input and installation as an app require HTTPS):
