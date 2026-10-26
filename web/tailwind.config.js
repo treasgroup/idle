@@ -16,6 +16,7 @@ export default {
         brand: { DEFAULT: c("brand"), fill: c("brand-fill"), soft: c("brand-soft"), ink: c("brand-ink") },
         herb: { DEFAULT: c("herb"), soft: c("herb-soft") },
         warn: { DEFAULT: c("warn"), soft: c("warn-soft") },
+        over: { DEFAULT: c("over"), strong: c("over-strong") },
       },
       fontFamily: {
         // One typeface for everything: Golos Text (made for public services, easy to read at any age).

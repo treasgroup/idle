@@ -36,6 +36,8 @@
   --herb-soft: 226 240 226;
   --warn: 143 82 8;
   --warn-soft: 252 239 214;
+  --over: 243 205 194;
+  --over-strong: 206 108 92;
   --scrim: 33 29 26;
   --scrim-a: 0.4;
   --nav-h: 0px;
@@ -61,6 +63,8 @@
   --herb-soft: 30 52 34;
   --warn: 236 176 80;
   --warn-soft: 60 44 18;
+  --over: 92 46 40;
+  --over-strong: 230 140 124;
   --scrim: 0 0 0;
   --scrim-a: 0.6;
   color-scheme: dark;

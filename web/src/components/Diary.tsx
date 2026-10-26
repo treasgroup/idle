@@ -2,11 +2,11 @@
 // a dish from our recipes (a portion of ½–2), a packaged product by barcode, or anything typed by hand.
 import { useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronLeft, ChevronRight, PenLine, Plus, ScanBarcode, Search, Target, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, PenLine, Plus, RotateCcw, ScanBarcode, Search, Target, X } from "lucide-react";
 import { searchRecipes, type Recipe } from "../engine";
 import { useStore } from "../app/store";
 import {
-  MEALS, PORTIONS, addEntry, dateKeyOf, entriesOn, goalOf, lookupBarcode, mealByHour, portionText, recipeEntry, removeEntry, setGoal, totals, useDiary,
+  MEALS, PORTIONS, addEntry, again, dateKeyOf, frequent, week, entriesOn, goalOf, lookupBarcode, mealByHour, portionText, recipeEntry, removeEntry, setGoal, totals, useDiary,
   type DiaryEntry, type DiaryMeal, type Packaged,
 } from "../app/diary";
 import { BarcodeScan, canScan } from "./BarcodeScan";
@@ -33,6 +33,14 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
   const goal = goalOf(diary, profile);
   const share = Math.min(1, sum.kcal / goal);
   const isToday = date === dateKeyOf(new Date());
+  // One tap: «Часто ем» and «Как вчера» write into the meal of this hour.
+  const meal = mealByHour();
+  const mealName = MEALS.find((m) => m.id === meal)!.label.toLowerCase();
+  const fav = isToday ? frequent(diary) : [];
+  const yesterday = isToday && !list.some((e) => e.meal === meal) ? entriesOn(diary, shift(date, -1)).filter((e) => e.meal === meal) : [];
+  const undo = (added: DiaryEntry[]) => ({ label: "Отменить", run: () => added.forEach((e) => removeEntry(e.id)) });
+  const quick = (e: DiaryEntry) => { const n = again(e, date, meal); toast("Записано на " + mealName + ": " + e.title, undo([n])); };
+  const repeat = () => { const n = yesterday.map((e) => again(e, date, meal)); toast("Записано, как вчера: " + kcal(totals(n).kcal), undo(n)); };
   const remove = (e: DiaryEntry) => {
     removeEntry(e.id);
     toast("Убрано: " + e.title, { label: "Вернуть", run: () => addEntry({ ...e, date: e.date }) });
@@ -60,12 +68,34 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
             <p className="text-body-sm text-ink-soft">{sum.kcal > goal ? "Больше цели на " + kcal(sum.kcal - goal) : "Осталось " + kcal(goal - sum.kcal)}</p>
             <button className="btn-outline h-10 px-3 text-small" onClick={() => setGoalOpen(true)}><Target size={16} aria-hidden />Цель: {kcal(goal)}</button>
           </div>
+          <Week diary={diary} date={date} goal={goal} onPick={setDate} />
           <div className="mt-3 grid grid-cols-3 gap-2 text-center">
             {([["Белки", sum.protein], ["Жиры", sum.fat], ["Углеводы", sum.carbs]] as const).map(([l, v]) => (
               <div key={l} className="rounded-input bg-sunken py-2"><p className="text-body font-semibold tabular-nums">{Math.round(v)} г</p><p className="text-caption text-ink-soft">{l}</p></div>
             ))}
           </div>
         </div>
+
+        {yesterday.length > 0 && (
+          <button className="card mt-3 flex w-full items-center gap-3 px-4 py-3 text-left" onClick={repeat}>
+            <RotateCcw size={18} className="shrink-0 text-brand" aria-hidden />
+            <span className="min-w-0 flex-1">
+              <span className="block text-body-sm font-semibold first-letter:uppercase">{mealName} как вчера</span>
+              <span className="block truncate text-caption text-ink-soft">{yesterday.slice(0, 2).map((e) => e.title).join(", ")}{yesterday.length > 2 ? " и ещё " + (yesterday.length - 2) : ""} · {kcal(totals(yesterday).kcal)}</span>
+            </span>
+            <span className="shrink-0 rounded-full bg-brand-soft px-3 py-1.5 text-small font-semibold text-brand-ink">Повторить</span>
+          </button>
+        )}
+        {fav.length > 0 && <>
+          <p className="label mb-2 mt-5">Часто ем</p>
+          <div className="flex flex-wrap gap-1.5">
+            {fav.map((e) => (
+              <Chip key={e.id} onClick={() => quick(e)} label={"Записать ещё: " + e.title + ", " + kcal(e.kcal)}>
+                {e.title}<span className="text-ink-faint">· {Math.round(e.kcal)}</span>
+              </Chip>
+            ))}
+          </div>
+        </>}
 
         <div className="mt-4 grid grid-cols-3 gap-2">
           <button className="btn-primary h-auto min-h-11 px-1 py-2 text-[min(0.875rem,4.2vw)] max-[359px]:flex-col max-[359px]:gap-1 [.xl-text_&]:flex-col [.xl-text_&]:gap-1" onClick={() => setAdd("dish")}><Search size={18} aria-hidden />Блюдо</button>
@@ -102,6 +132,35 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
       <AddManual open={add === "manual"} date={date} onClose={() => setAdd(null)} />
       <GoalSheet open={goalOpen} goal={goal} onClose={() => setGoalOpen(false)} />
     </Layer>
+  );
+}
+
+/** The week up to the chosen day, in the day's card: a bar a day, pink when over the goal; a tap opens that day. */
+function Week({ diary, date, goal, onPick }: { diary: ReturnType<typeof useDiary>; date: string; goal: number; onPick: (d: string) => void }) {
+  const today = dateKeyOf(new Date());
+  const days = week(diary, shift(date, 3) > today ? today : shift(date, 3));
+  const filled = days.filter((d) => d.any);
+  if (filled.length < 2) return null;
+  const top = Math.max(goal * 1.15, ...days.map((d) => d.kcal));
+  const avg = filled.reduce((t, d) => t + d.kcal, 0) / filled.length;
+  const long = (d: string) => new Date(d + "T12:00").toLocaleDateString("ru-RU", { weekday: "long", day: "numeric", month: "long" });
+  return (
+    <div className="mt-3 border-t border-line pt-3">
+      <div className="flex h-20 items-end gap-1.5">
+        {days.map((d) => {
+          const over = d.kcal > goal, on = d.date === date;
+          return (
+            <button key={d.date} className="flex h-full flex-1 flex-col items-center justify-end gap-1" disabled={d.date > today} onClick={() => onPick(d.date)}
+              aria-label={long(d.date) + ": " + (d.any ? kcal(d.kcal) + (over ? ", больше цели" : "") : "ничего не записано")} aria-current={on ? "date" : undefined}>
+              <span className={cx("block w-full rounded-[6px]", !d.any ? "bg-sunken" : over ? (on ? "bg-over-strong" : "bg-over") : on ? "bg-herb" : "bg-herb/35")}
+                style={{ height: d.any ? Math.max(6, (d.kcal / top) * 100) + "%" : "6px" }} />
+              <span className={cx("text-micro leading-none", on ? "font-semibold text-ink" : "text-ink-faint")} aria-hidden>{new Date(d.date + "T12:00").toLocaleDateString("ru-RU", { weekday: "short" })}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-2 text-caption text-ink-soft">Розовым — дни сверх цели · в среднем {kcal(avg)}</p>
+    </div>
   );
 }
 

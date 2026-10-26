@@ -96,3 +96,32 @@ export async function lookupBarcode(code: string): Promise<Packaged> {
   if (!r.ok) throw new Error((j as { error?: string }).error || "Не получилось узнать продукт.");
   return j as Packaged;
 }
+
+/** «Часто ем»: what was eaten on at least two days of the last 30 — one tap writes it again, the last time's numbers. */
+export function frequent(d: Diary, limit = 6): DiaryEntry[] {
+  const cut = dateKeyOf(new Date(Date.now() - 30 * 86400000));
+  const seen = new Map<string, { last: DiaryEntry; days: Set<string> }>();
+  for (const e of d.entries) {
+    if (e.date < cut) continue;
+    const k = (e.recipeId ?? e.title.toLowerCase()) + "|" + (e.portion ?? e.grams ?? "");
+    const s = seen.get(k) ?? { last: e, days: new Set<string>() };
+    s.days.add(e.date);
+    if (e.at >= s.last.at) s.last = e;
+    seen.set(k, s);
+  }
+  return [...seen.values()].filter((s) => s.days.size >= 2)
+    .sort((a, b) => b.days.size - a.days.size || b.last.at - a.last.at).slice(0, limit).map((s) => s.last);
+}
+/** The same entry once more: on another day or meal, with the numbers it had. */
+export function again(e: DiaryEntry, date: string, meal: DiaryMeal): DiaryEntry {
+  const { id: _id, at: _at, date: _date, ...rest } = e;
+  return addEntry({ ...rest, meal, date });
+}
+/** The seven days up to `end`, each with its calories (0 when nothing was written). */
+export function week(d: Diary, end: string): { date: string; kcal: number; any: boolean }[] {
+  return Array.from({ length: 7 }, (_, i) => {
+    const t = new Date(end + "T12:00"); t.setDate(t.getDate() - 6 + i);
+    const date = dateKeyOf(t), list = entriesOn(d, date);
+    return { date, kcal: totals(list).kcal, any: list.length > 0 };
+  });
+}
