@@ -458,8 +458,9 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const tile = "w-[150px] shrink-0 snap-start sm:w-[200px]";
   const action = (icon: ReactNode, title: string, line: string, onClick: () => void, school?: boolean) => (
     <button onClick={onClick} className={cx("flex flex-col items-start justify-between gap-3 p-4 text-left transition-[border-color,transform] duration-150 active:scale-[.99]", tile,
-      school ? "rounded-card bg-herb-soft" : "card hover:border-line-strong/60")}>
-      <span className={cx("grid h-11 w-11 place-items-center rounded-full", school ? "bg-card text-herb" : "bg-sunken text-ink")} aria-hidden>{icon}</span>
+      "card hover:border-line-strong/60")}>
+      {/* The school: a white tile like the others, only its mark and the lesson's line in green. */}
+      <span className={cx("grid h-11 w-11 place-items-center rounded-full", school ? "bg-herb-soft text-herb" : "bg-sunken text-ink")} aria-hidden>{icon}</span>
       <span><span className="block text-title leading-snug">{title}</span><span className={cx("mt-1 line-clamp-2 block text-caption", school ? "text-herb" : "text-ink-soft")}>{line}</span></span>
     </button>
   );
@@ -498,9 +499,6 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {sections && has("pantry") && <span className="contents">{action(<Refrigerator size={22} />, "Мои продукты",
           s.fridge.length ? "Дома " + s.fridge.length + (soon.length ? " · скоро испортится: " + shortName(soon[0].id).toLowerCase() : "") : "Что есть дома — подскажу, что приготовить",
           () => openLayer(routeHash({ tab: "pantry" })))}</span>}
-        {sections && has("school") && lessons.length > 0 && action(<GraduationCap size={22} />, "Школа готовки",
-          !nextLesson ? "Все " + lessons.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + lessons.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
-          () => openLayer(routeHash({ tab: "learn" })), true)}
         {sections && has("diary") && action(<NotebookPen size={22} />, eaten ? "Дневник · " + eaten.toLocaleString("ru-RU") + " ккал" : "Дневник еды",
           eaten ? "Из " + goalOf(diary, profile).toLocaleString("ru-RU") + " на день" : "Записать, что съели — калории и БЖУ", openDiary)}
         {/* Added by the person in «Оформление» → «Плитки в «На сегодня»». */}
@@ -513,6 +511,10 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {sections && has("feast") && action(<PartyPopper size={22} />, "Праздничный стол", "Блюда, покупки и когда что начинать", () => setFeastOpen(true))}
         {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
         {has("shopping") && toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
+        {/* The school last: not a thing of every day. */}
+        {sections && has("school") && lessons.length > 0 && action(<GraduationCap size={22} />, "Школа готовки",
+          !nextLesson ? "Все " + lessons.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + lessons.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
+          () => openLayer(routeHash({ tab: "learn" })), true)}
       </ScrollRow>
       <FastSheet open={fastSheet} onClose={() => setFastSheet(false)} />
       <FeastSheet open={feastOpen} onClose={() => setFeastOpen(false)} />
