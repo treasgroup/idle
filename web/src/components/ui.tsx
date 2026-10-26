@@ -24,7 +24,7 @@ if (typeof document !== "undefined") {
     stack[stack.length - 1].close();
   });
 }
-function useOverlay(active: boolean, close: () => void, sheet = false) {
+export function useOverlay(active: boolean, close: () => void, sheet = false) {
   const id = useId();
   const closeRef = useRef(close);
   closeRef.current = close;

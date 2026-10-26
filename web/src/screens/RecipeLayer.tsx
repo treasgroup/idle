@@ -4,10 +4,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import {
   Heart, Share2, ShoppingCart, CalendarPlus, ChefHat, Check, Clock, ChevronDown,
-  Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon, Users, Soup } from "lucide-react";
+  Timer, BellRing, Lightbulb, PenLine, CookingPot, ChevronRight, SearchX, BookOpen, MessageCircle, Plus, Pause, Play, X, Image as ImageIcon, Users, Soup, Maximize2 } from "lucide-react";
 import {
   LABELS, basics, clampServings, displayName, formatMinutes, ingredientMatches, nutritionOf, plural,
-  recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide,
+  photoUrl, recipeById, recipePageUrl, reviewsWord, scaleIngredient, similarRecipes, suggestSides, needsSide, withSide,
   type Recipe, type RecipeIngredient,
   catalogIsLight,
 } from "../engine";
@@ -29,6 +29,7 @@ import { goChat } from "../app/chatNav";
 import { openLayer, replace, routeHash } from "../app/router";
 import { addMinute, secondsLeft, startTimer, stopTimer, timerTitle, togglePause, useTick, useTimers, type CookTimer } from "../app/timers";
 import { RecipeImage, RecipeTile } from "../components/RecipeCard";
+import { PhotoViewer } from "../components/PhotoViewer";
 import { AddToMenuSheet } from "../components/AddToMenu";
 import { AskSheet, accusative, type AskRequest } from "../components/AskSheet";
 import { shareRecipeCard } from "../app/shareCard";
@@ -180,7 +181,9 @@ function stepLabel(text: string): string {
 interface Group { key: string; title: string | null; rows: RecipeIngredient[]; added?: boolean }
 
 function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
-  const { s, profile, toast, online } = useStore();
+  const { s, profile, toast, online, catalog } = useStore();
+  const [zoom, setZoom] = useState(false);
+  const photo = catalog.version ? photoUrl(base.id) : null;
   const terms = useTerms();
   useEffect(() => rememberRecipe(base.id), [base.id]);
   // How long the page was read: closed within seconds — not this; read for a while — interest.
@@ -330,7 +333,15 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
         <div className="mx-auto max-w-3xl sm:px-6 sm:pt-[calc(env(safe-area-inset-top)+4rem)] lg:max-w-[1120px] lg:px-8 lg:pt-[calc(env(safe-area-inset-top)+4.5rem)]">
           {/* Top: photo, title, facts, nutrition (and the actions on wide screens) */}
           <div className="lg:grid lg:grid-cols-[minmax(0,560px)_minmax(340px,1fr)] lg:items-start lg:gap-8 xl:gap-10">
-            <RecipeImage recipe={base} eager hero className="aspect-[4/3] w-full sm:aspect-[3/2]" rounded="rounded-none sm:rounded-card" />
+            {/* The photo opens over the whole screen, to look at closely (people tap it anyway). */}
+            <div className="relative">
+              <RecipeImage recipe={base} eager hero className="aspect-[4/3] w-full sm:aspect-[3/2]" rounded="rounded-none sm:rounded-card" />
+              {photo && <>
+                <button className="absolute inset-0 cursor-zoom-in sm:rounded-card" onClick={() => setZoom(true)} aria-label="Открыть фото крупно" />
+                <span className="pointer-events-none absolute bottom-3 right-3 grid h-10 w-10 place-items-center rounded-full bg-paper/90 text-ink shadow-[0_2px_8px_rgba(0,0,0,.15)]" aria-hidden><Maximize2 size={18} /></span>
+                <PhotoViewer src={photo} title={base.title} open={zoom} onClose={() => setZoom(false)} />
+              </>}
+            </div>
             <div className="px-4 pt-5 sm:px-0 sm:pt-6 lg:pt-1">
               <h1 ref={h1} className="text-h1 xl:text-display">{base.title}</h1>
               {/* One quiet line: stars from reviews, how many people cooked it (and liked it), and your own count. */}
