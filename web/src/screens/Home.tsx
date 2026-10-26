@@ -1,7 +1,7 @@
 // Главная (#/): a feed of food, like a streaming app — the recipe of the day, «Выбрать за меня», collections that
 // scroll sideways, and Шеф as a helper one tap away. Simple mode shows only the voice question and big ideas.
-import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator, NotebookPen } from "lucide-react";
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
+import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator, NotebookPen, HandPlatter } from "lucide-react";
 import {
   apiUrl, courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
@@ -10,10 +10,10 @@ import { useStore } from "../app/store";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
 import { goChat } from "../app/chatNav";
-import { goalConditions, type HomeBlock } from "../app/profile";
+import { goalConditions, type HomeBlock, type TodayTile } from "../app/profile";
 import { fastOffer, fastTomorrow, fitsFast, keepsFast } from "../app/fasting";
 import { FastSheet } from "../components/FastSheet";
-import { openParty } from "../app/party";
+import { knownParties, openParty } from "../app/party";
 import { usePartyNews } from "../app/partyNews";
 import { dateKeyOf, entriesOn, goalOf, openDiary, totals, useDiary } from "../app/diary";
 import { thawOffer, useFreezer } from "../app/freezer";
@@ -177,6 +177,10 @@ export function Home({ pwa }: { pwa?: Pwa }) {
       </div>
 
       <ContinueCard />
+      {/* «Оформление»: the blocks in the person's order (the install offer and the month's card after the first one). */}
+      {profile.homeOrder.map((b, i) => (
+        <Fragment key={b}>
+          {b === "hero" && <>
       <div className={cx("mt-5 grid gap-4", shows("hero") && "lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]")}>
         {/* The first second of a first visit: the day's dish is chosen from the full list, not the small built-in one. */}
         {!shows("hero") ? null : !catalog.version ? <Bone className="h-[340px] rounded-card lg:h-auto lg:min-h-[260px]" /> : hero && <TodayCard r={hero} badge={planned ? "По плану на сегодня" : "Рецепт дня"} onOpen={() => openRecipe(hero)} />}
@@ -201,13 +205,13 @@ export function Home({ pwa }: { pwa?: Pwa }) {
           </button>
         </div>
       </div>
-      {pwa && <InstallCard pwa={pwa} />}
-      <MonthCard />
-      {/* Personal first: what is for today (and what must be used up), then the holiday, the season and the themes. */}
+          </>}
+          {b === "today" && <>
       {/* Without the big card its dish (the planned one or the day's) still shows here. */}
       {shows("today") && <Now skip={shows("hero") ? planned?.id : undefined} dayDish={!shows("hero") ? (planned ? null : today) : planned && today?.id !== planned.id ? today : null} />}
       <Rescue />
-
+          </>}
+          {b === "collections" && <>
       {/* The holiday shelf only while a holiday is near; the season's shelf always; then the themes as cards. */}
       {holidayShelf && <Shelf from="holiday" c={holiday} list={holidayDishes} all={() => setDeck({ title: holiday.title, pool: holidayDishes, list: true, from: "holiday" })}
         extra={holiday.key === "afterny" ? <button className="mt-3 inline-flex h-11 items-center gap-2 rounded-full border border-line bg-card px-4 text-body-sm hover:border-line-strong" onClick={() => { void a.ask("что сделать с остатками после праздника", { fresh: true }); goChat(); }}><Refrigerator size={18} className="text-ink-soft" aria-hidden />Что сделать с остатками</button>
@@ -226,8 +230,12 @@ export function Home({ pwa }: { pwa?: Pwa }) {
         </Section>
       )}
 
+          </>}
+          {b === "saved" && shows("saved") && <Saved />}
+          {i === 0 && <>{pwa && <InstallCard pwa={pwa} />}<MonthCard /></>}
+        </Fragment>
+      ))}
       <BackupCard />
-      <Saved />
       {deck && <Deck title={deck.title} pool={deck.pool} askTime={deck.askTime} startList={deck.list} from={deck.from} onClose={() => setDeck(null)} />}
     </div>
   );
@@ -416,6 +424,11 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
   const [feastFor, setFeastFor] = useState<FamilyDate | null>(null);
   // «Соблюдаю пост»: today's fast, or the eve of a long one — the plan for it is one tap away.
   const fastToday = keepsFast(profile, new Date());
+  // «Оформление» → the tiles the person keeps in «На сегодня» (the usual ones are on until taken away).
+  const has = (t: TodayTile) => profile.todayTiles.includes(t);
+  const frozen = s.freezer ?? [];
+  const nextTable = knownParties().filter((k) => k.date >= today).sort((x, y) => x.date.localeCompare(y.date))[0];
+  const [feastOpen, setFeastOpen] = useState(false);
   const diary = useDiary();
   // «Морозилка»: in the evening, with no dinner planned for tomorrow, the oldest frozen dish — one tap to take it out.
   // «Стол в складчину»: what the guests of my coming tables answered since I last looked.
@@ -481,19 +494,28 @@ function Now({ skip, dayDish }: { skip?: string; dayDish?: Recipe | null }) {
         {left.length > 0 && action(<Refrigerator size={22} />, "Осталось: " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(", "),
           "После «" + left[0].from + "» — что из этого приготовить",
           () => { void ask.ask("что приготовить из " + left.slice(0, 2).map((x) => shortName(x.id).toLowerCase()).join(" и "), { fresh: true, source: "leftovers" }); goChat(); })}
-        {action(<CalendarDays size={22} />, planned ? "План на неделю" : "Составить план", planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") : "Ужины без повторов и список покупок", () => openLayer(routeHash({ tab: "menu" })))}
-        {sections && <span className="contents">{action(<Refrigerator size={22} />, "Мои продукты",
+        {has("plan") && action(<CalendarDays size={22} />, planned ? "План на неделю" : "Составить план", planned ? "Расписано " + planned + " " + plural(planned, "день", "дня", "дней") : "Ужины без повторов и список покупок", () => openLayer(routeHash({ tab: "menu" })))}
+        {sections && has("pantry") && <span className="contents">{action(<Refrigerator size={22} />, "Мои продукты",
           s.fridge.length ? "Дома " + s.fridge.length + (soon.length ? " · скоро испортится: " + shortName(soon[0].id).toLowerCase() : "") : "Что есть дома — подскажу, что приготовить",
           () => openLayer(routeHash({ tab: "pantry" })))}</span>}
-        {sections && lessons.length > 0 && action(<GraduationCap size={22} />, "Школа готовки",
+        {sections && has("school") && lessons.length > 0 && action(<GraduationCap size={22} />, "Школа готовки",
           !nextLesson ? "Все " + lessons.length + " уроков пройдены" : profile.lessonsDone.length ? "Урок " + lessonNo + " из " + lessons.length : "Урок 1: " + nextLesson.title.split(":")[0].toLowerCase(),
           () => openLayer(routeHash({ tab: "learn" })), true)}
-        {sections && action(<NotebookPen size={22} />, eaten ? "Дневник · " + eaten.toLocaleString("ru-RU") + " ккал" : "Дневник еды",
+        {sections && has("diary") && action(<NotebookPen size={22} />, eaten ? "Дневник · " + eaten.toLocaleString("ru-RU") + " ккал" : "Дневник еды",
           eaten ? "Из " + goalOf(diary, profile).toLocaleString("ru-RU") + " на день" : "Записать, что съели — калории и БЖУ", openDiary)}
+        {/* Added by the person in «Оформление» → «Плитки в «На сегодня»». */}
+        {sections && has("freezer") && action(<Snowflake size={22} />, "Морозилка",
+          frozen.length ? frozen.slice(0, 2).map((x) => x.title.toLowerCase()).join(", ") + (frozen.length > 2 ? " и ещё " + (frozen.length - 2) : "") : "Записать, что заморожено",
+          () => openLayer(routeHash({ tab: "pantry" })))}
+        {sections && has("party") && action(<HandPlatter size={22} />, "Складчина",
+          nextTable ? nextTable.title + ", " + new Date(nextTable.date + "T12:00").toLocaleDateString("ru-RU", { weekday: "short", day: "numeric", month: "short" }) : "Каждый принесёт своё — соберу стол",
+          () => openParty(nextTable ? { token: nextTable.token } : {}))}
+        {sections && has("feast") && action(<PartyPopper size={22} />, "Праздничный стол", "Блюда, покупки и когда что начинать", () => setFeastOpen(true))}
         {dinner && action(<Clock size={22} />, dinnerTitle(dinner), "Все блюда по шагам и по времени", () => push(routeHash({ dinner: true })))}
-        {toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
+        {has("shopping") && toBuy > 0 && action(<ShoppingCart size={22} />, "Покупки", "Купить: " + toBuy, () => replace(routeHash({ tab: "shopping" })))}
       </ScrollRow>
       <FastSheet open={fastSheet} onClose={() => setFastSheet(false)} />
+      <FeastSheet open={feastOpen} onClose={() => setFeastOpen(false)} />
       {feastFor && <FeastSheet open occasion={{ date: nextDate(feastFor), what: eventPhrase(feastFor) }} onClose={() => setFeastFor(null)} />}
     </Section>
   );

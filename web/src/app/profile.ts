@@ -45,6 +45,9 @@ export interface Profile {
   nav: Tab[];
   start: StartTab;
   homeHidden: HomeBlock[];
+  /** Главная's blocks in the person's order, and the tiles chosen for «На сегодня». */
+  homeOrder: HomeBlock[];
+  todayTiles: TodayTile[];
   /** «Фото и имя»: how to address the person and a small round photo (a 256 px JPEG) — on this device only. */
   name?: string;
   photo?: string;
@@ -56,7 +59,9 @@ export interface Profile {
 
 export type Palette = "shefly" | "clean" | "olive" | "sea" | "berry" | "graphite";
 export type StartTab = "home" | "menu" | "chat" | "shopping";
-export type HomeBlock = "hero" | "today" | "collections";
+export type HomeBlock = "hero" | "today" | "collections" | "saved";
+/** The tiles of «На сегодня» a person may choose; the ones that were always there are on by default. */
+export type TodayTile = "plan" | "diary" | "pantry" | "freezer" | "party" | "school" | "feast" | "shopping";
 /** The colour sets: the swatch shows the background and the accent (light theme), `dark` is the bar colour at night. */
 export const PALETTES: { id: Palette; label: string; paper: string; brand: string; dark: string }[] = [
   { id: "shefly", label: "Шефли", paper: "#FAF7F0", brand: "#B7432F", dark: "#181513" },
@@ -74,7 +79,20 @@ export const HOME_BLOCKS: { id: HomeBlock; label: string }[] = [
   { id: "hero", label: "Рецепт дня" },
   { id: "today", label: "На сегодня" },
   { id: "collections", label: "Подборки" },
+  { id: "saved", label: "Сохранённое" },
 ];
+export const TODAY_TILES: { id: TodayTile; label: string; isNew?: boolean }[] = [
+  { id: "plan", label: "План на неделю" },
+  { id: "diary", label: "Дневник еды" },
+  { id: "pantry", label: "Мои продукты" },
+  { id: "freezer", label: "Морозилка", isNew: true },
+  { id: "party", label: "Складчина", isNew: true },
+  { id: "school", label: "Школа готовки" },
+  { id: "feast", label: "Праздничный стол" },
+  { id: "shopping", label: "Покупки" },
+];
+export const DEFAULT_TODAY: TodayTile[] = ["plan", "diary", "pantry", "school", "shopping"];
+export const DEFAULT_ORDER: HomeBlock[] = ["hero", "today", "collections", "saved"];
 
 export interface Member { name: string; excluded: string[] }
 
@@ -99,6 +117,8 @@ export const DEFAULT_PROFILE: Profile = {
   nav: DEFAULT_NAV,
   start: "home",
   homeHidden: [],
+  homeOrder: DEFAULT_ORDER,
+  todayTiles: DEFAULT_TODAY,
   fast: DEFAULT_FAST,
 };
 
@@ -160,6 +180,12 @@ export function normalizeProfile(raw: unknown): Profile {
     if (n.length === 4) p.nav = n;
   }
   if (START_CHOICES.includes(r.start as StartTab)) p.start = r.start as StartTab;
+  // The order: every block once, the ones an older version did not know at their usual place.
+  if (Array.isArray(r.homeOrder)) {
+    const o = [...new Set(r.homeOrder.filter((b): b is HomeBlock => DEFAULT_ORDER.includes(b as HomeBlock)))];
+    p.homeOrder = [...o, ...DEFAULT_ORDER.filter((b) => !o.includes(b))];
+  }
+  if (Array.isArray(r.todayTiles)) p.todayTiles = [...new Set(r.todayTiles.filter((t): t is TodayTile => TODAY_TILES.some((x) => x.id === t)))];
   const fs = r.fast as Partial<FastSettings> | undefined;
   if (fs && typeof fs === "object") p.fast = { on: fs.on === true, weekly: fs.weekly !== false, fish: fs.fish === true };
   if (typeof r.name === "string" && r.name.trim()) p.name = r.name.trim().slice(0, 30);

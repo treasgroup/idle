@@ -2,13 +2,13 @@
 // opens on, the blocks of Главная. All of it stays on this device, like the rest of the profile; «Вернуть как было»
 // puts every choice back.
 import { useState } from "react";
-import { Check, ChefHat, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowUp, Check, ChefHat, RotateCcw } from "lucide-react";
 import { useStore } from "../app/store";
-import { DEFAULT_PROFILE, HOME_BLOCKS, NAV_CHOICES, PALETTES, START_CHOICES, type Profile } from "../app/profile";
+import { DEFAULT_PROFILE, HOME_BLOCKS, NAV_CHOICES, PALETTES, START_CHOICES, TODAY_TILES, type Profile } from "../app/profile";
 import { NAV_ITEMS } from "../app/navItems";
 import { feature } from "../app/feature";
 import type { Tab } from "../app/router";
-import { Sheet, Toggle, cx } from "./ui";
+import { Sheet, cx } from "./ui";
 
 const THEMES = [["light", "Светлая"], ["dark", "Тёмная"], ["contrast", "Контрастная"], ["system", "Как в телефоне"]] as const;
 
@@ -24,7 +24,8 @@ export function LookSheet({ open, onClose }: { open: boolean; onClose: () => voi
   const [slot, setSlot] = useState<number | null>(null);
   const set = (patch: Partial<Profile>) => { setProfile((p) => ({ ...p, ...patch })); feature("look_change"); };
   const changed = profile.palette !== DEFAULT_PROFILE.palette || profile.theme !== DEFAULT_PROFILE.theme || profile.start !== DEFAULT_PROFILE.start
-    || profile.nav.join() !== DEFAULT_PROFILE.nav.join() || profile.homeHidden.length > 0;
+    || profile.nav.join() !== DEFAULT_PROFILE.nav.join() || profile.homeHidden.length > 0
+    || profile.homeOrder.join() !== DEFAULT_PROFILE.homeOrder.join() || profile.todayTiles.join() !== DEFAULT_PROFILE.todayTiles.join();
   const put = (t: Tab) => {
     if (slot == null) return;
     const nav = [...profile.nav];
@@ -36,7 +37,7 @@ export function LookSheet({ open, onClose }: { open: boolean; onClose: () => voi
     setSlot(null);
   };
   const reset = () => {
-    set({ palette: DEFAULT_PROFILE.palette, theme: DEFAULT_PROFILE.theme, nav: DEFAULT_PROFILE.nav, start: DEFAULT_PROFILE.start, homeHidden: [] });
+    set({ palette: DEFAULT_PROFILE.palette, theme: DEFAULT_PROFILE.theme, nav: DEFAULT_PROFILE.nav, start: DEFAULT_PROFILE.start, homeHidden: [], homeOrder: DEFAULT_PROFILE.homeOrder, todayTiles: DEFAULT_PROFILE.todayTiles });
     setSlot(null);
     toast("Вернул оформление как было");
   };
@@ -119,12 +120,39 @@ export function LookSheet({ open, onClose }: { open: boolean; onClose: () => voi
         ))}
       </div>
 
-      <p className="label mb-0 mt-5">Что показывать на главной</p>
+      <p className="label mb-2 mt-5">Плитки в «На сегодня»</p>
+      <div className="grid grid-cols-2 gap-1.5">
+        {TODAY_TILES.map((t) => {
+          const on = profile.todayTiles.includes(t.id);
+          return (
+            <button key={t.id} role="checkbox" aria-checked={on} onClick={() => { setProfile((p) => ({ ...p, todayTiles: p.todayTiles.includes(t.id) ? p.todayTiles.filter((x) => x !== t.id) : [...p.todayTiles, t.id] })); feature("look_change"); }}
+              className="flex min-h-[48px] items-center gap-2.5 rounded-input border border-line bg-card px-3 text-left text-body-sm">
+              <span className={cx("grid h-5 w-5 shrink-0 place-items-center rounded-[6px] border-2", on ? "border-brand bg-brand-fill text-white" : "border-line-strong")} aria-hidden>{on && <Check size={13} strokeWidth={3} />}</span>
+              <span className="min-w-0">{t.label}{t.isNew && <span className="ml-1.5 rounded-full bg-herb-soft px-1.5 py-0.5 align-middle text-micro font-semibold text-herb">новое</span>}</span>
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-1.5 text-caption text-ink-faint">Подсказки по дню — пост, новости стола, что разморозить — появляются сами.</p>
+
+      <p className="label mb-0 mt-5">Что и в каком порядке на главной</p>
       <div className="divide-y divide-line">
-        {HOME_BLOCKS.map((b) => (
-          <Toggle key={b.id} label={b.label} on={!profile.homeHidden.includes(b.id)}
-            onChange={(v) => set({ homeHidden: v ? profile.homeHidden.filter((x) => x !== b.id) : [...profile.homeHidden, b.id] })} />
-        ))}
+        {profile.homeOrder.map((id, i) => {
+          const b = HOME_BLOCKS.find((x) => x.id === id)!;
+          const move = (d: number) => { setProfile((p) => { const o = [...p.homeOrder]; const k = o.indexOf(id); [o[k], o[k + d]] = [o[k + d], o[k]]; return { ...p, homeOrder: o }; }); feature("look_change"); };
+          const shown = !profile.homeHidden.includes(id);
+          return (
+            <div key={id} className="flex min-h-[56px] items-center gap-2">
+              <span className="min-w-0 flex-1 text-body-sm">{b.label}</span>
+              <button className="icon-btn h-10 w-10 disabled:opacity-30" disabled={i === 0} onClick={() => move(-1)} aria-label={"Выше: " + b.label}><ArrowUp size={18} /></button>
+              <button className="icon-btn h-10 w-10 disabled:opacity-30" disabled={i === profile.homeOrder.length - 1} onClick={() => move(1)} aria-label={"Ниже: " + b.label}><ArrowDown size={18} /></button>
+              <label className="ml-1 flex items-center" aria-label={(shown ? "Скрыть: " : "Показать: ") + b.label}>
+                <input type="checkbox" className="peer sr-only" checked={shown} onChange={(e) => { const show = e.target.checked; setProfile((p) => ({ ...p, homeHidden: show ? p.homeHidden.filter((x) => x !== id) : [...new Set([...p.homeHidden, id])] })); }} />
+                <span className="relative h-7 w-12 rounded-full bg-line-strong/50 transition-colors after:absolute after:left-1 after:top-1 after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-transform peer-checked:bg-brand-fill peer-checked:after:translate-x-5" aria-hidden />
+              </label>
+            </div>
+          );
+        })}
       </div>
       <p className="mt-2 text-caption text-ink-faint">Цвет, меню и главная переносятся на другие ваши устройства; тема и размер текста у каждого устройства свои.</p>
     </Sheet>
