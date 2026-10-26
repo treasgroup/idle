@@ -5,7 +5,11 @@ declare(strict_types=1);
 
 const LENTEN_OFF = ['meat', 'poultry', 'fish', 'seafood', 'dairy', 'eggs'];
 
+/** The New Year people are cooking for: from September it is the next one («на Новый год 2027» — that is how it is searched). */
+function seo_ny_year(): int { return (int)date('Y') + ((int)date('n') >= 9 ? 1 : 0); }
+
 function seo_collections(): array {
+    $ny = seo_ny_year();
     $title = fn(string $re) => fn(array $r) => (bool)preg_match($re, mb_strtolower((string)$r['title'], 'UTF-8'));
     $occ = fn(string $o) => fn(array $r) => in_array($o, (array)($r['occasions'] ?? []), true);
     $season = fn(string $s) => fn(array $r) => in_array($s, (array)($r['season'] ?? []), true);
@@ -18,12 +22,12 @@ function seo_collections(): array {
         return in_array($r['_course'], ['main', 'soup', 'salad', 'side', 'breakfast', 'baking'], true);
     };
     return [
-        'novyj-god' => ['На Новый год', 'Что приготовить на Новый год: салаты, горячее и закуски', 'праздничные салаты, горячее и закуски к новогоднему столу',
-            fn($r) => $occ('new-year')($r) || $title('/оливье|шуб|холодец|заливн|запечён|запечен/u')($r), [12, 1]],
-        'salaty-na-novyj-god' => ['Салаты на Новый год', 'Салаты на Новый год: оливье, шуба, мимоза и другие', 'новогодние салаты — классика и новые',
-            fn($r) => $r['_course'] === 'salad' && ($occ('new-year')($r) || $occ('holiday')($r) || $title('/оливье|шуб|мимоз|крабов/u')($r)), [12, 1]],
-        'goryachee-na-novyj-god' => ['Горячее на Новый год', 'Горячее на новогодний стол', 'горячие блюда к праздничному столу: мясо, птица, рыба',
-            fn($r) => $r['_course'] === 'main' && ($occ('new-year')($r) || $occ('holiday')($r) || ($occ('guests')($r) && $title('/запеч|рулет|по-французски|утк|гус|буженин|окорок|целиком|в духовке|жульен/u')($r))), [12, 1]],
+        'novyj-god' => ['На Новый год', 'Что приготовить на Новый год ' . $ny . ': салаты, горячее и закуски', 'праздничные салаты, горячее и закуски к новогоднему столу',
+            fn($r) => $occ('new-year')($r) || $title('/оливье|шуб|холодец|заливн|запечён|запечен/u')($r), [11, 12, 1]],
+        'salaty-na-novyj-god' => ['Салаты на Новый год', 'Салаты на Новый год ' . $ny . ': оливье, шуба, мимоза и другие', 'новогодние салаты — классика и новые',
+            fn($r) => $r['_course'] === 'salad' && ($occ('new-year')($r) || $occ('holiday')($r) || $title('/оливье|шуб|мимоз|крабов/u')($r)), [11, 12, 1]],
+        'goryachee-na-novyj-god' => ['Горячее на Новый год', 'Горячее на Новый год ' . $ny . ': мясо, птица и рыба', 'горячие блюда к праздничному столу: мясо, птица, рыба',
+            fn($r) => $r['_course'] === 'main' && ($occ('new-year')($r) || $occ('holiday')($r) || ($occ('guests')($r) && $title('/запеч|рулет|по-французски|утк|гус|буженин|окорок|целиком|в духовке|жульен/u')($r))), [11, 12, 1]],
         'salaty-bez-majoneza' => ['Салаты без майонеза', 'Праздничные салаты без майонеза', 'салаты к праздничному и обычному столу без майонеза',
             fn($r) => $r['_course'] === 'salad' && !in_array('mayonnaise', array_map(fn($i) => (string)($i['id'] ?? ''), (array)($r['ingredients'] ?? [])), true), [11, 12, 1]],
         'posle-prazdnika' => ['После праздника', 'Что приготовить после праздников: лёгкие блюда и супы', 'лёгкие супы, каши и простые блюда на первые дни после праздничного стола',

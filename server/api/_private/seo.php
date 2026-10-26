@@ -249,9 +249,15 @@ function seo_cut(string $s, int $max): string {
     return preg_replace('/\s+\S*$/u', '', $s) . '…';
 }
 function seo_lower_first(string $s): string { return mb_strtolower(mb_substr($s, 0, 1, 'UTF-8'), 'UTF-8') . mb_substr($s, 1, null, 'UTF-8'); }
-// «Борщ классический — рецепт с фото пошагово, 1 ч 30 мин» — what people search for.
+// «Борщ классический — рецепт с фото пошагово» — what people search for. The time only when it is short and helps
+// («Сырники — рецепт с фото пошагово, 25 мин»): «2 ч 55 мин» of a salad is mostly the fridge and scares people off,
+// and a long line is cut in the results anyway (the time is in the description).
 function seo_title(array $r, ?array $photo): string {
-    return $r['title'] . ' — ' . ($photo ? 'рецепт с фото пошагово' : 'пошаговый рецепт') . ', ' . seo_minutes((int)($r['totalMinutes'] ?? 0));
+    $t = $r['title'] . ' — ' . ($photo ? 'рецепт с фото пошагово' : 'пошаговый рецепт');
+    $min = (int)($r['totalMinutes'] ?? 0);
+    if ($min > 0 && $min <= 45 && mb_strlen($t, 'UTF-8') + 9 <= 70) return $t . ', ' . seo_minutes($min);
+    if (mb_strlen($t, 'UTF-8') > 70 && $photo) return $r['title'] . ' — рецепт с фото';
+    return $t;
 }
 function seo_description(array $r, ?array $kcal): string {
     $main = array_slice(array_values(array_filter(array_map(function ($i) { return is_array($i) && empty($i['optional']) && !preg_match('/^(water|salt|black-pepper|vegetable-oil|sunflower-oil|sugar)$/', (string)($i['id'] ?? '')) ? mb_strtolower((string)$i['name'], 'UTF-8') : null; }, $r['ingredients']))), 0, 5);
@@ -326,7 +332,7 @@ function seo_css(): string {
         . '.rating{display:inline-flex;align-items:center;gap:6px;font-size:15px;color:var(--muted);margin:0 0 10px}.rating b{color:var(--ink)}.stars{color:var(--warn);letter-spacing:1px}'
         // The recipe: photo and facts side by side on wide screens; ingredients beside the steps.
         . '.hero{display:grid;gap:20px;margin:6px 0 8px}@media(min-width:900px){.hero{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:center}.hero h1{margin-top:0}}'
-        . 'figure{margin:0}figure img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:24px;background:var(--soft)}figcaption{font-size:13px;color:var(--faint);margin-top:6px}'
+        . 'figure{margin:0}figure picture{display:block}figure img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;border-radius:24px;background:var(--soft)}figcaption{font-size:13px;color:var(--faint);margin-top:6px}'
         . '.go{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:4px}.go p{margin:0;font-size:14px;color:var(--muted);flex:1 1 220px}'
         . '.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;padding:13px 22px;border-radius:999px;min-height:48px}.btn:hover{filter:brightness(1.06)}'
         . '.cols{display:grid;gap:8px 40px}@media(min-width:900px){.cols{grid-template-columns:340px minmax(0,1fr)}.cols aside{position:sticky;top:88px;align-self:start}}'
@@ -459,7 +465,8 @@ function seo_recipe_page(string $id): void {
     if ($kcal) $facts[] = $kcal['kcal'] . ' ккал на порцию';
     // Top: the photo and, beside it on a wide screen, the name, the mark, what the dish is, the facts and «Готовить по шагам».
     echo '<article><div class="hero">';
-    if ($photo) echo '<figure><img src="' . h($photo['path']) . '" alt="' . h($r['title']) . '"' . ($photo['w'] ? ' width="' . (int)$photo['w'] . '" height="' . (int)$photo['h'] . '"' : '') . ' fetchpriority="high">' . ($photo['real'] ? '' : '<figcaption>Иллюстрация создана нейросетью по описанию рецепта и показывает примерную подачу.</figcaption>') . "</figure>\n";
+    $webp = $photo ? seo_photo_webp($r['id']) : null;
+    if ($photo) echo '<figure>' . ($webp ? '<picture><source srcset="' . h($webp) . '" type="image/webp">' : '') . '<img src="' . h($photo['path']) . '" alt="' . h($r['title']) . '"' . ($photo['w'] ? ' width="' . (int)$photo['w'] . '" height="' . (int)$photo['h'] . '"' : '') . ' fetchpriority="high">' . ($webp ? '</picture>' : '') . ($photo['real'] ? '' : '<figcaption>Иллюстрация создана нейросетью по описанию рецепта и показывает примерную подачу.</figcaption>') . "</figure>\n";
     echo '<div><h1>' . h($r['title']) . "</h1>\n";
     if ($rev['summary']['count'] > 0) {
         $avg = (float)$rev['summary']['avg'];
@@ -520,6 +527,40 @@ function seo_ratings(): array {
     return $out;
 }
 /** The card's small copy of the photo when it is ready (as on the app's cards), else the photo itself. */
+// The recipe page's photo, lighter: WebP up to 1200 px is about a third of the 300 KB JPEG, and the page's speed counts
+// in search. Made once, after the first page with it is sent (nobody waits); until then the JPEG.
+const SEO_WEBP_W = 1200;
+function seo_photo_webp(string $id): ?string {
+    if (!function_exists('imagewebp') || !function_exists('imagecreatefromjpeg')) return null;
+    $src = photos_dir() . '/' . $id . '.jpg';
+    if (!is_file($src)) return null;
+    $v = (string)filemtime($src);
+    $dst = photos_dir() . '/w/' . $id . '-' . $v . '.webp';
+    if (is_file($dst)) return seo_path() . 'photos/w/' . $id . '-' . $v . '.webp';
+    register_shutdown_function(function () use ($src, $dst) {
+        if (function_exists('fastcgi_finish_request')) @fastcgi_finish_request();
+        seo_webp_make($src, $dst);
+    });
+    return null;
+}
+function seo_webp_make(string $src, string $dst): bool {
+    $dir = dirname($dst);
+    if (!is_dir($dir) && !@mkdir($dir, 0755, true)) return false;
+    $img = @imagecreatefromjpeg($src);
+    if (!$img) return false;
+    $w = imagesx($img); $h = imagesy($img);
+    if ($w > SEO_WEBP_W) {
+        $nh = (int)round($h * SEO_WEBP_W / $w);
+        $out = imagecreatetruecolor(SEO_WEBP_W, $nh);
+        imagecopyresampled($out, $img, 0, 0, 0, 0, SEO_WEBP_W, $nh, $w, $h);
+        imagedestroy($img); $img = $out;
+    }
+    $tmp = $dst . '.' . bin2hex(random_bytes(4)) . '.tmp';
+    $ok = @imagewebp($img, $tmp, 78) && @rename($tmp, $dst);
+    imagedestroy($img);
+    if (!$ok) @unlink($tmp);
+    return $ok;
+}
 function seo_thumb(string $id): ?string {
     $file = photos_dir() . '/' . $id . '.jpg';
     if (!is_file($file)) return null;
@@ -636,14 +677,18 @@ function seo_list_page(?string $course): void {
 }
 
 // ---------- sitemap.php ----------
-function seo_sitemap(): void {
+function seo_sitemap(?callable $collect = null): void {
     $all = seo_recipes();
-    header('Content-Type: application/xml; charset=utf-8');
-    header('Cache-Control: public, max-age=3600');
+    // $collect: the addresses go to it instead of the page (IndexNow below).
+    if ($collect) ob_start();
+    else {
+        header('Content-Type: application/xml; charset=utf-8');
+        header('Cache-Control: public, max-age=3600');
+    }
     $newest = $all ? max(array_column($all, '_mtime')) : time();
     $x = function ($s) { return htmlspecialchars((string)$s, ENT_XML1 | ENT_QUOTES, 'UTF-8'); };
     echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
-    $url = function (string $loc, int $mtime, string $extra = '') use ($x) { echo '<url><loc>' . $x($loc) . '</loc><lastmod>' . gmdate('Y-m-d', $mtime) . '</lastmod>' . $extra . "</url>\n"; };
+    $url = function (string $loc, int $mtime, string $extra = '') use ($x, $collect) { if ($collect) { $collect($loc); return; } echo '<url><loc>' . $x($loc) . '</loc><lastmod>' . gmdate('Y-m-d', $mtime) . '</lastmod>' . $extra . "</url>\n"; };
     $url(seo_abs(seo_path()), $newest);
     $url(seo_abs(seo_list_path()), $newest);
     $courses = [];
@@ -665,6 +710,42 @@ function seo_sitemap(): void {
         $url(seo_abs(seo_recipe_path($r['id'])), max((int)$r['_mtime'], $p['mtime'] ?? 0), $p ? '<image:image><image:loc>' . $x(seo_abs($p['path'])) . '</image:loc></image:image>' : '');
     }
     echo "</urlset>\n";
+    if ($collect) ob_end_clean();
+}
+
+// ---------- IndexNow: Yandex (and Bing) hear of the site's pages without their panels ----------
+// Once a week, after some page of the site is sent, the addresses of the sitemap go to both (the key file
+// /<key>.txt proves the site is ours). Nobody has to press anything; Yandex's own panel may be down.
+const INDEXNOW_KEY = '2b603f6af1047066570826860f07bfaf';
+const INDEXNOW_EVERY = 7 * 86400;
+function seo_indexnow_state_file(): string { return rtrim((string)config()['storage_dir'], '/') . '/indexnow.json'; }
+function seo_indexnow_due(): bool {
+    if (strtolower((string)($_SERVER['HTTP_HOST'] ?? '')) !== 'shefly.ru' || !function_exists('curl_init')) return false;
+    $f = seo_indexnow_state_file();
+    return !is_file($f) || filemtime($f) < time() - INDEXNOW_EVERY;
+}
+function seo_indexnow_send(): array {
+    $f = seo_indexnow_state_file();
+    @touch($f); // one sender at a time: the next pages see it fresh
+    // Whatever page started it, the whole sitemap: its other parts too.
+    foreach (['collections', 'school_seo', 'skolko_seo'] as $part) require_once __DIR__ . '/' . $part . '.php';
+    $urls = [];
+    seo_sitemap(function (string $loc) use (&$urls) { $urls[] = $loc; });
+    $body = ['host' => 'shefly.ru', 'key' => INDEXNOW_KEY, 'keyLocation' => 'https://shefly.ru/' . INDEXNOW_KEY . '.txt'];
+    $out = ['at' => date('c'), 'urls' => count($urls), 'answers' => []];
+    foreach (['https://yandex.com/indexnow', 'https://api.indexnow.org/indexnow'] as $to) {
+        foreach (array_chunk($urls, 9000) as $part) {
+            $ch = curl_init($to);
+            curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 25,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json; charset=utf-8'],
+                CURLOPT_POSTFIELDS => json_encode($body + ['urlList' => $part], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)]);
+            $text = (string)curl_exec($ch);
+            $out['answers'][] = [$to, (int)curl_getinfo($ch, CURLINFO_HTTP_CODE), mb_substr($text, 0, 200, 'UTF-8')];
+            curl_close($ch);
+        }
+    }
+    @file_put_contents($f, json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+    return $out;
 }
 
 // Entry for the three page files: errors never reach the page as text.
@@ -676,7 +757,13 @@ function seo_run(callable $page): void {
         header('Location: https://' . $host . ($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
         return;
     }
-    try { config(); $page(); }
+    try {
+        config(); $page();
+        if (seo_indexnow_due()) register_shutdown_function(function () {
+            if (function_exists('fastcgi_finish_request')) @fastcgi_finish_request();
+            try { seo_indexnow_send(); } catch (Throwable $e) { /* next week again */ }
+        });
+    }
     catch (Throwable $e) {
         error_log('[what-to-cook] seo: ' . $e->getMessage());
         if (!headers_sent()) { http_response_code(503); header('Content-Type: text/html; charset=utf-8'); header('Retry-After: 120'); }
