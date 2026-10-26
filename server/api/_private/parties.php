@@ -195,6 +195,21 @@ function party_act(array $b): void {
                 $list = array_slice(array_merge([$id], $list), 0, 3);
             }
             $doc['notify'] = $list;
+        } elseif ($act === 'guest') {
+            // A guest who answered in the chat, not by the link: the organiser writes them in (and what they bring).
+            if (!$admin) throw new ApiError(403, 'forbidden', 'Вписывать гостей может только организатор.');
+            $who = is_string($b['who'] ?? null) && isset($doc['guests'][$b['who']]) && !empty($doc['guests'][$b['who']]['manual']) ? $b['who'] : 'm' . bin2hex(random_bytes(5));
+            if (!isset($doc['guests'][$who]) && count($doc['guests'] ?? []) >= 60) throw new ApiError(409, 'full', 'В этом столе уже 60 гостей.');
+            $g = party_answer($doc['guests'][$who] ?? ['name' => '', 'status' => 'yes', 'plus' => 0, 'cant' => [], 'spent' => null], $b);
+            if ($g['name'] === '') throw new ApiError(400, 'validation', 'Напишите, как зовут гостя.');
+            $g['manual'] = true;
+            $doc['guests'][$who] = $g;
+            foreach (['dishes', 'things'] as $l) foreach ($doc[$l] as &$x) {
+                $wants = in_array($x['key'], is_array($b['take'] ?? null) ? $b['take'] : [], true);
+                if ($wants && (empty($x['by']) || !isset($doc['guests'][$x['by']]))) $x['by'] = $who;
+                elseif (!$wants && ($x['by'] ?? null) === $who) $x['by'] = null;
+            }
+            unset($x);
         } elseif ($act === 'kick') {
             if (!$admin) throw new ApiError(403, 'forbidden', 'Убрать гостя может только организатор.');
             $who = (string)($b['who'] ?? '');

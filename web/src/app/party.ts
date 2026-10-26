@@ -6,7 +6,8 @@ import { apiUrl } from "../engine";
 export type PartyFormat = "dinner" | "bbq" | "kids" | "newyear" | "match" | "birthday";
 export type Status = "yes" | "no" | "maybe";
 export interface PartyItem { key: string; title: string; by: string | null; id?: string | null; slot?: string; added?: string }
-export interface Guest { key: string; name: string; status: Status; plus: number; cant: string[]; spent: number | null }
+/** `manual`: written in by the organiser (answered in the chat, not by the link). */
+export interface Guest { key: string; name: string; status: Status; plus: number; cant: string[]; spent: number | null; manual?: boolean }
 export interface Party {
   title: string; format: PartyFormat; date: string; time: string; place: string; note: string; host: string | null;
   dishes: PartyItem[]; things: PartyItem[]; expenses: boolean; split: number | null; guests: Guest[];

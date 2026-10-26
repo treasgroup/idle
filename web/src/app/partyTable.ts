@@ -165,3 +165,20 @@ export function tableHints(p: Party): string[] {
   }
   return out.slice(0, 3);
 }
+
+/** «Скопировать для чата»: the table in plain words for a messenger — who comes, who cooks and brings what, what is free. */
+export function partyText(p: Party, url: string): string {
+  const going = headcount(p);
+  const who = (key: string | null) => guestName(p, key);
+  const taken = (l: PartyItem[]) => l.filter((x) => x.by && p.guests.some((g) => g.key === x.by));
+  const free = [...p.dishes, ...p.things].filter((x) => !taken([x]).length).map((x) => x.title.toLowerCase());
+  const lines = [
+    formatOf(p.format).emoji + " " + p.title + " — " + whenLine(p) + (p.place ? ", " + p.place : ""),
+    going ? "Придут: " + going + " " + (going % 10 >= 2 && going % 10 <= 4 && (going % 100 < 12 || going % 100 > 14) ? "человека" : "человек") : "Пока никто не ответил",
+  ];
+  if (taken(p.dishes).length) lines.push("", "Готовят:", ...taken(p.dishes).map((x) => "• " + x.title + " — " + who(x.by)));
+  if (taken(p.things).length) lines.push("Берут: " + taken(p.things).map((x) => x.title.toLowerCase() + " — " + who(x.by)).join(", "));
+  if (free.length) lines.push("", "Свободно: " + free.join(", "));
+  lines.push("", "Отметиться и взять блюдо: " + url);
+  return lines.join("\n");
+}

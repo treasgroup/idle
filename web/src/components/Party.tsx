@@ -2,7 +2,7 @@
 // what to bring), and the table itself — the same page for the organiser and the guests who opened the link:
 // «приду / не смогу», «Я приготовлю», «Возьму я», who can't eat what, and the optional split of the expenses.
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CalendarDays, CalendarPlus, ChefHat, Check, Clock, ChevronRight, MapPin, Plus, RefreshCw, Send, Settings2, ShoppingCart, Trash2, Users, Wallet, X } from "lucide-react";
+import { AlertTriangle, CalendarDays, CalendarPlus, ChefHat, Check, Clock, ChevronRight, ClipboardList, MapPin, Plus, RefreshCw, Send, Settings2, ShoppingCart, Trash2, Users, Wallet, X } from "lucide-react";
 import {
   LABELS, addToShopping, clampServings, ingredientsToBuy, plural, recipeById, searchRecipes, siteBase, type Recipe,
 } from "../engine";
@@ -11,7 +11,7 @@ import { useActions, haveIds } from "../app/actions";
 import { cue } from "../app/feedback";
 import { forgetParty, guestSecret, knownParties, partyCall, rememberParty, type Party, type PartyDraft, type PartyFormat, type PartyItem, type Status } from "../app/party";
 import {
-  CANT, FORMATS, ROAD_MIN, candidates, formatOf, guestName, headcount, myStart, nextSaturday, partyIcs, settle, tableHints, warnings, whenLine,
+  CANT, FORMATS, ROAD_MIN, candidates, formatOf, guestName, headcount, myStart, nextSaturday, partyIcs, partyText, settle, tableHints, warnings, whenLine,
 } from "../app/partyTable";
 import { RecipeImage } from "./RecipeCard";
 import { ShareOptions } from "./ShareOptions";
@@ -201,6 +201,7 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   const [share, setShare] = useState(!!fresh);
   const [edit, setEdit] = useState(false);
   const [answering, setAnswering] = useState(false);
+  const [guestEdit, setGuestEdit] = useState<string | null>(null);
   const [busy, setBusy] = useState("");
   const reminders = useReminders();
 
@@ -244,6 +245,10 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   const url = siteBase() + "stol/" + token;
   const shareText = f.emoji + " " + p.title + " — " + whenLine(p) + (p.place ? ", " + p.place : "") + ". Отметься, придёшь ли и что принесёшь: " + url;
   const mine = p.dishes.filter((d) => d.by === p.me && d.id).map((d) => recipeById(d.id!)).filter((r): r is Recipe => !!r);
+  const copyForChat = () => {
+    const text = partyText(p, url);
+    void navigator.clipboard?.writeText(text).then(() => toast("Скопировано — вставьте в чат"), () => toast("Не получилось скопировать — отправьте через «Позвать гостей»"));
+  };
   const start = myStart(p, mine);
   const hints = tableHints(p);
   const toShopping = () => {
@@ -274,6 +279,7 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
           aria-label="В календарь" title="В календарь"><CalendarPlus size={18} aria-hidden /></button>
         {p.admin && <button className="btn-outline" onClick={() => setEdit(true)} aria-label="Изменить стол"><Settings2 size={18} aria-hidden />Изменить</button>}
       </div>
+      <button className="btn-ghost mt-1 h-10 w-full justify-start px-2 text-small text-brand" onClick={copyForChat}><ClipboardList size={16} aria-hidden />Скопировать для чата: кто что несёт</button>
 
       {/* The site: the organiser's browser can show «Оля придёт +1» by itself. In the app the news is on Главная. */}
       {p.admin && canNotify() && (
@@ -292,12 +298,16 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
           {people ? "Придут: " + people + " " + plural(people, "человек", "человека", "человек") : "Пока никто не ответил"}
           {maybe > 0 && <span className="font-normal text-ink-soft">· ещё {maybe} думают</span>}</p>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          {p.guests.filter((g) => g.name || g.key === p.host).map((g) => (
-            <span key={g.key} className={cx("rounded-full px-2.5 py-1 text-caption", g.status === "yes" ? "bg-herb-soft text-ink" : g.status === "no" ? "bg-sunken text-ink-faint line-through" : "bg-warn-soft text-ink")}>
-              {guestName(p, g.key)}{g.plus ? " +" + g.plus : ""}{g.key === p.host ? " · организатор" : ""}{g.key === p.me ? " (вы)" : ""}
-            </span>
-          ))}
+          {p.guests.filter((g) => g.name || g.key === p.host).map((g) => {
+            const cls = cx("rounded-full px-2.5 py-1 text-caption", g.status === "yes" ? "bg-herb-soft text-ink" : g.status === "no" ? "bg-sunken text-ink-faint line-through" : "bg-warn-soft text-ink");
+            const label = <>{guestName(p, g.key)}{g.plus ? " +" + g.plus : ""}{g.key === p.host ? " · организатор" : ""}{g.key === p.me ? " (вы)" : ""}</>;
+            // A guest the organiser wrote in: a tap edits them.
+            return p.admin && g.manual
+              ? <button key={g.key} className={cx(cls, "underline decoration-dotted underline-offset-2")} onClick={() => setGuestEdit(g.key)}>{label}</button>
+              : <span key={g.key} className={cls}>{label}</span>;
+          })}
         </div>
+        {p.admin && <button className="btn-ghost mt-2 h-10 px-2 text-small text-brand" onClick={() => setGuestEdit("new")}><Plus size={16} aria-hidden />Гость без приложения</button>}
       </div>
 
       {/* My answer: first thing for a guest who just opened the link. */}
@@ -334,6 +344,7 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
 
       {p.expenses && <Expenses p={p} busy={busy === "spent"} onSpent={(n) => act({ act: "answer", spent: n }, "spent")} canAct={answered} />}
 
+      {p.admin && <GuestSheet p={p} who={guestEdit} onClose={() => setGuestEdit(null)} onSave={(b) => act({ act: "guest", ...b }, "guest")} onRemove={(who) => act({ act: "kick", who }, "kick")} />}
       <Sheet open={share} title="Позвать гостей" onClose={() => setShare(false)}>
         <p className="mb-3 text-body-sm text-ink-soft">Отправьте ссылку в общий чат — гости отметят, придут ли, и возьмут блюда. Устанавливать ничего не нужно.</p>
         <ShareOptions title={p.title} text={shareText} url={url} onDone={(copied) => { setShare(false); if (copied) toast("Ссылка скопирована"); }} />
@@ -345,6 +356,50 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
 
 const hm = (d: Date) => d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+/** «Гость без приложения»: the organiser writes in someone who answered in the chat — name, coming, +N, what they take. */
+function GuestSheet({ p, who, onClose, onSave, onRemove }: {
+  p: Party; who: string | null; onClose: () => void;
+  onSave: (b: Record<string, unknown>) => Promise<boolean>; onRemove: (who: string) => Promise<boolean>;
+}) {
+  const g = who && who !== "new" ? p.guests.find((x) => x.key === who) : undefined;
+  const [name, setName] = useState("");
+  const [status, setStatus] = useState<Status>("yes");
+  const [plus, setPlus] = useState(0);
+  const [cant, setCant] = useState<string[]>([]);
+  const [take, setTake] = useState<string[]>([]);
+  useEffect(() => {
+    if (!who) return;
+    setName(g?.name ?? ""); setStatus(g?.status ?? "yes"); setPlus(g?.plus ?? 0); setCant(g?.cant ?? []);
+    setTake([...p.dishes, ...p.things].filter((x) => g && x.by === g.key).map((x) => x.key));
+  }, [who]); // eslint-disable-line react-hooks/exhaustive-deps
+  // What they may take: what is free, and what they already have.
+  const items = [...p.dishes, ...p.things].filter((x) => !x.by || !p.guests.some((y) => y.key === x.by) || (g && x.by === g.key));
+  const save = async () => { if (await onSave({ who: g?.key, name: name.trim(), status, plus: status === "no" ? 0 : plus, cant, take })) onClose(); };
+  return (
+    <Sheet open={!!who} title={g ? g.name : "Гость без приложения"} onClose={onClose}
+      footer={<button className="btn-primary w-full" disabled={!name.trim()} onClick={save}>{g ? "Сохранить" : "Добавить гостя"}</button>}>
+      {!g && <p className="text-body-sm text-ink-soft">Ответил в чате? Впишите сами — стол будет полным.</p>}
+      <input className="input mt-3" value={name} maxLength={30} placeholder="Имя" onChange={(e) => setName(e.target.value)} aria-label="Имя гостя" />
+      <div className="mt-3 grid grid-cols-3 gap-2" role="radiogroup" aria-label="Придёт?">
+        {([["yes", "Придёт"], ["no", "Не сможет"], ["maybe", "Не знает"]] as const).map(([id, label]) => (
+          <button key={id} role="radio" aria-checked={status === id} onClick={() => setStatus(id)}
+            className={cx("h-11 rounded-input border text-small", status === id ? "border-brand bg-brand-soft font-semibold text-brand-ink" : "border-line bg-card")}>{label}</button>
+        ))}
+      </div>
+      {status !== "no" && <>
+        <div className="mt-3 flex items-center justify-between gap-3"><span className="text-body-sm">С ним ещё</span><Stepper value={plus} min={0} max={6} onChange={setPlus} label="Сколько человек с гостем" /></div>
+        {items.length > 0 && <>
+          <p className="label mb-2 mt-4">Что берёт</p>
+          <div className="flex flex-wrap gap-1.5">{items.map((x) => { const on = take.includes(x.key); return <Chip key={x.key} on={on} onClick={() => setTake((l) => (on ? l.filter((k) => k !== x.key) : [...l, x.key]))}>{on && <Check size={14} aria-hidden />}{x.title}</Chip>; })}</div>
+        </>}
+        <p className="label mb-2 mt-4">Нельзя</p>
+        <div className="flex flex-wrap gap-1.5">{CANT.map((c) => { const on = cant.includes(c); return <Chip key={c} on={on} onClick={() => setCant((l) => (on ? l.filter((x) => x !== c) : [...l, c]))}>{LABELS[c] ?? c}</Chip>; })}</div>
+      </>}
+      {g && <button className="btn-ghost mt-4 w-full text-warn" onClick={async () => { if (await onRemove(g.key)) onClose(); }}><Trash2 size={16} aria-hidden />Убрать гостя</button>}
+    </Sheet>
+  );
+}
 
 function Answer({ p, busy, onSave, defaultName }: { p: Party; busy: boolean; defaultName: string; onSave: (a: { name?: string; status: Status; plus: number; cant: string[] }) => void }) {
   const me = p.guests.find((g) => g.key === p.me);
