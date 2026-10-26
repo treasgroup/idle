@@ -20,6 +20,8 @@ export function toLink(raw: string): Link | null {
   const q = new URLSearchParams(u.search);
   const m = path.match(/^recipe\/([a-z0-9-]+)\/?$/);
   if (m) q.set("recipe", m[1]);
+  // The long address shared before (recipe.php?id=borsch).
+  if (/^recipe\.php$/.test(path) && q.get("id")) q.set("recipe", q.get("id")!);
   const table = path.match(/^stol\/([0-9a-f]{32})\/?$/);
   if (table) return { hash: "#party=" + table[1], query: q };
   if (u.hash.startsWith("#/")) { opened = true; location.hash = u.hash; return null; }

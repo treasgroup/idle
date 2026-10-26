@@ -59,5 +59,7 @@ describe("links tapped in a messenger", () => {
   it("opens a table in складчину by its short address", () => {
     expect(toLink("https://shefly.ru/stol/0123456789abcdef0123456789abcdef")?.hash).toBe("#party=0123456789abcdef0123456789abcdef");
     expect(toLink("https://shefly.ru/recipe/borsch")?.query.get("recipe")).toBe("borsch");
+    expect(toLink("https://shefly.ru/recipe.php?id=borsch-classic")?.query.get("recipe")).toBe("borsch-classic");
+    expect(toLink("https://treas.su/cook/recipe.php?id=borsch")?.query.get("recipe")).toBe("borsch");
   });
 });

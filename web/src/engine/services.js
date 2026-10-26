@@ -1450,7 +1450,8 @@ var uA = [
   { id: "whatsapp", label: "WhatsApp" },
 ];
 function dA(e) {
-  return Ua() + "recipe.php?id=" + encodeURIComponent(e);
+  // The short address (/recipe/<id>): the Android app opens it on the recipe itself, and the preview is the same.
+  return Ua() + "recipe/" + encodeURIComponent(e);
 }
 function Ua() {
   if (mt()) return im;
