@@ -20,6 +20,7 @@ import { feature } from "../app/feature";
 import { openForMany } from "../app/recipeFor";
 import { canNotify, markSeen, notifyEndpoint } from "../app/partyNews";
 import { useReminders } from "../app/reminders";
+import { keepEve, type Eve } from "../app/partyEve";
 import { Chip, Layer, Sheet, Stepper, Toggle, cx } from "./ui";
 
 type Screen = { to: "list" } | { to: "new"; draft?: PartyDraft } | { to: "table"; token: string; fresh?: boolean };
@@ -205,7 +206,7 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
   const [busy, setBusy] = useState("");
   const reminders = useReminders();
 
-  const take = (v: Party) => { setP(v); rememberParty({ token, title: v.title, date: v.date }); if (v.admin) markSeen(token, v); };
+  const take = (v: Party) => { setP(v); rememberParty({ token, title: v.title, date: v.date }); if (v.admin) markSeen(token, v); keepEve(token, eveOf(v)); };
   const load = () => partyCall("party.get", { token, guest, admin }).then(take).catch((e: Error & { status?: number }) => {
     if (e.status === 404) { forgetParty(token); setError(e.message); } else if (!p) setError(e.message);
   });
@@ -356,6 +357,23 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
 
 const hm = (d: Date) => d.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+/** My part of the table for the evening's reminder (app/partyEve); null when I bring nothing or don't come. */
+function eveOf(p: Party): Omit<Eve, "token"> | null {
+  const me = p.guests.find((g) => g.key === p.me);
+  if (!me || me.status === "no") return null;
+  const dishes = p.dishes.filter((d) => d.by === p.me), things = p.things.filter((d) => d.by === p.me);
+  if (!dishes.length && !things.length) return null;
+  const mine = dishes.filter((d) => d.id).map((d) => recipeById(d.id!)).filter((r): r is Recipe => !!r);
+  const at = myStart(p, mine);
+  // Long dishes (the day before) by their recipe, said by the name the table gives them.
+  const longIds = (at?.dayBefore ?? []).map((r) => r.id);
+  const early = dishes.filter((d) => d.id && longIds.includes(d.id));
+  const hm = (d: Date) => d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+  return { title: p.title, date: p.date, time: p.time, dishes: dishes.filter((d) => !early.includes(d)).map((d) => d.title), things: things.map((d) => d.title),
+    start: at && at.start.toDateString() === new Date(p.date + "T12:00").toDateString() && mine.some((r) => !longIds.includes(r.id)) ? hm(at.start) : null,
+    early: early.map((d) => d.title) };
+}
 
 /** «Гость без приложения»: the organiser writes in someone who answered in the chat — name, coming, +N, what they take. */
 function GuestSheet({ p, who, onClose, onSave, onRemove }: {

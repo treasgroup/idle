@@ -2,6 +2,7 @@
 // and the tables this device made or opened (one tap away from Профиль). The table's own logic — formats, the split,
 // Шеф's hints — is in app/partyTable, loaded with the table.
 import { apiUrl } from "../engine";
+import { dropEve } from "./partyEve";
 
 export type PartyFormat = "dinner" | "bbq" | "kids" | "newyear" | "match" | "birthday";
 export type Status = "yes" | "no" | "maybe";
@@ -53,6 +54,7 @@ export function rememberParty(x: Omit<KnownParty, "at">): void {
 }
 export function forgetParty(token: string): void {
   saveList(knownParties().filter((k) => k.token !== token));
+  dropEve(token);
 }
 /** From the account (app/kept): the tables and the guest's secret of another device of the same person. */
 export function replaceParties(list: KnownParty[], guest?: string): void {

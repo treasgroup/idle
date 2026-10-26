@@ -7,6 +7,7 @@ import * as core from "../engine/core.js";
 import { useStore } from "./store";
 import { timeShort } from "./recipeTime";
 import { reminderText, type FamilyDate } from "./familyCalendar";
+import { eveText } from "./partyEve";
 
 const GENERIC = [
   "Не знаете, что приготовить? Идея дня уже ждёт.",
@@ -56,6 +57,9 @@ export function reminderPlan(s: EngineState, now = new Date(), family: FamilyDat
     const thaw = thawTomorrow(s, day);
     const thawText = thaw ? " Завтра «" + thaw.title + "»: если " + thaw.what + " в морозилке — переложите в холодильник." : "";
     const fam = reminderText(family, day);
+    // The evening before a table: what I cook or bring, and when to start — first of all.
+    const eve = eveText(next);
+    if (eve) { out.push({ date, body: (eve + (fam ? " " + fam : titles.length ? " Сегодня по плану: «" + titles[0] + "»." : "")).slice(0, 200) }); continue; }
     if (fam) { out.push({ date, body: (fam + (titles.length ? " По плану сегодня: «" + titles[0] + "»." : "")).slice(0, 200) }); continue; }
     out.push({
       date,
