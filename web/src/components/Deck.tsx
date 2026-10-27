@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { createPortal } from "react-dom";
 import { X, Heart, List, Zap, Timer, Clock3, UtensilsCrossed, ChevronRight, Star } from "lucide-react";
-import { mainIngredientOf, proteinOf, type Recipe } from "../engine";
+import { mainIngredientOf, nutritionOf, proteinOf, type Recipe } from "../engine";
 import { useActions } from "../app/actions";
 import { signal } from "../app/personal";
 import { useRatings, ratingLabel } from "../app/ratings";
@@ -80,10 +80,10 @@ export function Deck({ title, pool, askTime, startList, onClose, from }: {
 
   // On the page itself, not inside the screen that opened it (its fade-in would make the deck see-through).
   return createPortal(
-    <Layer title={title} onClose={onClose} closeIcon="close" label={title} actions={header} width="max-w-lg">
+    <Layer title={title} onClose={onClose} closeIcon="close" label={title} actions={header} width="max-w-lg lg:max-w-4xl">
       <div className="px-4 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-2" data-from={from}>
         {list ? (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {pool.slice(0, 60).map((x) => <RecipeTile key={x.id} recipe={x} onOpen={() => openRecipe(x)} />)}
           </div>
         ) : max === undefined ? (
@@ -118,7 +118,7 @@ export function Deck({ title, pool, askTime, startList, onClose, from }: {
 
 function TimeQuestion({ onPick }: { onPick: (max: number | null) => void }) {
   return (
-    <div className="anim-rise pt-4">
+    <div className="anim-rise pt-4 lg:max-w-xl">
       <h2 className="text-h1">Сколько есть времени?</h2>
       <p className="mt-2 text-body text-ink-soft">Покажу блюда по одному. Нравится — ♥, нет — ✕.</p>
       <div className="mt-5 grid gap-2.5">
@@ -146,6 +146,7 @@ function Card({ r, next, onAnswer }: { r: Recipe; next?: Recipe; onAnswer: (want
   const drag = useRef<{ x0: number; dx: number; lx: number; lt: number; v: number; past: boolean; raf: number } | null>(null);
   const done = useRef(false);
   const rating = useRatings()[r.id];
+  const kcal = nutritionOf(r).perServing.kcal;
 
   const paint = (x: number, ease = false) => {
     const c = card.current;
@@ -202,16 +203,23 @@ function Card({ r, next, onAnswer }: { r: Recipe; next?: Recipe; onAnswer: (want
 
   return (
     <>
-      <div className="relative mt-4 aspect-[4/5] max-h-[58vh] w-full">
+      <div className="relative mt-4 aspect-[4/5] max-h-[58vh] w-full lg:aspect-[16/9] lg:max-h-[min(62vh,500px)]">
         {next && (
           <div ref={behind} className="absolute inset-0 overflow-hidden rounded-[24px] opacity-60" style={{ transform: "translate3d(0,12px,0) scale(.95)" }} aria-hidden>
             <RecipeImage recipe={next} full className="h-full w-full" rounded="rounded-[24px]" />
           </div>
         )}
-        <div ref={card} className="absolute inset-0 touch-pan-y select-none overflow-hidden rounded-[24px] bg-card shadow-e2 will-change-transform"
+        <div ref={card} className="absolute inset-0 touch-pan-y select-none overflow-hidden rounded-[24px] bg-card shadow-e2 will-change-transform lg:flex"
           onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-          <RecipeImage recipe={r} full eager className="pointer-events-none h-full w-full" rounded="rounded-[24px]" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-5 pb-5 pt-20 text-white">
+          <RecipeImage recipe={r} full eager className="pointer-events-none h-full w-full lg:w-[56%] lg:shrink-0" rounded="rounded-[24px] lg:rounded-none" />
+          {/* A computer: the dish's words beside the photo, not over it. */}
+          <div className="pointer-events-none hidden min-w-0 flex-1 flex-col p-7 lg:flex">
+            <h3 className="text-h1 leading-tight">{r.title}</h3>
+            <p className="mt-2 text-body text-ink-soft">{timeShort(r)} · {DIFF[r.difficulty]}{kcal ? " · " + kcal + " ккал" : ""}{rating ? <> · <Star size={15} className="-mt-0.5 inline fill-current text-warn" aria-hidden /> {ratingLabel(rating)}</> : null}</p>
+            {r.summary && <p className="mt-4 line-clamp-6 text-body text-ink-soft">{r.summary}</p>}
+            <p className="mt-auto pt-4 text-caption text-ink-faint">Можно и клавишами: ← не то, → хочу</p>
+          </div>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-black/0 px-5 pb-5 pt-20 text-white lg:hidden">
             <h3 className="text-h2 leading-tight">{r.title}</h3>
             <p className="mt-1.5 text-body opacity-90">{timeShort(r)} · {DIFF[r.difficulty]}{rating ? <> · <Star size={15} className="-mt-0.5 inline fill-current" aria-hidden /> {ratingLabel(rating)}</> : null}</p>
           </div>
@@ -234,7 +242,7 @@ function Card({ r, next, onAnswer }: { r: Recipe; next?: Recipe; onAnswer: (want
 
 function Pick({ liked, onOpen, onMore, more }: { liked: Recipe[]; onOpen: (r: Recipe) => void; onMore: () => void; more: boolean }) {
   return (
-    <div className="anim-rise pt-2">
+    <div className="anim-rise pt-2 lg:max-w-xl">
       {liked.length ? (
         <>
           <h2 className="text-h1">{liked.length === 1 ? "Вам понравилось" : "Вам понравились " + liked.length}</h2>

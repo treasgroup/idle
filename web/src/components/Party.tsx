@@ -30,7 +30,7 @@ export function PartyLayer({ token, draft, onClose }: { token?: string | null; d
   // «Назад» steps back to the list of tables; from the list (or a table opened by a link with nothing else) it closes.
   const back = () => (screen.to === "list" || (!knownParties().length && screen.to !== "table") ? onClose() : setScreen({ to: "list" }));
   return (
-    <Layer title="Стол в складчину" onClose={back} width="max-w-xl">
+    <Layer title="Стол в складчину" onClose={back} width={screen.to === "table" ? "max-w-xl lg:max-w-5xl" : "max-w-xl"}>
       <div className="px-4 pb-12 sm:px-6">
         {screen.to === "list" && <PartyList onOpen={(t) => setScreen({ to: "table", token: t })} onNew={() => setScreen({ to: "new" })} />}
         {screen.to === "new" && <PartyNew draft={screen.draft} onCreated={(t) => setScreen({ to: "table", token: t, fresh: true })} />}
@@ -268,6 +268,9 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
 
   return (
     <>
+      {/* On a computer two columns: when, where and who comes on the left, the dishes and who brings what on the right. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:items-start lg:gap-8">
+      <div>
       <p className="text-[2rem] leading-none" aria-hidden>{f.emoji}</p>
       <h1 className="mt-2 text-h1">{p.title}</h1>
       <p className="mt-1 flex items-center gap-1.5 text-body-sm text-ink-soft"><CalendarDays size={16} aria-hidden />{whenLine(p)}</p>
@@ -322,6 +325,9 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
           </button>
         )}
 
+      </div>
+
+      <div className="lg:[&>:first-child]:mt-0">
       {hints.length > 0 && (
         <div className="mt-6 flex gap-3 rounded-card bg-brand-soft p-3.5">
           <ChefHat size={20} className="mt-0.5 shrink-0 text-brand" aria-hidden />
@@ -344,6 +350,8 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
       <Items p={p} kind="thing" title="Что взять, кроме еды" busy={busy} onAct={(b) => act(b, String(b.key ?? "add"))} canAct={answered} />
 
       {p.expenses && <Expenses p={p} busy={busy === "spent"} onSpent={(n) => act({ act: "answer", spent: n }, "spent")} canAct={answered} />}
+      </div>
+      </div>
 
       {p.admin && <GuestSheet p={p} who={guestEdit} onClose={() => setGuestEdit(null)} onSave={(b) => act({ act: "guest", ...b }, "guest")} onRemove={(who) => act({ act: "kick", who }, "kick")} />}
       <Sheet open={share} title="Позвать гостей" onClose={() => setShare(false)}>

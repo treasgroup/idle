@@ -47,8 +47,10 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Layer title="Дневник еды" onClose={onClose} width="max-w-xl">
-      <div className="px-4 pb-12 sm:px-6">
+    <Layer title="Дневник еды" onClose={onClose} width="max-w-xl lg:max-w-5xl">
+      {/* On a computer two columns: the day, the week and adding on the left, what was eaten on the right. */}
+      <div className="px-4 pb-12 sm:px-6 lg:grid lg:grid-cols-[minmax(0,400px)_minmax(0,1fr)] lg:items-start lg:gap-8">
+        <div>
         <div className="flex items-center justify-between gap-2">
           <button className="icon-btn -ml-2" onClick={() => setDate(shift(date, -1))} aria-label="Предыдущий день"><ChevronLeft size={22} /></button>
           <h1 className="text-h2 first-letter:uppercase">{dayTitle(date)}</h1>
@@ -102,7 +104,9 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
           <button className="btn-outline h-auto min-h-11 px-1 py-2 text-[min(0.875rem,4.2vw)] max-[359px]:flex-col max-[359px]:gap-1 [.xl-text_&]:flex-col [.xl-text_&]:gap-1" onClick={() => setAdd("barcode")}><ScanBarcode size={18} aria-hidden />Штрихкод</button>
           <button className="btn-outline h-auto min-h-11 px-1 py-2 text-[min(0.875rem,4.2vw)] max-[359px]:flex-col max-[359px]:gap-1 [.xl-text_&]:flex-col [.xl-text_&]:gap-1" onClick={() => setAdd("manual")}><PenLine size={18} aria-hidden />Вручную</button>
         </div>
+        </div>
 
+        <div className="lg:pt-12 lg:[&>:first-child]:mt-0">
         {!list.length && <p className="mt-6 text-center text-body-sm text-ink-soft">{isToday ? "Пока ничего не записано. Блюдо из рецептов — в одно касание, а после готовки я сам предложу записать порцию." : "В этот день ничего не записано."}</p>}
         {MEALS.map((m) => {
           const items = list.filter((e) => e.meal === m.id);
@@ -125,6 +129,7 @@ export function DiaryLayer({ onClose }: { onClose: () => void }) {
           );
         })}
         <p className="mt-6 text-caption text-ink-faint">Калории блюд — по нашим рецептам, покупных продуктов — с этикетки (база Open Food Facts). Дневник хранится в вашем аккаунте — он есть на всех ваших устройствах, семья его не видит.</p>
+        </div>
       </div>
 
       <AddDish open={add === "dish"} date={date} onClose={() => setAdd(null)} />

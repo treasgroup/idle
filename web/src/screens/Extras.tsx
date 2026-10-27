@@ -220,6 +220,22 @@ const DONT_EAT = [["meat", "Мясо"], ["fish", "Рыба"], ["dairy", "Мол�
 const LAST = 2;
 const TOUR = LAST;
 
+/** The left half of «Знакомство» on a computer: who Шеф is and what he does. */
+function WelcomeSide() {
+  return (
+    <div className="hidden lg:block">
+      <Mascot size={200} className="-ml-3" />
+      <p className="mt-4 text-display">Что приготовить?</p>
+      <p className="mt-3 max-w-md text-body text-ink-soft">Я Шеф. Помогу решить, что приготовить, — из того, что есть дома.</p>
+      <ul className="mt-6 grid gap-3 text-body">
+        {["Блюдо из ваших продуктов за минуту", "Меню на неделю и список покупок", "Готовка по шагам с таймерами"].map((t) => (
+          <li key={t} className="flex items-center gap-3"><span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-herb-soft text-herb" aria-hidden><CircleCheck size={16} /></span>{t}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function Onboarding({ onDone }: { onDone: () => void }) {
   const { s, profile, setProfile, update } = useStore();
   const a = useAssistant();
@@ -287,7 +303,10 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="anim-fade fixed inset-0 z-50 overflow-y-auto bg-paper" role="dialog" aria-modal="true" aria-label="Знакомство">
-      <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)]">
+      {/* On a computer: who we are on the left, the question in a card on the right — not a phone-wide strip. */}
+      <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] lg:grid lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] lg:items-center lg:gap-16 lg:px-10 lg:py-10">
+        <WelcomeSide />
+        <div className="flex flex-1 flex-col lg:flex-none lg:rounded-card lg:border lg:border-line lg:bg-card lg:p-7 lg:shadow-e1">
         {step < LAST ? (
           <>
             <div className="flex items-center gap-3">
@@ -296,8 +315,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
                 {[0, 1].map((i) => <span key={i} className={cx("h-1.5 rounded-full", i <= step ? "bg-brand-fill" : "bg-sunken")} />)}
               </div>
             </div>
-            <div className="anim-rise mt-8 flex-1" key={step}>{steps[step]}</div>
-            <div className="sticky bottom-0 -mx-5 mt-8 bg-paper px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
+            <div className="anim-rise mt-8 flex-1 lg:mt-6 lg:flex-none" key={step}>{steps[step]}</div>
+            <div className="sticky bottom-0 -mx-5 mt-8 bg-paper px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3 lg:static lg:mx-0 lg:mt-6 lg:bg-transparent lg:px-0 lg:pb-0">
               <button className="btn-primary h-13 w-full" onClick={() => { if (step === LAST - 1) save(false); setStep(step === LAST - 1 && !tourWanted() ? TOUR + 1 : step + 1); }}>Дальше</button>
               <div className="mt-1 flex">
                 {step > 0 && <button className="btn-ghost flex-1" onClick={() => setStep(step - 1)}>Назад</button>}
@@ -310,8 +329,8 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
         ) : (
           <div className="anim-rise flex flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1.5rem)]">
             <div className="flex flex-1 flex-col justify-center py-8">
-              <Mascot size={170} className="-ml-2" />
-              <h1 className="mt-3 text-display">Знакомьтесь — Шеф</h1>
+              <Mascot size={170} className="-ml-2 lg:hidden" />
+              <h1 className="mt-3 text-display lg:mt-0 lg:text-h1">Знакомьтесь — Шеф</h1>
               <p className="mt-3 text-body text-ink-soft">Ваш кулинарный помощник. Напишите или скажите, что есть дома, сколько времени и какое настроение, — он подберёт рецепт. И ответит на любой вопрос на кухне.</p>
               <p className="label mb-2 mt-8">Попробуйте спросить</p>
               <div className="grid gap-2">
@@ -327,6 +346,7 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
             <button className="btn-primary h-13 w-full" onClick={() => finish()}>Начать</button>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

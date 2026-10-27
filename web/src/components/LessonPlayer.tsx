@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import {
   X, Hand, Flame, Timer, Eye, Droplet, Sparkles, Leaf, Coffee, Utensils, Check, Grid3x3, Layers, DoorOpen, Refrigerator, CalendarDays,
   Repeat2, CookingPot, Egg, Snowflake, Clock, Carrot, Fish, RotateCcw, Moon, Salad, Blend, ChefHat, CircleCheck, type LucideIcon,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { apiUrl, recipeById, type Recipe } from "../engine";
 import { useActions } from "../app/actions";
@@ -84,24 +85,28 @@ export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Less
 
   return createPortal(
     <div className="anim-fade fixed inset-0 z-50 flex flex-col bg-paper" role="dialog" aria-modal="true" aria-label={"Урок: " + lesson.title}>
-      <div className="pt-safe mx-auto flex w-full max-w-md items-center gap-2 px-3 pt-2">
+      <div className="pt-safe mx-auto flex w-full max-w-md items-center gap-2 px-3 pt-2 lg:max-w-5xl lg:pt-4">
         <button className="icon-btn" onClick={onClose} aria-label="Закрыть урок"><X size={22} /></button>
         <span className="min-w-0 flex-1 truncate text-small text-ink-soft">{lesson.title}</span>
         <span className="shrink-0 pr-2 text-small tabular-nums text-ink-soft">{Math.min(at + 1, pages)} из {pages}</span>
       </div>
 
-      <div ref={rail} className="mx-auto flex w-full max-w-md flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain" style={{ scrollbarWidth: "none" }}>
+      {/* On a computer: a wide card (picture beside the words) with arrows at its sides, not a phone-tall strip. */}
+      <div className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 lg:max-w-5xl">
+      <div ref={rail} className="flex w-full flex-1 snap-x snap-mandatory overflow-x-auto overscroll-x-contain" style={{ scrollbarWidth: "none" }}>
         {lesson.cards.map((c, i) => {
           const Icon = ICONS[c.icon ?? ""] ?? ChefHat;
           return (
-            <section key={"c" + i} className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3" aria-hidden={i !== at}>
+            <section key={"c" + i} className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3 lg:grid lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:content-center lg:items-center lg:gap-10 lg:px-20" aria-hidden={i !== at}>
               {pics[lesson.id + "-" + i]
                 ? <img src={site() + "school/" + lesson.id + "-" + i + ".jpg?v=" + pics[lesson.id + "-" + i]} alt="" className="aspect-[3/2] w-full rounded-card bg-sunken object-cover" />
                 : c.art
                 ? <div className="rounded-card bg-sunken/60 p-3"><SchoolArt lesson={c.art} /></div>
-                : <div className="grid h-44 place-items-center rounded-card bg-herb-soft text-herb" aria-hidden><Icon size={72} strokeWidth={1.5} /></div>}
-              <h1 className="mt-6 text-h1 leading-tight">{c.title}</h1>
-              <p className="mt-2 text-body text-ink-soft">{c.text}</p>
+                : <div className="grid h-44 place-items-center rounded-card bg-herb-soft text-herb lg:h-72" aria-hidden><Icon size={72} strokeWidth={1.5} /></div>}
+              <div>
+                <h1 className="mt-6 text-h1 leading-tight lg:mt-0">{c.title}</h1>
+                <p className="mt-2 text-body text-ink-soft">{c.text}</p>
+              </div>
             </section>
           );
         })}
@@ -109,7 +114,7 @@ export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Less
           const chosen = answers[n];
           const right = chosen === q.right;
           return (
-            <section key={"q" + n} className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3" aria-hidden={lesson.cards.length + n !== at}>
+            <section key={"q" + n} className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3 lg:justify-center lg:px-[calc(50%-18rem)]" aria-hidden={lesson.cards.length + n !== at}>
               <p className="label">Проверь себя</p>
               <h1 className="mt-2 text-h1 leading-tight">{q.q}</h1>
               <div className="mt-5 grid gap-2">
@@ -134,7 +139,7 @@ export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Less
             </section>
           );
         })}
-        <section className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3" aria-hidden={!last}>
+        <section className="flex w-full shrink-0 snap-center flex-col overflow-y-auto px-5 pb-4 pt-3 lg:justify-center lg:px-[calc(50%-18rem)]" aria-hidden={!last}>
           <CircleCheck size={56} className="text-herb" aria-hidden />
           <h1 className="mt-4 text-h1 leading-tight">{done ? "Урок пройден" : "Закрепите на практике"}</h1>
           <p className="mt-2 text-body text-ink-soft">{lesson.skill}</p>
@@ -144,6 +149,9 @@ export function LessonPlayer({ lesson, done, onFinish, onClose }: { lesson: Less
             </div>
           )}
         </section>
+      </div>
+      <button className="icon-btn absolute left-2 top-1/2 hidden h-12 w-12 -translate-y-1/2 rounded-full border border-line bg-card shadow-e1 disabled:opacity-0 lg:grid" disabled={at === 0} onClick={() => go(at - 1)} aria-label="Назад"><ChevronLeft size={24} /></button>
+      <button className="icon-btn absolute right-2 top-1/2 hidden h-12 w-12 -translate-y-1/2 rounded-full border border-line bg-card shadow-e1 disabled:opacity-0 lg:grid" disabled={last} onClick={() => go(at + 1)} aria-label="Дальше"><ChevronRight size={24} /></button>
       </div>
 
       <div className="mx-auto w-full max-w-md px-5 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">

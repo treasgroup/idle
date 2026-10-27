@@ -147,14 +147,24 @@ export function DinnerLayer({ onClose }: { onClose: () => void }) {
   const end = () => { saveDinner(null); onClose(); };
   const finished = !current;
   return (
-    <Layer title={dinnerTitle(plan)} onClose={onClose} width="max-w-xl">
-      <div className="mx-auto max-w-xl px-4 pb-40 pt-2 sm:px-6">
+    <Layer title={dinnerTitle(plan)} onClose={onClose} width="max-w-xl lg:max-w-5xl">
+      {/* On a computer: the plan and its buttons on the left (they stay in view), the steps on the right. */}
+      <div className="mx-auto max-w-xl px-4 pb-40 pt-2 sm:px-6 lg:grid lg:max-w-none lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start lg:gap-10 lg:pb-16">
+        <div className="lg:sticky lg:top-4">
         <h1 className="text-h1">{dinnerTitle(plan)}</h1>
         <p className="mt-1 text-body-sm text-ink-soft">Начать в {hhmm(s.start)} · у плиты около {s.handsOn} мин</p>
-        <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+        <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 lg:flex-col lg:gap-2">
           {list.map((r, i) => <li key={r.id} className="flex items-center gap-1.5 text-small"><span className={cx("h-2.5 w-2.5 rounded-full", COLORS[i])} aria-hidden />{r.title}</li>)}
         </ul>
-        <ol className="mt-5 grid gap-1.5">
+        <div className="mt-6 hidden gap-2 lg:grid">
+          {finished
+            ? <button className="btn-primary h-13" onClick={end}><Check size={20} aria-hidden />{plan.kind === "prep" ? "Всё заготовлено" : "Приятного аппетита"}</button>
+            : <button className="btn-primary h-13" onClick={markDone}><Check size={20} aria-hidden />Готово — дальше</button>}
+          <button className="btn-outline h-12" onClick={late}>Опаздываю на 10 мин</button>
+        </div>
+        </div>
+        <div>
+        <ol className="mt-5 grid gap-1.5 lg:mt-0">
           {s.items.map((it) => {
             const isDone = done.has(it.key);
             const isNow = current?.key === it.key;
@@ -186,8 +196,9 @@ export function DinnerLayer({ onClose }: { onClose: () => void }) {
         </ol>
         <p className="mt-4 flex items-center gap-2 text-small text-ink-soft"><Bell size={16} aria-hidden />Перед каждым шагом прозвенит напоминание — и при выключенном экране.</p>
         <button className="btn-ghost mt-6 w-full text-ink-soft" onClick={end}><X size={18} aria-hidden />Закончить и убрать план</button>
+        </div>
       </div>
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-xl gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-3 sm:px-6">
           <button className="btn-outline h-13 px-4" onClick={late}>Опаздываю на 10 мин</button>
           {finished

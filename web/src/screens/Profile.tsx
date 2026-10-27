@@ -273,7 +273,10 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       {/* On the page itself: the screen under it fades in and would make it see-through. */}
       {tour && createPortal(
         <div className="anim-fade fixed inset-0 z-50 overflow-y-auto bg-paper" role="dialog" aria-modal="true" aria-label="Как пользоваться">
-          <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)]"><Tour onDone={() => setTour(false)} last="Понятно" /></div>
+          {/* On a computer: the cards in a card in the middle, not a phone-wide strip down the whole screen. */}
+          <div className="mx-auto flex min-h-full max-w-md flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] lg:max-w-xl lg:justify-center lg:py-10">
+            <div className="flex flex-1 flex-col lg:flex-none lg:rounded-card lg:border lg:border-line lg:bg-card lg:p-7 lg:shadow-e1"><Tour onDone={() => setTour(false)} last="Понятно" /></div>
+          </div>
         </div>,
         document.body,
       )}
