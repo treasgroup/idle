@@ -37,3 +37,18 @@ test("a dish asked by name and hidden by «не ем» is shown with the reason"
   // Without «не ем» nothing changes.
   expect(turn("Сельдь под шубой").text).toMatch(/^Нашёл по запросу/);
 });
+
+test("the audit's common questions (31.10.2026)", () => {
+  // The guesser heard «острое» in «перцы»: the title finds the stuffed peppers.
+  expect(turn("фаршированные перцы").results[0]?.recipe.title).toMatch(/[Пп]ерцы фаршированные|Фаршированные перцы/);
+  // «торт» is sweet cakes, not biscuits, a sushi «cake» or the liver one.
+  const cakes = turn("торт").results.slice(0, 3).map((m) => m.recipe.title);
+  expect(cakes.every((t) => /торт/i.test(t) && !/печён|кабачк|суши/i.test(t))).toBe(true);
+  // Human questions get dishes, not «Не понял».
+  for (const q of ["что-нибудь вкусное", "чем накормить мужа"]) expect(turn(q).results.length).toBeGreaterThan(0);
+  expect(turn("домашний хлеб").kind).not.toBe("unclear");
+  // Word forms.
+  expect(turn("лосось").text).toMatch(/С лососем/);
+  expect(turn("хочу острое").text).not.toMatch(/остроем/);
+  expect(turn("что приготовить ребенку").text).not.toMatch(/ребенка, детям/);
+});

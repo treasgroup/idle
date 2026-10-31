@@ -3174,6 +3174,11 @@ function Xb(e) {
 }
 var NS = /[жшчщц]$/,
   MS = {
+    // Masculine soft-sign fish and birds («с лососью» was said).
+    лосось: "лососем",
+    окунь: "окунем",
+    угорь: "угрём",
+    гусь: "гусем",
     картофель: "картофелем",
     щавель: "щавелем",
     миндаль: "миндалем",
@@ -3375,7 +3380,7 @@ var Oi = [
       "пирожки",
       "пирожн",
       "кекс",
-      "торт",
+      // «торт» is not here: cakes are asked by name like «котлеты» («Торт — 25 вариантов»), not all the baking.
       "печенье",
       // «печенья», «печеньки» — not «печень» (liver) itself.
       "печенья",
@@ -4070,6 +4075,7 @@ function CD(e, t) {
 }
 var COLD_MONTHS = [9, 10, 11, 0, 1, 2, 3],
   COLD_SOUP_TITLE = /(окрошк|свекольник холодн|холодн\S* суп|суп холодн|гаспачо|таратор|ботвинь|холодник)/i;
+var HOME_CUISINE = new Set(["russian", "ukrainian", "belarusian"]);
 function Qe(e, t, n, a = 3, i = {}) {
   let s = [...new Set([...t.excluded, ...n.excluded])],
     // Asking "в аэрогриле" means the person has one, even if the profile does not say so.
@@ -4151,6 +4157,8 @@ function Qe(e, t, n, a = 3, i = {}) {
           (gadgetOnly ? 1.5 : 0) +
           (/для (детей|малышей|ребёнка|ребенка)/i.test(p.title) && t.occasion !== "kids" ? 1.5 : 0) +
           (byName && !t.vegetarian && /постн/i.test(p.title) ? 1.5 : 0) +
+          // «торт» is a sweet cake first: the liver and the courgette «торт» are snacks, further down.
+          (i.words?.some((R) => R.startsWith("торт")) && !["baking", "dessert"].includes(course) ? 3 : 0) +
           // A cold soup out of its season (October to April) only when asked for by name.
           (!askedKind && COLD_MONTHS.includes(new Date().getMonth()) && COLD_SOUP_TITLE.test(p.title) ? 3 : 0),
         lowTitle = p.title.toLowerCase().replace(/ё/g, "е"),
@@ -4161,6 +4169,8 @@ function Qe(e, t, n, a = 3, i = {}) {
           (b ? 8 : 0) +
           g -
           aside +
+          // «суп», «салат» alone: the home kitchen first (борщ, щи, куриный), the Chinese egg soup further down.
+          (byName && !t.available.length && HOME_CUISINE.has(p.cuisine) ? 1.5 : 0) +
           said +
           y.length * 4 -
           S.length * 3 -
@@ -4427,7 +4437,7 @@ var Gp = ["pan", "pot", "oven", "blender", "multicooker", "airfryer", "microwave
     ],
     [
       "cozy",
-      /(печал|из-за холода|холод на улице|на улице холод|холодрыг|холодин|ноябр|темнот|осенн|разбит\S* сердц|грущу|тоскую|бабул|бабушк|по-домашнему|как мама|мамин|уют|тепленьк|теплого|теплое|горяч|согреться|согреть|домашн|как у бабушки|как у мамы|как в детстве|грустн|тоскл|хандр|настроения нет|плохое настроение|стресс|холодно|замерз|замёрз|(^|[^а-я])мороз|зимн|дожд|слякот)/,
+      /(печал|из-за холода|холод на улице|на улице холод|холодрыг|холодин|ноябр|темнот|осенн|разбит\S* сердц|грущу|тоскую|бабул|бабушк|по-домашнему|как мама|мамин|уют|тепленьк|теплого|теплое|горяч|согреться|согреть|домашнее|домашнего|домашненьк|как у бабушки|как у мамы|как в детстве|грустн|тоскл|хандр|настроения нет|плохое настроение|стресс|холодно|замерз|замёрз|(^|[^а-я])мороз|зимн|дожд|слякот)/,
     ],
     [
       "light",
@@ -5133,8 +5143,12 @@ function QS(e, t) {
               : null;
         })()
       : null,
+    // «Подобрал — ребенка, детям»: the words «для ребёнка» from a title are not a dish when «детям» is said already.
+    aShown = e.occasion === "kids" ? a.filter((u) => !/^dish:(ребен|ребён|дет|малыш)/.test(u)) : a,
+    // «поострее, с остроем»: the spicy mood said once.
+    iShown = e.mood === "spicy" ? i.filter((u) => u !== "spicy") : i,
     r = [
-      a.length ? a.map((u) => Ds(u).toLowerCase()).join(" или ") : null,
+      aShown.length ? aShown.map((u) => Ds(u).toLowerCase()).join(" или ") : null,
       e.occasion ? jD[e.occasion] : null,
       e.moodChanged &&
       e.mood &&
@@ -5150,7 +5164,7 @@ function QS(e, t) {
       e.strictPantry ? "без покупок" : null,
       e.nutrition?.maxKcal ? "до " + e.nutrition.maxKcal + " ккал" : null,
       e.nutrition?.minProtein ? "много белка" : null,
-      i.length ? _i(i.map((u) => aa(n(u)))).replace(/^/, "с ") : null,
+      iShown.length ? _i(iShown.map((u) => aa(n(u)))).replace(/^/, "с ") : null,
       e.availableAdd.length
         ? "есть дома: " + e.availableAdd.map(n).join(", ")
         : null,
@@ -8217,6 +8231,9 @@ function p_(e) {
     a = n ? l0(n.label) : void 0;
   if (!n || !a || !e.local || x_(e.message)) return Er(e);
   let i = n.source === "taught" || n.prob >= l_;
+  // A wish the words do not hint at is not put in their place either: «фаршированные перцы» was heard as «хочу острое»
+  // (0.93) and answered with a spicy Chinese soup — now the title search finds the peppers.
+  if (NEED_CUE[a.id] && !NEED_CUE[a.id].test(_e(e.message))) return Er(e);
   if (Ii(e.patch)) {
     if (i && a.id === "offtopic")
       return {
