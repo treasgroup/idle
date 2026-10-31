@@ -9,6 +9,8 @@ import {
 } from "../engine";
 import { useStore } from "../app/store";
 import { OPEN_PROFILE_SHEET, takeProfileSheet, type ProfileSheet } from "../app/profileSheet";
+import { InstallSheet } from "../components/InstallSheet";
+import { platform } from "../app/stores";
 import { overdueList } from "../app/freezer";
 import { LEGAL_TITLES } from "../engine/legalApi";
 import { useReminders } from "../app/reminders";
@@ -57,7 +59,7 @@ function Row({ icon, title, hint, onClick, dot }: { icon: JSX.Element; title: st
 export interface Pwa { installed: boolean; canInstall: boolean; ios: boolean; install: () => Promise<boolean> }
 
 export function Profile({ pwa }: { pwa: Pwa }) {
-  const { s, update, profile, setProfile, sync, toast, wipe, server } = useStore();
+  const { s, update, profile, setProfile, sync, wipe, server } = useStore();
   const reminders = useReminders();
   const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs" | "alice">(null);
   // «Ограничения» from a link in Шеф's answer (app/profileSheet).
@@ -73,6 +75,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
   const [holidays, setHolidays] = useState(false);
+  const [install, setInstall] = useState(false);
   const [calendar, setCalendar] = useState(false);
   const nextDate = byNext(profile.familyDates)[0];
   const [writeUs, setWriteUs] = useState(false);
@@ -159,10 +162,10 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         </div>
         {reminders.supported && <div className="border-t border-line"><Row icon={<Bell size={18} />} title="Напоминания" hint={s.reminders.daily ? "Каждый день в " + s.reminders.daily : "Выключены"} onClick={() => setSheet("reminders")} /></div>}
       </div>
-      {!pwa.installed && (pwa.canInstall || pwa.ios) && (
+      {/* The site only (the app is the app): a store or a shortcut, what fits the phone (components/InstallSheet). */}
+      {!isNativeApp() && (
         <div className="card mt-3 overflow-hidden">
-          <Row icon={<Download size={18} />} title="Установить приложение" hint={pwa.ios ? "Safari → «Поделиться» → «На экран Домой»" : "Значок на экране, работает без интернета"}
-            onClick={() => { if (pwa.canInstall) void pwa.install(); else toast("В Safari нажмите «Поделиться», затем «На экран Домой»"); }} />
+          <Row icon={<Download size={18} />} title="Приложение на телефон" hint={platform() === "ios" ? "Ярлык на экран «Домой»" : "RuStore или ярлык на рабочий стол"} onClick={() => setInstall(true)} />
         </div>
       )}
     </>,
@@ -275,6 +278,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       </Sheet>
 
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
+      <InstallSheet open={install} onClose={() => setInstall(false)} pwa={pwa} />
       <Sheet open={holidays} title="Праздники" onClose={() => setHolidays(false)}>
         <div className="grid gap-2.5">
           {([

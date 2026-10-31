@@ -11,6 +11,7 @@ import {
   type Recipe, type VoiceCommand,
 } from "../engine";
 import { useStore } from "../app/store";
+import { RUSTORE_URL } from "../app/stores";
 import { eatRecipe, removeEntry } from "../app/diary";
 import { FreezeSheet } from "../components/Freezer";
 import { SupportAsk } from "../components/SupportButton";
@@ -909,7 +910,7 @@ function Done({ onClose }: { onClose: () => void }) {
 }
 
 // In the Android app, after the third «Понравилось»: one quiet request to rate the app in RuStore, asked once.
-const RUSTORE = "https://apps.rustore.ru/app/su.treas.cook";
+const RUSTORE = RUSTORE_URL;
 function storeAskDue(): boolean {
   if (!isNativeApp()) return false;
   try {
