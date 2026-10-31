@@ -3,7 +3,7 @@
 import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ChevronRight, ShoppingCart, GraduationCap, Clock, X, Shuffle, Mic, Repeat2, PartyPopper, CalendarDays, Snowflake, Refrigerator, NotebookPen, HandPlatter } from "lucide-react";
 import {
-  apiUrl, courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, plural, rankRecipes, recipeById, recipes, shortName,
+  apiUrl, courseOf, dateKey, expiryLabel, expiringSoon, freshConditions, isNativeApp, plural, rankRecipes, recipeById, recipes, shortName,
   type Recipe,
 } from "../engine";
 import { useStore } from "../app/store";
@@ -36,6 +36,8 @@ import { forgetRecipe, lastRecipe } from "../app/lastSeen";
 import { thawTomorrow } from "../app/reminders";
 import { KIND_ICON, comingSoon, daysUntil, eventPhrase, nextDate, whenText, type FamilyDate } from "../app/familyCalendar";
 import { BackupCard } from "../components/BackupCard";
+import { InstallSheet } from "../components/InstallSheet";
+import { platform } from "../app/stores";
 import { Bone } from "../components/Skeleton";
 import { timeShort } from "../app/recipeTime";
 
@@ -602,26 +604,29 @@ function Saved() {
 
 
 /** Phones, from the second visit: «put Шеф on the home screen» — once, and it can be dismissed. */
+/** From the second visit, on a phone: the app — RuStore on Android, the shortcut on iPhone — the same choice as in Профиль. */
 function InstallCard({ pwa }: { pwa: Pwa }) {
-  const { s, update, toast } = useStore();
+  const { s, update } = useStore();
+  const [open, setOpen] = useState(false);
   const [visits] = useState(() => {
     try { const n = Number(localStorage.getItem("cook-visits") || 0) + 1; localStorage.setItem("cook-visits", String(n)); return n; } catch { return 0; }
   });
+  const where = platform();
   const phone = typeof matchMedia !== "undefined" && matchMedia("(max-width: 1023px)").matches;
-  if (!phone || pwa.installed || s.installDismissed || visits < 2 || !(pwa.canInstall || pwa.ios)) return null;
+  if (isNativeApp() || !phone || where === "desktop" || pwa.installed || s.installDismissed || visits < 2) return null;
   const close = () => update((st) => ({ ...st, installDismissed: true }));
+  const android = where === "android";
   return (
-    <section className="mt-5 flex items-center gap-3 rounded-card border border-line bg-card p-3 pr-2 shadow-e1" aria-label="Установить приложение">
-      <img src="icons/icon-192.png" alt="" className="h-11 w-11 shrink-0 rounded-input" />
+    // The button under the words: beside them it squeezed the text into five lines on a phone.
+    <section className="mt-5 flex items-start gap-3 rounded-card border border-line bg-card p-3 pr-2 shadow-e1" aria-label="Приложение на телефон">
+      <img src="icons/icon-192.png" alt="" className="mt-0.5 h-11 w-11 shrink-0 rounded-input" />
       <span className="min-w-0 flex-1">
-        <span className="block text-body-sm font-semibold">Шеф на экране телефона</span>
-        <span className="block text-caption text-ink-soft">Открывается как приложение и работает без интернета</span>
+        <span className="block text-body-sm font-semibold">{android ? "Шеф в приложении" : "Шеф на экране телефона"}</span>
+        <span className="block text-caption text-ink-soft">{android ? "Таймеры со звуком и рецепты без интернета" : "Открывается как приложение и работает без интернета"}</span>
+        <button className="btn-soft mt-2 h-10 px-4" onClick={() => setOpen(true)}>{android ? "Установить" : "Добавить на экран"}</button>
       </span>
-      <button className="btn-soft h-10 shrink-0 px-4" onClick={() => {
-        if (pwa.canInstall) void pwa.install().then((ok) => { if (ok) close(); });
-        else toast("В Safari нажмите «Поделиться», затем «На экран Домой»");
-      }}>Добавить</button>
-      <button className="icon-btn shrink-0 text-ink-soft" onClick={close} aria-label="Не показывать"><X size={18} /></button>
+      <button className="icon-btn -mt-1 shrink-0 text-ink-soft" onClick={close} aria-label="Не показывать"><X size={18} /></button>
+      <InstallSheet open={open} onClose={() => setOpen(false)} pwa={pwa} />
     </section>
   );
 }
