@@ -1,6 +1,6 @@
 // «Рецепты»: search, saved dishes and «Моя книга», dish types and filters. Long or vague queries go to Шеф.
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { ArrowUpRight, BookOpen, Heart, Search, SearchX, SlidersHorizontal, X } from "lucide-react";
+import { ArrowUpRight, BookOpen, BookOpenCheck, Heart, Search, SearchX, SlidersHorizontal, Users, X } from "lucide-react";
 import { useRatings } from "../app/ratings";
 import {
   CATALOG_SECTIONS, courseOf, freshConditions, isLenten, track, mealsOf, nutritionOf, plural, rankRecipes, recipeById, recipes, searchRecipes,
@@ -400,11 +400,29 @@ export function Recipes({ mode = "search" }: { mode?: "search" | "favorites" }) 
 
 /** Все / Сохранённые / Моя книга: a radio group; the label width does not jump when it turns bold. */
 function ViewSwitch({ value, onChange, counts }: { value: View; onChange: (v: View) => void; counts: { saved: number; book: number; mine: number } }) {
-  const opts: { id: View; label: string; count?: number }[] = [
-    { id: "saved", label: "Сохранённые", count: counts.saved }, { id: "book", label: "Я готовил(а)", count: counts.book },
-    { id: "mine", label: "Семейные", count: counts.mine },
+  const opts: { id: View; label: string; short: string; icon: ReactNode; count?: number }[] = [
+    { id: "saved", label: "Сохранённые", short: "Любимые", icon: <Heart size={18} aria-hidden />, count: counts.saved },
+    { id: "book", label: "Я готовил(а)", short: "Готовил(а)", icon: <BookOpenCheck size={18} aria-hidden />, count: counts.book },
+    { id: "mine", label: "Семейные", short: "Семейные", icon: <Users size={18} aria-hidden />, count: counts.mine },
   ];
   const ref = useRef<HTMLDivElement>(null);
+  // Full labels while they fit. A narrow phone or large text in the phone's settings ran them into each other
+  // (reported on 2.0.9): then three columns, an icon over a short label. Back to full labels when there is room again.
+  const [compact, setCompact] = useState(false);
+  const needed = useRef(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => {
+      if (!compact) { if (el.scrollWidth > el.clientWidth + 1) { needed.current = el.scrollWidth; setCompact(true); } }
+      else if (el.clientWidth >= needed.current) setCompact(false);
+    };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    for (const c of el.children) ro.observe(c);
+    return () => ro.disconnect();
+  }, [compact]);
   const key = (e: KeyboardEvent) => {
     const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
     if (!d) return;
@@ -414,18 +432,24 @@ function ViewSwitch({ value, onChange, counts }: { value: View; onChange: (v: Vi
     ref.current?.querySelectorAll<HTMLButtonElement>("[role=radio]")[i]?.focus();
   };
   return (
-    <div ref={ref} role="radiogroup" aria-label="Какие рецепты показать" onKeyDown={key} className="flex h-12 gap-1 rounded-full bg-sunken p-1">
+    <div ref={ref} role="radiogroup" aria-label="Какие рецепты показать" onKeyDown={key}
+      className={compact ? "grid grid-cols-3 gap-1 rounded-[1.25rem] bg-sunken p-1" : "flex h-12 gap-1 overflow-hidden rounded-full bg-sunken p-1"}>
       {opts.map((o) => {
         const on = value === o.id;
-        return (
+        const tone = on ? "bg-card font-semibold text-ink shadow-e1" : "text-ink-soft hover:text-ink";
+        return compact ? (
+          <button key={o.id} type="button" role="radio" aria-checked={on} tabIndex={on ? 0 : -1} onClick={() => onChange(o.id)} aria-label={o.label}
+            className={cx("flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 py-1.5 text-micro leading-tight transition-colors duration-150", tone)}>
+            {o.icon}<span className="max-w-full truncate">{o.short}</span>
+          </button>
+        ) : (
           <button key={o.id} type="button" role="radio" aria-checked={on} tabIndex={on ? 0 : -1} onClick={() => onChange(o.id)}
-            className={cx("inline-flex min-w-0 flex-auto items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 text-small transition-colors duration-150",
-              on ? "bg-card font-semibold text-ink shadow-e1" : "text-ink-soft hover:text-ink")}>
+            className={cx("inline-flex flex-auto shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-3 text-small transition-colors duration-150", tone)}>
             <span className="grid">
               <span className="col-start-1 row-start-1">{o.label}</span>
               <span aria-hidden className="invisible col-start-1 row-start-1 font-semibold">{o.label}</span>
             </span>
-            {!!o.count && <span className={cx("rounded-full px-1.5 text-micro tabular-nums text-ink-soft max-[374px]:hidden", on ? "bg-sunken" : "bg-paper")}>{o.count}</span>}
+            {!!o.count && <span className={cx("rounded-full px-1.5 text-micro tabular-nums text-ink-soft", on ? "bg-sunken" : "bg-paper")}>{o.count}</span>}
           </button>
         );
       })}

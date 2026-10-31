@@ -137,7 +137,8 @@ export function Shopping() {
 
   return (
     <div className="pt-4 sm:pt-6">
-      <div className="flex items-center justify-between gap-2">
+      {/* Large text in the phone's settings: the buttons move under the title instead of running into it. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <h1 className="min-w-0 whitespace-nowrap text-h1">Покупки{toBuy.length - pinches.length > 0 && <span className="font-medium text-ink-soft"><span className="sr-only">, осталось купить</span> · {toBuy.length - pinches.length}</span>}</h1>
         <div className="flex shrink-0 items-center gap-0.5">
           {s.shopping.length > 0 && <button className="icon-btn" onClick={() => setShare(true)} aria-label="Отправить список"><Share2 size={20} /></button>}
@@ -149,7 +150,7 @@ export function Shopping() {
       {toBuy.length > 0 && <PlaceHint id="shopping" className="mt-3" text="Нажмите на продукт, когда положили его в корзину. Смахните влево — удалить." />}
       {/* The shop mode and «Для блюд» side by side: the list itself starts on the first screen. */}
       {(toBuy.length > 0 || dishes.length > 0) && (
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3 flex flex-wrap gap-2">
           {toBuy.length > 0 && <button className="chip chip-on" onClick={() => setStore(true)}><ShoppingBasket size={18} aria-hidden />Я в магазине</button>}
           {dishes.length > 0 && (
             <button className="chip min-w-0" onClick={() => (dishes.length === 1 ? setDish(dishes[0]) : setAllDishes(true))}>
@@ -222,7 +223,7 @@ export function Shopping() {
           {bought.length > 0 && (
             <div ref={bar} className="fixed inset-x-0 z-20 border-t border-line bg-paper/95 backdrop-blur sm:left-20 lg:left-64" style={{ bottom: "var(--nav-h)" }}>
               <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-2.5 sm:px-6 lg:max-w-[1200px] lg:px-8">
-                <button className="btn-primary min-w-0 flex-1 sm:flex-none" onClick={toPantry}><Refrigerator size={18} /><span className="truncate">Куплено {bought.length} · в «Мои продукты»</span></button>
+                <button className="btn-primary min-w-0 flex-1 sm:flex-none" onClick={toPantry}><Refrigerator size={18} /><span className="truncate"><span className="max-[399px]:hidden">Куплено {bought.length} · в «Мои продукты»</span><span className="min-[400px]:hidden">В «Мои продукты» · {bought.length}</span></span></button>
               </div>
             </div>
           )}

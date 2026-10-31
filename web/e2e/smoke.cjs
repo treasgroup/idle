@@ -26,7 +26,7 @@ async function walk(size, mobile) {
   };
 
   console.log(mobile ? "Phone" : "Computer");
-  await page.goto(BASE, { waitUntil: "networkidle" });
+  await page.goto(BASE, { waitUntil: "load" }); await page.waitForTimeout(2500);
   const skip = page.getByRole("button", { name: "Пропустить" });
   if (await skip.count()) await skip.first().click();
   await page.waitForTimeout(600);
@@ -37,10 +37,17 @@ async function walk(size, mobile) {
   await page.getByRole("button", { name: /^Дальше/ }).last().click(); await page.waitForTimeout(400); await must(/Шаг 2 из/, "next step");
   await page.keyboard.press("Escape"); await page.waitForTimeout(600);
   await go("#/chat"); await page.getByRole("textbox").last().fill("курица и картошка"); await page.keyboard.press("Enter"); await page.waitForTimeout(2000); await must(/Открыть рецепт/, "chat answer");
-  await go("#/shopping"); await must(/Список покупок пуст|Осталось купить/, "shopping");
+  await go("#/shopping"); await must(/Список покупок пуст|Покупки.*·/, "shopping");
   await go("#/menu"); await must(/План на неделю/, "plan");
+  // A week plan into the list: one line per product, a tick brings the «в «Мои продукты»» bar.
+  const make = page.getByRole("button", { name: /Составить план/ }); if (await make.count()) { await make.first().click(); await page.waitForTimeout(1200); }
+  await page.getByRole("button", { name: /^В покупки/ }).first().click(); await page.waitForTimeout(800);
+  await go("#/shopping"); await must(/Покупки.*·/, "list from the plan");
+  await page.locator("button[aria-label^='Купить: ']").first().click(); await page.waitForTimeout(500); await must(/«Мои продукты»/, "bought bar");
+  await go("#/chat"); await page.getByRole("textbox").last().fill("яйца морковь готовое пюре"); await page.keyboard.press("Enter"); await page.waitForTimeout(2000); await must(/Из пюре и варёной картошки/, "leftovers answer");
+  await go("#/recipes/r/beef-kholodets"); await page.waitForTimeout(800); await must(/Холодец из говядины/, "new recipe");
   await go("#/pantry"); await must(/Мои продукты/, "my products");
-  await go("#/profile"); await must(/Размер текста/, "profile");
+  await go("#/profile"); await must(/Мои разделы/, "profile");
   await go("#/learn"); await must(/Школа готовки/, "school");
   await browser.close();
 }

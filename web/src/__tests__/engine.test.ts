@@ -1,6 +1,6 @@
 // Checks the engine on the real catalog: every file is valid, requests are understood, the week menu is built.
 import { readFileSync, readdirSync } from "node:fs";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_STATE, buildCatalog, cleanMessage, generateMenu, parseMessage, rankRecipes, recipes, respond, useCatalog, weekDays,
   type Recipe,
@@ -87,10 +87,13 @@ describe("week menu", () => {
       expect(october.filter((t) => /окрошк|холодник|свекольник холодн|гаспачо/i.test(t))).toEqual([]);
       expect(october.filter((t) => odd.test(t)).length).toBeLessThanOrEqual(1);
       expect(october.filter((t) => /(?<![а-яё])паст[аыу](?![а-яё])|спагетти|ризотто|лазань|равиоли|ньокки|карбонар|аранчини|минестроне/i.test(t)).length).toBeLessThanOrEqual(2);
+      // A summer plan is made in summer: Шеф's ranking reads today's month, so the clock is set to July for it.
+      vi.useFakeTimers({ toFake: ["Date"] }); vi.setSystemTime(new Date("2026-07-12T10:00:00"));
       summerCold += titles(generateMenu(week("2026-07-13"), s.preferences, 2, seed, s.menuPlan)).filter((t) => /окрошк|холодник|свекольник холодн|гаспачо/i.test(t)).length;
+      vi.useRealTimers();
     }
     expect(summerCold).toBeGreaterThan(0);
-  });
+  }, 30000); // 80 week menus: slow when the other test files run alongside
 });
 
 describe("receipt import", () => {
