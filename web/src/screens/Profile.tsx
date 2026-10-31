@@ -72,6 +72,7 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const [voice, setVoice] = useState(false);
   const [wiping, setWiping] = useState(false);
   const [feast, setFeast] = useState(false);
+  const [holidays, setHolidays] = useState(false);
   const [calendar, setCalendar] = useState(false);
   const nextDate = byNext(profile.familyDates)[0];
   const [writeUs, setWriteUs] = useState(false);
@@ -201,8 +202,8 @@ export function Profile({ pwa }: { pwa: Pwa }) {
         {!profile.simple && tile(<Refrigerator size={18} />, "Продукты", () => openLayer(routeHash({ tab: "pantry" })), soonFridge > 0 || overdueList(s.freezer ?? []).length > 0)}
         {profile.simple && tile(<ShoppingCart size={18} />, "Покупки", () => openLayer(routeHash({ tab: "shopping" })))}
         {tile(<BookHeart size={18} />, "Семейная книга", () => openRecipesView("mine"))}
-        {tile(<PartyPopper size={18} />, "Праздничный стол", () => setFeast(true))}
-        {tile(<HandPlatter size={18} />, "Складчина", () => openParty())}
+        {/* «Праздничный стол» and «Стол в складчину» under one tile: both are a holiday table. */}
+        {tile(<PartyPopper size={18} />, "Праздники", () => setHolidays(true))}
         {tile(<NotebookPen size={18} />, "Дневник еды", openDiary)}
         {tile(<CalendarHeart size={18} />, "Календарь", () => setCalendar(true), !!nextDate && daysUntil(nextDate) <= AHEAD)}
         {tile(<BookOpenCheck size={18} />, "Я готовил(а)", () => openRecipesView("book"))}
@@ -274,6 +275,20 @@ export function Profile({ pwa }: { pwa: Pwa }) {
       </Sheet>
 
       <FeastSheet open={feast} onClose={() => setFeast(false)} />
+      <Sheet open={holidays} title="Праздники" onClose={() => setHolidays(false)}>
+        <div className="grid gap-2.5">
+          {([
+            [<PartyPopper size={22} />, "Праздничный стол", "Сами готовите на всех: блюда, покупки и когда что начинать", () => { setHolidays(false); setFeast(true); }],
+            [<HandPlatter size={22} />, "Стол в складчину", "Каждый гость приносит своё: ссылка в общий чат, кто что берёт", () => { setHolidays(false); openParty(); }],
+          ] as const).map(([icon, title, hint, go]) => (
+            <button key={title} onClick={go} className="flex min-h-[72px] w-full items-center gap-3 rounded-card border border-line bg-card px-4 py-3 text-left hover:border-line-strong">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-soft text-brand" aria-hidden>{icon}</span>
+              <span className="min-w-0 flex-1"><span className="block text-body font-semibold">{title}</span><span className="mt-0.5 block text-body-sm text-ink-soft">{hint}</span></span>
+              <ChevronRight size={18} className="shrink-0 text-ink-faint" aria-hidden />
+            </button>
+          ))}
+        </div>
+      </Sheet>
       <FamilyCalendarSheet open={calendar} onClose={() => setCalendar(false)} onReminders={() => { setCalendar(false); setSheet("reminders"); }} />
       <WriteUs open={writeUs} onClose={() => setWriteUs(false)} />
       <LookSheet open={look} onClose={() => setLook(false)} />
