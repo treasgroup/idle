@@ -15,7 +15,7 @@ test("sent in the screen's words and amounts", () => {
   expect(text).toContain("• Капуста — 1 кочан");
   expect(text).not.toContain("Репчатый лук");
   expect(text).not.toContain("Соль"); // what is already bought is not sent
-  expect(text).toMatch(/Собрано в «Что приготовить\?»/);
+  expect(text).toMatch(/Собрано в «Шефли»/);
 });
 
 test("Шеф's button is kept with the conversation", () => {

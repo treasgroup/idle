@@ -225,7 +225,7 @@ function WelcomeSide() {
   return (
     <div className="hidden lg:block">
       <Mascot size={200} className="-ml-3" />
-      <p className="mt-4 text-display">Что приготовить?</p>
+      <p className="mt-4 text-display">Шефли</p>
       <p className="mt-3 max-w-md text-body text-ink-soft">Я Шеф. Помогу решить, что приготовить, — из того, что есть дома.</p>
       <ul className="mt-6 grid gap-3 text-body">
         {["Блюдо из ваших продуктов за минуту", "Меню на неделю и список покупок", "Готовка по шагам с таймерами"].map((t) => (

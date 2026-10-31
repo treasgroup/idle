@@ -16,7 +16,7 @@ const inCatalog = (dish: string, titles: string[]) => { const d = norm(dish); re
 
 function spec(theme: Theme, dishes: string[], titles: string[], products: { id: string; name: string }[], batch: string): string {
   return [
-    `Ты составляешь рецепты для сайта и приложения «Что приготовить?». Ими пользуются люди всех возрастов, в том числе пожилые, и готовят прямо с телефона. Сделай ${dishes.length} рецептов для подборки «${theme.title}» — ровно эти блюда:`,
+    `Ты составляешь рецепты для сайта и приложения «Шефли». Ими пользуются люди всех возрастов, в том числе пожилые, и готовят прямо с телефона. Сделай ${dishes.length} рецептов для подборки «${theme.title}» — ровно эти блюда:`,
     ...dishes.map((d, i) => `${i + 1}. ${d}`),
     "",
     "Правила этой подборки:",

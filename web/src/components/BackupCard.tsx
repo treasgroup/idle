@@ -18,7 +18,7 @@ export function BackupCard() {
   const keep = async () => {
     try {
       const code = await sync.code();
-      const text = "Код для «Что приготовить?»: " + code.replace(/(\d{4})(?=\d)/g, "$1 ") + ". На новом телефоне: Профиль → Другое устройство → «Это новое устройство» и ввести код. Или открыть ссылку: " + siteBase() + "#login=" + code;
+      const text = "Код для «Шефли»: " + code.replace(/(\d{4})(?=\d)/g, "$1 ") + ". На новом телефоне: Профиль → Другое устройство → «Это новое устройство» и ввести код. Или открыть ссылку: " + siteBase() + "#login=" + code;
       if (canShare()) { try { await navigator.share({ title: "Код восстановления", text }); close(); return; } catch (e) { if ((e as Error).name === "AbortError") return; } }
       toast((await copyText(text)) ? "Код скопирован — сохраните его себе в заметки или в избранное мессенджера" : "Код: " + code);
       close();

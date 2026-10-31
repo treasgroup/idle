@@ -28,7 +28,7 @@ self.addEventListener("fetch",event=>{
 });
 // Reminders: the push itself is empty; what to show comes from the site's server.
 self.addEventListener("push",event=>{event.waitUntil((async()=>{
- let msg={title:"Что приготовить?",body:"Загляните — идея дня уже ждёт.",url:"./"};
+ let msg={title:"Шефли",body:"Загляните — идея дня уже ждёт.",url:"./"};
  try{const sub=await self.registration.pushManager.getSubscription();if(sub){const r=await fetch(local("api/index.php?r=push.next"),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({endpoint:sub.endpoint})});if(r.ok){const j=await r.json();if(j&&typeof j.body==="string")msg={title:String(j.title||msg.title).slice(0,80),body:j.body.slice(0,240),url:typeof j.url==="string"&&j.url.startsWith("./")?j.url:"./"};}}}catch{/* offline: the general text */}
  await self.registration.showNotification(msg.title,{body:msg.body,icon:local("icons/icon-192.png"),badge:local("icons/icon-192.png"),tag:"cook-reminder",lang:"ru",data:{url:local(msg.url)}});
 })());});

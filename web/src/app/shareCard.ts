@@ -71,7 +71,7 @@ export async function recipeCard(r: Recipe): Promise<Blob | null> {
   // Footer: where to find it.
   ctx.fillStyle = "#B7432F"; ctx.fillRect(0, H - 120, W, 120);
   ctx.fillStyle = "#FFFFFF"; ctx.font = font(600, 40);
-  ctx.fillText("Что приготовить?", 64, H - 46);
+  ctx.fillText("Шефли", 64, H - 46);
   ctx.font = font(400, 34); ctx.textAlign = "right";
   ctx.fillText(siteBase().replace(/^https?:\/\//, "").replace(/\/$/, ""), W - 64, H - 48);
   return new Promise((res) => c.toBlob((b) => res(b), "image/png"));

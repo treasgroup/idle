@@ -20,7 +20,7 @@ export function printPage(title: string, sections: PrintSection[], note?: string
     .big{font-size:19px;line-height:1.55;max-width:900px}.big h1{font-size:32px}.big h2{font-size:22px}.big li{margin:7px 0}
     .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:32px}
     @media print{body{margin:0 auto}}</style></head><body${side?.length ? ' class="big"' : ""}><h1>${esc(title)}</h1>${body}
-    <p class="note">${esc(note ?? "Что приготовить? — " + location.host + location.pathname)}</p>
+    <p class="note">${esc(note ?? "Шефли — " + location.host + location.pathname)}</p>
     <script>window.onload=function(){window.print()}</script></body></html>`;
   const w = window.open("", "_blank");
   if (!w) return;

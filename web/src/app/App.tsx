@@ -368,7 +368,7 @@ function Header({ route, go }: { route: Route; go: (t: Tab) => void }) {
         ) : (
           <button className="-ml-1 flex items-center gap-2.5 rounded-full pr-2" onClick={() => go("home")} aria-label="На главную">
             <Logo size={30} />
-            <span className="text-title">Что приготовить?</span>
+            <span className="text-left"><span className="block text-title leading-tight">Шефли</span><span className="block text-caption leading-tight text-ink-soft">что приготовить?</span></span>
           </button>
         )}
         <span className="flex-1" />
@@ -428,7 +428,7 @@ function Sidebar({ route, go }: { route: Route; go: (t: Tab) => void }) {
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-4 pt-5 lg:flex" aria-label="Меню сайта">
       <button className="flex items-center gap-2.5 rounded-input px-2 py-1 text-left" onClick={() => go("home")}>
         <Logo size={32} />
-        <span className="text-title leading-tight">Что приготовить?</span>
+        <span className="text-left"><span className="block text-title leading-tight">Шефли</span><span className="block text-caption leading-tight text-ink-soft">что приготовить?</span></span>
       </button>
       <nav className="mt-6 grid gap-0.5" aria-label="Разделы">
         {nav.map(({ tab, label, icon }) => {

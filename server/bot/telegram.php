@@ -104,7 +104,7 @@ try {
     if ($text === '' ) { tg('sendMessage', ['chat_id' => $chat, 'text' => 'Напишите, что есть дома: например, «курица, картошка, 30 минут».']); exit; }
     if (preg_match('#^/start#', $text)) {
         tg('sendMessage', ['chat_id' => $chat, 'parse_mode' => 'HTML', 'text' => "Привет! Я подскажу, что приготовить.\n\nНапишите, что есть дома и сколько времени:\n• <i>курица, картошка</i>\n• <i>суп с грибами за 40 минут</i>\n• <i>фарш, рис, без лука</i>\n\nИли нажмите /idea — предложу случайное блюдо.",
-            'reply_markup' => ['inline_keyboard' => [[['text' => 'Открыть «Что приготовить?»', 'url' => seo_abs(seo_path())]]]]]);
+            'reply_markup' => ['inline_keyboard' => [[['text' => 'Открыть «Шефли»', 'url' => seo_abs(seo_path())]]]]]);
         tg_count('visit', '/start');
     } elseif (preg_match('#^/idea#', $text) || bot_is_surprise($text)) {
         $r = bot_random();

@@ -5,7 +5,7 @@
 // Pretty addresses (/cook/recipe/borsch) are used when the hosting runs mod_rewrite (see .htaccess);
 // otherwise recipe.php?id=borsch. Both show the same page with one canonical address.
 
-const SEO_SITE = 'Что приготовить?';
+const SEO_SITE = 'Шефли';
 const SEO_COURSES = ['soup' => ['Супы', 'Суп', 'супов'], 'main' => ['Вторые блюда', 'Второе блюдо', 'вторых блюд'], 'side' => ['Гарниры', 'Гарнир', 'гарниров'],
     'salad' => ['Салаты и закуски', 'Салат', 'салатов и закусок'], 'breakfast' => ['Завтраки', 'Завтрак', 'завтраков'], 'baking' => ['Выпечка', 'Выпечка', 'выпечки'],
     'dessert' => ['Десерты', 'Десерт', 'десертов'], 'snack' => ['Перекусы', 'Перекус', 'перекусов'], 'sauce' => ['Соусы', 'Соус', 'соусов'], 'drink' => ['Напитки', 'Напиток', 'напитков']];
@@ -390,7 +390,7 @@ function seo_recipe_faq(array $r, ?array $kcal, int $servings, ?array $t = null)
         $swaps++;
     }
     if ($kcal) $out[] = ['Сколько калорий в одной порции?', 'Около ' . $kcal['kcal'] . ' ккал: белки ' . $kcal['protein'] . ' г, жиры ' . $kcal['fat'] . ' г, углеводы ' . $kcal['carbs'] . ' г.'];
-    $out[] = ['На сколько порций рассчитан рецепт?', 'На ' . $servings . ' ' . seo_plural($servings, 'порцию', 'порции', 'порций') . '. В приложении «Что приготовить?» продукты пересчитываются на любое число человек.'];
+    $out[] = ['На сколько порций рассчитан рецепт?', 'На ' . $servings . ' ' . seo_plural($servings, 'порцию', 'порции', 'порций') . '. В приложении «Шефли» продукты пересчитываются на любое число человек.'];
     return $out;
 }
 function seo_faq_ld(array $faq): ?array {

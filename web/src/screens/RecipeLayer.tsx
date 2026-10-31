@@ -264,7 +264,7 @@ function RecipeView({ base, onClose }: { base: Recipe; onClose: () => void }) {
   const swapQuestion = firstMissing ? "Чем заменить " + accusative(displayName(firstMissing.id, firstMissing.name)) + "?" : undefined;
   const toggleHave = (id: string) => setHave((h) => (hasIt(id) ? h.filter((x) => !ingredientMatches(id, x)) : [...h, id]));
 
-  useEffect(() => { document.title = base.title + " — Что приготовить?"; return () => { document.title = "Что приготовить?"; }; }, [base.title]);
+  useEffect(() => { document.title = base.title + " — Шефли"; return () => { document.title = "Шефли — что приготовить?"; }; }, [base.title]);
 
   // --dock: the bottom bar's height, so toasts float above it.
   useLayoutEffect(() => {

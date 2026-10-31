@@ -25,7 +25,7 @@ export function InstallSheet({ open, onClose, pwa }: { open: boolean; onClose: (
         {pwa.installed ? (
           <div className={row + " cursor-default hover:border-line"}>
             <span className={mark + " bg-herb-soft text-herb"} aria-hidden><Check size={20} /></span>
-            <span className="min-w-0 flex-1"><span className="block text-body font-semibold">Ярлык уже на экране</span><span className="mt-0.5 block text-body-sm text-ink-soft">Открывайте «Что приготовить?» с рабочего стола</span></span>
+            <span className="min-w-0 flex-1"><span className="block text-body font-semibold">Ярлык уже на экране</span><span className="mt-0.5 block text-body-sm text-ink-soft">Открывайте «Шефли» с рабочего стола</span></span>
           </div>
         ) : where === "ios" ? (
           <div className={row + " cursor-default hover:border-line"}>

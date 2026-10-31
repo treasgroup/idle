@@ -23,7 +23,7 @@ export function planIcs(days: MenuDay[], siteUrl: string): string {
       "DESCRIPTION:" + esc("Рецепт: " + siteUrl + "#/r/" + r.id),
       "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + esc("Пора начинать: " + r.title), "TRIGGER:-PT15M", "END:VALARM", "END:VEVENT");
   });
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Что приготовить?//RU", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR"].join("\r\n");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Шефли//RU", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR"].join("\r\n");
 }
 
 export function downloadIcs(text: string, name = "plan.ics"): void {
