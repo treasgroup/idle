@@ -3485,7 +3485,8 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
     l = Qe(i.only ? F.filter(i.only) : F, o, t, 1 / 0)
       .map((R) => R.recipe)
       .filter((R) => inSeason(R, month))
-      .map((R) => ({ r: R, k: r() }))
+      // In June–August окрошка and холодник come up now and then, not once in ten summer weeks.
+      .map((R) => ({ r: R, k: r() - (month >= 5 && month <= 7 && COLD_SOUP.test(R.title) ? 0.15 : 0) }))
       .sort((R, T) => R.k - T.k)
       .map((R) => R.r),
     u = l.filter((R) => CA(R) && ["main", "soup"].includes(Ne(R))),

@@ -3188,6 +3188,11 @@ var NS = /[жшчщц]$/,
     яйца: "яйцами",
     яйцо: "яйцом",
     филе: "филе",
+    окорочка: "окорочками",
+    окорочок: "окорочком",
+    опята: "опятами",
+    опенок: "опёнком",
+    опёнок: "опёнком",
     кабачок: "кабачком",
     кабачки: "кабачками",
     тунец: "тунцом",
@@ -3496,6 +3501,9 @@ var DS = new Set([
     "яичница",
     "каша",
     "овсянка",
+    // «варенье» is close to the product «варёная сгущёнка»; «квас» is also the product for okroshka.
+    "варенье",
+    "квас",
   ]),
   Zp = null;
 function uD() {
@@ -4172,6 +4180,8 @@ function Qe(e, t, n, a = 3, i = {}) {
           // «суп», «салат» alone: the home kitchen first (борщ, щи, куриный), the Chinese egg soup further down.
           (byName && !t.available.length && HOME_CUISINE.has(p.cuisine) ? 1.5 : 0) +
           said +
+          // «на Новый год»: the New Year table (холодец, тарталетки, салаты) first, not any dish for guests.
+          (i.newYear && p.occasions?.includes("new-year") ? 8 : 0) +
           y.length * 4 -
           S.length * 3 -
           (t.available.length ? v.length : 0) +
@@ -8782,7 +8792,7 @@ function Er(e) {
       w,
       a,
       3,
-      { meal: N, words: wordsOf(t) },
+      { meal: N, words: wordsOf(t), newYear: /нов\S*\s+год|новогодн|(^|\s)нг(\s|$)/i.test(t) },
     );
   if (!R.length && _.length && !F.some(B)) {
     let k = Qe(
