@@ -37,6 +37,8 @@ export default defineConfig({
   build: {
     outDir: previewOut ?? "../server",
     emptyOutDir: false,
+    // Vite 6 builds for Chrome 107+ by default; old phones keep an older WebView, so the Vite 5 range stays.
+    target: ["es2020", "edge88", "firefox78", "chrome87", "safari14"],
     assetsDir: "assets",
     sourcemap: false,
     chunkSizeWarningLimit: 900,
