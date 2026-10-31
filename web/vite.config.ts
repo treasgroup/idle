@@ -28,7 +28,7 @@ const versionedBoot = (): Plugin => ({
   transformIndexHtml: (html) => html.replace('src="./boot.js"', 'src="./boot.js?v=' + fileHash("boot.js") + '"'),
 });
 
-// The site lives in a subfolder (treas.su/cook/), so every path is relative.
+// Every path is relative: the same build works at the site root (shefly.ru) and in a subfolder (the old treas.su/cook/).
 // The build goes straight into ../server — the folder that is uploaded to the hosting.
 export default defineConfig({
   base: "./",
@@ -49,6 +49,6 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: { "/api": { target: process.env.COOK_API ?? "https://treas.su/cook", changeOrigin: true } },
+    proxy: { "/api": { target: process.env.COOK_API ?? "https://shefly.ru", changeOrigin: true } },
   },
 });

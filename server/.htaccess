@@ -7,6 +7,9 @@ AddType text/javascript .js
 
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
+  # The site is HTTPS only (http and www redirect to https://shefly.ru): browsers remember it for a year.
+  # Set on every answer — HTTPS ends at the hosting's nginx, so Apache may not see it; over http browsers ignore it.
+  Header always set Strict-Transport-Security "max-age=31536000"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   # Microphone for voice input, location only for «Погода за окном» → «Определить, где я» (asked only on that tap).
   Header always set Permissions-Policy "microphone=(self), camera=(self), geolocation=(self)"
