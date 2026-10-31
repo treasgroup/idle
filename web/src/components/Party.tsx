@@ -304,7 +304,7 @@ function PartyTable({ token, fresh, onGone }: { token: string; fresh?: boolean; 
         <div className="mt-2 flex flex-wrap gap-1.5">
           {p.guests.filter((g) => g.name || g.key === p.host).map((g) => {
             const cls = cx("rounded-full px-2.5 py-1 text-caption", g.status === "yes" ? "bg-herb-soft text-ink" : g.status === "no" ? "bg-sunken text-ink-faint line-through" : "bg-warn-soft text-ink");
-            const label = <>{guestName(p, g.key)}{g.plus ? " +" + g.plus : ""}{g.key === p.host ? " · организатор" : ""}{g.key === p.me ? " (вы)" : ""}</>;
+            const label = <>{guestName(p, g.key)}{g.plus ? " +" + g.plus : ""}{g.key === p.host && g.name ? " · организатор" : ""}{g.key === p.me ? " (вы)" : ""}</>;
             // A guest the organiser wrote in: a tap edits them.
             return p.admin && g.manual
               ? <button key={g.key} className={cx(cls, "underline decoration-dotted underline-offset-2")} onClick={() => setGuestEdit(g.key)}>{label}</button>

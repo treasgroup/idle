@@ -3555,7 +3555,9 @@ function Mu(e, t, n, a = Date.now(), i = U0) {
         Q = m[M],
         // Not the same meat or fish two days running, nor more than three times a week, while there is a choice.
         fresh = (W) => { let p = proteinOf(W); return !p || (p !== PROT[M] && (protCount[p] || 0) < 3); },
-        ne = Q.filter((W) => G(W) && fresh(W) && (V === null || W.totalMinutes <= V));
+        // Food made for babies («…для детей», «…для малышей») is not a family dinner, while there is a choice.
+        grown = (W) => !/для (детей|малышей|ребёнка|ребенка)/i.test(W.title),
+        ne = Q.filter((W) => G(W) && fresh(W) && grown(W) && (V === null || W.totalMinutes <= V));
       ne.length || (ne = Q.filter((W) => G(W) && (V === null || W.totalMinutes <= V)));
       if (
         (ne.length ||

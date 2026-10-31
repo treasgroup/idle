@@ -55,6 +55,7 @@ export function secondsLeft(t: CookTimer, now = Date.now()): number {
 }
 
 /** Starts a timer; one already running for the same recipe step is replaced. */
+const NOTICES_ALLOWED = "cook-notices-allowed";
 export function startTimer(o: { dish: string; recipeId?: string; step?: number | null; label?: string; seconds: number; phase?: number; ring?: string }): CookTimer {
   const t: CookTimer = {
     id: Math.random().toString(36).slice(2, 10), dish: o.dish, recipeId: o.recipeId, step: o.step ?? null, label: o.label ?? "",
@@ -64,7 +65,9 @@ export function startTimer(o: { dish: string; recipeId?: string; step?: number |
   const rest = current().filter((x) => !(o.recipeId && x.recipeId === o.recipeId && x.step === t.step && t.step != null));
   save([...rest, t]);
   // Asked at the moment it is needed: the first timer, so it can ring with the screen off.
-  if (isNativeApp()) void askNativeNotifications().catch(() => {});
+  // Allowed only now (the first timer asked): the signal of the timer already running is planned again — it was tried
+  // before the answer and failed, so the very first timer did not ring with the app in the background.
+  if (isNativeApp()) void askNativeNotifications().then((ok) => { if (ok) window.dispatchEvent(new Event(NOTICES_ALLOWED)); }).catch(() => {});
   else if ("Notification" in window && Notification.permission === "default") void Notification.requestPermission().catch(() => {});
   return t;
 }
@@ -146,6 +149,12 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
   const list = useTimers();
   const running = list.filter((t) => t.end && !t.rang);
   const nearest = running[0]?.end ?? null;
+  const [allowed, setAllowed] = useState(0);
+  useEffect(() => {
+    const on = () => setAllowed((n) => n + 1);
+    window.addEventListener(NOTICES_ALLOWED, on);
+    return () => window.removeEventListener(NOTICES_ALLOWED, on);
+  }, []);
   useEffect(() => {
     if (!running.length) return;
     const tick = () => {
@@ -195,7 +204,7 @@ export function useTimerAlarm(toast: (msg: string) => void, readAloud: boolean):
       text: (t.label ? "Таймер: " + t.label : "Идёт таймер") + (more > 0 ? " · ещё " + more : ""),
     })?.catch(() => { /* an older app without it */ });
     return () => { cancelNativeTimer(); cook?.countdownHide?.()?.catch(() => {}); };
-  }, [nearest, running.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [nearest, running.length, allowed]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 /** Old builds kept one timer per dish in the cooking state; bring it over once. */
