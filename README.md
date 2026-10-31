@@ -41,7 +41,7 @@ npm run build     # typecheck + сборка в ../server (старые банд
 
 ## Проверки и качество
 
-* `npm test` — 211 проверок движка и экранов на настоящем каталоге (подбор, разбор фраз, меню, покупки, Шеф). `CHEF_BENCH=1 npx vitest run src/__tests__/chefBench.test.ts` — прогон 253 живых запросов к Шефу с отчётом.
+* `npm test` — 211 проверок движка и экранов на настоящем каталоге (подбор, разбор фраз, меню, покупки, Шеф). `CHEF_BENCH=1 npx vitest run src/__tests__/chefBench.test.ts --silent=false` — прогон 253 живых запросов к Шефу с отчётом.
 * GitHub Actions (`.github/workflows/check.yml`) на каждый push: типы TypeScript (`strict`), все тесты, синтаксис PHP и JSON каталога.
 * Сервер: все запросы к SQLite — подготовленные; админка — пароль `password_hash`, сессии в httpOnly/SameSite=Strict cookie, ограничение попыток входа, проверка Origin на изменениях; закрытые папки отдают 403; заголовки CSP, HSTS, nosniff.
 * Известный долг: `web/src/engine/core.js` и `services.js` перенесены из прежней сборки с короткими именами переменных и без проверки типов (`@ts-nocheck`). Наружу движок смотрит через типизированный `engine/index.ts`; переписывать его на читаемые модули — по частям, под защитой тестов.

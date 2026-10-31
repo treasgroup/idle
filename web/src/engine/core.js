@@ -4190,6 +4190,8 @@ function Qe(e, t, n, a = 3, i = {}) {
           // «суп», «салат» alone: the home kitchen first (борщ, щи, куриный), the Chinese egg soup further down.
           (byName && !t.available.length && HOME_CUISINE.has(p.cuisine) ? 1.5 : 0) +
           said +
+          // Said exactly as a recipe's alias («пюре» → the classic mashed potatoes, not the baby apple purée).
+          (i.words?.length && p.aliases?.some((A) => wordsOf(A).join(" ") === i.words.join(" ")) ? 2 : 0) +
           // «на Новый год»: the New Year table (холодец, тарталетки, салаты) first, not any dish for guests.
           (i.newYear && p.occasions?.includes("new-year") ? 8 : 0) +
           y.length * 4 -

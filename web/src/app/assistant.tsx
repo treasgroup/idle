@@ -305,7 +305,9 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       // only what the person does not eat and the kitchen they have.
       const asked = ((patch?.desiredAdd as string[] | undefined) ?? []).filter((d) => d.startsWith("dish:") && !st.conditions.desired.includes(d));
       const hasAsked = (o: typeof out) => o.results.some((m) => asked.some((d) => matchesDish(m.recipe, d)));
-      if (asked.length && !reset && !opts.fresh && !hasAsked(out)) {
+      // «яйца, морковь, готовое пюре»: the leftovers answer (dishes made from mash) is the answer, not a miss of «пюре».
+      const leftovers = out.results.some((m) => m.reason?.startsWith("Из остатков"));
+      if (asked.length && !leftovers && !reset && !opts.fresh && !hasAsked(out)) {
         const clean: Conditions = { ...base(), servings: st.conditions.servings, excluded: st.conditions.excluded, appliances: st.conditions.appliances, health: st.conditions.health };
         let again = turnWith(withGoals(clean));
         if (!hasAsked(again)) again = turnWith(clean);
@@ -313,7 +315,7 @@ export function AssistantProvider({ children, onOpen }: { children: ReactNode; o
       }
       // Still none of it: the dish is in the catalog, but what the person does not eat (or the kitchen) rules it out — say
       // so plainly instead of «не нашлось».
-      if (asked.length && !hasAsked(out) && out.kind !== "talk") {
+      if (asked.length && !leftovers && !hasAsked(out) && out.kind !== "talk") {
         const have = recipes().filter((r) => asked.some((d) => matchesDish(r, d))).length;
         if (have) out.text = "«" + dishLabel(asked[0]) + "» у меня есть" + (have > 1 ? " (" + have + " " + plural(have, "вариант", "варианта", "вариантов") + ")" : "")
           + ", но под ваши условия не подходит — их можно поменять в «Условиях» вверху." + (out.results.length ? " Вот что подходит:" : "");
