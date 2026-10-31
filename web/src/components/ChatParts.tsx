@@ -1,5 +1,5 @@
 // Pieces of the conversation with Шеф: messages, «Условия» (what Шеф takes into account), suggestion cards, mood tiles, the pantry picker.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { ArrowUpRight, X, Search, SlidersHorizontal, Clock, Snowflake, Egg, Soup, Sparkles, Refrigerator, CalendarDays, ShoppingCart, Heart, GraduationCap, UserRound, Home, ChefHat, Type, Moon, Sun, VolumeX, Volume2, Check, PartyPopper, HandPlatter, Leaf, NotebookPen, type LucideIcon } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import { push as openLayer, replace } from "../app/router";
 import { cue } from "../app/feedback";
 import { openParty } from "../app/party";
 import { openDiary } from "../app/diary";
+import { openProfileSheet } from "../app/profileSheet";
 import type { Profile } from "../app/profile";
 import { useActions } from "../app/actions";
 import { useAssistant } from "../app/assistant";
@@ -23,6 +24,15 @@ import { FeastSheet } from "./Feast";
 import { ProductTiles, useFrequent } from "./ProductTiles";
 
 /** One message. Results: the best one big, the rest as rows; follow-up chips only under the last message. */
+/** Шеф's words with a place in the app as a link: «Ограничения» opens the «не ем» list in Профиль. */
+function linked(text: string): ReactNode {
+  const parts = text.split(/(«Ограничения»)/);
+  if (parts.length === 1) return text;
+  return parts.map((p, i) => (p === "«Ограничения»"
+    ? <button key={i} type="button" className="font-semibold text-brand underline decoration-1 underline-offset-2 hover:text-brand-ink" onClick={() => openProfileSheet("limits")}>«Ограничения»</button>
+    : p));
+}
+
 export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; onOption: (o: ChatOption) => void }) {
   const { isFavorite, toggleFavorite, openRecipe } = useActions();
   const a = useAssistant();
@@ -47,11 +57,11 @@ export function Message({ m, last, onOption }: { m: ChatMessage; last: boolean; 
         {m.go
           ? (
             <div className="w-fit max-w-[85%] xl:max-w-[640px] rounded-[20px] rounded-bl-md border border-line bg-card px-4 pb-3 pt-2.5">
-              <p className="whitespace-pre-line text-body">{tidyReply(m.text)}</p>
+              <p className="whitespace-pre-line text-body">{linked(tidyReply(m.text))}</p>
               <GoButton go={m.go} />
             </div>
           )
-          : <p className="w-fit max-w-[85%] xl:max-w-[640px] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{tidyReply(m.text)}</p>}
+          : <p className="w-fit max-w-[85%] xl:max-w-[640px] whitespace-pre-line rounded-[20px] rounded-bl-md border border-line bg-card px-4 py-2.5 text-body">{linked(tidyReply(m.text))}</p>}
         {results[0]?.recipe && (
           <RecipeFeatured recipe={results[0].recipe} note={results[0].why || undefined} onOpen={() => open(results[0].id)}
             onMenu={() => setMenuFor(results[0].id)} onSave={() => toggleFavorite(results[0].recipe!)} saved={isFavorite(results[0].id)} />

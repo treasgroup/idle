@@ -1,5 +1,5 @@
 // «Профиль»: who we cook for, what we don't eat, the kitchen, family and devices, reminders, theme, documents.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Users, Bell, Download, Shield, Trash2, CircleHelp, Volume2, ChevronRight, KeyRound, Link2, Utensils, Target, GraduationCap, Ban, Check, X, Smartphone, QrCode, CalendarDays, Refrigerator, ShoppingCart, BookOpenCheck, Type, PartyPopper, BookHeart, Send, Mic, MessageSquareHeart, Sparkles, CloudSun, CalendarHeart, Heart, Palette, Camera, HandPlatter, Leaf, NotebookPen,
@@ -8,6 +8,7 @@ import {
   LABELS, expiringSoon, ingredientOptions, isNativeApp, plural, qrSvg, searchIngredients, shortName, siteBase, type LegalKey,
 } from "../engine";
 import { useStore } from "../app/store";
+import { OPEN_PROFILE_SHEET, takeProfileSheet, type ProfileSheet } from "../app/profileSheet";
 import { overdueList } from "../app/freezer";
 import { LEGAL_TITLES } from "../engine/legalApi";
 import { useReminders } from "../app/reminders";
@@ -59,6 +60,14 @@ export function Profile({ pwa }: { pwa: Pwa }) {
   const { s, update, profile, setProfile, sync, toast, wipe, server } = useStore();
   const reminders = useReminders();
   const [sheet, setSheet] = useState<null | "goals" | "limits" | "kitchen" | "family" | "login" | "reminders" | "data" | "docs" | "alice">(null);
+  // «Ограничения» from a link in Шеф's answer (app/profileSheet).
+  useEffect(() => {
+    const s0 = takeProfileSheet();
+    if (s0) setSheet(s0);
+    const on = (e: Event) => { takeProfileSheet(); setSheet((e as CustomEvent<ProfileSheet>).detail); };
+    window.addEventListener(OPEN_PROFILE_SHEET, on);
+    return () => window.removeEventListener(OPEN_PROFILE_SHEET, on);
+  }, []);
   const [tour, setTour] = useState(false);
   const [voice, setVoice] = useState(false);
   const [wiping, setWiping] = useState(false);
