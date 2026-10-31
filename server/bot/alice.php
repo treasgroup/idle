@@ -59,13 +59,15 @@ function step_text(array $r, int $n): string {
     }
     return $t;
 }
-function offer(array $list, array $q): void {
+/** `$off`: how many were offered before for the same request («Другие варианты» goes on, never in a circle). */
+function offer(array $list, array $q, int $off = 0): void {
+    if (!$list && $off > 0) say('Других вариантов по этому запросу больше нет. Назовите другие продукты или блюдо, или скажите «удиви меня».', [], ['Удиви меня', 'Курица и картошка', 'Помощь']);
     if (!$list) say(bot_intro($q, 0), [], ['Удиви меня', 'Курица и картошка', 'Что-нибудь быстрое']);
     $titles = array_map(fn($r) => $r['title'], $list);
     $spoken = [];
     foreach ($titles as $k => $t) $spoken[] = ['первое', 'второе', 'третье'][$k] . ' — ' . $t;
     say(bot_intro($q, count($list)) . "\n" . implode("\n", array_map(fn($k, $t) => ($k + 1) . '. ' . $t, array_keys($titles), $titles)) . "\nКакое выберете?",
-        ['list' => array_map(fn($r) => $r['id'], $list), 'q' => $q['text']],
+        ['list' => array_map(fn($r) => $r['id'], $list), 'q' => $q['text'], 'off' => $off + count($list)],
         array_merge(array_map(fn($t) => mb_substr($t, 0, 64, 'UTF-8'), $titles), ['Другие варианты']),
         false, bot_intro($q, count($list)) . ' ' . implode('. ', $spoken) . '. Какое выберете?');
 }
@@ -79,7 +81,10 @@ function choose(array $r): void {
 
 try {
     if ($orig === 'ping') say('pong');
-    $hello = fn() => say('Привет! Скажите, что есть дома, — подберу рецепт и проведу по шагам. Например: «курица и картошка» или «суп за 30 минут».', [], ['Курица и картошка', 'Удиви меня', 'Суп за 30 минут']);
+    // The greeting says who this is, what it does and what to say next (Yandex moderation, 2026-10).
+    $hello = fn() => say('Привет! Я Повар Шефли — помогу решить, что приготовить. Назовите продукты, которые есть дома, например «курица и картошка», — предложу три блюда, назову продукты и проведу по шагам. Не знаете, чего хочется, — скажите «удиви меня». Все команды — по слову «помощь».',
+        [], ['Курица и картошка', 'Удиви меня', 'Помощь'],
+        false, 'Привет! Я Повар Шефли — помогу решить, что приготовить. Назовите продукты, которые есть дома, например: курица и картошка. Я предложу три блюда, назову продукты и проведу по шагам. Не знаете, чего хочется, — скажите: удиви меня. А все команды — по слову «помощь».');
     if (!empty($req['session']['new']) && $cmd === '') {
         alice_count('visit', 'alice');
         // Back after setting Alice's timer (within 12 hours): go on from the same step.
@@ -101,8 +106,18 @@ try {
         if ($mid) say('Хорошо. Когда будете готовы, ' . ($name !== '' ? 'скажите «Алиса, запусти навык ' . $name . '»' : 'позовите меня снова') . ' — продолжу с шага ' . ((int)$state['step'] + 1) . '.', [], [], true);
         say('Приятного аппетита! Возвращайтесь, когда снова встанет вопрос «что приготовить».', [], [], true);
     }
-    if (preg_match('/(помощь|что ты умеешь|что умеешь)/u', $cmd))
-        say('Назовите продукты — например, «фарш и рис без лука» или «быстрый ужин с рыбой». Я предложу три блюда. Выберите одно, и я назову продукты, а потом поведу по шагам: говорите «дальше», «назад» или «повтори». А если назвать код из профиля на сайте, буду знать ваш план, список покупок и морозилку.', $state, ['Удиви меня']);
+    // «Что ты умеешь» — what the skill can do; «помощь» — how to use it, here and now. Different answers: Yandex does not
+    // accept the two helper commands repeating each other.
+    if (preg_match('/(что ты умеешь|что умеешь|что ты можешь|что можешь|о навыке|что это за навык)/u', $cmd))
+        say('Я подбираю домашние рецепты: по продуктам, которые есть дома, по времени — например, «ужин за 30 минут», — или просто наугад. Называю продукты с количеством и веду по шагам, пока вы готовите. А если подключить код из приложения «Что приготовить?», расскажу, что у вас по плану на ужин, прочитаю и поправлю список покупок и подскажу, что лежит в морозилке.',
+            $state, ['Курица и картошка', 'Удиви меня', 'Помощь']);
+    if (preg_match('/(помощь|как пользоваться|какие команды|что говорить|что сказать)/u', $cmd)) {
+        // Cooking right now: the commands of the steps.
+        if (isset($state['rid'])) say('Пока готовим, говорите: «дальше» — следующий шаг, «назад» — предыдущий, «повтори» — ещё раз этот шаг, «продукты» — что нужно и сколько. Чтобы поставить таймер, скажите «хватит», попросите Алису поставить таймер, а потом позовите меня снова — продолжу с того же шага.',
+            $state, (int)($state['step'] ?? -1) < 0 ? ['Начать', 'Повтори продукты'] : ['Дальше', 'Повтори', 'Назад']);
+        say('Как пользоваться: назовите продукты или блюдо — «фарш и рис без лука», «быстрый ужин с рыбой», «хочу борщ». Я предложу три варианта — выберите номером, например «второе». Скажите «начать», и я поведу по шагам: «дальше», «назад», «повтори». Другие варианты — «ещё». Выйти — «хватит».',
+            $state, ['Курица и картошка', 'Удиви меня', 'Что ты умеешь?']);
+    }
 
     // ---------- «Шеф в Алисе»: the family's plan and shopping list (api/_private/alice_home.php) ----------
     $device = alice_device($req);
@@ -119,7 +134,9 @@ try {
         alice_unlink($device);
         say('Хорошо, на этом устройстве ваш план и список покупок больше не видны.', [], ['Удиви меня']);
     }
-    $need = fn() => say('Чтобы я видел ваш план и список покупок, откройте на сайте «Профиль» → «Шеф в Алисе» и скажите: «запомни код» и четыре цифры оттуда.', $state, ['Удиви меня']);
+    // Not linked yet: say how, and offer what works without it (not a dead end).
+    $need = fn() => say('Ваш план, список покупок и морозилку я вижу, когда подключён код из приложения «Что приготовить?» или с сайта shefly.ru: «Профиль» → «Шеф в Алисе», потом скажите мне «запомни код» и четыре цифры. А рецепт подберу и без этого — назовите продукты.',
+        [], ['Курица и картошка', 'Удиви меня', 'Помощь']);
     // «Что на ужин?», «что сегодня готовим», «что по плану на завтра» — not «что приготовить на ужин» (a search).
     $askPlan = !preg_match('/приготов|сготов/u', $cmd) && preg_match('/^(а\s+)?что\s+(у нас\s+|сегодня\s+|завтра\s+|по плану\s+)*(на\s+(ужин|обед|завтрак)|по плану|сегодня|завтра|готовим|едим)/u', $cmd);
     if ($askPlan) {
@@ -215,9 +232,20 @@ try {
         $pick = null;
         foreach ([['перв', 'один', '1'], ['втор', 'два', '2'], ['трет', 'три', '3'], ['четв', 'четыре', '4'], ['пят', 'пять', '5']] as $k => $forms)
             foreach ($forms as $f) if (preg_match('/(^|\s)' . $f . '/u', $cmd)) { $pick = $offered[$k] ?? null; break 2; }
-        if (!$pick) foreach ($offered as $o) { $tw = explode(' ', match_norm($o['title'])); $hits = 0; foreach (explode(' ', $cmd) as $w) foreach ($tw as $x) if (mb_strlen($w, 'UTF-8') >= 4 && match_same($w, $x)) $hits++; if ($hits >= 1 && $hits >= count(array_filter(explode(' ', $cmd), fn($w) => mb_strlen($w, 'UTF-8') >= 4)) / 2) { $pick = $o; break; } }
+        // A button says the whole title: that one. Said in words: the title with the most of them («курица с картошкой
+        // в духовке» picked «…в мультиварке», the first that shared a few words).
+        if (!$pick) foreach ($offered as $o) if (match_norm($o['title']) === $cmd || str_starts_with(match_norm($o['title']), $cmd . ' ') && mb_strlen($cmd, 'UTF-8') >= 20) { $pick = $o; break; }
+        if (!$pick) {
+            $said = array_filter(explode(' ', $cmd), fn($w) => mb_strlen($w, 'UTF-8') >= 4);
+            $best = 0;
+            foreach ($offered as $o) {
+                $tw = explode(' ', match_norm($o['title'])); $hits = 0;
+                foreach ($said as $w) foreach ($tw as $x) if (match_same($w, $x)) { $hits++; break; }
+                if ($hits > $best && $hits >= count($said) / 2) { $best = $hits; $pick = $o; }
+            }
+        }
         if ($pick) choose($pick);
-        if (preg_match('/(другие|ещ[её]|не то|не хочу)/u', $cmd) && isset($state['q'])) { [$list, $q] = bot_search((string)$state['q'], 3, 3); offer($list, $q); }
+        if (preg_match('/(другие|ещ[её]|не то|не хочу)/u', $cmd) && isset($state['q'])) { $off = (int)($state['off'] ?? 3); [$list, $q] = bot_search((string)$state['q'], $off, 3); offer($list, $q, $off); }
     }
 
     if (bot_is_surprise($cmd) || $cmd === '') { $r = bot_random(); if ($r) choose($r); }
