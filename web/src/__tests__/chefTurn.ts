@@ -30,7 +30,8 @@ const MEMORIAL = /кутья|кутью|кути|канун|поминал/i;
 const found = (c: Conditions, limit = 5) => rankRecipes(recipes(), c, prefs, limit + 3).filter((m) => !MEMORIAL.test(m.recipe.title)).slice(0, limit);
 
 type Turn = { kind: string; text: string; results: Match[]; conditions: Conditions; via: string };
-export function turn(text: string): Turn {
+/** `p`: the person's «не ем» and the rest (the default — eats everything). */
+export function turn(text: string, p: typeof prefs = prefs): Turn {
   const nav = navigatorAnswer(text, DEFAULT_STATE, DEFAULT_PROFILE);
   const c0 = { ...DEFAULT_CONDITIONS, servings: 2 };
   if (nav) return { kind: "nav", text: nav.text, results: [], conditions: c0, via: "nav" };
@@ -49,7 +50,7 @@ export function turn(text: string): Turn {
   const method = cookingMethod(text);
   const cleaned = cleanMessage(fixBySound(plainWords(saidWithout(dropDates(method ? method.text : text))), titleSounds()));
   const patch = parseMessage(cleaned, st);
-  const run = (conditions: Conditions) => respond({ message: cleaned, patch, reply: patch.reply, local: true, conditions, preferences: prefs,
+  const run = (conditions: Conditions) => respond({ message: cleaned, patch, reply: patch.reply, local: true, conditions, preferences: p,
     conversation: [], guess: classifyIntent(cleaned), focus: null, voice: false, now: NOW } as Parameters<typeof respond>[0]);
   let out = run(st);
   if (health) Object.assign(out, { kind: "found", text: HEALTH[health].reply, results: out.results.length && out.kind !== "unclear" ? out.results : found({ ...out.conditions, health }) });

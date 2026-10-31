@@ -8160,6 +8160,20 @@ var l_ = 0.6,
     "sick",
     "batch",
   ]);
+// The words that must be there for a guessed wish to be added to products or dishes already found.
+var NEED_CUE = {
+  comfort: /уют|душевн|по-домашн|как у (мам|бабушк)|грустн|тоск|настроен/,
+  quick: /быстр|скор|минут|некогда|спеш|на ходу/,
+  cozy: /уют|тепл|согре|холодн|дожд|мороз|зим|осен/,
+  light: /л[её]гк|диет|худе|похуд|не тяж|полегче|калори|пп\b/,
+  hearty: /сытн|голод|плотн|наесть|поплотн/,
+  fresh: /свеж|овощн|зелен|летн/,
+  spicy: /остр|пикант|жгуч|чили|халапен|огненн/,
+  sweet: /сладк|десерт|вкусняш|к чаю|выпечк|торт|пирожн/,
+  fasting: /пост/,
+  sick: /простыл|просту|болею|болит|заболел|температур|горло|грипп|болезн|насморк/,
+  batch: /впрок|на неделю|на несколько дней|заготов|наготов|на пару дней/,
+};
 function f_(e, t) {
   let n = (a, i) => [...new Set([...a, ...i])];
   return {
@@ -8259,7 +8273,9 @@ function p_(e) {
     }
     return Er(e);
   }
-  if (i && d_.has(a.id)) {
+  // A wish on top of what was found in the words only when the words hint at it: the model alone heard «острое» in
+  // «что приготовить из куриной печени» (0.88) and turned a liver question into one spicy dish with nuts.
+  if (i && d_.has(a.id) && (!NEED_CUE[a.id] || NEED_CUE[a.id].test(_e(e.message)))) {
     let s = tl(a.phrase, e.conditions, za),
       r = f_(e.patch, s);
     return Er({ ...e, patch: r, reply: XS(r, za) });
@@ -8719,7 +8735,7 @@ function Er(e) {
       : (v =
           "«" +
           tn(U) +
-          "» исключено в ваших предпочтениях, поэтому подбираю без этого. Изменить можно в «Профиле» → «Предпочтения в еде». ");
+          "» исключено в ваших предпочтениях, поэтому подбираю без этого. Изменить можно в «Профиле» → «Под меня» → «Ограничения». ");
   }
   let g = r ? Wp(i) : [],
     x = o.getHours(),
@@ -8785,7 +8801,8 @@ function Er(e) {
           ...Y.slice(0, 2),
           { label: "Начать заново", text: "начнём заново" },
         ],
-        kind: "near",
+        // The dish itself, hidden only by «не ем»: found, not «near».
+        kind: U.key === "prefs" ? "found" : "near",
       };
     }
   }
@@ -9124,6 +9141,26 @@ function S_(e, t, n, a) {
         ". Можно приготовить две порции:",
     });
   }
+  // A dish asked by name that only the person's «не ем» hides («Сельдь под шубой» with «не ем рыбу»): show it and say
+  // why, instead of «под эти условия не нашлось» and cottage cheese — they may have tapped «Рыба» on the first visit.
+  if (o.length && (t.excluded.length || t.vegetarian)) {
+    let free = { ...t, excluded: [], vegetarian: !1 },
+      found = Qe(n, e, free, 3, { meal: a });
+    if (found.length) {
+      let block = t.excluded.filter((x) => !Qe(n, e, { ...free, excluded: [x] }, 1, { meal: a }).length).map(tn);
+      t.vegetarian && !Qe(n, e, { ...free, vegetarian: !0 }, 1, { meal: a }).length && block.push("вегетарианское");
+      l.push({
+        key: "prefs",
+        cost: 0.5,
+        cond: e,
+        results: found,
+        text: () =>
+          "Нашёл, но " + (found.length > 1 ? "в этих блюдах" : "в этом блюде") + " есть то, что у вас отмечено «не ем»" +
+          (block.length ? ": " + block.join(", ") : "") +
+          (found.length > 1 ? ". Если сегодня можно — вот они." : ". Если сегодня можно — вот оно.") + " Изменить можно в «Профиле» → «Под меня» → «Ограничения»:",
+      });
+    }
+  }
   for (let S of o)
     l.push({
       key: "desired:" + S,
@@ -9136,7 +9173,7 @@ function S_(e, t, n, a) {
         "» под эти условия не нашлось. Вот что подходит под остальное:",
     });
   let y = l
-    .map((S) => ({ ...S, results: i(S.cond) }))
+    .map((S) => ({ ...S, results: S.results ?? i(S.cond) }))
     .filter((S) => S.results.length)
     .sort((S, w) => S.cost - w.cost);
   if (y.length) {
