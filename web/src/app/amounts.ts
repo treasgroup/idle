@@ -223,13 +223,14 @@ export function mergeSame<T extends RecipeIngredient>(list: T[]): T[] {
 }
 
 /** A shopping row: the name, how much to take, and under it how much is really needed (when that differs). */
-export function shopLine(i: { ingredientId: string; name: string; amount: number; unit: string }): { name: string; text: string; need?: string } {
+/** `pack`: a whole pack is bought for less (a dozen eggs for 2) — then «нужно 200 г» under it matters in the shop. */
+export function shopLine(i: { ingredientId: string; name: string; amount: number; unit: string }): { name: string; text: string; need?: string; pack?: boolean } {
   const q = shopQuantity(i.ingredientId, i.amount, i.unit);
   // The same short name as on the recipe page: «Судак», not «Филе судака сырое без костей».
   const name = q?.name ?? displayName(i.ingredientId, i.name);
   if (q) return { name, text: q.text, need: q.need };
   const pack = packageHint(i.ingredientId, i.amount, i.unit);
-  if (pack) return { name, text: pack, need: "нужно " + formatAmount(i.amount, i.unit) };
+  if (pack) return { name, text: pack, need: "нужно " + formatAmount(i.amount, i.unit), pack: true };
   // Spices and such for a week: «немного», not «0,33 г» — a packet is bought anyway.
   if ((grams(i.unit) || i.unit.trim() === "мл") && i.amount > 0 && i.amount < 10)
     return { name, text: "немного", need: i.amount < 1 ? "на кончике ножа" : "нужно ≈ " + Math.round(i.amount) + " " + i.unit.trim() };
