@@ -23,15 +23,12 @@ import { StoreMode } from "../components/StoreMode";
 
 interface Partner { id: string; label: string; note?: string }
 
-// What nearly every kitchen has: 25 г of flour or 30 г of sour cream is checked at home, not bought.
-const STAPLES = new Set(["wheat-flour", "sugar", "salt", "vegetable-oil", "butter", "sour-cream", "potato-starch", "corn-starch", "breadcrumbs",
-  "table-vinegar-9", "soy-sauce", "tomato-paste", "mayonnaise", "honey", "tomato-ketchup", "prepared-mustard", "baking-powder", "baking-soda",
-  "vanilla-sugar", "cocoa-powder", "milk", "kefir", "semolina"]);
-/** Spices and other pinches, and a little of the staples: most homes have them, so they are checked at home rather than bought. */
-const isPinch = (i: ShoppingItem) => {
-  const g = i.unit === "г" || i.unit === "мл";
-  return (g && i.amount > 0 && i.amount < 5) || (STAPLES.has(i.ingredientId) && ((g && i.amount <= 50) || /^(ч|ст)\. л\.$/.test(i.unit)));
-};
+// What nearly every kitchen has (the owner: salt, sugar, sunflower oil, ground black pepper — flour or sour cream are
+// still bought). A kilo of sugar for jam is bought all the same.
+const STAPLES = new Set(["salt", "sugar", "vegetable-oil", "black-pepper"]);
+/** A little salt, sugar, oil, pepper: checked at home rather than bought. A pinch of cumin or paprika is bought — not every home has it. */
+const isPinch = (i: ShoppingItem) =>
+  STAPLES.has(i.ingredientId) && (((i.unit === "г" || i.unit === "мл") && i.amount <= 100) || /^(ч|ст)\. л\.$/.test(i.unit));
 const products = (n: number) => n + " " + plural(n, "продукт", "продукта", "продуктов");
 
 export function Shopping() {

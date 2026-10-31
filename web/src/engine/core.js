@@ -3029,6 +3029,16 @@ function sD(e, t, n = 2) {
 var SOUND_PAIR = new Set(["шщ", "щш", "жш", "шж", "зс", "сз", "дт", "тд", "бп", "пб", "вф", "фв", "гк", "кг"]),
   RS = new Set("аеиоуыэюя".split("")),
   rD = new Set([
+    // «готовое пюре» was read as «голова» (свиная).
+    "готов",
+    "готовое",
+    "готовая",
+    "готовый",
+    "готовые",
+    // «тесто» is not «тосты».
+    "тест",
+    "тесто",
+    "теста",
     "пост",
     "гост",
     "гостей",
@@ -5324,7 +5334,8 @@ var Nr = [
     },
   ],
   HD =
-    /(остал(ся|ась|ось|ись)|остатк|вчерашн|лишн(ий|яя|ее|ие|его|ей|юю)|ч[её]рств|подсох|куда (деть|девать|пристроить)|не доел|недоел|доесть)/,
+    // «готовое пюре», «готовый рис»: cooked already, the same as left over.
+    /(остал(ся|ась|ось|ись)|остатк|вчерашн|лишн(ий|яя|ее|ие|его|ей|юю)|ч[её]рств|подсох|куда (деть|девать|пристроить)|не доел|недоел|доесть|готов(ое|ая|ый|ые|ого|ой|ую|ых)\s)/,
   VD =
     /(минут|час[аов]?([^а-я]|$)|сыр(ая|ой|ое|ые|ого)|морозил|заморож|фарш|сырой)/;
 function FS(e) {
@@ -5333,7 +5344,8 @@ function FS(e) {
     ? null
     : (Nr.find((n) => n.words.test(t)) ?? null);
 }
-function JS(e, t, n = 4) {
+// `also`: the other products named with the leftovers («яйца, морковь, готовое пюре») — such dishes first.
+function JS(e, t, n = 4, also = []) {
   let a = F.filter(
       (r) =>
         t(r) && r.ingredients.some((o) => !o.optional && e.ids.includes(o.id)),
@@ -5341,8 +5353,10 @@ function JS(e, t, n = 4) {
     i = a.filter((r) => e.best.test(r.title.toLowerCase())),
     s = a
       .filter((r) => !i.includes(r) && r.course !== "soup")
-      .sort((r, o) => r.totalMinutes - o.totalMinutes);
-  return [...i, ...s].slice(0, n);
+      .sort((r, o) => r.totalMinutes - o.totalMinutes),
+    hits = (r) => also.filter((id) => r.ingredients.some((o) => o.id === id)).length;
+  // Only among the dishes made for these leftovers: «оливье» has potato, egg and carrot, but no mash.
+  return [...i.map((r, k) => ({ r, k })).sort((x, y) => hits(y.r) - hits(x.r) || x.k - y.k).map((x) => x.r), ...s].slice(0, n);
 }
 var $S = [
     {
@@ -8365,7 +8379,8 @@ function v_(e) {
   if (a) {
     let x = e.preferences,
       N = { ...rn(x), servings: e.conditions.servings },
-      _ = JS(a, (B) => Qe([B], N, x).length > 0);
+      also = [...(e.patch?.desiredAdd ?? []), ...(e.patch?.availableAdd ?? [])].filter((B) => !B.startsWith("dish:") && !a.ids.includes(B)),
+      _ = JS(a, (B) => Qe([B], N, x).length > 0, 4, also);
     if (_.length)
       return {
         ...n,
